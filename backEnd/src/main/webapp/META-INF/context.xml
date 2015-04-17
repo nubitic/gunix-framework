@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+	<Resource name="jdbc/pippDS" auth="Container" type="javax.sql.DataSource"
+		driverClassName="org.postgresql.Driver" url="jdbc:postgresql://10.75.15.123:7001/pipp"
+		username="pipp" password="loloq123" maxActive="20" maxIdle="10"
+		maxWait="-1" defaultAutoCommit="false" />
+</Context>
