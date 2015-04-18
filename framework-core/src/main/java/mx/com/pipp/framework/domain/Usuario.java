@@ -75,5 +75,10 @@ public class Usuario implements Serializable {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "Usuario [idUsuario=" + idUsuario + ", eliminado=" + eliminado + ", bloqueado=" + bloqueado + ", activo=" + activo + "]";
+	}
 	
 }

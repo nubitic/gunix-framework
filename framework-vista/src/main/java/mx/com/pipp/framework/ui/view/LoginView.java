@@ -16,13 +16,10 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ValoTheme;
 
 @VaadinView(name="",ui=LoginUI.class)
 public class LoginView extends VerticalLayout implements View {
@@ -54,9 +51,7 @@ public class LoginView extends VerticalLayout implements View {
         loginPanel.setSizeUndefined();
         loginPanel.setSpacing(true);
         Responsive.makeResponsive(loginPanel);
-        loginPanel.addStyleName("login-panel");
 
-        loginPanel.addComponent(buildLabels());
         loginPanel.addComponent(buildFields());
         loginPanel.addComponent(rememberMe);
         return loginPanel;
@@ -65,18 +60,15 @@ public class LoginView extends VerticalLayout implements View {
     private Component buildFields() {
         HorizontalLayout fields = new HorizontalLayout();
         fields.setSpacing(true);
-        fields.addStyleName("fields");
 
         username = new TextField("Username");
         username.setIcon(FontAwesome.USER);
-        username.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
 
         password = new PasswordField("Password");
         password.setIcon(FontAwesome.LOCK);
-        password.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
 
         final Button signin = new Button("Sign In");
-        signin.addStyleName(ValoTheme.BUTTON_PRIMARY);
+ 
         signin.setClickShortcut(KeyCode.ENTER);
         signin.focus();
 
@@ -107,23 +99,4 @@ public class LoginView extends VerticalLayout implements View {
         
         return fields;
     }
-
-    private Component buildLabels() {
-        CssLayout labels = new CssLayout();
-        labels.addStyleName("labels");
-
-        Label welcome = new Label("Welcome");
-        welcome.setSizeUndefined();
-        welcome.addStyleName(ValoTheme.LABEL_H4);
-        welcome.addStyleName(ValoTheme.LABEL_COLORED);
-        labels.addComponent(welcome);
-
-        Label title = new Label("Security-Sample");
-        title.setSizeUndefined();
-        title.addStyleName(ValoTheme.LABEL_H3);
-        title.addStyleName(ValoTheme.LABEL_LIGHT);
-        labels.addComponent(title);
-        return labels;
-    }
-
 }
