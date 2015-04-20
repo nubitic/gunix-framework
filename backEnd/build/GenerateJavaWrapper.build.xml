@@ -22,9 +22,9 @@
 		 
 -->	
 	<openlgen openlName="org.openl.xls" userHome="." 
-		srcFile="src/main/resources/mx/com/pipp/reglas/Tutorial_1.xls"
-		deplSrcFile="mx/com/pipp/reglas/Tutorial_1.xls"
-	    targetClass="mx.com.pipp.reglas.Tutorial_1Wrapper"
+		srcFile="src/main/resources/mx/com/gunix/reglas/Tutorial_1.xls"
+		deplSrcFile="mx/com/gunix/reglas/Tutorial_1.xls"
+	    targetClass="mx.com.gunix.reglas.Tutorial_1Wrapper"
 		displayName="Tutorial 1 - Intro to Decision Tables"
 		targetSrcDir="src/main/java">
 	</openlgen>		

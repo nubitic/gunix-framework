@@ -2,19 +2,19 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>mx.com.pipp</groupId>
-		<artifactId>pipp</artifactId>
+		<groupId>mx.com.gunix</groupId>
+		<artifactId>gunix</artifactId>
 		<version>1.0</version>
 	</parent>
 	<artifactId>vista</artifactId>
 	<packaging>war</packaging>
 	<dependencies>
 		<dependency>
-			<groupId>mx.com.pipp</groupId>
+			<groupId>mx.com.gunix</groupId>
 			<artifactId>core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>mx.com.pipp</groupId>
+			<groupId>mx.com.gunix</groupId>
 			<artifactId>framework-vista</artifactId>
 			<version>${project.version}</version>
 		</dependency>

@@ -1,6 +1,6 @@
 package org.vaadin.spring.config;
 
-import mx.com.pipp.framework.vaadin.spring.SpringViewProvider;
+import mx.com.gunix.framework.vaadin.spring.SpringViewProvider;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;

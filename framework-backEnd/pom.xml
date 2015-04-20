@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>mx.com.pipp</groupId>
-    <artifactId>pipp</artifactId>
-    <version>1.0</version>
-  </parent>
+	<parent>
+		<groupId>mx.com.gunix</groupId>
+		<artifactId>gunix</artifactId>
+		<version>1.0</version>
+	</parent>
 	<artifactId>framework-backEnd</artifactId>
 	<properties>
 		<openl.version>5.14.0</openl.version>
@@ -13,7 +13,7 @@
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>mx.com.pipp</groupId>
+			<groupId>mx.com.gunix</groupId>
 			<artifactId>framework-core</artifactId>
 		</dependency>
 		<dependency>
@@ -37,10 +37,10 @@
 			<version>${openl.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.openl</groupId>
-		    <artifactId>org.openl.conf.ant</artifactId>
-		    <version>${openl.version}</version>
-		    <scope>provided</scope>
+			<groupId>org.openl</groupId>
+			<artifactId>org.openl.conf.ant</artifactId>
+			<version>${openl.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mybatis</groupId>
@@ -83,6 +83,10 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-acl</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 		</dependency>
@@ -112,9 +116,9 @@
 			<version>3.1.4</version>
 		</dependency>
 		<dependency>
-		    <groupId>net.sf.dozer</groupId>
-		    <artifactId>dozer</artifactId>
-		    <version>${dozer.version}</version>
+			<groupId>net.sf.dozer</groupId>
+			<artifactId>dozer</artifactId>
+			<version>${dozer.version}</version>
 		</dependency>
 	</dependencies>
 </project>
