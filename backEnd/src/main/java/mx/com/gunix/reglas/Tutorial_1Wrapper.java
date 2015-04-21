@@ -94,15 +94,14 @@ public class Tutorial_1Wrapper implements org.openl.main.OpenLWrapper,org.openl.
 
 
 
-  static org.openl.types.IOpenMethod hello2_Method;
-  public java.lang.String hello2(int hour)  {
+  static org.openl.types.IOpenMethod hello1_Method;
+  public void hello1(int hour)  {
     Object[] __params = new Object[1];
     __params[0] = new Integer(hour);
     try
     {
     Object __myInstance = __instance;
-    Object __res = hello2_Method.invoke(__myInstance, __params, __env.get());
-   return (java.lang.String)__res;  }
+    hello1_Method.invoke(__myInstance, __params, __env.get());  }
   catch(Throwable t)
   {
     Log.error("Java Wrapper execution error:", t);
@@ -112,14 +111,15 @@ public class Tutorial_1Wrapper implements org.openl.main.OpenLWrapper,org.openl.
   }
 
 
-  static org.openl.types.IOpenMethod hello1_Method;
-  public void hello1(int hour)  {
+  static org.openl.types.IOpenMethod hello2_Method;
+  public java.lang.String hello2(int hour)  {
     Object[] __params = new Object[1];
     __params[0] = new Integer(hour);
     try
     {
     Object __myInstance = __instance;
-    hello1_Method.invoke(__myInstance, __params, __env.get());  }
+    Object __res = hello2_Method.invoke(__myInstance, __params, __env.get());
+   return (java.lang.String)__res;  }
   catch(Throwable t)
   {
     Log.error("Java Wrapper execution error:", t);
@@ -154,9 +154,9 @@ public synchronized void  reload(){reset();__init();__instance = __class.newInst
     __class = wrapper.getOpenClassWithErrors();
    // __env.set(wrapper.getEnv());
 
-    hello2_Method = __class.getMatchingMethod("hello2", new IOpenClass[] {
-      OpenClassHelper.getOpenClass(__class, int.class)});
     hello1_Method = __class.getMatchingMethod("hello1", new IOpenClass[] {
+      OpenClassHelper.getOpenClass(__class, int.class)});
+    hello2_Method = __class.getMatchingMethod("hello2", new IOpenClass[] {
       OpenClassHelper.getOpenClass(__class, int.class)});
 
     __initialized=true;

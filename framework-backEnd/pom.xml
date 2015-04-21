@@ -7,10 +7,6 @@
 		<version>1.0</version>
 	</parent>
 	<artifactId>framework-backEnd</artifactId>
-	<properties>
-		<openl.version>5.14.0</openl.version>
-		<dozer.version>5.5.1</dozer.version>
-	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>mx.com.gunix</groupId>
@@ -119,6 +115,15 @@
 			<groupId>net.sf.dozer</groupId>
 			<artifactId>dozer</artifactId>
 			<version>${dozer.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjtools</artifactId>
 		</dependency>
 	</dependencies>
 </project>

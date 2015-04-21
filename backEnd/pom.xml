@@ -18,6 +18,12 @@
 			<artifactId>framework-backEnd</artifactId>
 			<version>1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.openl</groupId>
+			<artifactId>org.openl.conf.ant</artifactId>
+			<version>${openl.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>mx.com.gunix</groupId>
-    <artifactId>gunix</artifactId>
-    <version>1.0</version>
-  </parent>
+	<parent>
+		<groupId>mx.com.gunix</groupId>
+		<artifactId>gunix</artifactId>
+		<version>1.0</version>
+	</parent>
 	<artifactId>framework-vista</artifactId>
 	<repositories>
 		<repository>
@@ -13,10 +13,6 @@
 			<url>http://maven.vaadin.com/vaadin-addons</url>
 		</repository>
 	</repositories>
-	<properties>
-		<vaadin.version>7.4.3</vaadin.version>
-		<vaadin-spring.version>0.0.5.RELEASE</vaadin-spring.version>
-	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>mx.com.gunix</groupId>
@@ -55,10 +51,10 @@
 			<version>${vaadin-spring.version}</version>
 		</dependency>
 		<dependency>
-            <groupId>org.vaadin.spring</groupId>
-            <artifactId>spring-vaadin-mvp</artifactId>
-            <version>${vaadin-spring.version}</version>
-        </dependency>
+			<groupId>org.vaadin.spring</groupId>
+			<artifactId>spring-vaadin-mvp</artifactId>
+			<version>${vaadin-spring.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-server</artifactId>
@@ -94,14 +90,181 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
-			<dependency>
-				<groupId>org.aspectj</groupId>
-				<artifactId>aspectjrt</artifactId>
-				<scope>runtime</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.aspectj</groupId>
-				<artifactId>aspectjtools</artifactId>
-			</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjtools</artifactId>
+		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.4.0</version>
+				<executions>
+					<execution>
+						<id>tests-valo</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<classpathScope>compile</classpathScope>
+							<mainClass>com.vaadin.sass.SassCompiler</mainClass>
+							<arguments>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/tests-valo/styles.scss</argument>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/tests-valo/styles.css</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>tests-valo-blueprint</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<classpathScope>compile</classpathScope>
+							<mainClass>com.vaadin.sass.SassCompiler</mainClass>
+							<arguments>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/tests-valo-blueprint/styles.scss</argument>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/tests-valo-blueprint/styles.css</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>tests-valo-dark</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<classpathScope>compile</classpathScope>
+							<mainClass>com.vaadin.sass.SassCompiler</mainClass>
+							<arguments>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/tests-valo-dark/styles.scss</argument>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/tests-valo-dark/styles.css</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>tests-valo-facebook</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<classpathScope>compile</classpathScope>
+							<mainClass>com.vaadin.sass.SassCompiler</mainClass>
+							<arguments>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/tests-valo-facebook/styles.scss</argument>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/tests-valo-facebook/styles.css</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>tests-valo-flat</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<classpathScope>compile</classpathScope>
+							<mainClass>com.vaadin.sass.SassCompiler</mainClass>
+							<arguments>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/tests-valo-flat/styles.scss</argument>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/tests-valo-flat/styles.css</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>tests-valo-flatdark</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<classpathScope>compile</classpathScope>
+							<mainClass>com.vaadin.sass.SassCompiler</mainClass>
+							<arguments>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/tests-valo-flatdark/styles.scss</argument>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/tests-valo-flatdark/styles.css</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>tests-valo-light</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<classpathScope>compile</classpathScope>
+							<mainClass>com.vaadin.sass.SassCompiler</mainClass>
+							<arguments>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/tests-valo-light/styles.scss</argument>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/tests-valo-light/styles.css</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>tests-valo-metro</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<classpathScope>compile</classpathScope>
+							<mainClass>com.vaadin.sass.SassCompiler</mainClass>
+							<arguments>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/tests-valo-metro/styles.scss</argument>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/tests-valo-metro/styles.css</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.codehaus.mojo
+										</groupId>
+										<artifactId>
+											exec-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.4.0,)
+										</versionRange>
+										<goals>
+											<goal>java</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 </project>

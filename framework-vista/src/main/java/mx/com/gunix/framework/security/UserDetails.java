@@ -15,14 +15,18 @@ public class UserDetails extends Usuario implements org.springframework.security
 	private List<SimpleGrantedAuthority> autorities = new ArrayList<SimpleGrantedAuthority>();
 
 	public UserDetails(Usuario usuario) {
-		if(usuario.getRoles()!=null){
-			usuario.getRoles()
+		if(usuario.getAplicaciones()!=null){
+			usuario.getAplicaciones()
 						.stream()
-						.forEach(rol->{
-							autorities.add(new SimpleGrantedAuthority(rol.getIdRol()));
+						.forEach(aplicacion->{
+							aplicacion.getRoles()
+										.stream()
+										.forEach(rol->{
+											autorities.add(new SimpleGrantedAuthority(rol.getIdRol()));
+										});
 						});
 		}
-		setRoles(usuario.getRoles());
+		setAplicaciones(usuario.getAplicaciones());
 		setIdUsuario(usuario.getIdUsuario());
 		setPassword(usuario.getPassword());
 		setEliminado(usuario.isEliminado());

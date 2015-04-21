@@ -10,7 +10,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.UI;
 
 @VaadinUI
-@Theme("valo")
+@Theme("tests-valo-facebook")
 public class MainUI  extends UI {
 	private static final long serialVersionUID = 1L;
 

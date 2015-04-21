@@ -6,19 +6,18 @@ import java.util.List;
 public class Usuario implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	private List<Rol> roles;
+	private List<Aplicacion> aplicaciones;
 	private String idUsuario;
 	private String password;
 	private boolean eliminado;
 	private boolean bloqueado;
 	private boolean activo;
 	
-	public List<Rol> getRoles() {
-		return roles;
+	public List<Aplicacion> getAplicaciones() {
+		return aplicaciones;
 	}
-	
-	public void setRoles(List<Rol> roles) {
-		this.roles = roles;
+	public void setAplicaciones(List<Aplicacion> aplicaciones) {
+		this.aplicaciones = aplicaciones;
 	}
 	public String getIdUsuario() {
 		return idUsuario;

@@ -54,41 +54,47 @@ public class UsuarioMapperInterceptor implements Interceptor {
 	
 	private void jerarquizaFunciones(Usuario usuario){
 		Objects.requireNonNull(usuario);
-		Objects.requireNonNull(usuario.getRoles());
-		usuario.getRoles()
-					.parallelStream()
-					.forEach(rol->{
-						Objects.requireNonNull(rol.getModulos());
-						rol.getModulos()
-								.parallelStream()
-								.forEach(modulo->{
-									Objects.requireNonNull(modulo.getFunciones());
-									List<Funcion> funcionesReacomodadas = new ArrayList<Funcion>();
-									modulo.getFunciones()
-												.stream()
-												.forEach(funcion->{
-													funcion.setModulo(modulo);
-													if(funcion.getPadre()!=null){
-														Optional<Funcion> padre = modulo.getFunciones()
-																							.stream()
-																							.filter(posiblePadre-> (posiblePadre.getIdFuncion().equals(funcion.getPadre().getIdFuncion())))
-																							.findFirst();
-														padre.ifPresent(p-> {
-															funcion.setPadre(p);
-															List<Funcion> hijas = p.getHijas();
-															if(hijas==null){
-																p.setHijas((hijas=new ArrayList<Funcion>()));
-															}
-															hijas.add(funcion);
-															funcionesReacomodadas.add(funcion);
-														});
-													}
-												});
-									modulo.setFunciones(modulo.getFunciones()
-																	.stream()
-																	.filter(funcion->(!funcionesReacomodadas.contains(funcion)))
-																	.collect(Collectors.toList()));
-								});
-					});
+		Objects.requireNonNull(usuario.getAplicaciones());
+		usuario.getAplicaciones()
+				.parallelStream()
+				.forEach(aplicacion->{
+						Objects.requireNonNull(aplicacion.getRoles());
+						aplicacion.getRoles()
+						.parallelStream()
+						.forEach(rol->{
+							Objects.requireNonNull(rol.getModulos());
+							rol.setAplicacion(aplicacion);
+							rol.getModulos()
+									.parallelStream()
+									.forEach(modulo->{
+										Objects.requireNonNull(modulo.getFunciones());
+										List<Funcion> funcionesReacomodadas = new ArrayList<Funcion>();
+										modulo.getFunciones()
+													.stream()
+													.forEach(funcion->{
+														funcion.setModulo(modulo);
+														if(funcion.getPadre()!=null){
+															Optional<Funcion> padre = modulo.getFunciones()
+																								.stream()
+																								.filter(posiblePadre-> (posiblePadre.getIdFuncion().equals(funcion.getPadre().getIdFuncion())))
+																								.findFirst();
+															padre.ifPresent(p-> {
+																funcion.setPadre(p);
+																List<Funcion> hijas = p.getHijas();
+																if(hijas==null){
+																	p.setHijas((hijas=new ArrayList<Funcion>()));
+																}
+																hijas.add(funcion);
+																funcionesReacomodadas.add(funcion);
+															});
+														}
+													});
+										modulo.setFunciones(modulo.getFunciones()
+																		.stream()
+																		.filter(funcion->(!funcionesReacomodadas.contains(funcion)))
+																		.collect(Collectors.toList()));
+									});
+						});
+				});
 	}
 }

@@ -7,8 +7,9 @@ public class Rol implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private String idRol;
+	private String descripcion;
+	private Aplicacion aplicacion;
 	private List<Modulo> modulos;
-
 	
 	public String getIdRol() {
 		return idRol;
@@ -22,7 +23,19 @@ public class Rol implements Serializable {
 	public void setModulos(List<Modulo> modulos) {
 		this.modulos = modulos;
 	}
-
+	public String getDescripcion() {
+		return descripcion;
+	}
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+	
+	public Aplicacion getAplicacion() {
+		return aplicacion;
+	}
+	public void setAplicacion(Aplicacion aplicacion) {
+		this.aplicacion = aplicacion;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
