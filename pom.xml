@@ -6,13 +6,12 @@
 	<version>1.0</version>
 	<packaging>pom</packaging>
 	<modules>
-		<module>framework-core</module>
+		<module>framework-commons</module>
 		<module>framework-vista</module>
 		<module>framework-backEnd</module>
 		<module>core</module>
 		<module>vista</module>
 		<module>backEnd</module>
-    <module>spring-hessian</module>
   </modules>
 
 	<properties>
@@ -49,7 +48,7 @@
 			</dependency>
 			<dependency>
 				<groupId>mx.com.gunix</groupId>
-				<artifactId>framework-core</artifactId>
+				<artifactId>framework-commons</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

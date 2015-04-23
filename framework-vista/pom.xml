@@ -16,7 +16,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>mx.com.gunix</groupId>
-			<artifactId>framework-core</artifactId>
+			<artifactId>framework-commons</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
