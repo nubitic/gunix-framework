@@ -1,29 +1,18 @@
 package mx.com.gunix.framework.config;
 
-import mx.com.gunix.service.ActivitiService;
-import mx.com.gunix.service.UsuarioService;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.remoting.caucho.HessianProxyFactoryBean;
+
+import com.hunteron.api.HessianClientScannerConfigurer;
+import com.hunteron.core.Hessian;
 
 @Configuration
-public class FrameworkClientServiceConfig {
-	
+public class FrameworkClientServiceConfig {	
 	@Bean
-	public HessianProxyFactoryBean usuarioService(){
-		HessianProxyFactoryBean hessianProxy = new HessianProxyFactoryBean();
-		hessianProxy.setServiceInterface(UsuarioService.class);
-		hessianProxy.setServiceUrl("http://localhost:8080/backEnd/usuarioService");
-		return hessianProxy;
+	public HessianClientScannerConfigurer hessianClientScannerConfigurer(){
+		HessianClientScannerConfigurer hcsc = new HessianClientScannerConfigurer();
+		hcsc.setAnnotationClass(Hessian.class);
+		hcsc.setBasePackage("mx.com.gunix.**.service");
+		return hcsc;
 	}
-	
-	@Bean
-	public HessianProxyFactoryBean activitiService(){
-		HessianProxyFactoryBean hessianProxy = new HessianProxyFactoryBean();
-		hessianProxy.setServiceInterface(ActivitiService.class);
-		hessianProxy.setServiceUrl("http://localhost:8080/backEnd/activitiService");
-		return hessianProxy;
-	}
-
 }

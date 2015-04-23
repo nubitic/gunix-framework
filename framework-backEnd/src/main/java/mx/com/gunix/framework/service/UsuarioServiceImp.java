@@ -2,7 +2,7 @@ package mx.com.gunix.framework.service;
 
 import mx.com.gunix.framework.domain.Usuario;
 import mx.com.gunix.framework.domain.persistence.UsuarioMapper;
-import mx.com.gunix.service.UsuarioService;
+import mx.com.gunix.framework.service.UsuarioService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>mx.com.gunix</groupId>
 	<artifactId>gunix</artifactId>
@@ -12,7 +12,8 @@
 		<module>core</module>
 		<module>vista</module>
 		<module>backEnd</module>
-	</modules>
+    <module>spring-hessian</module>
+  </modules>
 
 	<properties>
 		<javac.path>${JAVA_1_8_HOME}/bin/javac</javac.path>

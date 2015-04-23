@@ -3,7 +3,7 @@ package mx.com.gunix.framework.service;
 import java.util.Map;
 import java.util.Optional;
 
-import mx.com.gunix.service.ActivitiService;
+import mx.com.gunix.framework.service.ActivitiService;
 
 import org.activiti.engine.FormService;
 import org.activiti.engine.IdentityService;

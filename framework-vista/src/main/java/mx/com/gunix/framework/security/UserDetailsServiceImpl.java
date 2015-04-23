@@ -1,6 +1,6 @@
 package mx.com.gunix.framework.security;
 
-import mx.com.gunix.service.UsuarioService;
+import mx.com.gunix.framework.service.UsuarioService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;

@@ -5,10 +5,13 @@ import java.util.Arrays;
 import javax.annotation.PostConstruct;
 
 import mx.com.gunix.framework.domain.Usuario;
+import mx.com.gunix.framework.service.ActivitiService;
 import mx.com.gunix.framework.ui.component.Header;
 import mx.com.gunix.framework.ui.view.SecuredView;
 import mx.com.gunix.ui.MainUI;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.vaadin.spring.navigator.annotation.VaadinView;
 
@@ -23,7 +26,11 @@ import com.vaadin.ui.VerticalLayout;
 
 @VaadinView(name="",ui=MainUI.class)
 public class MenuView extends VerticalLayout implements SecuredView{
-
+	
+	@Autowired
+	@Lazy
+	ActivitiService as;
+	
 	private static final long serialVersionUID = 1;
 	private String[] themes = { "valo", "tests-valo-blueprint","tests-valo-dark","tests-valo-facebook","tests-valo-flat","tests-valo-flatdark","tests-valo-light","tests-valo-metro"};
 	private TabSheet aplicacionesTab;
@@ -70,7 +77,7 @@ public class MenuView extends VerticalLayout implements SecuredView{
 		u.getAplicaciones()
 					.stream()
 					.forEach(aplicacion->{
-						aplicacionesTab.addTab(new Header(aplicacion), aplicacion.getDescripcion());
+						aplicacionesTab.addTab(new Header(as,aplicacion), aplicacion.getDescripcion());
 					});
 		
 
