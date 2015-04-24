@@ -1,5 +1,11 @@
 package com.hunteron.core;
-
+/**
+ * hessian
+ * 
+ * @author rocca.peng@hunteron.com
+ * @Description
+ * @Date 2015
+ */
 public enum Context {
 	HOST("backEnd.host");
 	private String backEndHost;

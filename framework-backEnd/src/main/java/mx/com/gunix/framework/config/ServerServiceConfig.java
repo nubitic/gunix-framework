@@ -4,6 +4,7 @@ import mx.com.gunix.framework.service.ActivitiService;
 import mx.com.gunix.framework.service.ActivitiServiceImp;
 import mx.com.gunix.framework.service.UsuarioService;
 import mx.com.gunix.framework.service.UsuarioServiceImp;
+import mx.com.gunix.framework.service.hessian.spring.HessianServerScannerConfigurer;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -11,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import com.hunteron.api.HessianServerScannerConfigurer;
 import com.hunteron.core.Hessian;
 
 @Configuration

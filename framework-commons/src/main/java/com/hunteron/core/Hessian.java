@@ -1,5 +1,11 @@
 package com.hunteron.core;
-
+/**
+ * hessian
+ * 
+ * @author rocca.peng@hunteron.com
+ * @Description
+ * @Date 2015
+ */
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -6,10 +6,8 @@ import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.Authentication;
 
-import com.vaadin.navigator.View;
+public class RolAccessDecisionVoter implements AccessDecisionVoter<Object> {
 
-public class RolAccessDecisionVoter implements AccessDecisionVoter<View> {
-	
 	@Override
 	public boolean supports(ConfigAttribute attribute) {
 		return true;
@@ -21,7 +19,7 @@ public class RolAccessDecisionVoter implements AccessDecisionVoter<View> {
 	}
 
 	@Override
-	public int vote(Authentication authentication, View view, Collection<ConfigAttribute> attributes) {
+	public int vote(Authentication authentication, Object securedObject, Collection<ConfigAttribute> attributes) {
 		return ACCESS_GRANTED;
 	}
 

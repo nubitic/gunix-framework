@@ -150,7 +150,7 @@ public class Header extends CustomComponent {
 					}else{
 						nvoPadre = padre.addItem(funcion.getTitulo(), 
 								selectedItem->{
-									as.iniciaProceso("", "", null, "");
+									as.iniciaProceso("", null, "");
 									Notification.show(funcion.getDescripcion());
 								});
 					}

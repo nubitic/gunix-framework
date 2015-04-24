@@ -1,9 +1,10 @@
 package mx.com.gunix.framework.config;
 
+import mx.com.gunix.framework.service.hessian.spring.HessianClientScannerConfigurer;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.hunteron.api.HessianClientScannerConfigurer;
 import com.hunteron.core.Hessian;
 
 @Configuration
