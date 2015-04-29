@@ -1,10 +1,15 @@
 package mx.com.gunix.framework.service;
 
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+
+import mx.com.gunix.framework.security.PersistentRememberMeToken;
+import mx.com.gunix.framework.security.domain.Usuario;
+
 import com.hunteron.core.Hessian;
 
-import mx.com.gunix.framework.domain.Usuario;
-
 @Hessian("/usuarioService")
-public interface UsuarioService {
+public interface UsuarioService extends PersistentTokenRepository{
 	public Usuario getUsuario(String idUsuario);
+
+	void createNewToken(PersistentRememberMeToken token);
 }

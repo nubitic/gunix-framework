@@ -1,9 +1,15 @@
 package mx.com.gunix.framework.service;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import mx.com.gunix.framework.domain.Usuario;
+import mx.com.gunix.framework.processes.domain.Instancia;
+import mx.com.gunix.framework.processes.domain.Tarea;
+import mx.com.gunix.framework.processes.domain.Variable;
+import mx.com.gunix.framework.security.domain.Usuario;
 
 import org.activiti.engine.FormService;
 import org.activiti.engine.IdentityService;
@@ -33,26 +39,88 @@ public class ActivitiServiceImp implements ActivitiService {
 	FormService fs;
 
 	@Override
-	public Map<String, Object> completeTask(String processInstaceId, Map<String, Object> variables, String comentario) {
-		String taskId = ts.createTaskQuery().active().processInstanceId(processInstaceId).singleResult().getId();
+	public Instancia completaTarea(Tarea tarea) {
+		String taskId = tarea.getId();
 		ts.claim(taskId, ((Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getIdUsuario());
-		Optional.ofNullable(comentario).ifPresent(comment -> {
-			ts.addComment(taskId, processInstaceId, comment);
+		Optional.ofNullable(tarea.getComentario()).ifPresent(comment -> {
+			ts.addComment(taskId, tarea.getInstancia().getId(), comment);
 		});
-		ts.complete(taskId, variables);
-		return variables;
+		Map<String, Object>[] variablesMaps = toMap(tarea.getVariables());
+		Map<String, Object> variablesProcesoMap = variablesMaps[Variable.Scope.PROCESO.ordinal()];
+		if (!variablesProcesoMap.isEmpty()) {
+			rs.setVariables(tarea.getInstancia().getId(), variablesProcesoMap);
+		}
+		ts.complete(taskId, variablesMaps[Variable.Scope.TAREA.ordinal()]);
+		tarea.getInstancia().setTareaActual(getCurrentTask(tarea.getInstancia().getId()));
+		if(tarea.getInstancia().getTareaActual()==null){
+			tarea.getInstancia().setTareaActual(Tarea.DEFAULT_END_TASK);
+		}else{
+			tarea.getInstancia().getTareaActual().setInstancia(tarea.getInstancia());	
+		}
+		return tarea.getInstancia();
+	}
+
+	@SuppressWarnings("unchecked")
+	private Map<String, Object>[] toMap(List<Variable> variables) {
+		Map<String, Object> variablesProcesoMap = new HashMap<String, Object>();
+		Map<String, Object> variablesTareaMap = new HashMap<String, Object>();
+		Optional.ofNullable(variables).ifPresent(vars -> {
+			vars.stream().forEach(variable -> {
+				switch (variable.getScope()) {
+				case PROCESO:
+					variablesProcesoMap.put(variable.getNombre(), variable.getValor());
+					break;
+				case TAREA:
+					variablesTareaMap.put(variable.getNombre(), variable.getValor());
+					break;
+				}
+			});
+		});
+		Map<String, Object>[] variablesMaps = new Map[2];
+		variablesMaps[Variable.Scope.PROCESO.ordinal()] = variablesProcesoMap;
+		variablesMaps[Variable.Scope.TAREA.ordinal()] = variablesTareaMap;
+		return variablesMaps;
 	}
 
 	@Override
-	public String iniciaProceso(String processKey, Map<String, Object> variables, String comentario) {
-		is.setAuthenticatedUserId(((Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getIdUsuario());
-		ProcessInstance pi = rs.startProcessInstanceByKey(processKey, variables);
-		Task task = ts.createTaskQuery().active().processInstanceId(pi.getProcessInstanceId()).singleResult();
-		Optional.ofNullable(comentario).ifPresent(comment -> {
-			ts.addComment(null, pi.getProcessInstanceId(), comment);
-		});
-		TaskFormData fd = fs.getTaskFormData(task.getId());
-		is.setAuthenticatedUserId(null);
-		return fd.getFormKey();
+	public Instancia iniciaProceso(String processKey, List<Variable> variables, String comentario) {
+		Instancia instancia = null;
+		try {
+			String usuario = ((Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getIdUsuario();
+			is.setAuthenticatedUserId(usuario);
+			ProcessInstance pi = rs.startProcessInstanceByKey(processKey, toMap(variables)[Variable.Scope.PROCESO.ordinal()]);
+			Optional.ofNullable(comentario).ifPresent(comment -> {
+				ts.addComment(null, pi.getProcessInstanceId(), comment);
+			});
+
+			instancia = new Instancia();
+			instancia.setId(pi.getId());
+			instancia.setComentario(comentario);
+			instancia.setProcessKey(pi.getBusinessKey());
+			instancia.setUsuario(usuario);
+			instancia.setVariables(Collections.unmodifiableList(variables));
+
+			Tarea currTask = getCurrentTask(pi.getId());
+			currTask.setInstancia(instancia);
+			instancia.setTareaActual(currTask);
+		} finally {
+			is.setAuthenticatedUserId(null);
+		}
+		return instancia;
+	}
+
+	private Tarea getCurrentTask(String piid) {
+		Tarea tarea = null;
+		Task task = ts.createTaskQuery().active().processInstanceId(piid).singleResult();
+		if (task != null) {
+			tarea = new Tarea();
+			tarea.setId(task.getId());
+			tarea.setInicio(task.getCreateTime());
+			TaskFormData fd = fs.getTaskFormData(tarea.getId());
+			if (fd != null) {
+				tarea.setVista(fd.getFormKey());
+			}
+		}
+		return tarea;
 	}
 }

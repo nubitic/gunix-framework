@@ -82,9 +82,9 @@ public class HessianSkeleton extends com.caucho.hessian.server.HessianSkeleton {
 		}
 
 		UserDetails ud = (UserDetails) in.readObject(UserDetails.class);
-		if(ud!=null){
-			SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(ud,null,ud.getAuthorities()));
-			}
+		if (ud != null) {
+			SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(ud, null, ud.getAuthorities()));
+		}
 		Object result = null;
 
 		try {
@@ -94,9 +94,11 @@ public class HessianSkeleton extends com.caucho.hessian.server.HessianSkeleton {
 			if (e1 instanceof InvocationTargetException)
 				e1 = ((InvocationTargetException) e).getTargetException();
 
-			out.writeFault("ServiceException", escapeMessage(e1.getMessage()), e1);
+			out.writeFault("ServiceException", escapeMessage(e1.getMessage()), new GunixHessianServiceException(e1));
 			out.close();
 			return;
+		} finally {
+			SecurityContextHolder.getContext().setAuthentication(null);
 		}
 
 		// The complete call needs to be after the invoke to

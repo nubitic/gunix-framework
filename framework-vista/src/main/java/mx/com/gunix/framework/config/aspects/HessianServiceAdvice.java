@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class HessianServiceAdvice {
 	@Around("execution(* net.bytebuddy.generated.*.*(..))")
-	public Object aroundPublicMethodInsideAClassMarkedWithAtHessian(ProceedingJoinPoint pjp){
+	public Object aroundAnyMethodInsideAClassGeneratedByByteBuddy(ProceedingJoinPoint pjp){
 		try {
 			Object[] orgArgs = pjp.getArgs();
 			Object[] newArgs = new Object[orgArgs.length+1];
