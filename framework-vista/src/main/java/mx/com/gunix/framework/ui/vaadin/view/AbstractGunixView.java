@@ -8,6 +8,7 @@ import mx.com.gunix.framework.processes.domain.Instancia;
 import mx.com.gunix.framework.processes.domain.Tarea;
 import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.service.ActivitiService;
+import mx.com.gunix.framework.ui.vaadin.component.Header.TareaActualNavigator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -25,7 +26,7 @@ public abstract class AbstractGunixView extends VerticalLayout implements Secure
 	@Autowired
 	@Lazy
 	ApplicationContext applicationContext;
-	
+
 	@Autowired
 	@Lazy
 	ActivitiService as;
@@ -52,13 +53,19 @@ public abstract class AbstractGunixView extends VerticalLayout implements Secure
 		tarea.setComentario(getComentarioTarea());
 		Instancia instancia = as.completaTarea(tarea);
 		String taskView = null;
-		if((taskView=instancia.getTareaActual().getVista()).equals(Tarea.DEFAULT_END_TASK_VIEW)){
-			taskView = DefaultProcessEndView.class.getName(); 
+		if ((taskView = instancia.getTareaActual().getVista()).equals(Tarea.DEFAULT_END_TASK_VIEW)) {
+			taskView = DefaultProcessEndView.class.getName();
 		}
-		UI.getCurrent().getNavigator().navigateTo(taskView);
+		TareaActualNavigator taNav = (TareaActualNavigator) UI.getCurrent().getNavigator();
+		try {
+			taNav.setTareaActual(instancia.getTareaActual());
+			taNav.navigateTo(taskView);
+		} finally {
+			taNav.setTareaActual(null);
+		}
 	}
-	
-	protected final <T extends Component> T getBeanComponent(Class<T> beanClass){
+
+	protected final <T extends Component> T getBeanComponent(Class<T> beanClass) {
 		return applicationContext.getBean(beanClass);
 	}
 
@@ -73,7 +80,7 @@ public abstract class AbstractGunixView extends VerticalLayout implements Secure
 	protected abstract void doConstruct();
 
 	protected abstract List<Variable> getVariablesTarea();
-	
+
 	protected abstract String getComentarioTarea();
 
 }
