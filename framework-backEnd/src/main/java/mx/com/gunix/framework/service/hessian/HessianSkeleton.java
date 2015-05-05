@@ -2,6 +2,8 @@ package mx.com.gunix.framework.service.hessian;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,6 +14,8 @@ import com.caucho.hessian.io.AbstractHessianOutput;
 import com.caucho.services.server.ServiceContext;
 
 public class HessianSkeleton extends com.caucho.hessian.server.HessianSkeleton {
+	private static final Logger log = Logger.getLogger(HessianSkeleton.class.getName());
+
 	public HessianSkeleton(Object service, Class<?> apiClass) {
 		super(service, apiClass);
 	}
@@ -90,6 +94,7 @@ public class HessianSkeleton extends com.caucho.hessian.server.HessianSkeleton {
 		try {
 			result = method.invoke(service, values);
 		} catch (Exception e) {
+			log.log(Level.SEVERE,"Error en invocación remota", e);
 			Throwable e1 = e;
 			if (e1 instanceof InvocationTargetException)
 				e1 = ((InvocationTargetException) e).getTargetException();

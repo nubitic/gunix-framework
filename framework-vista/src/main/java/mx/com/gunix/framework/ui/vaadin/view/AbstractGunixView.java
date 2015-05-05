@@ -35,11 +35,11 @@ public abstract class AbstractGunixView extends VerticalLayout implements Secure
 
 	@PostConstruct
 	private void postConstruct() {
-		setWidth("-1px");
-		setHeight("-1px");
+		setWidth("100%");
+		setHeight("100%");
 		setSpacing(false);
 		setMargin(false);
-
+		setId(getClass().getName()+":"+hashCode());
 		doConstruct();
 	}
 
@@ -79,7 +79,7 @@ public abstract class AbstractGunixView extends VerticalLayout implements Secure
 
 	protected abstract void doConstruct();
 
-	protected abstract List<Variable> getVariablesTarea();
+	protected abstract List<Variable<?>> getVariablesTarea();
 
 	protected abstract String getComentarioTarea();
 

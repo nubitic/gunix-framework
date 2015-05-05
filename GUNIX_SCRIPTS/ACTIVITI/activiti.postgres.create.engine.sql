@@ -1,4 +1,4 @@
-create table ACT_GE_PROPERTY (
+﻿create table ACT_GE_PROPERTY (
     NAME_ varchar(64),
     VALUE_ varchar(300),
     REV_ integer,
@@ -149,7 +149,7 @@ create table ACT_RU_VARIABLE (
     ID_ varchar(64) not null,
     REV_ integer,
     TYPE_ varchar(255) not null,
-    NAME_ varchar(255) not null,
+    NAME_ TEXT not null,
     EXECUTION_ID_ varchar(64),
     PROC_INST_ID_ varchar(64),
     TASK_ID_ varchar(64),

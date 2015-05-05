@@ -1,10 +1,10 @@
 package mx.com.gunix.framework.ui.vaadin.view;
 
 import mx.com.gunix.framework.ui.vaadin.LoginUI;
+import mx.com.gunix.framework.ui.vaadin.spring.GunixVaadinView;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
-import org.vaadin.spring.navigator.annotation.VaadinView;
 import org.vaadin.spring.security.VaadinSecurity;
 
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -21,82 +21,82 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
-@VaadinView(name="",ui=LoginUI.class)
+@GunixVaadinView(tipo = GunixVaadinView.INDEX, ui = LoginUI.class)
 public class LoginView extends VerticalLayout implements View {
 	private static final long serialVersionUID = 1L;
-    
-    @Autowired
-    private VaadinSecurity security;
-    
-    private TextField       username;
-    private PasswordField   password;
-    private CheckBox        rememberMe = new CheckBox("Remember me", true);
-    
-    public LoginView() {
-        setSizeFull();
 
-        Component loginForm = buildLoginForm();
-        addComponent(loginForm);
-        setComponentAlignment(loginForm, Alignment.MIDDLE_CENTER);
+	@Autowired
+	private VaadinSecurity security;
 
-    }
-    
-    @Override
-    public void enter(ViewChangeEvent event) {
-        username.focus();
-    }
+	private TextField username;
+	private PasswordField password;
+	private CheckBox rememberMe = new CheckBox("Remember me", true);
 
-    private Component buildLoginForm() {
-        final VerticalLayout loginPanel = new VerticalLayout();
-        loginPanel.setSizeUndefined();
-        loginPanel.setSpacing(true);
-        Responsive.makeResponsive(loginPanel);
+	public LoginView() {
+		setSizeFull();
 
-        loginPanel.addComponent(buildFields());
-        loginPanel.addComponent(rememberMe);
-        return loginPanel;
-    }
+		Component loginForm = buildLoginForm();
+		addComponent(loginForm);
+		setComponentAlignment(loginForm, Alignment.MIDDLE_CENTER);
 
-    private Component buildFields() {
-        HorizontalLayout fields = new HorizontalLayout();
-        fields.setSpacing(true);
+	}
 
-        username = new TextField("Username");
-        username.setIcon(FontAwesome.USER);
+	@Override
+	public void enter(ViewChangeEvent event) {
+		username.focus();
+	}
 
-        password = new PasswordField("Password");
-        password.setIcon(FontAwesome.LOCK);
+	private Component buildLoginForm() {
+		final VerticalLayout loginPanel = new VerticalLayout();
+		loginPanel.setSizeUndefined();
+		loginPanel.setSpacing(true);
+		Responsive.makeResponsive(loginPanel);
 
-        final Button signin = new Button("Sign In");
- 
-        signin.setClickShortcut(KeyCode.ENTER);
-        signin.focus();
+		loginPanel.addComponent(buildFields());
+		loginPanel.addComponent(rememberMe);
+		return loginPanel;
+	}
 
-        fields.addComponents(username, password, signin);
-        fields.setComponentAlignment(signin, Alignment.BOTTOM_LEFT);
+	private Component buildFields() {
+		HorizontalLayout fields = new HorizontalLayout();
+		fields.setSpacing(true);
 
-        signin.addClickListener(evnt ->{
-            try {
-                
-                security.login(username.getValue(), password.getValue(), rememberMe.getValue());
-                
-            } catch(AuthenticationException e) {
-                e.printStackTrace();
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-            // TODO Register Remember me Token
-            
-            /*
-             * Redirect is handled by the VaadinRedirectStrategy
-             * User is redirected to either always the default
-             * or the URL the user request before authentication
-             * 
-             * Strategy is configured within SecurityConfiguration
-             * Defaults to User request URL.
-             */
-        });
-        
-        return fields;
-    }
+		username = new TextField("Username");
+		username.setIcon(FontAwesome.USER);
+
+		password = new PasswordField("Password");
+		password.setIcon(FontAwesome.LOCK);
+
+		final Button signin = new Button("Sign In");
+
+		signin.setClickShortcut(KeyCode.ENTER);
+		signin.focus();
+
+		fields.addComponents(username, password, signin);
+		fields.setComponentAlignment(signin, Alignment.BOTTOM_LEFT);
+
+		signin.addClickListener(evnt -> {
+			try {
+
+				security.login(username.getValue(), password.getValue(), rememberMe.getValue());
+
+			} catch (AuthenticationException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			// TODO Register Remember me Token
+
+			/*
+			 * Redirect is handled by the VaadinRedirectStrategy User is
+			 * redirected to either always the default or the URL the user
+			 * request before authentication
+			 * 
+			 * Strategy is configured within SecurityConfiguration Defaults to
+			 * User request URL.
+			 */
+		});
+
+		return fields;
+	}
 }

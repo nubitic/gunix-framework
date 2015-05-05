@@ -3,12 +3,11 @@ package mx.com.gunix.framework.ui.vaadin.view;
 import java.util.List;
 
 import mx.com.gunix.framework.processes.domain.Variable;
-
-import org.vaadin.spring.navigator.annotation.VaadinView;
+import mx.com.gunix.framework.ui.vaadin.spring.GunixVaadinView;
 
 import com.vaadin.ui.Label;
 
-@VaadinView(name = "mx.com.gunix.framework.ui.vaadin.view.DefaultProcessEndView")
+@GunixVaadinView
 public class DefaultProcessEndView extends AbstractGunixView {
 	private static final long serialVersionUID = 1L;
 
@@ -18,7 +17,7 @@ public class DefaultProcessEndView extends AbstractGunixView {
 	}
 
 	@Override
-	protected List<Variable> getVariablesTarea() {
+	protected List<Variable<?>> getVariablesTarea() {
 		return null;
 	}
 

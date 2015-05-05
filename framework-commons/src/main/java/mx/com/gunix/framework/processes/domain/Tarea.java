@@ -16,8 +16,9 @@ public class Tarea implements Serializable {
 	}
 	
 	private String id;
+	private String executionId;
 	private List<String> rolesCandidatos;
-	private List<Variable> variables;
+	private List<Variable<?>> variables;
 	private String comentario;
 	private String usuario;
 	private Date inicio;
@@ -37,10 +38,10 @@ public class Tarea implements Serializable {
 	public void setRolesCandidatos(List<String> rolesCandidatos) {
 		this.rolesCandidatos = rolesCandidatos;
 	}
-	public List<Variable> getVariables() {
+	public List<Variable<?>> getVariables() {
 		return variables;
 	}
-	public void setVariables(List<Variable> variables) {
+	public void setVariables(List<Variable<?>> variables) {
 		this.variables = variables;
 	}
 	public String getComentario() {
@@ -80,10 +81,18 @@ public class Tarea implements Serializable {
 	public void setInstancia(Instancia instancia) {
 		this.instancia = instancia;
 	}
+	
+	public String getExecutionId() {
+		return executionId;
+	}
+	public void setExecutionId(String executionId) {
+		this.executionId = executionId;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((executionId == null) ? 0 : executionId.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((instancia == null) ? 0 : instancia.hashCode());
 		return result;
@@ -97,6 +106,11 @@ public class Tarea implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Tarea other = (Tarea) obj;
+		if (executionId == null) {
+			if (other.executionId != null)
+				return false;
+		} else if (!executionId.equals(other.executionId))
+			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;

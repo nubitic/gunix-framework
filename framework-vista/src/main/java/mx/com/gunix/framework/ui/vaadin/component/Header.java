@@ -113,6 +113,7 @@ public class Header extends CustomComponent {
 		rolCBox.setInputPrompt("Seleccione un Rol");
 		setCompositionRoot(mainLayout);
 		navigator = new TareaActualNavigator(UI.getCurrent(), panelContenido);
+		setSizeFull();
 	}
 
 	public Navigator getNavigator() {
@@ -120,6 +121,7 @@ public class Header extends CustomComponent {
 	}
 
 	public void renderHeader(Aplicacion aplicacion) {
+		setId(getClass().getName()+":"+aplicacion.getIdAplicacion());
 		navigator.addProvider(svp);
 
 		mainLayout.setExpandRatio(userDetailsPanel, 0.0f);
@@ -216,8 +218,8 @@ public class Header extends CustomComponent {
 		});
 	}
 
-	private List<Variable> aVariables(List<Parametro> parametros) {
-		List<Variable> vars = new ArrayList<Variable>();
+	private List<Variable<?>> aVariables(List<Parametro> parametros) {
+		List<Variable<?>> vars = new ArrayList<Variable<?>>();
 		parametros.stream().forEach(p -> {
 			vars.add(Variable.fromParametro(p));
 		});
@@ -246,7 +248,7 @@ public class Header extends CustomComponent {
 		modulosLayout = new GridLayout();
 		modulosLayout.setImmediate(false);
 		modulosLayout.setWidth("-1px");
-		modulosLayout.setHeight("100.0%");
+		modulosLayout.setHeight("-1px");
 		modulosLayout.setMargin(false);
 		modulosLayout.setSpacing(true);
 		mainLayout.addComponent(modulosLayout);
@@ -256,6 +258,7 @@ public class Header extends CustomComponent {
 		// panelContenido
 		panelContenido = buildPanelContenido();
 		mainLayout.addComponent(panelContenido);
+		mainLayout.setComponentAlignment(panelContenido, new Alignment(48));
 		
 		return mainLayout;
 	}

@@ -1,4 +1,4 @@
-create table ACT_HI_PROCINST (
+﻿create table ACT_HI_PROCINST (
     ID_ varchar(64) not null,
     PROC_INST_ID_ varchar(64) not null,
     BUSINESS_KEY_ varchar(255),
@@ -64,7 +64,7 @@ create table ACT_HI_VARINST (
     PROC_INST_ID_ varchar(64),
     EXECUTION_ID_ varchar(64),
     TASK_ID_ varchar(64),
-    NAME_ varchar(255) not null,
+    NAME_ TEXT not null,
     VAR_TYPE_ varchar(100),
     REV_ integer,
     BYTEARRAY_ID_ varchar(64),

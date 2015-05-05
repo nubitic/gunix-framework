@@ -7,12 +7,12 @@ import javax.annotation.PostConstruct;
 import mx.com.gunix.framework.security.domain.Usuario;
 import mx.com.gunix.framework.ui.vaadin.MainUI;
 import mx.com.gunix.framework.ui.vaadin.component.Header;
+import mx.com.gunix.framework.ui.vaadin.spring.GunixVaadinView;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.vaadin.spring.navigator.annotation.VaadinView;
 
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Alignment;
@@ -23,7 +23,7 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-@VaadinView(name = "", ui = MainUI.class)
+@GunixVaadinView(tipo = GunixVaadinView.INDEX, ui = MainUI.class)
 public class MenuView extends VerticalLayout implements SecuredView {
 	@Autowired
 	@Lazy
@@ -36,7 +36,9 @@ public class MenuView extends VerticalLayout implements SecuredView {
 
 	@PostConstruct
 	private void postConstruct() {
-		setSizeFull();
+		//setSizeFull();
+		setWidth("-1px");
+		setHeight("-1px");
 		setSpacing(false);
 		setMargin(false);
 		Usuario u = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -77,7 +79,7 @@ public class MenuView extends VerticalLayout implements SecuredView {
 			h.renderHeader(aplicacion);
 			aplicacionesTab.addTab(h, aplicacion.getDescripcion());
 			aplicacionesTab.addSelectedTabChangeListener(selectedTab -> {
-				UI.getCurrent().setNavigator(((Header) selectedTab.getComponent()).getNavigator());
+				UI.getCurrent().setNavigator(((Header) selectedTab.getTabSheet().getSelectedTab()).getNavigator());
 			});
 		});
 

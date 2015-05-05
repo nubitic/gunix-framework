@@ -9,7 +9,7 @@ public class Instancia implements Serializable {
 	
 	private String processKey;
 	private String id;
-	private List<Variable> variables;
+	private List<Variable<?>> variables;
 	private String comentario;
 	private String usuario;
 	private Date inicio;
@@ -29,10 +29,10 @@ public class Instancia implements Serializable {
 	public void setId(String id) {
 		this.id = id;
 	}
-	public List<Variable> getVariables() {
+	public List<Variable<?>> getVariables() {
 		return variables;
 	}
-	public void setVariables(List<Variable> variables) {
+	public void setVariables(List<Variable<?>> variables) {
 		this.variables = variables;
 	}
 	public String getComentario() {

@@ -15,5 +15,5 @@ import com.hunteron.core.Hessian;
 @Secured(AuthenticatedVoter.IS_AUTHENTICATED_FULLY)
 public interface ActivitiService {
 	public Instancia completaTarea(Tarea tarea);
-	public Instancia iniciaProceso(String processKey, List<Variable> variables, String comentario);
+	public Instancia iniciaProceso(String processKey, List<Variable<?>> variables, String comentario);
 }
