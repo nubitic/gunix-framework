@@ -1519,6 +1519,14 @@ div.v-layout.v-horizontal.v-widget {
 	border: none !important;
 }
 
+.xbreadcrumbs LI {
+	height: auto !important;
+}
+
+.xbreadcrumbs {
+	background: transparent !important;
+}
+
 .tests-valo-flat.v-app, .tests-valo-flat.v-app-loading {
 	font: 400 16px/1.55 "Roboto", sans-serif;
 	color: #474747;
@@ -14081,4 +14089,9 @@ div.v-layout.v-horizontal.v-widget {
 
 .tests-valo-flat .content-common, .tests-valo-flat .content-labels {
 	max-width: 800px;
+}
+
+.tests-valo-flat .v-button-link.v-disabled.xbreadcrumbbutton {
+	opacity: 1;
+	filter: alpha(opacity=100);
 }

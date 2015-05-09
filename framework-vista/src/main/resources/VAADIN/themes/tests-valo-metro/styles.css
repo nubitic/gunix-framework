@@ -1493,6 +1493,14 @@ div.v-layout.v-horizontal.v-widget {
 	vertical-align: top;
 }
 
+.xbreadcrumbs LI {
+	height: auto !important;
+}
+
+.xbreadcrumbs {
+	background: transparent !important;
+}
+
 .tests-valo-metro.v-app, .tests-valo-metro.v-app-loading {
 	font: 300 16px/1.55 "Source Sans Pro", sans-serif;
 	color: #474747;
@@ -13956,4 +13964,9 @@ div.v-layout.v-horizontal.v-widget {
 
 .tests-valo-metro .content-common, .tests-valo-metro .content-labels {
 	max-width: 800px;
+}
+
+.tests-valo-metro .v-button-link.v-disabled.xbreadcrumbbutton {
+	opacity: 1;
+	filter: alpha(opacity=100);
 }

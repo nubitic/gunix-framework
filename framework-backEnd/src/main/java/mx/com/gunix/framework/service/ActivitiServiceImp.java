@@ -1,5 +1,7 @@
 package mx.com.gunix.framework.service;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -10,13 +12,23 @@ import mx.com.gunix.framework.activiti.GunixObjectVariableType;
 import mx.com.gunix.framework.processes.domain.Instancia;
 import mx.com.gunix.framework.processes.domain.Tarea;
 import mx.com.gunix.framework.processes.domain.Variable;
+import mx.com.gunix.framework.processes.domain.Variable.Scope;
 import mx.com.gunix.framework.security.domain.Usuario;
 
 import org.activiti.engine.FormService;
 import org.activiti.engine.IdentityService;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.form.TaskFormData;
+import org.activiti.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
+import org.activiti.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
+import org.activiti.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
+import org.activiti.engine.impl.bpmn.behavior.TerminateEndEventActivityBehavior;
+import org.activiti.engine.impl.persistence.entity.TaskEntity;
+import org.activiti.engine.impl.pvm.PvmTransition;
+import org.activiti.engine.impl.pvm.process.ActivityImpl;
+import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +50,9 @@ public class ActivitiServiceImp implements ActivitiService {
 
 	@Autowired
 	FormService fs;
+	
+	@Autowired
+	RepositoryService repos;
 
 	@Override
 	public Instancia completaTarea(Tarea tarea) {
@@ -56,7 +71,7 @@ public class ActivitiServiceImp implements ActivitiService {
 			rs.setVariables(tarea.getInstancia().getId(), variablesProcesoMap);
 		}
 		if (!variablesTareaMap.isEmpty()) {
-			rs.setVariablesLocal(tarea.getExecutionId(), variablesProcesoMap);
+			ts.setVariablesLocal(tarea.getId(), variablesProcesoMap);
 		}
 		ts.complete(taskId, variablesMaps[Variable.Scope.TAREA.ordinal()]);
 		tarea.getInstancia().setTareaActual(getCurrentTask(tarea.getInstancia().getId()));
@@ -65,6 +80,14 @@ public class ActivitiServiceImp implements ActivitiService {
 		}else{
 			tarea.getInstancia().getTareaActual().setInstancia(tarea.getInstancia());	
 		}
+		
+		refreshVars(tarea.getInstancia().getTareaActual());
+		refreshVars(tarea.getInstancia());
+		
+		if(tarea.getInstancia().getTareaActual().isTerminal()){
+			ts.complete(tarea.getInstancia().getTareaActual().getId());
+		}
+		
 		return tarea.getInstancia();
 	}
 
@@ -113,10 +136,36 @@ public class ActivitiServiceImp implements ActivitiService {
 			Tarea currTask = getCurrentTask(pi.getId());
 			currTask.setInstancia(instancia);
 			instancia.setTareaActual(currTask);
+			refreshVars(instancia);
 		} finally {
 			is.setAuthenticatedUserId(null);
 		}
 		return instancia;
+	}
+
+	private void refreshVars(Instancia instancia) {
+		instancia.setVariables(new ArrayList<Variable<?>>());
+		Map<String,Object> vars = rs.getVariables(instancia.getId());
+		doStoreVariables(vars,instancia.getVariables(), Scope.PROCESO);
+	}
+	
+	private void doStoreVariables(Map<String, Object> vars, List<Variable<?>> variables, Scope scope) {
+		vars.keySet()
+		.stream()
+		.forEach(key->{
+			Object valor = vars.get(key);
+			Variable<Serializable> var = new Variable<Serializable>();
+			var.setNombre(key);
+			var.setValor((Serializable) valor);
+			var.setScope(scope);
+			variables.add(var);
+		});
+	}
+
+	private void refreshVars(Tarea tarea) {
+		tarea.setVariables(new ArrayList<Variable<?>>());
+		Map<String,Object> vars = ts.getVariablesLocal(tarea.getId());
+		doStoreVariables(vars,tarea.getVariables(), Scope.TAREA);
 	}
 
 	private Tarea getCurrentTask(String piid) {
@@ -130,6 +179,22 @@ public class ActivitiServiceImp implements ActivitiService {
 			TaskFormData fd = fs.getTaskFormData(tarea.getId());
 			if (fd != null) {
 				tarea.setVista(fd.getFormKey());
+			}
+			TaskEntity te = (TaskEntity) task;
+			ProcessDefinitionImpl pdfimp = (ProcessDefinitionImpl) repos.getProcessDefinition(te.getProcessDefinitionId());
+			List<PvmTransition> oTrans = pdfimp.findActivity(te.getTaskDefinitionKey()).getOutgoingTransitions();
+			if(oTrans.size()>=1){
+				if(oTrans.isEmpty()){
+					tarea.setTerminal(true);
+				}else{
+					ActivityImpl pva = (ActivityImpl) oTrans.get(0).getDestination();
+					if((pva.getActivityBehavior() instanceof TerminateEndEventActivityBehavior) || 
+					   (pva.getActivityBehavior() instanceof ErrorEndEventActivityBehavior) ||
+					   (pva.getActivityBehavior() instanceof NoneEndEventActivityBehavior) ||
+					   (pva.getActivityBehavior() instanceof CancelEndEventActivityBehavior)){
+						tarea.setTerminal(true);
+					}
+				}
 			}
 		}
 		return tarea;

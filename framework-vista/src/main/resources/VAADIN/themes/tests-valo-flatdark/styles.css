@@ -1493,6 +1493,14 @@ div.v-layout.v-horizontal.v-widget {
 	vertical-align: top;
 }
 
+.xbreadcrumbs LI {
+	height: auto !important;
+}
+
+.xbreadcrumbs {
+	background: transparent !important;
+}
+
 .tests-valo-flatdark.v-app, .tests-valo-flatdark.v-app-loading {
 	font: 600 15px/1.55 "Lato", sans-serif;
 	color: #b8b8b8;
@@ -13865,4 +13873,9 @@ div.v-layout.v-horizontal.v-widget {
 
 .tests-valo-flatdark .content-common, .tests-valo-flatdark .content-labels {
 	max-width: 800px;
+}
+
+.tests-valo-flatdark .v-button-link.v-disabled.xbreadcrumbbutton {
+	opacity: 1;
+	filter: alpha(opacity=100);
 }

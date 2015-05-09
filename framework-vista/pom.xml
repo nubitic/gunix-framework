@@ -12,7 +12,23 @@
 			<id>vaadin-addons</id>
 			<url>http://maven.vaadin.com/vaadin-addons</url>
 		</repository>
+		<repository>
+			<id>lexaden</id>
+			<name>Lexaden Repository</name>
+			<url>http://www.lexaden.com/maven2/repo</url>
+		</repository>
 	</repositories>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-bom</artifactId>
+				<version>${vaadin.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>mx.com.gunix</groupId>
@@ -51,24 +67,17 @@
 			<version>${vaadin-spring.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.vaadin.spring</groupId>
-			<artifactId>spring-vaadin-mvp</artifactId>
-			<version>${vaadin-spring.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-server</artifactId>
-			<version>${vaadin.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-client-compiled</artifactId>
-			<version>${vaadin.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-themes</artifactId>
-			<version>${vaadin.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.lexaden.components</groupId>
+			<artifactId>breadcrumb</artifactId>
+			<version>1.7.3</version>
 		</dependency>
 		<dependency>
 			<groupId>com.caucho</groupId>
@@ -104,9 +113,47 @@
 			<artifactId>byte-buddy</artifactId>
 			<version>0.6.1</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-client</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-client-compiler</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-maven-plugin</artifactId>
+				<version>${vaadin.version}</version>
+				<configuration>
+					<extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
+					<webappDirectory>${basedir}/src/main/resources/VAADIN/widgetsets</webappDirectory>
+					<hostedWebapp>${basedir}/src/main/resources/VAADIN/widgetsets</hostedWebapp>
+					<deploy>${basedir}/target/VAADIN</deploy>
+					<persistentunitcachedir>${basedir}/target/VAADIN</persistentunitcachedir>
+					<force>false</force>
+					<strict>true</strict>
+					<noServer>true</noServer>
+					<compileReport>true</compileReport>
+					<style>OBF</style>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>resources</goal>
+							<goal>update-widgetset</goal>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -237,8 +284,7 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -259,6 +305,27 @@
 										</versionRange>
 										<goals>
 											<goal>java</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>com.vaadin</groupId>
+										<artifactId>
+											vaadin-maven-plugin
+										</artifactId>
+										<versionRange>
+											[7.4.3,)
+										</versionRange>
+										<goals>
+											<goal>resources</goal>
+											<goal>
+												update-widgetset
+											</goal>
+											<goal>compile</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>

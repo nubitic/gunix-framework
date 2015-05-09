@@ -6,13 +6,39 @@ import java.util.Map;
 import mx.com.gunix.framework.activiti.GunixObjectVariableType;
 
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.ResultType;
 import org.apache.ibatis.annotations.Select;
 
-public interface VariableInstanceMapper {	
+public interface VariableInstanceMapper {
+	public static String DOUBLE_KEY = "double_";
+	public static String LONG_KEY = "long_";
+	public static String TEXT_KEY = "text_";
 	@Select("SELECT"+
+			"	  id_ ,"+
+			"	  rev_ ,"+
+			"	  type_ ,"+
+			"	  name_ ,"+
+			"	  execution_id_ ,"+
+			"	  proc_inst_id_ ,"+
+			"	  task_id_ ,"+
+			"	  bytearray_id_ ,"+
+			"	  " + DOUBLE_KEY + " ,"+
+			"	  " + LONG_KEY + " ,"+
+			"	  " + TEXT_KEY + " ,"+
+			"	  text2_"+
+			"	FROM"+
+			"	  ACT_RU_VARIABLE"+
+			"	WHERE"+
+			"	  TASK_ID_ = #{taskId} "+
+			"	and type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"'"+
+			"	AND name_ NOT LIKE '%.%'"+
+			"	AND name_ NOT LIKE '%[%'"+
+			"	UNION ALL"+
+			"	SELECT"+
 			"	  id_ ,"+
 			"	  rev_ ,"+
 			"	  type_ ,"+
@@ -28,29 +54,10 @@ public interface VariableInstanceMapper {
 			"	FROM"+
 			"	  ACT_RU_VARIABLE"+
 			"	WHERE"+
-			"	  TASK_ID_ = #{taskId}"+
-			"	AND name_ NOT LIKE '%.%' and type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"'"+
-			"	UNION ALL"+
-			"	SELECT"+
-			"	  id_ ,"+
-			"	  rev_ ,"+
-			"	  '"+GunixObjectVariableType.GUNIX_OBJECT+"'::text type_ ,"+
-			"	  substring(name_ FROM 1 FOR position('.' IN name_)-1) name_ ,"+
-			"	  execution_id_ ,"+
-			"	  proc_inst_id_ ,"+
-			"	  task_id_ ,"+
-			"	  bytearray_id_ ,"+
-			"	  double_ ,"+
-			"	  long_ ,"+
-			"	  text_ ,"+
-			"	  text2_"+
-			"	FROM"+
-			"	  ACT_RU_VARIABLE"+
-			"	WHERE"+
-			"	  TASK_ID_ = #{taskId}"+
-			"	AND name_ LIKE '%.%' and type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"'"+
-			"	AND substring(name_ FROM position('.' IN name_)+1) ='class'")
+			"	  TASK_ID_ = #{taskId} "+
+			"	AND type_ = '"+GunixObjectVariableType.GUNIX_OBJECT+"'")
 	@ResultMap("variableInstanceResultMap")
+	@Options(flushCache=true)
 	public List<VariableInstanceEntity>  findVariableInstancesByTaskId(String taskId);
 	
 	@Select("SELECT"+
@@ -62,21 +69,23 @@ public interface VariableInstanceMapper {
 			"	  proc_inst_id_ ,"+
 			"	  task_id_ ,"+
 			"	  bytearray_id_ ,"+
-			"	  double_ ,"+
-			"	  long_ ,"+
-			"	  text_ ,"+
+			"	  " + DOUBLE_KEY + " ,"+
+			"	  " + LONG_KEY + " ,"+
+			"	  " + TEXT_KEY + " ,"+
 			"	  text2_"+
 			"	FROM"+
 			"	  ACT_RU_VARIABLE"+
 			"	WHERE"+
-			"	  EXECUTION_ID_ = #{executionId} and TASK_ID_ is null and type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"'"+
+			"	  EXECUTION_ID_ = #{executionId} and TASK_ID_ is null "+
+			"	and type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"'"+
 			"	AND name_ NOT LIKE '%.%'"+
+			"	AND name_ NOT LIKE '%[%'"+
 			"	UNION ALL"+
 			"	SELECT"+
 			"	  id_ ,"+
 			"	  rev_ ,"+
-			"	  '"+GunixObjectVariableType.GUNIX_OBJECT+"'::text type_ ,"+
-			"	  substring(name_ FROM 1 FOR position('.' IN name_)-1) name_ ,"+
+			"	  type_ ,"+
+			"	  name_ ,"+
 			"	  execution_id_ ,"+
 			"	  proc_inst_id_ ,"+
 			"	  task_id_ ,"+
@@ -89,31 +98,45 @@ public interface VariableInstanceMapper {
 			"	  ACT_RU_VARIABLE"+
 			"	WHERE"+
 			"	  EXECUTION_ID_ = #{executionId} and TASK_ID_ is null"+
-			"	AND name_ LIKE '%.%' and type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"'"+
-			"	AND substring(name_ FROM position('.' IN name_)+1) ='class'")
+			"	AND type_ = '"+GunixObjectVariableType.GUNIX_OBJECT+"'")
 	@ResultMap("variableInstanceResultMap")
+	@Options(flushCache=true)
 	public List<VariableInstanceEntity>  findVariableInstancesByExecutionId(String executionId);
 
 	
 	@Select("SELECT"+
+			"	  id_ ,"+
+			"	  rev_ ,"+
 			"	  name_ as key,"+
-			"	  COALESCE(double_::text,long_::text ,text_||COALESCE(text2_,'')) as value"+
+			"	  " + DOUBLE_KEY + " ,"+
+			"	  " + LONG_KEY + " ,"+
+			"	  text_||COALESCE(text2_,'')   as " + TEXT_KEY + 
 			"	FROM"+
 			"	  ACT_RU_VARIABLE"+
 			"	WHERE"+
 			"	  EXECUTION_ID_ = #{executionId} and TASK_ID_ is null"+
-			"	AND name_ LIKE #{varName} and type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"'")
+			"	AND type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}.%' or name_ LIKE '${varName}[%')")
 	@ResultType(Map.class)
-	public List<Map<String,String>> findGunixObjectByNameAndExecutionId(@Param("executionId") String executionId, @Param("varName") String varName);
+	@Options(flushCache=true)
+	public List<Map<String,Object>> findGunixObjectByNameAndExecutionId(@Param("executionId") String executionId, @Param("varName") String varName);
 
 	@Select("SELECT"+
+			"	  id_ ,"+
+			"	  rev_ ,"+
 			"	  name_ as key,"+
-			"	  COALESCE(double_::text,long_::text ,text_||COALESCE(text2_,'')) as value"+
+			"	  " + DOUBLE_KEY + " ,"+
+			"	  " + LONG_KEY + " ,"+
+			"	  text_||COALESCE(text2_,'')   as " + TEXT_KEY +
 			"	FROM"+
 			"	  ACT_RU_VARIABLE"+
 			"	WHERE"+
 			"	  TASK_ID_ = #{taskId}"+
-			"	AND name_ LIKE #{varName} and type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"'")
+			"	AND type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}.%' or name_ LIKE '${varName}[%')")
 	@ResultType(Map.class)
-	public List<Map<String,String>> findGunixObjectByNameAndTaskId(@Param("taskId") String taskId, @Param("varName") String varName);
+	@Options(flushCache=true)
+	public List<Map<String,Object>> findGunixObjectByNameAndTaskId(@Param("taskId") String taskId, @Param("varName") String varName);
+	
+	
+	@Delete("delete from ACT_RU_VARIABLE where ID_ = #{id,jdbcType=VARCHAR} and REV_ = #{revision}")
+	public void delete(@Param("id") String id, @Param("revision") int revision);
 }

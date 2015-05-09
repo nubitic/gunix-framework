@@ -25,7 +25,14 @@ public class Tarea implements Serializable {
 	private Date termino;
 	private String vista;
 	private Instancia instancia;
+	private boolean terminal;
 	
+	public boolean isTerminal() {
+		return terminal;
+	}
+	public void setTerminal(boolean terminal) {
+		this.terminal = terminal;
+	}
 	public String getId() {
 		return id;
 	}

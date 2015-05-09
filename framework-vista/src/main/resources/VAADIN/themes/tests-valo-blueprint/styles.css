@@ -1469,6 +1469,14 @@ div.v-layout.v-horizontal.v-widget {
 	vertical-align: top;
 }
 
+.xbreadcrumbs LI {
+	height: auto !important;
+}
+
+.xbreadcrumbs {
+	background: transparent !important;
+}
+
 .tests-valo-blueprint.v-app, .tests-valo-blueprint.v-app-loading {
 	font: 300 18px/1.55 sans-serif;
 	color: #c1d3e9;
@@ -13992,4 +14000,9 @@ div.v-layout.v-horizontal.v-widget {
 
 .tests-valo-blueprint .content-common, .tests-valo-blueprint .content-labels {
 	max-width: 800px;
+}
+
+.tests-valo-blueprint .v-button-link.v-disabled.xbreadcrumbbutton {
+	opacity: 1;
+	filter: alpha(opacity=100);
 }

@@ -7,6 +7,7 @@ import mx.com.gunix.framework.security.domain.UsuarioMapperInterceptor;
 
 import org.activiti.engine.impl.persistence.ByteArrayRefTypeHandler;
 import org.activiti.engine.impl.variable.VariableType;
+import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.type.Alias;
 import org.apache.ibatis.type.JdbcType;
@@ -50,11 +51,11 @@ public class PersistenceConfig {
 	public SqlSessionFactoryBean sqlSessionFactory() throws Exception {
 		SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
 		sessionFactory.setDataSource(dataSource());
+		sessionFactory.setDatabaseIdProvider(new VendorDatabaseIdProvider());
 		sessionFactory.setPlugins(new Interceptor[] { new UsuarioMapperInterceptor() });
 		sessionFactory.setMapperLocations(resourcePatternResolver.getResources("classpath*:/mx/com/gunix/**/*Mapper.xml"));
 		sessionFactory.setTypeAliases(new Class<?>[] { ByteArrayRefTypeHandlerAlias.class });
 		sessionFactory.setTypeHandlers(new TypeHandler[] { new ByteArrayRefTypeHandlerAlias(), new IbatisVariableTypeHandler() });
-
 		return sessionFactory;
 	}
 

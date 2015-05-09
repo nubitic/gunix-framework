@@ -1479,6 +1479,14 @@ div.v-layout.v-horizontal.v-widget {
 	vertical-align: top;
 }
 
+.xbreadcrumbs LI {
+	height: auto !important;
+}
+
+.xbreadcrumbs {
+	background: transparent !important;
+}
+
 .tests-valo-facebook.v-app, .tests-valo-facebook.v-app-loading {
 	font: 400 14px/1.55 Helvetica, Arial, "lucida grande", tahoma, verdana, arial, sans-serif;
 	color: #37404E;
@@ -14229,4 +14237,9 @@ div.v-layout.v-horizontal.v-widget {
 
 .tests-valo-facebook .content-common, .tests-valo-facebook .content-labels {
 	max-width: 800px;
+}
+
+.tests-valo-facebook .v-button-link.v-disabled.xbreadcrumbbutton {
+	opacity: 1;
+	filter: alpha(opacity=100);
 }

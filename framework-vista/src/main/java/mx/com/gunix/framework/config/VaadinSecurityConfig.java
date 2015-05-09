@@ -149,7 +149,7 @@ public class VaadinSecurityConfig extends WebSecurityConfigurerAdapter implement
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(userDetailsService())/*.passwordEncoder(passwordEncoder())*/;
+		auth.userDetailsService(userDetailsService()).passwordEncoder(passwordEncoder());
 	}
 
 	@Override

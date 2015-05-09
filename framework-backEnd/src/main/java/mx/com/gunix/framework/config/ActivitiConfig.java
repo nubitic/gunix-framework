@@ -61,10 +61,10 @@ public class ActivitiConfig{
 		speConf.setDatabaseType(ProcessEngineConfigurationImpl.DATABASE_TYPE_POSTGRES);
 		speConf.setTransactionManager(transactionManager);
 		speConf.setDatabaseSchemaUpdate("false");
-		speConf.setJobExecutorActivate(true);
 		speConf.setDbIdentityUsed(false);
 		speConf.setBatchSizeTasks(1000);
-		speConf.setJobExecutor(jobExecutor());
+		//speConf.setJobExecutorActivate(true);
+		//speConf.setJobExecutor(jobExecutor());
 		speConf.setIdGenerator(idGenerator());
 		speConf.setDeploymentMode(ResourceParentFolderAutoDeploymentStrategy.DEPLOYMENT_MODE);
 		speConf.setDeploymentResources(resourcePatternResolver.getResources("classpath*:/mx/com/gunix/procesos/*.bpmn"));

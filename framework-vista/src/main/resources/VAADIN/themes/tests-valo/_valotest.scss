@@ -1,3 +1,9 @@
+  .xbreadcrumbs LI {
+	height: auto !important;
+  }
+  .xbreadcrumbs {
+	background: transparent !important;
+  }
 @mixin valotest {
   @include valo;
 
@@ -149,5 +155,10 @@
   .content-common,
   .content-labels {
   	max-width: 800px;
+  }
+  
+  .v-button-link.v-disabled.xbreadcrumbbutton{
+  	opacity: 1;
+	filter: alpha(opacity=100);
   }
 }

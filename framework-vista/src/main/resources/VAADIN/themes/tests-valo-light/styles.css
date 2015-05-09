@@ -1510,6 +1510,14 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #e8e8e8;
 }
 
+.xbreadcrumbs LI {
+	height: auto !important;
+}
+
+.xbreadcrumbs {
+	background: transparent !important;
+}
+
 .tests-valo-light.v-app, .tests-valo-light.v-app-loading {
 	font: 300 16px/1.55 "Open Sans", sans-serif;
 	color: #474747;
@@ -14271,4 +14279,9 @@ div.v-layout.v-horizontal.v-widget {
 
 .tests-valo-light .content-common, .tests-valo-light .content-labels {
 	max-width: 800px;
+}
+
+.tests-valo-light .v-button-link.v-disabled.xbreadcrumbbutton {
+	opacity: 1;
+	filter: alpha(opacity=100);
 }

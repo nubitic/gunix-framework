@@ -5,6 +5,7 @@ import java.util.List;
 import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.ui.vaadin.spring.GunixVaadinView;
 
+import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Label;
 
 @GunixVaadinView
@@ -24,6 +25,12 @@ public class DefaultProcessEndView extends AbstractGunixView {
 	@Override
 	protected String getComentarioTarea() {
 		return null;
+	}
+
+	@Override
+	protected void doEnter(ViewChangeEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

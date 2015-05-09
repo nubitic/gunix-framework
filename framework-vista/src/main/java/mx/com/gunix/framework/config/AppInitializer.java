@@ -33,6 +33,7 @@ public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
 		ServletRegistration.Dynamic savsReg = servletContext.addServlet(SpringAwareVaadinServlet.class.getName(), savs);
 		savsReg.setAsyncSupported(true);
 		savsReg.setLoadOnStartup(1);
+		savsReg.setInitParameter("widgetset", "mx.com.gunix.framework.ui.vaadin.GunixWidgetset");
 		savsReg.addMapping("/*");
 	}
 
