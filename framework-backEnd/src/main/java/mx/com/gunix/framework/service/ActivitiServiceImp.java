@@ -16,6 +16,7 @@ import mx.com.gunix.framework.processes.domain.Variable.Scope;
 import mx.com.gunix.framework.security.domain.Usuario;
 
 import org.activiti.engine.FormService;
+import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -52,6 +53,9 @@ public class ActivitiServiceImp implements ActivitiService {
 	FormService fs;
 	
 	@Autowired
+	HistoryService hs;
+	
+	@Autowired
 	RepositoryService repos;
 
 	@Override
@@ -86,6 +90,7 @@ public class ActivitiServiceImp implements ActivitiService {
 		
 		if(tarea.getInstancia().getTareaActual().isTerminal()){
 			ts.complete(tarea.getInstancia().getTareaActual().getId());
+			hs.deleteHistoricProcessInstance(tarea.getInstancia().getId());
 		}
 		
 		return tarea.getInstancia();

@@ -32,9 +32,6 @@ public class ClientesView extends AbstractGunixView {
 		
 		nombre = new TextField("Nombre");
 		nombre.setNullRepresentation("");
-		nombre.setNullSettingAllowed(false);
-		nombre.setRequired(true);
-		nombre.setRequiredError("El nombre es requerido");
 		nombre.setInvalidCommitted(false);
 
 		flyt.addComponent(nombre);
