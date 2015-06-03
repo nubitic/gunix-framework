@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Context>
-	<Resource name="jdbc/gunixDS" auth="Container" type="javax.sql.DataSource"
-		driverClassName="org.postgresql.Driver" url="jdbc:postgresql://ec2-107-22-166-233.compute-1.amazonaws.com:5432/dd63r58emiovmf?ssl=true&amp;sslfactory=org.postgresql.ssl.NonValidatingFactory"
-		username="exsipqluzgntfw" password="UGQEeO-oEjV2qzhO87L6hMmvC_" maxActive="3" maxIdle="1"
-		maxWait="-1" defaultAutoCommit="false" />
-</Context>

@@ -1,6 +1,5 @@
 package mx.com.gunix.framework.config;
 
-import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import mx.com.gunix.framework.security.domain.UsuarioMapperInterceptor;
@@ -21,11 +20,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @EnableTransactionManagement
@@ -34,12 +35,21 @@ public class PersistenceConfig {
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
 	@Bean
-	@Resource(name = "jdbc/gunixDS")
 	public DataSource dataSource() {
-		JndiDataSourceLookup dsLookup = new JndiDataSourceLookup();
-		dsLookup.setResourceRef(true);
-		DataSource dataSource = dsLookup.getDataSource("java:comp/env/jdbc/gunixDS");
-		return dataSource;
+		HikariConfig config = new HikariConfig();
+		
+		config.setAutoCommit(false);
+		config.setMaximumPoolSize(15);
+		config.addDataSourceProperty("ssl", "true");
+		config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
+		config.addDataSourceProperty("sslfactory", "org.postgresql.ssl.NonValidatingFactory");
+		
+		config.addDataSourceProperty("password", System.getenv("DB_PASSWORD"));
+		config.addDataSourceProperty("user", System.getenv("DB_USER"));
+		config.addDataSourceProperty("databaseName", System.getenv("DB_NAME"));
+		config.addDataSourceProperty("serverName", System.getenv("DB_SERVER_NAME"));
+
+		return new HikariDataSource(config);
 	}
 
 	@Bean
