@@ -7,7 +7,7 @@ package com.hunteron.core;
  * @Date 2015
  */
 public enum Context {
-	HOST("backEnd.host");
+	HOST("BACKEND_HOST");
 	private String backEndHost;
 	 
     private Context(String backEndHost) {
@@ -15,6 +15,7 @@ public enum Context {
     }
  
     public String getRemoteUrl() {
-        return System.getProperty(backEndHost, "http://localhost:8080/backEnd");
+    	String remoteURL = System.getenv(backEndHost);
+        return remoteURL!=null?remoteURL:"http://localhost:8080/backEnd";
     }
 }

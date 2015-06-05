@@ -11,7 +11,7 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
 
 @GunixVaadinView
-public class OperaciónExitosaView extends AbstractGunixView {
+public class OperacionExitosaView extends AbstractGunixView {
 	private static final long serialVersionUID = 1L;
 
 	@Override

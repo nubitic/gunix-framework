@@ -18,7 +18,7 @@
       <sequenceFlow id="flow7" name="esValido" sourceRef="exclusivegateway2" targetRef="servicetask2">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${esValido}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="usertask2" name="Alta Exitosa" activiti:formKey="mx.com.gunix.ui.vaadin.view.OperaciónExitosaView"></userTask>
+      <userTask id="usertask2" name="Alta Exitosa" activiti:formKey="mx.com.gunix.ui.vaadin.view.OperacionExitosaView"></userTask>
       <endEvent id="endevent1" name="End"></endEvent>
       <sequenceFlow id="flow9" sourceRef="usertask2" targetRef="endevent1"></sequenceFlow>
       <serviceTask id="servicetask2" name="Service Task" activiti:expression="${clienteService.guarda(cliente)}"></serviceTask>
@@ -100,14 +100,14 @@
         <omgdi:waypoint x="459.0" y="137.0"></omgdi:waypoint>
         <omgdi:waypoint x="395.0" y="137.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="602.0" y="180.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="44.0" x="602.0" y="180.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
         <omgdi:waypoint x="480.0" y="213.0"></omgdi:waypoint>
         <omgdi:waypoint x="550.0" y="213.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="691.0" y="276.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="42.0" x="691.0" y="276.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
