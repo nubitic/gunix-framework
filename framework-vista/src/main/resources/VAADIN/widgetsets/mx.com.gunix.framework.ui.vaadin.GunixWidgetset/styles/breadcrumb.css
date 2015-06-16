@@ -26,6 +26,7 @@
 .xbreadcrumbs {
 	position: relative;
 	z-index: 1000;
+	background: transparent !important;
 }
 
 .xbreadcrumbs LI UL {
@@ -63,7 +64,7 @@
 	background: url(images/separator.gif) no-repeat right center;
 	padding-right: 15px;
 	padding-left: 10px;
-	height: 16px;
+	height: auto !important;
 }
 
 .xbreadcrumbs LI.current {
