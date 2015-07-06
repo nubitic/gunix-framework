@@ -1,6 +1,7 @@
 package mx.com.gunix.framework.ui.vaadin.view;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,10 +13,13 @@ import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.service.ActivitiService;
 import mx.com.gunix.framework.ui.vaadin.component.Header.TareaActualNavigator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
 
+import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -23,7 +27,10 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-public abstract class AbstractGunixView extends VerticalLayout implements SecuredView {
+public abstract class AbstractGunixView extends VerticalLayout implements View {
+	
+	protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
+	
 	private static final long serialVersionUID = 1L;
 	@Autowired
 	@Lazy
@@ -56,6 +63,13 @@ public abstract class AbstractGunixView extends VerticalLayout implements Secure
 	protected final void completaTarea() {
 		tarea.setVariables(getVariablesTarea());
 		tarea.setComentario(getComentarioTarea());
+		
+		if(tarea.getInstancia()!=null&&tarea.getInstancia().getVariables()!=null) {
+			for(Variable<?> var:tarea.getInstancia().getVariables()) {
+				LOGGER.debug(var.toString());
+			}
+		}
+		
 		Instancia instancia = as.completaTarea(tarea);
 		String taskView = null;
 		Tarea tareaAct = instancia.getTareaActual();

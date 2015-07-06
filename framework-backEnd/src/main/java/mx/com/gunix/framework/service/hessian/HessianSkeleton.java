@@ -2,9 +2,13 @@ package mx.com.gunix.framework.service.hessian;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import mx.com.gunix.framework.service.UsuarioService;
+
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +19,8 @@ import com.caucho.services.server.ServiceContext;
 
 public class HessianSkeleton extends com.caucho.hessian.server.HessianSkeleton {
 	private static final Logger log = Logger.getLogger(HessianSkeleton.class.getName());
-
+	private final String key = UUID.randomUUID().toString();
+	
 	public HessianSkeleton(Object service, Class<?> apiClass) {
 		super(service, apiClass);
 	}
@@ -87,7 +92,12 @@ public class HessianSkeleton extends com.caucho.hessian.server.HessianSkeleton {
 
 		UserDetails ud = (UserDetails) in.readObject(UserDetails.class);
 		if (ud != null) {
-			SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(ud, null, ud.getAuthorities()));
+			SecurityContextHolder.getContext().setAuthentication(
+					ud.getUsername().equals(UsuarioService.ANONYMOUS)?
+							new AnonymousAuthenticationToken(key,ud, ud.getAuthorities())
+						:
+							new UsernamePasswordAuthenticationToken(ud, null, ud.getAuthorities())
+					);
 		}
 		Object result = null;
 

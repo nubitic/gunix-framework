@@ -3,6 +3,8 @@ package mx.com.gunix.framework.config.aspects;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+import mx.com.gunix.framework.service.UsuarioService;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -22,7 +24,9 @@ public class HessianServiceAdvice {
 			Object[] orgArgs = pjp.getArgs();
 			Object[] newArgs = new Object[orgArgs.length+1];
 			System.arraycopy(orgArgs, 0, newArgs, 0, orgArgs.length);
-			Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Object principal = pjp.getSignature().getDeclaringType().equals(UsuarioService.class)&&pjp.getSignature().getName().equals("getAnonymous")?
+								null
+								:SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			newArgs[newArgs.length-1]=(principal instanceof UserDetails)?principal:null;
 			
 			Class<?>[] interfaces = ((Advised)pjp.getThis()).getProxiedInterfaces();

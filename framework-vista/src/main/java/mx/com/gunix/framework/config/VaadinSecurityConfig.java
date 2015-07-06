@@ -3,6 +3,7 @@ package mx.com.gunix.framework.config;
 import java.util.UUID;
 
 import mx.com.gunix.framework.security.PersistentTokenBasedRememberMeServices;
+import mx.com.gunix.framework.security.UserDetails;
 import mx.com.gunix.framework.security.UserDetailsServiceImpl;
 import mx.com.gunix.framework.security.Utils;
 import mx.com.gunix.framework.service.UsuarioService;
@@ -154,9 +155,29 @@ public class VaadinSecurityConfig extends WebSecurityConfigurerAdapter implement
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers("/login/**").permitAll().antMatchers("/UIDL/**").permitAll().antMatchers("/HEARTBEAT/**").authenticated().antMatchers("/**").authenticated().anyRequest()
-				.authenticated().and().sessionManagement().sessionFixation().migrateSession().and().csrf().disable().headers().frameOptions().disable();
-		http.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"));
+		http
+			.anonymous()
+				.principal(new UserDetails(usuarioService.getAnonymous()))
+			.and()
+			.authorizeRequests()
+				.antMatchers("/login/**").permitAll()
+				.antMatchers("/public/**").anonymous()
+				.antMatchers("/UIDL/**").permitAll()
+				.antMatchers("/HEARTBEAT/**").authenticated()
+				.antMatchers("/**").authenticated()
+				.anyRequest().authenticated()
+			.and()
+				.sessionManagement()
+					.sessionFixation()
+					.migrateSession()
+			.and()
+				.csrf()
+					.disable()
+				.headers()
+					.frameOptions()
+						.disable();
+		http.exceptionHandling()
+			.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"));
 	}
 
 	@Bean

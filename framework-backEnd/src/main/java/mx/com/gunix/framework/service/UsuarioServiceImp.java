@@ -49,5 +49,10 @@ public class UsuarioServiceImp implements UsuarioService {
 	public void createNewToken(org.springframework.security.web.authentication.rememberme.PersistentRememberMeToken token) {
 		throw new UnsupportedOperationException();
 	}
+
+	@Override
+	public Usuario getAnonymous() {
+		return um.getUsuario(ANONYMOUS);
+	}
 	
 }

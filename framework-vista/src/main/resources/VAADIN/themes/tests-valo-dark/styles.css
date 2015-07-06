@@ -1479,14 +1479,6 @@ div.v-layout.v-horizontal.v-widget {
 	vertical-align: top;
 }
 
-.xbreadcrumbs LI {
-	height: auto !important;
-}
-
-.xbreadcrumbs {
-	background: transparent !important;
-}
-
 .tests-valo-dark.v-app, .tests-valo-dark.v-app-loading {
 	font: 400 16px/1.55 Roboto, sans-serif;
 	color: #cacecf;

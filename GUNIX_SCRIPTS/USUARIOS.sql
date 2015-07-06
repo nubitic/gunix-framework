@@ -121,7 +121,7 @@ create table PERSISTENT_LOGINS
         LAST_USED timestamp not null
 );
 
-INSERT INTO USUARIO(ID_USUARIO,PASSWORD,ESTATUS) VALUES('bjvences@gmail.com',crypt('loloq123', gen_salt('bf', 16)),'ACTIVO');
+INSERT INTO USUARIO(ID_USUARIO,PASSWORD,ESTATUS) VALUES('anonymous',crypt('loloq123', gen_salt('bf', 16)),'ACTIVO');
 
 INSERT INTO APLICACION VALUES('GUNIX_ADMON','Gunix','Gunix.png');
         INSERT INTO ROL VALUES('GUNIX_ADMON','ADMINISTRADOR','Administrador de Clientes y Aplicaciones');
@@ -133,7 +133,7 @@ INSERT INTO APLICACION VALUES('GUNIX_ADMON','Gunix','Gunix.png');
 
                         INSERT INTO ROL_FUNCION VALUES('GUNIX_ADMON','ADMINISTRADOR','CLIENTES','ADMINISTRACION','COMPLETO');
 
-                INSERT INTO USUARIO_ROL VALUES('bjvences@gmail.com','GUNIX_ADMON','ADMINISTRADOR');
+                INSERT INTO USUARIO_ROL VALUES('anonymous','GUNIX_ADMON','ADMINISTRADOR');
 
 create or replace function MENU_USUARIO(id_usuario text)
   returns table (

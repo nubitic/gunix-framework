@@ -1,22 +1,31 @@
 package mx.com.gunix.framework.processes.domain;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Map;
 
 import mx.com.gunix.framework.security.domain.Parametro;
 
 public class Variable<T extends Serializable> implements Serializable {
 	public static enum Scope {
-		PROCESO,
-		TAREA
+		PROCESO, TAREA
 	}
 
 	private static final long serialVersionUID = 1L;
 	private Scope scope = Scope.PROCESO;
-	private T valor;
+
 	private String nombre;
-	
-	public static Variable<String> fromParametro(Parametro parametro){
-		Variable<String> v= new Variable<String>();
+
+	private transient T valor;
+
+	@SuppressWarnings("rawtypes")
+	private Collection iterableValue;
+	@SuppressWarnings("rawtypes")
+	private Map mapValue;
+	private Serializable objectValue;
+
+	public static Variable<String> fromParametro(Parametro parametro) {
+		Variable<String> v = new Variable<String>();
 		v.setNombre(parametro.getNombre());
 		v.setValor(parametro.getValor());
 		v.setScope(Scope.PROCESO);
@@ -31,11 +40,47 @@ public class Variable<T extends Serializable> implements Serializable {
 		this.scope = scope;
 	}
 
+	@SuppressWarnings("unchecked")
 	public T getValor() {
+		if (valor == null && (iterableValue != null || mapValue != null || objectValue != null)) {
+			if (iterableValue != null) {
+				this.valor = (T) iterableValue;
+			} else {
+				if (mapValue != null) {
+					this.valor = (T) mapValue;
+				} else {
+					if (objectValue != null) {
+						this.valor = (T) objectValue;
+					}
+				}
+			}
+		}
 		return valor;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void setValor(T valor) {
+		if (valor instanceof Collection) {
+			iterableValue = (Collection) valor;
+			mapValue = null;
+			objectValue = null;
+		} else {
+			if (valor instanceof Map) {
+				iterableValue = null;
+				mapValue = (Map) valor;
+				objectValue = null;
+			} else {
+				if (valor instanceof Serializable) {
+					iterableValue = null;
+					mapValue = null;
+					objectValue = valor;
+				} else {
+					if (valor != null) {
+						throw new IllegalArgumentException("Tipo de dato no soportado: " + valor.getClass());
+					}
+				}
+			}
+		}
 		this.valor = valor;
 	}
 
@@ -86,6 +131,5 @@ public class Variable<T extends Serializable> implements Serializable {
 	public String toString() {
 		return "Variable [scope=" + scope + ", valor=" + valor + ", nombre=" + nombre + "]";
 	}
-	
-	
+
 }

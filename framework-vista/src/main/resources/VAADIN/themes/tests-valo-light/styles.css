@@ -1510,14 +1510,6 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #e8e8e8;
 }
 
-.xbreadcrumbs LI {
-	height: auto !important;
-}
-
-.xbreadcrumbs {
-	background: transparent !important;
-}
-
 .tests-valo-light.v-app, .tests-valo-light.v-app-loading {
 	font: 300 16px/1.55 "Open Sans", sans-serif;
 	color: #474747;

@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Instancia implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	private String processKey;
 	private String id;
 	private List<Variable<?>> variables;
@@ -17,67 +17,87 @@ public class Instancia implements Serializable {
 	private List<Tarea> tareas;
 	private Tarea tareaActual;
 	private List<String> rolesCandidatos;
+
 	public String getProcessKey() {
 		return processKey;
 	}
+
 	public void setProcessKey(String processKey) {
 		this.processKey = processKey;
 	}
+
 	public String getId() {
 		return id;
 	}
+
 	public void setId(String id) {
 		this.id = id;
 	}
+
 	public List<Variable<?>> getVariables() {
 		return variables;
 	}
+
 	public void setVariables(List<Variable<?>> variables) {
 		this.variables = variables;
 	}
+
 	public String getComentario() {
 		return comentario;
 	}
+
 	public void setComentario(String comentario) {
 		this.comentario = comentario;
 	}
+
 	public String getUsuario() {
 		return usuario;
 	}
+
 	public void setUsuario(String usuario) {
 		this.usuario = usuario;
 	}
+
 	public Date getInicio() {
 		return inicio;
 	}
+
 	public void setInicio(Date inicio) {
 		this.inicio = inicio;
 	}
+
 	public Date getTermino() {
 		return termino;
 	}
+
 	public void setTermino(Date termino) {
 		this.termino = termino;
 	}
+
 	public List<Tarea> getTareas() {
 		return tareas;
 	}
+
 	public void setTareas(List<Tarea> tareas) {
 		this.tareas = tareas;
 	}
+
 	public List<String> getRolesCandidatos() {
 		return rolesCandidatos;
 	}
+
 	public void setRolesCandidatos(List<String> rolesCandidatos) {
 		this.rolesCandidatos = rolesCandidatos;
 	}
-	
+
 	public Tarea getTareaActual() {
 		return tareaActual;
 	}
+
 	public void setTareaActual(Tarea tareaActual) {
 		this.tareaActual = tareaActual;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -86,6 +106,7 @@ public class Instancia implements Serializable {
 		result = prime * result + ((processKey == null) ? 0 : processKey.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -107,10 +128,9 @@ public class Instancia implements Serializable {
 			return false;
 		return true;
 	}
+
 	@Override
 	public String toString() {
 		return "Instancia [processKey=" + processKey + ", id=" + id + ", usuario=" + usuario + ", inicio=" + inicio + ", termino=" + termino + "]";
 	}
-	
-	
 }

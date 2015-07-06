@@ -1519,14 +1519,6 @@ div.v-layout.v-horizontal.v-widget {
 	border: none !important;
 }
 
-.xbreadcrumbs LI {
-	height: auto !important;
-}
-
-.xbreadcrumbs {
-	background: transparent !important;
-}
-
 .tests-valo-flat.v-app, .tests-valo-flat.v-app-loading {
 	font: 400 16px/1.55 "Roboto", sans-serif;
 	color: #474747;

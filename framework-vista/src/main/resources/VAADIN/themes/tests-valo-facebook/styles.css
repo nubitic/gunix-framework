@@ -1479,14 +1479,6 @@ div.v-layout.v-horizontal.v-widget {
 	vertical-align: top;
 }
 
-.xbreadcrumbs LI {
-	height: auto !important;
-}
-
-.xbreadcrumbs {
-	background: transparent !important;
-}
-
 .tests-valo-facebook.v-app, .tests-valo-facebook.v-app-loading {
 	font: 400 14px/1.55 Helvetica, Arial, "lucida grande", tahoma, verdana, arial, sans-serif;
 	color: #37404E;
