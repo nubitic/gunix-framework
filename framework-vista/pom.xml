@@ -168,6 +168,21 @@
 				<version>1.4.0</version>
 				<executions>
 					<execution>
+						<id>gunix</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<classpathScope>compile</classpathScope>
+							<mainClass>com.vaadin.sass.SassCompiler</mainClass>
+							<arguments>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/gunix/styles.scss</argument>
+								<argument>${basedir}/src/main/resources/VAADIN/themes/gunix/styles.css</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
 						<id>tests-valo</id>
 						<phase>generate-sources</phase>
 						<goals>

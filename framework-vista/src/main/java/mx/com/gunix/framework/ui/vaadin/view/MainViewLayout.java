@@ -5,16 +5,13 @@ import java.util.Arrays;
 import javax.annotation.PostConstruct;
 
 import mx.com.gunix.framework.security.domain.Usuario;
-import mx.com.gunix.framework.ui.vaadin.MainUI;
 import mx.com.gunix.framework.ui.vaadin.component.Header;
-import mx.com.gunix.framework.ui.vaadin.spring.GunixVaadinView;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
@@ -23,8 +20,7 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-@GunixVaadinView(tipo = GunixVaadinView.INDEX, ui = MainUI.class)
-public class MenuView extends VerticalLayout implements SecuredView {
+public class MainViewLayout extends VerticalLayout {
 	@Autowired
 	@Lazy
 	ApplicationContext applicationContext;
@@ -36,7 +32,6 @@ public class MenuView extends VerticalLayout implements SecuredView {
 
 	@PostConstruct
 	private void postConstruct() {
-		//setSizeFull();
 		setWidth("-1px");
 		setHeight("-1px");
 		setSpacing(false);
@@ -87,9 +82,4 @@ public class MenuView extends VerticalLayout implements SecuredView {
 		UI.getCurrent().setNavigator(((Header) aplicacionesTab.getSelectedTab()).getNavigator());
 		setExpandRatio(aplicacionesTab, 1.0f);
 	}
-
-	@Override
-	public void enter(ViewChangeEvent event) {
-	}
-
 }

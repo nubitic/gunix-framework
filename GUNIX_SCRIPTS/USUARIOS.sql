@@ -125,7 +125,7 @@ INSERT INTO USUARIO(ID_USUARIO,PASSWORD,ESTATUS) VALUES('anonymous',crypt('loloq
 
 INSERT INTO APLICACION VALUES('GUNIX_ADMON','Gunix','Gunix.png');
         INSERT INTO ROL VALUES('GUNIX_ADMON','ADMINISTRADOR','Administrador de Clientes y Aplicaciones');
-        INSERT INTO MODULO VALUES('GUNIX_ADMON','CLIENTES','Administración de Clientes Gunix','Address Card.png');
+        INSERT INTO MODULO VALUES('GUNIX_ADMON','CLIENTES','Administración de Clientes','AddressCard.png');
         INSERT INTO MODULO VALUES('GUNIX_ADMON','APLICACIONES','Administración de Aplicaciones Gunix','window-32.png');
                 INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,ORDEN) VALUES('GUNIX_ADMON','CLIENTES','ADMINISTRACION','Administración','Menú con opciones de Administración de usuarios',1);
                 INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,PROCESS_KEY,ID_FUNCION_PADRE,ORDEN) VALUES('GUNIX_ADMON','CLIENTES','ALTA','Alta','Alta de Clientes','AdministraciónClientes','ADMINISTRACION',1);

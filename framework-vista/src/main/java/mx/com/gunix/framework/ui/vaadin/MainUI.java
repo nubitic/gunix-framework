@@ -5,7 +5,7 @@ import org.vaadin.spring.annotation.VaadinUI;
 import com.vaadin.annotations.Theme;
 
 @VaadinUI
-@Theme("tests-valo-facebook")
+@Theme("gunix")
 public class MainUI extends AbstractGunixUI {
 	private static final long serialVersionUID = 1L;
 

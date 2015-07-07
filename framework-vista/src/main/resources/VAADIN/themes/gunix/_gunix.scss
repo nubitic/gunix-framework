@@ -1,0 +1,8 @@
+@mixin gunix {
+  @include valo;
+
+  .v-button-link.v-disabled.xbreadcrumbbutton{
+  	opacity: 1;
+	filter: alpha(opacity=100);
+  }
+}
