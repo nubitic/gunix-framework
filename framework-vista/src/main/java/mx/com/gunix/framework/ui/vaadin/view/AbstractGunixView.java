@@ -1,7 +1,6 @@
 package mx.com.gunix.framework.ui.vaadin.view;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +20,7 @@ import org.springframework.context.annotation.Lazy;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.server.Responsive;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -42,6 +42,7 @@ public abstract class AbstractGunixView extends VerticalLayout implements View {
 	
 	TareaActualNavigator taNav;
 	private Tarea tarea;
+	private Button prevBoton;
 
 	@PostConstruct
 	private void postConstruct() {
@@ -49,15 +50,21 @@ public abstract class AbstractGunixView extends VerticalLayout implements View {
 		setHeight("100%");
 		setSpacing(false);
 		setMargin(true);
-		setId(getClass().getName()+":"+hashCode());
+		setId(new StringBuilder(getClass().getName()).append(":").append(hashCode()).toString());
 		taNav = (TareaActualNavigator) UI.getCurrent().getNavigator();
 		tarea = taNav.getTareaActual();
 		doConstruct();
 	}
 
 	protected void posicionaBotonCompletaTarea(Button boton) {
+		if(prevBoton==null) {
+			prevBoton=boton;
+		}else {
+			removeComponent(prevBoton);
+		}
 		addComponent(boton);
 		setComponentAlignment(boton, Alignment.BOTTOM_RIGHT);
+		boton.setDisableOnClick(true);
 	}
 
 	protected final void completaTarea() {
@@ -101,6 +108,7 @@ public abstract class AbstractGunixView extends VerticalLayout implements View {
 	public void enter(ViewChangeEvent event) {
 		tarea = taNav.getTareaActual();
 		doEnter(event);
+		Responsive.makeResponsive(this);
 	}
 
 	protected abstract void doEnter(ViewChangeEvent event);
