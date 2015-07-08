@@ -173,7 +173,7 @@ public class Header extends CustomComponent {
 			menuBar.setEnabled(false);
 			menuBar.setCaption("");
 			initBreadCrumb();
-			modulosLayout.setRows(3);// Rows Iniciales
+			modulosLayout.setRows(1);// Rows Iniciales
 			modulosLayout.setColumns((MODULOS_POR_FILA * 2) + 1);
 
 			Optional<Rol> rolSelOpt =  aplicacion.getRoles().stream().filter(rol -> rol.getIdRol().equals(rolCBox.getValue())).findFirst();
@@ -181,16 +181,18 @@ public class Header extends CustomComponent {
 			rolSelOpt.ifPresent(rolSel->{
 				int filasModulos = ((filasModulos = rolSel.getModulos().size()) % MODULOS_POR_FILA == 0) ? filasModulos / MODULOS_POR_FILA : (filasModulos / MODULOS_POR_FILA) + 1;
 				if (filasModulos > 1) {
-					modulosLayout.setRows(3 + (filasModulos * 2));
+					modulosLayout.setRows(1 + (filasModulos * 2));
 				}
 
 				int modulosProcesados = 0;
+				int rowIncr=1;
 				for (int row = 0; row < filasModulos; row++) {
 					if (row % 2 != 0) {
-						modulosLayout.setRowExpandRatio(row, 2 / modulosLayout.getRows());
+						modulosLayout.setRowExpandRatio(row, 1);
 					} else {
-						modulosLayout.setRowExpandRatio(row, 1 / modulosLayout.getRows());
+						modulosLayout.setRowExpandRatio(row, 2);
 					}
+					int colIncr=1;
 					for (int col = 0; col < MODULOS_POR_FILA; col++) {
 						Modulo modulo = rolSel.getModulos().get(modulosProcesados);
 						Image button = new Image(modulo.getDescripcion(),new ThemeResource(modulo.getIcono()));
@@ -216,14 +218,16 @@ public class Header extends CustomComponent {
 							});
 							menuBar.setCaption(modulo.getDescripcion());
 						});
-						modulosLayout.addComponent(button, row + 1, col + 1);
+						modulosLayout.addComponent(button, col + colIncr, row + rowIncr);
 
 						modulosLayout.setComponentAlignment(button, Alignment.TOP_CENTER);
 						modulosProcesados++;
+						colIncr++;
 						if (modulosProcesados == rolSel.getModulos().size()) {
 							break;
 						}
 					}
+					rowIncr++;
 				}
 			});
 		});
@@ -306,7 +310,7 @@ public class Header extends CustomComponent {
 		// modulosLayout
 		modulosLayout = new GridLayout();
 		modulosLayout.setImmediate(false);
-		modulosLayout.setWidth("-1px");
+		modulosLayout.setWidth("550px");
 		modulosLayout.setHeight("-1px");
 		modulosLayout.setMargin(false);
 		modulosLayout.setSpacing(true);

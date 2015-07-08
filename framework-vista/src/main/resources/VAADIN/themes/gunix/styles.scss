@@ -3,9 +3,20 @@
 
 .gunix {
    @include gunix;
-   
+	
+	.v-gridlayout-slot {
+		display: table;
+		padding-top: 0px !important;
+	} 
+	   
    .v-image-moduleImageButton {
-		cursor:pointer;cursor:hand
+		cursor:pointer;cursor:hand;
+		display: table-header-group;
+	}
+	.v-caption-moduleImageButton{
+		display: table-footer-group;
+		text-align: center;
+		position: relative !important;
 	}
 }
 

@@ -12420,7 +12420,19 @@ div.v-layout.v-horizontal.v-widget {
 	filter: alpha(opacity=100);
 }
 
+.gunix .v-gridlayout-slot {
+	display: table;
+	padding-top: 0px !important;
+}
+
 .gunix .v-image-moduleImageButton {
 	cursor: pointer;
 	cursor: hand;
+	display: table-header-group;
+}
+
+.gunix .v-caption-moduleImageButton {
+	display: table-footer-group;
+	text-align: center;
+	position: relative !important;
 }
