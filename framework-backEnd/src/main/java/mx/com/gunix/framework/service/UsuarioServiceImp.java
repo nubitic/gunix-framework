@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UsuarioServiceImp implements UsuarioService {
 	@Autowired
 	UsuarioMapper um;
-	
+
 	@Autowired
 	PersistentTokenRepository persistentTokenRepository;
 
@@ -37,7 +37,8 @@ public class UsuarioServiceImp implements UsuarioService {
 
 	@Override
 	public PersistentRememberMeToken getTokenForSeries(String seriesId) {
-		return (PersistentRememberMeToken) persistentTokenRepository.getTokenForSeries(seriesId);
+		org.springframework.security.web.authentication.rememberme.PersistentRememberMeToken rememberMeToken = persistentTokenRepository.getTokenForSeries(seriesId);
+		return new PersistentRememberMeToken(rememberMeToken.getUsername(), rememberMeToken.getSeries(), rememberMeToken.getTokenValue(), rememberMeToken.getDate());
 	}
 
 	@Override
@@ -54,5 +55,5 @@ public class UsuarioServiceImp implements UsuarioService {
 	public Usuario getAnonymous() {
 		return um.getUsuario(ANONYMOUS);
 	}
-	
+
 }

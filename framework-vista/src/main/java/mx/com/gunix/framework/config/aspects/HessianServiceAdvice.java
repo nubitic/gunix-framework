@@ -3,6 +3,7 @@ package mx.com.gunix.framework.config.aspects;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+import mx.com.gunix.framework.security.PersistentTokenBasedRememberMeServices;
 import mx.com.gunix.framework.service.UsuarioService;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -11,8 +12,10 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.core.ControlFlowFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.stereotype.Component;
 
 @Aspect
@@ -24,7 +27,16 @@ public class HessianServiceAdvice {
 			Object[] orgArgs = pjp.getArgs();
 			Object[] newArgs = new Object[orgArgs.length+1];
 			System.arraycopy(orgArgs, 0, newArgs, 0, orgArgs.length);
-			Object principal = pjp.getSignature().getDeclaringType().equals(UsuarioService.class)&&pjp.getSignature().getName().equals("getAnonymous")?
+			
+			Object principal = (SecurityContextHolder.getContext().getAuthentication()==null && 
+								(pjp.getSignature().getDeclaringType().equals(UsuarioService.class) &&				// Excepciones para las que se acepta autenticación null
+							     (pjp.getSignature().getName().equals("getAnonymous") || 							//
+							      (pjp.getSignature().getName().equals("getUsuario") && 							// UsuarioService.getAnonymous(),
+							       ControlFlowFactory.createControlFlow().under(PersistentTokenBasedRememberMeServices.class, "processAutoLoginCookie")))) ||
+							    (pjp.getSignature().getDeclaringType().equals(PersistentTokenRepository.class) &&	// UsuarioService.getUsuario() siempre y cuando provenga de un PersistentTokenBasedRememberMeServices.processAutoLoginCookie, 
+							     (pjp.getSignature().getName().equals("getTokenForSeries") || 						// PersistentTokenRepository.getTokenForSeries() y
+							      pjp.getSignature().getName().equals("updateToken")) 								// PersistentTokenRepository.updateToken
+							    ))?																					// 
 								null
 								:SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			newArgs[newArgs.length-1]=(principal instanceof UserDetails)?principal:null;

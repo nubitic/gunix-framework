@@ -48,6 +48,7 @@ import org.vaadin.spring.security.web.authentication.VaadinAuthenticationSuccess
 @EnableWebSecurity
 @EnableVaadinSecurity
 public class VaadinSecurityConfig extends WebSecurityConfigurerAdapter implements InitializingBean {
+	private final String REMEMBER_ME_KEY = UUID.randomUUID().toString();
 	@Autowired
 	private VaadinSecurityContext vaadinSecurityContext;
 
@@ -81,7 +82,7 @@ public class VaadinSecurityConfig extends WebSecurityConfigurerAdapter implement
 
 	@Bean
 	public RememberMeServices rememberMeService() {
-		ptbrms = new PersistentTokenBasedRememberMeServices(UUID.randomUUID().toString(), userDetailsService());
+		ptbrms = new PersistentTokenBasedRememberMeServices(REMEMBER_ME_KEY, userDetailsService());
 		return ptbrms;
 	}
 
@@ -159,13 +160,17 @@ public class VaadinSecurityConfig extends WebSecurityConfigurerAdapter implement
 			.anonymous()
 				.principal(new UserDetails(usuarioService.getAnonymous()))
 			.and()
-			.authorizeRequests()
-				.antMatchers("/login/**").permitAll()
-				.antMatchers("/public/**").anonymous()
-				.antMatchers("/UIDL/**").permitAll()
-				.antMatchers("/HEARTBEAT/**").authenticated()
-				.antMatchers("/**").authenticated()
-				.anyRequest().authenticated()
+				.authorizeRequests()
+					.antMatchers("/login/**").permitAll()
+					.antMatchers("/public/**").anonymous()
+					.antMatchers("/UIDL/**").permitAll()
+					.antMatchers("/HEARTBEAT/**").authenticated()
+					.antMatchers("/**").authenticated()
+					.anyRequest().authenticated()
+			.and()
+				.rememberMe()
+					.rememberMeServices(rememberMeService())
+					.key(REMEMBER_ME_KEY)
 			.and()
 				.sessionManagement()
 					.sessionFixation()
@@ -176,6 +181,7 @@ public class VaadinSecurityConfig extends WebSecurityConfigurerAdapter implement
 				.headers()
 					.frameOptions()
 						.disable();
+		
 		http.exceptionHandling()
 			.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"));
 	}
