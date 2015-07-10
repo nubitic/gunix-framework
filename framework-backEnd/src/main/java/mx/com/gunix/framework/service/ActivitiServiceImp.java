@@ -74,19 +74,21 @@ public class ActivitiServiceImp implements ActivitiService {
 		if (!variablesProcesoMap.isEmpty()) {
 			rs.setVariables(tarea.getInstancia().getId(), variablesProcesoMap);
 		}
+		
 		if (!variablesTareaMap.isEmpty()) {
 			ts.setVariablesLocal(tarea.getId(), variablesProcesoMap);
 		}
+		
 		ts.complete(taskId, variablesMaps[Variable.Scope.TAREA.ordinal()]);
 		tarea.getInstancia().setTareaActual(getCurrentTask(tarea.getInstancia().getId()));
+		
 		if(tarea.getInstancia().getTareaActual()==null){
 			tarea.getInstancia().setTareaActual(Tarea.DEFAULT_END_TASK);
 		}else{
-			tarea.getInstancia().getTareaActual().setInstancia(tarea.getInstancia());	
-		}
-		
-		refreshVars(tarea.getInstancia().getTareaActual());
-		refreshVars(tarea.getInstancia());
+			tarea.getInstancia().getTareaActual().setInstancia(tarea.getInstancia());
+			refreshVars(tarea.getInstancia().getTareaActual());
+			refreshVars(tarea.getInstancia());
+		}		
 		
 		if(tarea.getInstancia().getTareaActual().isTerminal()){
 			ts.complete(tarea.getInstancia().getTareaActual().getId());

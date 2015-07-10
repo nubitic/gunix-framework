@@ -21,8 +21,6 @@ import org.springframework.context.annotation.Lazy;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.Responsive;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -42,7 +40,6 @@ public abstract class AbstractGunixView extends VerticalLayout implements View {
 	
 	TareaActualNavigator taNav;
 	private Tarea tarea;
-	private Button prevBoton;
 
 	@PostConstruct
 	private void postConstruct() {
@@ -54,17 +51,6 @@ public abstract class AbstractGunixView extends VerticalLayout implements View {
 		taNav = (TareaActualNavigator) UI.getCurrent().getNavigator();
 		tarea = taNav.getTareaActual();
 		doConstruct();
-	}
-
-	protected void posicionaBotonCompletaTarea(Button boton) {
-		if(prevBoton==null) {
-			prevBoton=boton;
-		}else {
-			removeComponent(prevBoton);
-		}
-		addComponent(boton);
-		setComponentAlignment(boton, Alignment.BOTTOM_RIGHT);
-		boton.setDisableOnClick(true);
 	}
 
 	protected final void completaTarea() {
@@ -96,7 +82,7 @@ public abstract class AbstractGunixView extends VerticalLayout implements View {
 		return applicationContext.getBean(beanClass);
 	}
 	
-	protected final Serializable getVariable(String nombreVariable){
+	protected final Serializable $(String nombreVariable){
 		Optional<Variable<?>> valor = tarea.getInstancia().getVariables()
 							.stream()
 							.filter(var-> var.getNombre().equals(nombreVariable))

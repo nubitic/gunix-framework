@@ -5,7 +5,7 @@ import mx.com.gunix.domain.Cliente;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.vote.AuthenticatedVoter;
 
-@Secured(AuthenticatedVoter.IS_AUTHENTICATED_ANONYMOUSLY)
+@Secured(AuthenticatedVoter.IS_AUTHENTICATED_REMEMBERED)
 public interface ClienteService {
 	public void guarda(Cliente cliente);
 	public Boolean isValid(Cliente cliente);

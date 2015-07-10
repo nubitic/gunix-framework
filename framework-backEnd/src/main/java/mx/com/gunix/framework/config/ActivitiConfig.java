@@ -67,7 +67,7 @@ public class ActivitiConfig{
 		//speConf.setJobExecutor(jobExecutor());
 		speConf.setIdGenerator(idGenerator());
 		speConf.setDeploymentMode(ResourceParentFolderAutoDeploymentStrategy.DEPLOYMENT_MODE);
-		speConf.setDeploymentResources(resourcePatternResolver.getResources("classpath*:/mx/com/gunix/procesos/*.bpmn"));
+		speConf.setDeploymentResources(resourcePatternResolver.getResources("classpath*:/mx/com/gunix/procesos/**/*.bpmn"));
 
 		VariableInstanceEntityManager vim = variableInstanceEntityManager();
 

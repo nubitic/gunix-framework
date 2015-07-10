@@ -29,7 +29,7 @@ public class ClienteServiceImpl extends GunixActivitServiceSupport implements Cl
 		Boolean ans=Boolean.TRUE;
 		if(clienteBD!=null){
 			List<String> errores = new ArrayList<String>();
-			errores.add("El cliente: "+cliente.getNombre()+" ya existe en la Base de Datos");
+			errores.add(new StringBuilder("El cliente: ").append(cliente.getNombre()).append(" ya existe en la Base de Datos").toString());
 			agregaVariable("errores", errores);
 			ans = Boolean.FALSE;
 		}

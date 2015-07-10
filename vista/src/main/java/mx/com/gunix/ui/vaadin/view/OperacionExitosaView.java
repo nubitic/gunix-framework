@@ -5,18 +5,19 @@ import java.util.List;
 import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.ui.vaadin.spring.GunixVaadinView;
 import mx.com.gunix.framework.ui.vaadin.view.AbstractGunixView;
+import mx.com.gunix.framework.ui.vaadin.view.SecuredView;
 
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
 
 @GunixVaadinView
-public class OperacionExitosaView extends AbstractGunixView {
+public class OperacionExitosaView extends AbstractGunixView implements SecuredView{
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected void doConstruct() {
-		addComponent(new Label(getVariable("operación")+" Exitosa<\br>Cliente:"+getVariable("cliente"), ContentMode.HTML));
+		addComponent(new Label($("operación")+" Exitosa<\br>Cliente:"+$("cliente"), ContentMode.HTML));
 		
 	}
 

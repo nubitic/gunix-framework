@@ -121,11 +121,14 @@ create table PERSISTENT_LOGINS
         LAST_USED timestamp not null
 );
 
-INSERT INTO USUARIO(ID_USUARIO,PASSWORD,ESTATUS) VALUES('anonymous',crypt('loloq123', gen_salt('bf', 16)),'ACTIVO');
+INSERT INTO USUARIO(ID_USUARIO,PASSWORD,ESTATUS) VALUES('bjvences@gmail.com',crypt('loloq123', gen_salt('bf', 16)),'ACTIVO');
+INSERT INTO USUARIO(ID_USUARIO,PASSWORD,ESTATUS) VALUES('anonymous',crypt('anonymous', gen_salt('bf', 16)),'ACTIVO');
 
 INSERT INTO APLICACION VALUES('GUNIX_ADMON','Gunix','Gunix.png');
-        INSERT INTO ROL VALUES('GUNIX_ADMON','ADMINISTRADOR','Administrador de Clientes y Aplicaciones');
 
+        /* Funcionalidad Privada (Segura) */
+        INSERT INTO ROL VALUES('GUNIX_ADMON','ADMINISTRADOR','Administrador de Clientes y Aplicaciones');
+        
         INSERT INTO MODULO VALUES('GUNIX_ADMON','CLIENTES','Clientes','AddressCard.png');
                 INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,ORDEN) VALUES('GUNIX_ADMON','CLIENTES','ADMINISTRACION','Administración','Menú con opciones de Administración de usuarios',1);
                 INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,PROCESS_KEY,ID_FUNCION_PADRE,ORDEN) VALUES('GUNIX_ADMON','CLIENTES','ALTA','Alta','Alta de Clientes','AdministraciónClientes','ADMINISTRACION',1);
@@ -145,7 +148,18 @@ INSERT INTO APLICACION VALUES('GUNIX_ADMON','Gunix','Gunix.png');
         INSERT INTO ROL_FUNCION VALUES('GUNIX_ADMON','ADMINISTRADOR','CONTACTO','ADMINISTRACION','COMPLETO');
         INSERT INTO ROL_FUNCION VALUES('GUNIX_ADMON','ADMINISTRADOR','SOPORTE','ADMINISTRACION','COMPLETO');
 
-                INSERT INTO USUARIO_ROL VALUES('anonymous','GUNIX_ADMON','ADMINISTRADOR');
+        INSERT INTO USUARIO_ROL VALUES('bjvences@gmail.com','GUNIX_ADMON','ADMINISTRADOR');
+
+        /* Funcionalidad Pública */
+        INSERT INTO ROL VALUES('GUNIX_ADMON','PUBLIC','Público en General');
+        INSERT INTO MODULO VALUES('GUNIX_ADMON','MODULO_PRUEBA','Demostraciones','1436568412_demo.png');
+                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,ORDEN) VALUES('GUNIX_ADMON','MODULO_PRUEBA','DEMOS','Demos','Menú con funcionalidad de demostración',1);
+                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,PROCESS_KEY,ID_FUNCION_PADRE,ORDEN) VALUES('GUNIX_ADMON','MODULO_PRUEBA','ALTA_FORM','Formulario Alta','Demostración de Formularios','DemoForm','DEMOS',1);
+                        INSERT INTO PARAM_FUNCION VALUES ('GUNIX_ADMON','MODULO_PRUEBA','ALTA_FORM','operación','Alta');
+
+        INSERT INTO ROL_FUNCION VALUES('GUNIX_ADMON','PUBLIC','MODULO_PRUEBA','DEMOS','COMPLETO');
+
+        INSERT INTO USUARIO_ROL VALUES('anonymous','GUNIX_ADMON','PUBLIC');
 
 create or replace function MENU_USUARIO(id_usuario text)
   returns table (

@@ -173,13 +173,14 @@ public class Header extends CustomComponent {
 			menuBar.setEnabled(false);
 			menuBar.setCaption("");
 			initBreadCrumb();
-			modulosLayout.setRows(1);// Rows Iniciales
+			modulosLayout.setRows(3);// Rows Iniciales
 			modulosLayout.setColumns((MODULOS_POR_FILA * 2) + 1);
 
 			Optional<Rol> rolSelOpt =  aplicacion.getRoles().stream().filter(rol -> rol.getIdRol().equals(rolCBox.getValue())).findFirst();
 			
 			rolSelOpt.ifPresent(rolSel->{
 				int filasModulos = ((filasModulos = rolSel.getModulos().size()) % MODULOS_POR_FILA == 0) ? filasModulos / MODULOS_POR_FILA : (filasModulos / MODULOS_POR_FILA) + 1;
+				boolean isOneModulo = rolSel.getModulos().size()==1;
 				if (filasModulos > 1) {
 					modulosLayout.setRows(1 + (filasModulos * 2));
 				}
@@ -192,7 +193,7 @@ public class Header extends CustomComponent {
 					} else {
 						modulosLayout.setRowExpandRatio(row, 2);
 					}
-					int colIncr=1;
+					int colIncr=isOneModulo?3:1;
 					for (int col = 0; col < MODULOS_POR_FILA; col++) {
 						Modulo modulo = rolSel.getModulos().get(modulosProcesados);
 						Image button = new Image(modulo.getDescripcion(),new ThemeResource(modulo.getIcono()));

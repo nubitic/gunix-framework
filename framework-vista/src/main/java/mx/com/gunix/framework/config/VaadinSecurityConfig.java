@@ -162,7 +162,7 @@ public class VaadinSecurityConfig extends WebSecurityConfigurerAdapter implement
 			.and()
 				.authorizeRequests()
 					.antMatchers("/login/**").permitAll()
-					.antMatchers("/public/**").anonymous()
+					.antMatchers("/public/**").permitAll()
 					.antMatchers("/UIDL/**").permitAll()
 					.antMatchers("/HEARTBEAT/**").authenticated()
 					.antMatchers("/**").authenticated()
@@ -181,7 +181,6 @@ public class VaadinSecurityConfig extends WebSecurityConfigurerAdapter implement
 				.headers()
 					.frameOptions()
 						.disable();
-		
 		http.exceptionHandling()
 			.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"));
 	}

@@ -38,7 +38,7 @@ public class UsuarioServiceImp implements UsuarioService {
 	@Override
 	public PersistentRememberMeToken getTokenForSeries(String seriesId) {
 		org.springframework.security.web.authentication.rememberme.PersistentRememberMeToken rememberMeToken = persistentTokenRepository.getTokenForSeries(seriesId);
-		return new PersistentRememberMeToken(rememberMeToken.getUsername(), rememberMeToken.getSeries(), rememberMeToken.getTokenValue(), rememberMeToken.getDate());
+		return rememberMeToken !=null?new PersistentRememberMeToken(rememberMeToken.getUsername(), rememberMeToken.getSeries(), rememberMeToken.getTokenValue(), rememberMeToken.getDate()):null;
 	}
 
 	@Override
