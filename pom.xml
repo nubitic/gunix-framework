@@ -50,11 +50,6 @@
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>mx.com.gunix</groupId>
-				<artifactId>core</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>com.caucho</groupId>
 				<artifactId>hessian</artifactId>
 				<version>4.0.38</version>
