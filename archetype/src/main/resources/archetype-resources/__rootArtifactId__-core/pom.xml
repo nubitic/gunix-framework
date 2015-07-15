@@ -16,5 +16,9 @@
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>mx.com.gunix</groupId>
+			<artifactId>framework-commons</artifactId>
+		</dependency>
 	</dependencies>
 </project>
