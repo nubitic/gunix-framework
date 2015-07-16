@@ -8,9 +8,12 @@
 create table acl_sid(
     id bigserial not null primary key,
     principal boolean not null,
-    sid varchar(100) not null,
-    constraint unique_uk_1 unique(sid,principal)
+    sid VARCHAR(254) not null,
+    constraint unique_uk_1 unique(sid)
 );
+
+ALTER TABLE acl_sid ADD CONSTRAINT "acl_sid_USUARIO_FK1" FOREIGN KEY (sid) REFERENCES USUARIO (ID_USUARIO)  ON UPDATE NO ACTION ON DELETE NO ACTION;
+CREATE INDEX acl_sid_FK1IDX ON acl_sid USING BTREE (sid);
 
 create table acl_class(
     id bigserial not null primary key,
@@ -21,15 +24,20 @@ create table acl_class(
 create table acl_object_identity(
     id bigserial primary key,
     object_id_class bigint not null,
-    object_id_identity bigint not null,
+    object_id_identity numeric not null,
     parent_object bigint,
     owner_sid bigint,
     entries_inheriting boolean not null,
     constraint unique_uk_3 unique(object_id_class,object_id_identity),
-    constraint foreign_fk_1 foreign key(parent_object)references acl_object_identity(id),
-    constraint foreign_fk_2 foreign key(object_id_class)references acl_class(id),
-    constraint foreign_fk_3 foreign key(owner_sid)references acl_sid(id)
+    constraint foreign_fk_1 foreign key(parent_object)references acl_object_identity(id)  ON UPDATE NO ACTION ON DELETE NO ACTION,
+    constraint foreign_fk_2 foreign key(object_id_class)references acl_class(id)  ON UPDATE NO ACTION ON DELETE NO ACTION,
+    constraint foreign_fk_3 foreign key(owner_sid)references acl_sid(id)  ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+CREATE INDEX acl_object_identity_FK1IDX ON acl_object_identity USING BTREE (parent_object);
+CREATE INDEX acl_object_identity_FK2IDX ON acl_object_identity USING BTREE (object_id_class);
+CREATE INDEX acl_object_identity_FK3IDX ON acl_object_identity USING BTREE (owner_sid);
+
 
 create table acl_entry(
     id bigserial primary key,
@@ -41,6 +49,9 @@ create table acl_entry(
     audit_success boolean not null,
     audit_failure boolean not null,
     constraint unique_uk_4 unique(acl_object_identity,ace_order),
-    constraint foreign_fk_4 foreign key(acl_object_identity) references acl_object_identity(id),
-    constraint foreign_fk_5 foreign key(sid) references acl_sid(id)
+    constraint foreign_fk_4 foreign key(acl_object_identity) references acl_object_identity(id)  ON UPDATE NO ACTION ON DELETE NO ACTION,
+    constraint foreign_fk_5 foreign key(sid) references acl_sid(id)  ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+CREATE INDEX acl_entry_FK4IDX ON acl_entry USING BTREE (acl_object_identity);
+CREATE INDEX acl_entry_FK5IDX ON acl_entry USING BTREE (sid);

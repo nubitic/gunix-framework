@@ -8,6 +8,7 @@ import mx.com.gunix.framework.ui.vaadin.spring.GunixVaadinView;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Label;
 
+@SuppressWarnings("rawtypes")
 @GunixVaadinView
 public class DefaultProcessEndView extends AbstractGunixView {
 	private static final long serialVersionUID = 1L;
