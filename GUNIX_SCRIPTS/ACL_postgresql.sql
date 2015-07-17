@@ -1,9 +1,22 @@
 ﻿-- ACL Schema SQL for PostgreSQL
 
- drop table acl_entry;
- drop table acl_object_identity;
- drop table acl_class;
- drop table acl_sid;
+ drop table if exists acl_entry;
+ drop table if exists acl_object_identity;
+ drop table if exists acl_class;
+ drop table if exists acl_sid;
+ DROP TABLE if exists USUARIO;
+ DROP TYPE if exists ESTATUS_USUARIO;
+ 
+CREATE TYPE ESTATUS_USUARIO AS ENUM ('ACTIVO','ELIMINADO','BLOQUEADO','SIN PASSWORD');
+
+CREATE TABLE USUARIO
+(
+	ID_USUARIO VARCHAR(254) NOT NULL,
+	PASSWORD VARCHAR(60),
+	ESTATUS ESTATUS_USUARIO NOT NULL DEFAULT 'SIN PASSWORD'
+);
+
+ALTER TABLE USUARIO ADD CONSTRAINT "USUARIO_PK" PRIMARY KEY (ID_USUARIO);
 
 create table acl_sid(
     id bigserial not null primary key,
@@ -24,11 +37,11 @@ create table acl_class(
 create table acl_object_identity(
     id bigserial primary key,
     object_id_class bigint not null,
-    object_id_identity numeric not null,
+    object_id_identity BIGSERIAL NOT NULL,
     parent_object bigint,
     owner_sid bigint,
     entries_inheriting boolean not null,
-    constraint unique_uk_3 unique(object_id_class,object_id_identity),
+    constraint unique_uk_3 unique(object_id_identity),
     constraint foreign_fk_1 foreign key(parent_object)references acl_object_identity(id)  ON UPDATE NO ACTION ON DELETE NO ACTION,
     constraint foreign_fk_2 foreign key(object_id_class)references acl_class(id)  ON UPDATE NO ACTION ON DELETE NO ACTION,
     constraint foreign_fk_3 foreign key(owner_sid)references acl_sid(id)  ON UPDATE NO ACTION ON DELETE NO ACTION
@@ -55,3 +68,7 @@ create table acl_entry(
 
 CREATE INDEX acl_entry_FK4IDX ON acl_entry USING BTREE (acl_object_identity);
 CREATE INDEX acl_entry_FK5IDX ON acl_entry USING BTREE (sid);
+
+INSERT INTO USUARIO(ID_USUARIO,PASSWORD,ESTATUS) VALUES('bjvences@gmail.com',crypt('loloq123', gen_salt('bf', 16)),'ACTIVO');
+INSERT INTO USUARIO(ID_USUARIO,PASSWORD,ESTATUS) VALUES('anonymous',crypt('anonymous', gen_salt('bf', 16)),'ACTIVO');
+INSERT INTO acl_sid(principal,sid) VALUES(true,'bjvences@gmail.com');

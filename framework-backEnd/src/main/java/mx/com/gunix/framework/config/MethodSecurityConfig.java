@@ -67,6 +67,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration implements BeanFactoryAware{
 	public static String ACL_CACHE_NAME = "aclCache";
+	public static final String ACL_ADMIN_ROLE = "ACL_ADMIN";
 	private BeanFactory beanFactory;
 
 	
@@ -102,7 +103,7 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration impl
     
     @Bean
     public AclAuthorizationStrategy aclAuthorizationStrategy() {
-        return new AclAuthorizationStrategyImpl(new SimpleGrantedAuthority("ROLE_ACL_ADMIN"));
+        return new AclAuthorizationStrategyImpl(new SimpleGrantedAuthority(ACL_ADMIN_ROLE));
     }
     
     @Bean

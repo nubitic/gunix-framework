@@ -9,30 +9,18 @@ DROP TABLE if exists USUARIO_ROL;
 DROP TABLE if exists ROL;
 DROP TABLE if exists USUARIO_APLICACION;
 DROP TABLE if exists APLICACION;
-DROP TABLE if exists USUARIO;
-DROP TYPE if exists ESTATUS_USUARIO;
-
-CREATE TYPE ESTATUS_USUARIO AS ENUM ('ACTIVO','ELIMINADO','BLOQUEADO','SIN PASSWORD');
-
-CREATE TABLE USUARIO
-(
-	ID_USUARIO VARCHAR(254) NOT NULL,
-	PASSWORD VARCHAR(60),
-	ESTATUS ESTATUS_USUARIO NOT NULL DEFAULT 'SIN PASSWORD'
-);
-
-ALTER TABLE USUARIO ADD CONSTRAINT "USUARIO_PK" PRIMARY KEY (ID_USUARIO);
 
 CREATE TABLE APLICACION
 (
 	ID_APLICACION VARCHAR(30) NOT NULL,
-	SURROGATE_PK BIGINT NOT NULL,
+	ACL_ID BIGINT NOT NULL,
 	DESCRIPCION VARCHAR(100) NOT NULL DEFAULT 'APLICACION SIN DESCRIPCION',
 	ICONO VARCHAR(25) NOT NULL DEFAULT 'APLICACION_SIN_ICONO.png'
 );
 ALTER TABLE APLICACION ADD CONSTRAINT "APLICACION_PK" PRIMARY KEY (ID_APLICACION);
-ALTER TABLE APLICACION ADD CONSTRAINT "APLICACION_SPK" UNIQUE (SURROGATE_PK);
-
+ALTER TABLE APLICACION ADD CONSTRAINT "APLICACION_ACL_UQ" UNIQUE (ACL_ID);
+ALTER TABLE APLICACION ADD CONSTRAINT "APLICACION_ACL_FK1" FOREIGN KEY (ACL_ID) REFERENCES acl_object_identity (object_id_identity)  ON UPDATE NO ACTION ON DELETE NO ACTION;
+CREATE INDEX APLICACION_ACL_FK1IDX ON APLICACION USING BTREE (ACL_ID);
 
 CREATE TABLE USUARIO_APLICACION
 (
@@ -136,10 +124,16 @@ create table PERSISTENT_LOGINS
         LAST_USED timestamp not null
 );
 
-INSERT INTO USUARIO(ID_USUARIO,PASSWORD,ESTATUS) VALUES('bjvences@gmail.com',crypt('loloq123', gen_salt('bf', 16)),'ACTIVO');
-INSERT INTO USUARIO(ID_USUARIO,PASSWORD,ESTATUS) VALUES('anonymous',crypt('anonymous', gen_salt('bf', 16)),'ACTIVO');
 
-INSERT INTO APLICACION VALUES('ADMIN_APP',char_2_bigint('ADMIN_APP'),'Gunix Admin App','Gunix.png');
+INSERT INTO acl_class(class) values ('mx.com.gunix.domain.Aplicacion');
+INSERT INTO acl_object_identity(object_id_class,owner_sid,entries_inheriting) values( currval(pg_get_serial_sequence('acl_class', 'id')),(select id from acl_sid where sid = 'bjvences@gmail.com'),true);
+
+INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 0, (select id from acl_sid where sid = 'bjvences@gmail.com'), 16, TRUE, FALSE, FALSE);
+INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 1, (select id from acl_sid where sid = 'bjvences@gmail.com'), 1, TRUE, FALSE, FALSE);
+INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 2, (select id from acl_sid where sid = 'bjvences@gmail.com'), 2, TRUE, FALSE, FALSE);
+INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 3, (select id from acl_sid where sid = 'bjvences@gmail.com'), 8, TRUE, FALSE, FALSE);
+
+INSERT INTO APLICACION VALUES('ADMIN_APP',currval(pg_get_serial_sequence('acl_object_identity', 'object_id_identity')),'Gunix Admin App','Gunix.png');
 
 	INSERT INTO USUARIO_APLICACION VALUES('bjvences@gmail.com','ADMIN_APP');
 
