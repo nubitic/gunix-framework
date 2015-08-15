@@ -2,10 +2,14 @@ package mx.com.gunix.framework.security.domain;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.NotNull;
+
 public class Parametro implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
+	@NotNull
 	private String nombre;
+	@NotNull
 	private String valor;
 	
 	public String getNombre() {

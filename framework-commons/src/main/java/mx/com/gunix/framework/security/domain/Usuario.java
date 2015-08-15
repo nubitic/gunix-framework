@@ -3,14 +3,21 @@ package mx.com.gunix.framework.security.domain;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 public class Usuario implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private List<Aplicacion> aplicaciones;
+	@NotNull
 	private String idUsuario;
+	@NotNull
 	private String password;
+	@NotNull
 	private boolean eliminado;
+	@NotNull
 	private boolean bloqueado;
+	@NotNull
 	private boolean activo;
 	
 	public List<Aplicacion> getAplicaciones() {

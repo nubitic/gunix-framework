@@ -1,7 +1,9 @@
 package mx.com.gunix.framework.processes.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import mx.com.gunix.framework.security.domain.Parametro;
@@ -30,6 +32,14 @@ public class Variable<T extends Serializable> implements Serializable {
 		v.setValor(parametro.getValor());
 		v.setScope(Scope.PROCESO);
 		return v;
+	}
+	
+	public static List<Variable<?>> fromParametros(List<Parametro> parametros){
+		List<Variable<?>> vars = new ArrayList<Variable<?>>();
+		parametros.stream().forEach(p -> {
+			vars.add(fromParametro(p));
+		});
+		return vars;
 	}
 
 	public Scope getScope() {

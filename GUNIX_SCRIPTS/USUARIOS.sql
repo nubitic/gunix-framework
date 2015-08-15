@@ -1,4 +1,4 @@
-ï»¿drop function MENU_USUARIO(text);
+drop function MENU_USUARIO(text);
 DROP TABLE PERSISTENT_LOGINS;
 DROP TABLE ROL_FUNCION;
 DROP TYPE if exists NIVEL_ACCESO;
@@ -70,12 +70,12 @@ CREATE INDEX MODULO_APLICACION_FK1IDX ON MODULO USING BTREE (ID_APLICACION);
 
 CREATE TABLE FUNCION
 (
-        ID_APLICACION VARCHAR(30) NOT NULL,
+     ID_APLICACION VARCHAR(30) NOT NULL,
 	ID_MODULO VARCHAR(30) NOT NULL,
 	ID_FUNCION VARCHAR(30) NOT NULL,
 	TITULO VARCHAR(20) NOT NULL,
 	DESCRIPCION VARCHAR(100) NOT NULL DEFAULT 'FUNCION SIN DESCRIPCION',
-	PROCESS_KEY VARCHAR(255) NOT NULL DEFAULT 'EnConstrucciÃ³n',
+	PROCESS_KEY VARCHAR(255) NOT NULL DEFAULT 'EnConstrucción',
 	ORDEN NUMERIC(3,2) NOT NULL DEFAULT 0.0,
 	ID_FUNCION_PADRE VARCHAR(30)
 );
@@ -125,7 +125,7 @@ create table PERSISTENT_LOGINS
 );
 
 
-INSERT INTO acl_class(class) values ('mx.com.gunix.domain.Aplicacion');
+INSERT INTO acl_class(class) values ('mx.com.gunix.framework.security.domain.Aplicacion');
 INSERT INTO acl_object_identity(object_id_class,owner_sid,entries_inheriting) values( currval(pg_get_serial_sequence('acl_class', 'id')),(select id from acl_sid where sid = 'bjvences@gmail.com'),true);
 
 INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 0, (select id from acl_sid where sid = 'bjvences@gmail.com'), 16, TRUE, FALSE, FALSE);
@@ -138,39 +138,38 @@ INSERT INTO APLICACION VALUES('ADMIN_APP',currval(pg_get_serial_sequence('acl_ob
 	INSERT INTO USUARIO_APLICACION VALUES('bjvences@gmail.com','ADMIN_APP');
 
         /* Funcionalidad Privada (Segura) */
-        INSERT INTO ROL VALUES('ADMIN_APP','ADMINISTRADOR','Administrador de Clientes y Aplicaciones');
-        INSERT INTO ROL VALUES('ADMIN_APP','ACL_ADMIN','Administrador de la Lista de Control de Acceso');
-
         INSERT INTO MODULO VALUES('ADMIN_APP','CLIENTES','Clientes','AddressCard.png');
-                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,ORDEN) VALUES('ADMIN_APP','CLIENTES','ADMINISTRACION','AdministraciÃ³n','MenÃº con opciones de AdministraciÃ³n de usuarios',1);
-                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,PROCESS_KEY,ID_FUNCION_PADRE,ORDEN) VALUES('ADMIN_APP','CLIENTES','ALTA','Alta','Alta de Clientes','AdministraciÃ³nClientes','ADMINISTRACION',1);
-                        INSERT INTO PARAM_FUNCION VALUES ('ADMIN_APP','CLIENTES','ALTA','operaciÃ³n','Alta');
+                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,ORDEN) VALUES('ADMIN_APP','CLIENTES','ADMINISTRACION','Administración','Menú con opciones de Administración de usuarios',1);
+                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,PROCESS_KEY,ID_FUNCION_PADRE,ORDEN) VALUES('ADMIN_APP','CLIENTES','ALTA','Alta','Alta de Clientes','AdministraciónClientes','ADMINISTRACION',1);
+                        INSERT INTO PARAM_FUNCION VALUES ('ADMIN_APP','CLIENTES','ALTA','operación','Alta');
 
         INSERT INTO MODULO VALUES('ADMIN_APP','APLICACIONES','Aplicaciones','window-128.png');
-                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,ORDEN) VALUES('ADMIN_APP','APLICACIONES','ADMINISTRACION','AdministraciÃ³n','MenÃº con opciones de AdministraciÃ³n de aplicaciones',1);
-                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,PROCESS_KEY,ID_FUNCION_PADRE,ORDEN) VALUES('ADMIN_APP','APLICACIONES','ALTA','Alta','Alta de Aplicaciones','AdministraciÃ³nAplicaciones','ADMINISTRACION',1);
-                        INSERT INTO PARAM_FUNCION VALUES ('ADMIN_APP','APLICACIONES','ALTA','operaciÃ³n','Alta');
+                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,ORDEN) VALUES('ADMIN_APP','APLICACIONES','ADMINISTRACION','Administración','Menú con opciones de Administración de aplicaciones',1);
+                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,PROCESS_KEY,ID_FUNCION_PADRE,ORDEN) VALUES('ADMIN_APP','APLICACIONES','ALTA','Alta','Alta de Aplicaciones','AdministraciónAplicaciones','ADMINISTRACION',1);
+                        INSERT INTO PARAM_FUNCION VALUES ('ADMIN_APP','APLICACIONES','ALTA','operación','Alta');
 
 		INSERT INTO MODULO VALUES('ADMIN_APP','ACL','Lista de Control de Acceso','window-128.png');
-                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,ORDEN) VALUES('ADMIN_APP','ACL','ADMINISTRACION','AdministraciÃ³n','MenÃº con opciones de AdministraciÃ³n de ACL',1);
-                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,PROCESS_KEY,ID_FUNCION_PADRE,ORDEN) VALUES('ADMIN_APP','ACL','ALTA','Alta','Alta de Control de Acceso','AdministraciÃ³nACL','ADMINISTRACION',1);
-                        INSERT INTO PARAM_FUNCION VALUES ('ADMIN_APP','ACL','ALTA','operaciÃ³n','Alta');
+                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,ORDEN) VALUES('ADMIN_APP','ACL','ADMINISTRACION','Administración','Menú con opciones de Administración de ACL',1);
+                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,PROCESS_KEY,ID_FUNCION_PADRE,ORDEN) VALUES('ADMIN_APP','ACL','ALTA','Alta','Alta de Control de Acceso','AdministraciónACL','ADMINISTRACION',1);
+                        INSERT INTO PARAM_FUNCION VALUES ('ADMIN_APP','ACL','ALTA','operación','Alta');
 
-                
-        INSERT INTO ROL_FUNCION VALUES('ADMIN_APP','ADMINISTRADOR','CLIENTES','ADMINISTRACION','COMPLETO');
-        INSERT INTO ROL_FUNCION VALUES('ADMIN_APP','ADMINISTRADOR','APLICACIONES','ADMINISTRACION','COMPLETO');
-        INSERT INTO ROL_FUNCION VALUES('ADMIN_APP','ACL_ADMIN','ACL','ADMINISTRACION','COMPLETO');
+        INSERT INTO ROL VALUES('ADMIN_APP','ADMINISTRADOR','Administrador de Clientes y Aplicaciones');
+     	      INSERT INTO ROL_FUNCION VALUES('ADMIN_APP','ADMINISTRADOR','CLIENTES','ADMINISTRACION','COMPLETO');
+	     	 INSERT INTO ROL_FUNCION VALUES('ADMIN_APP','ADMINISTRADOR','APLICACIONES','ADMINISTRACION','COMPLETO');
+
+        INSERT INTO ROL VALUES('ADMIN_APP','ACL_ADMIN','Administrador de la Lista de Control de Acceso');
+                INSERT INTO ROL_FUNCION VALUES('ADMIN_APP','ACL_ADMIN','ACL','ADMINISTRACION','COMPLETO');
 
         INSERT INTO USUARIO_ROL VALUES('bjvences@gmail.com','ADMIN_APP','ADMINISTRADOR');
         INSERT INTO USUARIO_ROL VALUES('bjvences@gmail.com','ADMIN_APP','ACL_ADMIN');
         
 
-        /* Funcionalidad PÃºblica */
-        INSERT INTO ROL VALUES('ADMIN_APP','PUBLIC','PÃºblico en General');
+        /* Funcionalidad Pública */
+        INSERT INTO ROL VALUES('ADMIN_APP','PUBLIC','Público en General');
         INSERT INTO MODULO VALUES('ADMIN_APP','MODULO_PRUEBA','Demostraciones','1436568412_demo.png');
-                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,ORDEN) VALUES('ADMIN_APP','MODULO_PRUEBA','DEMOS','Demos','MenÃº con funcionalidad de demostraciÃ³n',1);
-                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,PROCESS_KEY,ID_FUNCION_PADRE,ORDEN) VALUES('ADMIN_APP','MODULO_PRUEBA','ALTA_FORM','Formulario Alta','DemostraciÃ³n de Formularios','DemoForm','DEMOS',1);
-                        INSERT INTO PARAM_FUNCION VALUES ('ADMIN_APP','MODULO_PRUEBA','ALTA_FORM','operaciÃ³n','Alta');
+                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,ORDEN) VALUES('ADMIN_APP','MODULO_PRUEBA','DEMOS','Demos','Menú con funcionalidad de demostración',1);
+                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,PROCESS_KEY,ID_FUNCION_PADRE,ORDEN) VALUES('ADMIN_APP','MODULO_PRUEBA','ALTA_FORM','Formulario Alta','Demostración de Formularios','DemoForm','DEMOS',1);
+                        INSERT INTO PARAM_FUNCION VALUES ('ADMIN_APP','MODULO_PRUEBA','ALTA_FORM','operación','Alta');
 
         INSERT INTO ROL_FUNCION VALUES('ADMIN_APP','PUBLIC','MODULO_PRUEBA','DEMOS','COMPLETO');
 

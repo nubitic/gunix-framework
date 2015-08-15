@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-fragment xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-fragment_3_1.xsd"
+	version="3.1">
+
+	<name>mx_com_gunix_framework_vista</name>
+	<distributable /><jsp-config>
+	<taglib>
+		<taglib-uri>/framework/index/tags</taglib-uri>
+		<taglib-location>/WEB-INF/tags/mx/com/gunix/ui/springmvc/framework/index/index-taglib.tld</taglib-location>
+	</taglib></jsp-config>
+</web-fragment>

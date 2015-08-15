@@ -172,6 +172,10 @@ public class PersistentTokenBasedRememberMeServices extends AbstractRememberMeSe
 					|| paramValue.equalsIgnoreCase("yes") || paramValue.equals("1")) {
 				return true;
 			}
+		}else {
+			if(super.rememberMeRequested(request, parameter)) {
+				return true;
+			}
 		}
 
 		if (logger.isDebugEnabled()) {

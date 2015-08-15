@@ -12,9 +12,11 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.core.ControlFlow;
 import org.springframework.core.ControlFlowFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.stereotype.Component;
 
@@ -28,15 +30,19 @@ public class HessianServiceAdvice {
 			Object[] newArgs = new Object[orgArgs.length+1];
 			System.arraycopy(orgArgs, 0, newArgs, 0, orgArgs.length);
 			
+			ControlFlow controlFlow = null;
+			
 			Object principal = (SecurityContextHolder.getContext().getAuthentication()==null && 
-								(pjp.getSignature().getDeclaringType().equals(UsuarioService.class) &&				// Excepciones para las que se acepta autenticación null
-							     (pjp.getSignature().getName().equals("getAnonymous") || 							//
-							      (pjp.getSignature().getName().equals("getUsuario") && 							// UsuarioService.getAnonymous(),
-							       ControlFlowFactory.createControlFlow().under(PersistentTokenBasedRememberMeServices.class, "processAutoLoginCookie")))) ||
-							    (pjp.getSignature().getDeclaringType().equals(PersistentTokenRepository.class) &&	// UsuarioService.getUsuario() siempre y cuando provenga de un PersistentTokenBasedRememberMeServices.processAutoLoginCookie, 
-							     (pjp.getSignature().getName().equals("getTokenForSeries") || 						// PersistentTokenRepository.getTokenForSeries() y
-							      pjp.getSignature().getName().equals("updateToken")) 								// PersistentTokenRepository.updateToken
-							    ))?																					// 
+								((pjp.getSignature().getDeclaringType().equals(UsuarioService.class) &&				// Excepciones para las que se acepta autenticación null
+							     (pjp.getSignature().getName().equals("getAnonymous") || 							// UsuarioService.getAnonymous(),
+							      (pjp.getSignature().getName().equals("getUsuario") && 							// UsuarioService.getUsuario() siempre y cuando provenga de:
+							       ((controlFlow= ControlFlowFactory.createControlFlow()).under(PersistentTokenBasedRememberMeServices.class, "processAutoLoginCookie") || // PersistentTokenBasedRememberMeServices.processAutoLoginCookie ó 
+							    		   									  controlFlow.under(UsernamePasswordAuthenticationFilter.class, "attemptAuthentication"))))) ||// UsernamePasswordAuthenticationFilter.attemptAuthentication,
+							    (pjp.getSignature().getDeclaringType().equals(PersistentTokenRepository.class) &&	// ó 
+							     (pjp.getSignature().getName().equals("getTokenForSeries") || 						// PersistentTokenRepository.getTokenForSeries() ó
+							      pjp.getSignature().getName().equals("updateToken") || 						// PersistentTokenRepository.getTokenForSeries() ó
+							      pjp.getSignature().getName().equals("removeUserTokens")) 								// PersistentTokenRepository.removeUserTokens
+							    )))?																				
 								null
 								:SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			newArgs[newArgs.length-1]=(principal instanceof UserDetails)?principal:null;

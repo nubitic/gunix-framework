@@ -37,23 +37,10 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 
 	protected FormLayout flyt = new FormLayout();
 
-	@SuppressWarnings("unchecked")
-	private void initFieldGroup() {
-		Type genSuperType = getClass().getGenericSuperclass();
-		if (genSuperType instanceof ParameterizedType) {
-			Type[] typeArguments = ((ParameterizedType) genSuperType).getActualTypeArguments();
-			if (typeArguments.length == 1) {
-				Class<S> clazz = ((Class<S>) typeArguments[0]);
-				fieldGroup = new BeanFieldGroup<S>(clazz);
-				try {
-					fieldGroup.setItemDataSource(clazz.newInstance());
-				} catch (InstantiationException | IllegalAccessException e) {
-					throw new IllegalArgumentException("No fue posible inicializar el ItemDataSource para el fieldGroup con una nueva instancia de " + clazz.getName(), e);
-				}
-				fieldGroup.bindMemberFields(this);
-			}
+	private void postInitFieldGroup() {
+		if (fieldGroup != null) {
+			fieldGroup.bindMemberFields(this);
 		}
-
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -77,16 +64,34 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		setId(new StringBuilder(getClass().getName()).append(":").append(hashCode()).toString());
 		taNav = (TareaActualNavigator) UI.getCurrent().getNavigator();
 		tarea = taNav.getTareaActual();
+		preInitFieldGroup();
 		doConstruct();
 		addComponent(flyt);
-		initFieldGroup();
+		postInitFieldGroup();
+	}
+
+	@SuppressWarnings("unchecked")
+	private void preInitFieldGroup() {
+		Type genSuperType = getClass().getGenericSuperclass();
+		if (genSuperType instanceof ParameterizedType) {
+			Type[] typeArguments = ((ParameterizedType) genSuperType).getActualTypeArguments();
+			if (typeArguments.length == 1) {
+				Class<S> clazz = ((Class<S>) typeArguments[0]);
+				fieldGroup = new BeanFieldGroup<S>(clazz);
+				try {
+					fieldGroup.setItemDataSource(clazz.newInstance());
+				} catch (InstantiationException | IllegalAccessException e) {
+					throw new IllegalArgumentException("No fue posible inicializar el ItemDataSource para el fieldGroup con una nueva instancia de " + clazz.getName(), e);
+				}
+			}
+		}
 	}
 
 	protected final void completaTarea() {
 		tarea.setVariables(getVariablesTarea());
 		tarea.setComentario(getComentarioTarea());
 
-		if (tarea.getInstancia() != null && tarea.getInstancia().getVariables() != null) {
+		if (LOGGER.isDebugEnabled() && tarea.getInstancia() != null && tarea.getInstancia().getVariables() != null) {
 			for (Variable<?> var : tarea.getInstancia().getVariables()) {
 				LOGGER.debug(var.toString());
 			}

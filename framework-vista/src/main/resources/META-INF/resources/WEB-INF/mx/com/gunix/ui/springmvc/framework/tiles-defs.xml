@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+ <definition name="index" template="/WEB-INF/mx/com/gunix/ui/springmvc/framework/index.jsp">
+ 	<put-attribute name="roles" expression="/WEB-INF/mx/com/gunix/ui/springmvc/${jspView}.jsp"/>
+ 	<put-attribute name="modulos" expression="/WEB-INF/mx/com/gunix/ui/springmvc/${jspView}.jsp"/>
+ 	<put-attribute name="menu" expression="/WEB-INF/mx/com/gunix/ui/springmvc/${jspView}.jsp"/>
+    <put-attribute name="content">
+		<definition template="/WEB-INF/mx/com/gunix/ui/springmvc/framework/formContentWrapper.jsp">
+	    	<put-attribute name="formContent" expression="/WEB-INF/mx/com/gunix/ui/springmvc/${jspView}.jsp"/>
+	    </definition>
+    </put-attribute>
+ </definition>
+</tiles-definitions>

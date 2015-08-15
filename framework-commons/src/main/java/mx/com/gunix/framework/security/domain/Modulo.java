@@ -3,13 +3,21 @@ package mx.com.gunix.framework.security.domain;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 public class Modulo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
+	@NotNull
 	private String idModulo;
+	@NotNull
 	private String descripcion;
+	@NotNull
 	private String icono;
+	@NotNull
 	private List<Funcion> funciones;
+	@NotNull
+	private Aplicacion aplicacion;
 	
 	public String getIdModulo() {
 		return idModulo;
@@ -35,10 +43,17 @@ public class Modulo implements Serializable {
 	public void setFunciones(List<Funcion> funciones) {
 		this.funciones = funciones;
 	}
+	public Aplicacion getAplicacion() {
+		return aplicacion;
+	}
+	public void setAplicacion(Aplicacion aplicacion) {
+		this.aplicacion = aplicacion;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((aplicacion == null) ? 0 : aplicacion.hashCode());
 		result = prime * result + ((idModulo == null) ? 0 : idModulo.hashCode());
 		return result;
 	}
@@ -51,6 +66,11 @@ public class Modulo implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Modulo other = (Modulo) obj;
+		if (aplicacion == null) {
+			if (other.aplicacion != null)
+				return false;
+		} else if (!aplicacion.equals(other.aplicacion))
+			return false;
 		if (idModulo == null) {
 			if (other.idModulo != null)
 				return false;
@@ -60,7 +80,7 @@ public class Modulo implements Serializable {
 	}
 	@Override
 	public String toString() {
-		return "Modulo [idModulo=" + idModulo + "]";
+		return "Modulo [idModulo=" + idModulo + ", aplicacion=" + aplicacion + "]";
 	}
 	
 }

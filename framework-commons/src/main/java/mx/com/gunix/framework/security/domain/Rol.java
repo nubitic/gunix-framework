@@ -3,12 +3,18 @@ package mx.com.gunix.framework.security.domain;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 public class Rol implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
+	@NotNull
 	private String idRol;
+	@NotNull
 	private String descripcion;
+	@NotNull
 	private Aplicacion aplicacion;
+	@NotNull
 	private List<Modulo> modulos;
 	
 	public String getIdRol() {
@@ -40,6 +46,7 @@ public class Rol implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((aplicacion == null) ? 0 : aplicacion.hashCode());
 		result = prime * result + ((idRol == null) ? 0 : idRol.hashCode());
 		return result;
 	}
@@ -52,6 +59,11 @@ public class Rol implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Rol other = (Rol) obj;
+		if (aplicacion == null) {
+			if (other.aplicacion != null)
+				return false;
+		} else if (!aplicacion.equals(other.aplicacion))
+			return false;
 		if (idRol == null) {
 			if (other.idRol != null)
 				return false;
@@ -61,6 +73,7 @@ public class Rol implements Serializable {
 	}
 	@Override
 	public String toString() {
-		return "Rol [idRol=" + idRol + "]";
+		return "Rol [idRol=" + idRol + ", aplicacion=" + aplicacion + "]";
 	}
+
 }

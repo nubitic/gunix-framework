@@ -1,45 +1,18 @@
 package mx.com.gunix.framework.config;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import mx.com.gunix.framework.security.PersistentTokenBasedRememberMeServices;
-import mx.com.gunix.framework.security.RolAccessDecisionVoter;
-import mx.com.gunix.framework.security.UserDetails;
-import mx.com.gunix.framework.security.UserDetailsServiceImpl;
-import mx.com.gunix.framework.service.UsuarioService;
 import mx.com.gunix.framework.ui.vaadin.spring.security.GenericVaadinSecurity;
 import mx.com.gunix.framework.ui.vaadin.spring.security.SecuredViewProviderAccessDelegate;
 import mx.com.gunix.framework.ui.vaadin.spring.security.VaadinAuthenticationFailureHandler;
 
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.AccessDecisionManager;
-import org.springframework.security.access.AccessDecisionVoter;
-import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
-import org.springframework.security.access.expression.method.ExpressionBasedPreInvocationAdvice;
-import org.springframework.security.access.prepost.PreInvocationAuthorizationAdviceVoter;
-import org.springframework.security.access.vote.AuthenticatedVoter;
-import org.springframework.security.access.vote.UnanimousBased;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-import org.springframework.security.web.authentication.RememberMeServices;
-import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
-import org.springframework.security.web.savedrequest.RequestCache;
-import org.springframework.security.web.savedrequest.RequestCacheAwareFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.vaadin.spring.security.VaadinSecurity;
 import org.vaadin.spring.security.VaadinSecurityContext;
@@ -52,52 +25,28 @@ import org.vaadin.spring.security.web.authentication.SavedRequestAwareVaadinAuth
 import org.vaadin.spring.security.web.authentication.VaadinAuthenticationSuccessHandler;
 
 @Configuration
-@ComponentScan({ "mx.com.gunix.ui.vaadin", "mx.com.gunix.framework.ui.vaadin", "mx.com.gunix.framework.security" })
-@EnableWebSecurity
+@ComponentScan({ "mx.com.gunix.ui", "mx.com.gunix.framework.ui.vaadin"})
 @EnableVaadinSecurity
-public class VaadinSecurityConfig extends WebSecurityConfigurerAdapter implements InitializingBean {
-	private final String REMEMBER_ME_KEY = UUID.randomUUID().toString();
-	@Autowired
-	private VaadinSecurityContext vaadinSecurityContext;
+public class VaadinSecurityConfig  extends AbstractSecurityConfig{
 
 	@Autowired
-	@Lazy
-	UsuarioService usuarioService;
-	
-	private PersistentTokenBasedRememberMeServices ptbrms;
-	
-	@Bean
-	public UserDetailsService userDetailsService(){
-		return new UserDetailsServiceImpl();
-	}
+	private VaadinSecurityContext vaadinSecurityContext;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		vaadinSecurityContext.addAuthenticationSuccessHandler(redirectSaveHandler());
 		vaadinSecurityContext.addAuthenticationFailureHandler(new VaadinAuthenticationFailureHandler());
-		ptbrms.setTokenRepository(usuarioService);
+		super.afterPropertiesSet();
 	}
 
 	@Bean(name = VaadinSecurityConfiguration.Beans.ACCESS_DECISION_MANAGER)
 	protected AccessDecisionManager accessDecisionManager() {
-		List<AccessDecisionVoter<? extends Object>> voters = new ArrayList<AccessDecisionVoter<? extends Object>>();
-    	ExpressionBasedPreInvocationAdvice expressionAdvice = new ExpressionBasedPreInvocationAdvice();
-		expressionAdvice.setExpressionHandler(new DefaultMethodSecurityExpressionHandler());
-    	voters.add(new PreInvocationAuthorizationAdviceVoter(expressionAdvice));
-    	voters.add(new AuthenticatedVoter());
-        voters.add(new RolAccessDecisionVoter());
-        return new UnanimousBased(voters);
+        return buildAccessDesicionManager();
 	}
 
 	@Bean(name = Beans.VAADIN_SECURITY)
 	VaadinSecurity vaadinSecurity() {
 		return new GenericVaadinSecurity();
-	}
-
-	@Bean
-	public RememberMeServices rememberMeService() {
-		ptbrms = new PersistentTokenBasedRememberMeServices(REMEMBER_ME_KEY, userDetailsService());
-		return ptbrms;
 	}
 
 	@Bean(name = Beans.AUTHENTICATION_MANAGER)
@@ -111,25 +60,6 @@ public class VaadinSecurityConfig extends WebSecurityConfigurerAdapter implement
 		return new SecuredViewProviderAccessDelegate();
 	}
 
-	/*
-	 * The HttpSessionRequestCache is where the initial request before redirect
-	 * to the login is cached so it can be used after successful login
-	 */
-	@Bean
-	public RequestCache requestCache() {
-		RequestCache requestCache = new HttpSessionRequestCache();
-		return requestCache;
-	}
-
-	/*
-	 * The RequestCacheAwareFilter is responsible for storing the initial
-	 * request
-	 */
-	@Bean
-	public RequestCacheAwareFilter requestCacheAwareFilter() {
-		RequestCacheAwareFilter filter = new RequestCacheAwareFilter(requestCache());
-		return filter;
-	}
 
 	/*
 	 * The VaadinRedirectStategy
@@ -159,49 +89,22 @@ public class VaadinSecurityConfig extends WebSecurityConfigurerAdapter implement
 	}
 
 	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(userDetailsService()).passwordEncoder(passwordEncoder());
-	}
-
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http
-			.anonymous()
-				.principal(new UserDetails(usuarioService.getAnonymous()))
-			.and()
-				.authorizeRequests()
-					.antMatchers("/login/**").permitAll()
-					.antMatchers("/public/**").permitAll()
-					.antMatchers("/UIDL/**").permitAll()
-					.antMatchers("/HEARTBEAT/**").authenticated()
-					.antMatchers("/**").authenticated()
-					.anyRequest().authenticated()
-			.and()
-				.rememberMe()
-					.rememberMeServices(rememberMeService())
-					.key(REMEMBER_ME_KEY)
-			.and()
-				.sessionManagement()
-					.sessionFixation()
-					.migrateSession()
-			.and()
-				.csrf()
-					.disable()
-				.headers()
-					.frameOptions()
-						.disable();
-		http.exceptionHandling()
-			.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"));
-	}
-
-	@Bean
 	public HiddenHttpMethodFilter hiddenHttpMethodFilter() {
 		HiddenHttpMethodFilter hiddenHttpMethodFilter = new HiddenHttpMethodFilter();
 		return hiddenHttpMethodFilter;
+	}
+
+	@Override
+	protected void doConfigure(HttpSecurity http) throws Exception {
+		http
+			.authorizeRequests()
+				.antMatchers("/login/**").permitAll()
+				.antMatchers("/public/**").permitAll()
+				.antMatchers("/UIDL/**").permitAll()
+				.antMatchers("/HEARTBEAT/**").authenticated()
+				.antMatchers("/**").authenticated()
+				.anyRequest().authenticated();
+		http.exceptionHandling()
+			.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"));
 	}
 }

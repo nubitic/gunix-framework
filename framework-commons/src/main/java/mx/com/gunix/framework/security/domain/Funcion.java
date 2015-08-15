@@ -3,14 +3,22 @@ package mx.com.gunix.framework.security.domain;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 public class Funcion implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
+	@NotNull
 	private String idFuncion;
+	@NotNull
 	private Modulo modulo;
+	@NotNull
 	private String titulo;
+	@NotNull
 	private String descripcion;
+	@NotNull
 	private String processKey;
+	@NotNull
 	private float orden;
 	private Funcion padre;
 	private List<Funcion> hijas;

@@ -40,6 +40,12 @@
             <include>**/*.*</include>
           </includes>
         </fileSet>
+        <fileSet encoding="UTF-8" >
+          <directory>src/main/webapp/WEB-INF</directory>
+          <includes>
+            <include>**/*.*</include>
+          </includes>
+        </fileSet>
       </fileSets>
     </module>
 
