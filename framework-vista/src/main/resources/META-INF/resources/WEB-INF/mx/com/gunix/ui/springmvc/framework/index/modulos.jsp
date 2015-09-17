@@ -11,7 +11,7 @@
 					<c:if test="${rol.idRol == param.idRol}">
 						<c:forEach items="${rol.modulos}" var="modulo">
 							<article class="module width_quarter">
-								<img src="<spring:url value="/VAADIN/themes/gunix/"/>${modulo.icono}" onclick="onModuloChange('${modulo.idModulo}','${param.idRol}','${param.idAplicacion}','${modulo.descripcion}');"/>
+								<img src="<spring:url value="/VAADIN/themes/gunix/img/"/>${modulo.icono}" onclick="onModuloChange('${modulo.idModulo}','${param.idRol}','${param.idAplicacion}','${modulo.descripcion}');"/>
 								<p>${modulo.descripcion}</p>
 							</article>
 						</c:forEach>

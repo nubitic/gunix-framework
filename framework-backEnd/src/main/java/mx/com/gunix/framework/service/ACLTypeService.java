@@ -20,7 +20,7 @@ import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-public abstract class ACLTypeService<T extends ACLType> {
+public abstract class ACLTypeService<T extends ACLType> extends GunixActivitServiceSupport{
 
 	@Autowired
 	SequenceHelperMapper shm;

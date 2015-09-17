@@ -115,6 +115,11 @@
 			<version>1.7.3</version>
 		</dependency>
 		<dependency>
+			<groupId>org.vaadin.addon</groupId>
+			<artifactId>easyuploads</artifactId>
+			<version>7.4.2</version>
+		</dependency>
+		<dependency>
 			<groupId>com.caucho</groupId>
 			<artifactId>hessian</artifactId>
 		</dependency>

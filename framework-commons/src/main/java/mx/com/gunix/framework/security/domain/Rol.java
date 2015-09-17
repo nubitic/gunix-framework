@@ -4,44 +4,60 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
 
 public class Rol implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	@NotNull
+	@Size(min = 1, max = 30)
 	private String idRol;
+
 	@NotNull
+	@Size(min = 1, max = 100)
 	private String descripcion;
-	@NotNull
+
+	@NotNull(groups = BeanValidations.class)
 	private Aplicacion aplicacion;
-	@NotNull
+
+	@NotNull(groups = BeanValidations.class)
+	@Size(min = 1, groups = BeanValidations.class)
 	private List<Modulo> modulos;
-	
+
 	public String getIdRol() {
 		return idRol;
 	}
+
 	public void setIdRol(String idRol) {
 		this.idRol = idRol;
 	}
+
 	public List<Modulo> getModulos() {
 		return modulos;
 	}
+
 	public void setModulos(List<Modulo> modulos) {
 		this.modulos = modulos;
 	}
+
 	public String getDescripcion() {
 		return descripcion;
 	}
+
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
-	
+
 	public Aplicacion getAplicacion() {
 		return aplicacion;
 	}
+
 	public void setAplicacion(Aplicacion aplicacion) {
 		this.aplicacion = aplicacion;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -50,6 +66,7 @@ public class Rol implements Serializable {
 		result = prime * result + ((idRol == null) ? 0 : idRol.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -71,6 +88,7 @@ public class Rol implements Serializable {
 			return false;
 		return true;
 	}
+
 	@Override
 	public String toString() {
 		return "Rol [idRol=" + idRol + ", aplicacion=" + aplicacion + "]";

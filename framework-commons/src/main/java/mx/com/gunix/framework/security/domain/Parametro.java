@@ -3,13 +3,17 @@ package mx.com.gunix.framework.security.domain;
 import java.io.Serializable;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 public class Parametro implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@NotNull
+	@Size(min=1,max=15)
 	private String nombre;
+	
 	@NotNull
+	@Size(min=1,max=500)
 	private String valor;
 	
 	public String getNombre() {

@@ -1,14 +1,14 @@
-drop function MENU_USUARIO(text);
-DROP TABLE PERSISTENT_LOGINS;
-DROP TABLE ROL_FUNCION;
+drop function if exists MENU_USUARIO(text);
+DROP TABLE if exists PERSISTENT_LOGINS cascade;
+DROP TABLE if exists ROL_FUNCION  cascade;
 DROP TYPE if exists NIVEL_ACCESO;
-DROP TABLE if exists PARAM_FUNCION;
-DROP TABLE if exists FUNCION;
-DROP TABLE if exists MODULO;
-DROP TABLE if exists USUARIO_ROL;
-DROP TABLE if exists ROL;
-DROP TABLE if exists USUARIO_APLICACION;
-DROP TABLE if exists APLICACION;
+DROP TABLE if exists PARAM_FUNCION  cascade;
+DROP TABLE if exists FUNCION cascade;
+DROP TABLE if exists MODULO cascade;
+DROP TABLE if exists USUARIO_ROL cascade;
+DROP TABLE if exists ROL cascade;
+DROP TABLE if exists USUARIO_APLICACION cascade;
+DROP TABLE if exists APLICACION cascade;
 
 CREATE TABLE APLICACION
 (

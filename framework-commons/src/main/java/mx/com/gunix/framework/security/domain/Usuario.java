@@ -4,19 +4,27 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 public class Usuario implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private List<Aplicacion> aplicaciones;
+	
 	@NotNull
+	@Size(min=1,max=254)
 	private String idUsuario;
+	
 	@NotNull
+	@Size(min=1,max=60)
 	private String password;
+	
 	@NotNull
 	private boolean eliminado;
+	
 	@NotNull
 	private boolean bloqueado;
+	
 	@NotNull
 	private boolean activo;
 	

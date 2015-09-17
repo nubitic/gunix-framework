@@ -1,11 +1,11 @@
-﻿-- ACL Schema SQL for PostgreSQL
+-- ACL Schema SQL for PostgreSQL
 
- drop table if exists acl_entry;
- drop table if exists acl_object_identity;
- drop table if exists acl_class;
- drop table if exists acl_sid;
- DROP TABLE if exists USUARIO;
- DROP TYPE if exists ESTATUS_USUARIO;
+ drop table if exists acl_entry cascade;
+ drop table if exists acl_object_identity cascade;
+ drop table if exists acl_class cascade;
+ drop table if exists acl_sid cascade;
+ DROP TABLE if exists USUARIO cascade;
+ DROP TYPE if exists ESTATUS_USUARIO cascade;
  
 CREATE TYPE ESTATUS_USUARIO AS ENUM ('ACTIVO','ELIMINADO','BLOQUEADO','SIN PASSWORD');
 

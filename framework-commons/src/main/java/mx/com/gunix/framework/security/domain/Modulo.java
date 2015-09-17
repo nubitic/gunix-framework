@@ -4,51 +4,72 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
 
 public class Modulo implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	@NotNull
+	@Size(min = 1, max = 30)
 	private String idModulo;
+
 	@NotNull
+	@Size(min = 1, max = 200)
 	private String descripcion;
+
 	@NotNull
+	@Size(min = 1, max = 25)
 	private String icono;
-	@NotNull
+
+	@NotNull(groups = BeanValidations.class)
+	@Size(min = 1, groups = BeanValidations.class)
 	private List<Funcion> funciones;
-	@NotNull
+
+	@NotNull(groups = BeanValidations.class)
 	private Aplicacion aplicacion;
-	
+
 	public String getIdModulo() {
 		return idModulo;
 	}
+
 	public void setIdModulo(String idModulo) {
 		this.idModulo = idModulo;
 	}
+
 	public String getDescripcion() {
 		return descripcion;
 	}
+
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
+
 	public String getIcono() {
 		return icono;
 	}
+
 	public void setIcono(String icono) {
 		this.icono = icono;
 	}
+
 	public List<Funcion> getFunciones() {
 		return funciones;
 	}
+
 	public void setFunciones(List<Funcion> funciones) {
 		this.funciones = funciones;
 	}
+
 	public Aplicacion getAplicacion() {
 		return aplicacion;
 	}
+
 	public void setAplicacion(Aplicacion aplicacion) {
 		this.aplicacion = aplicacion;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -57,6 +78,7 @@ public class Modulo implements Serializable {
 		result = prime * result + ((idModulo == null) ? 0 : idModulo.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -78,9 +100,10 @@ public class Modulo implements Serializable {
 			return false;
 		return true;
 	}
+
 	@Override
 	public String toString() {
 		return "Modulo [idModulo=" + idModulo + ", aplicacion=" + aplicacion + "]";
 	}
-	
+
 }

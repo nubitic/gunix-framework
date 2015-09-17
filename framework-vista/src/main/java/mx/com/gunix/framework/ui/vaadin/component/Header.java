@@ -194,7 +194,7 @@ public class Header extends CustomComponent {
 					int colIncr=isOneModulo?3:1;
 					for (int col = 0; col < MODULOS_POR_FILA; col++) {
 						Modulo modulo = rolSel.getModulos().get(modulosProcesados);
-						Image button = new Image(modulo.getDescripcion(),new ThemeResource(modulo.getIcono()));
+						Image button = new Image(modulo.getDescripcion(),new ThemeResource("img/"+modulo.getIcono()));
 						button.addStyleName("moduleImageButton");
 						button.addClickListener(clickEvnt -> {
 							menuBar.removeItems();

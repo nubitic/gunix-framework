@@ -12,6 +12,8 @@ import mx.com.gunix.framework.processes.domain.Instancia;
 import mx.com.gunix.framework.processes.domain.Tarea;
 import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.service.ActivitiService;
+import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup;
+import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup.OnBeanValidationErrorCallback;
 import mx.com.gunix.framework.ui.vaadin.component.Header.TareaActualNavigator;
 
 import org.slf4j.Logger;
@@ -20,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
 
-import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -33,7 +34,7 @@ import com.vaadin.ui.VerticalLayout;
 public abstract class AbstractGunixView<S extends Serializable> extends VerticalLayout implements View {
 
 	protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
-	private BeanFieldGroup<S> fieldGroup;
+	private GunixBeanFieldGroup<S> fieldGroup;
 
 	protected FormLayout flyt = new FormLayout();
 
@@ -77,7 +78,7 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 			Type[] typeArguments = ((ParameterizedType) genSuperType).getActualTypeArguments();
 			if (typeArguments.length == 1) {
 				Class<S> clazz = ((Class<S>) typeArguments[0]);
-				fieldGroup = new BeanFieldGroup<S>(clazz);
+				fieldGroup = new GunixBeanFieldGroup<S>(clazz);
 				try {
 					fieldGroup.setItemDataSource(clazz.newInstance());
 				} catch (InstantiationException | IllegalAccessException e) {
@@ -129,10 +130,19 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	}
 
 	protected final void commit() throws CommitException {
+		validaFieldGroup();
+		fieldGroup.commit();
+	}
+	
+	protected final void commit(OnBeanValidationErrorCallback onBVECallback) throws CommitException {
+		validaFieldGroup();
+		fieldGroup.commit(onBVECallback);
+	}
+
+	private void validaFieldGroup() {
 		if (fieldGroup == null) {
 			throw new IllegalStateException("No se puede dar commit dado que no se indicó el tipo específico para la clase genérica AbstractGunixView");
 		}
-		fieldGroup.commit();
 	}
 
 	@Override

@@ -4,81 +4,112 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
+import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
+import mx.com.gunix.framework.security.domain.validation.ValidaFuncion;
+
+@ValidaFuncion(groups = BeanValidations.class)
 public class Funcion implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	@NotNull
+	@Size(min = 1, max = 30)
 	private String idFuncion;
-	@NotNull
+
+	@NotNull(groups = BeanValidations.class)
 	private Modulo modulo;
+
 	@NotNull
+	@Size(min = 1, max = 20)
 	private String titulo;
+
 	@NotNull
+	@Size(min = 1, max = 100)
 	private String descripcion;
-	@NotNull
+
+	@Size(min = 0, max = 255)
 	private String processKey;
+
 	@NotNull
 	private float orden;
+
 	private Funcion padre;
 	private List<Funcion> hijas;
 	private List<Parametro> parametros;
-	
+
 	public String getIdFuncion() {
 		return idFuncion;
 	}
+
 	public void setIdFuncion(String idFuncion) {
 		this.idFuncion = idFuncion;
 	}
+
 	public Modulo getModulo() {
 		return modulo;
 	}
+
 	public void setModulo(Modulo modulo) {
 		this.modulo = modulo;
 	}
+
 	public String getTitulo() {
 		return titulo;
 	}
+
 	public void setTitulo(String titulo) {
 		this.titulo = titulo;
 	}
+
 	public String getDescripcion() {
 		return descripcion;
 	}
+
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
+
 	public String getProcessKey() {
 		return processKey;
 	}
+
 	public void setProcessKey(String processKey) {
 		this.processKey = processKey;
 	}
+
 	public float getOrden() {
 		return orden;
 	}
+
 	public void setOrden(float orden) {
 		this.orden = orden;
 	}
+
 	public Funcion getPadre() {
 		return padre;
 	}
+
 	public void setPadre(Funcion padre) {
 		this.padre = padre;
 	}
+
 	public List<Funcion> getHijas() {
 		return hijas;
 	}
+
 	public void setHijas(List<Funcion> hijas) {
 		this.hijas = hijas;
 	}
+
 	public List<Parametro> getParametros() {
 		return parametros;
 	}
+
 	public void setParametros(List<Parametro> parametros) {
 		this.parametros = parametros;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -87,6 +118,7 @@ public class Funcion implements Serializable {
 		result = prime * result + ((modulo == null) ? 0 : modulo.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -108,10 +140,9 @@ public class Funcion implements Serializable {
 			return false;
 		return true;
 	}
+
 	@Override
 	public String toString() {
-		return "Funcion [idFuncion=" + idFuncion + ", modulo=" + modulo + ", titulo=" + titulo + ", processKey=" + processKey +"]";
+		return "Funcion [idFuncion=" + idFuncion + ", modulo=" + modulo + ", titulo=" + titulo + ", processKey=" + processKey + "]";
 	}
-	
-	
 }
