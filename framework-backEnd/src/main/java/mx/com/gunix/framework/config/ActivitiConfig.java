@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import mx.com.gunix.framework.activiti.FloatType;
 import mx.com.gunix.framework.activiti.GunixObjectVariableType;
 import mx.com.gunix.framework.activiti.persistence.entity.VariableInstanceEntityManager;
 
@@ -77,6 +78,7 @@ public class ActivitiConfig{
 
 		List<VariableType> varTypes = new ArrayList<VariableType>();
 		varTypes.add(gunixObjectVariableType());
+		varTypes.add(new FloatType());
 		speConf.setCustomPreVariableTypes(varTypes);//Se establece primero en la lista que se usa para el guardado
 		speConf.setCustomPostVariableTypes(varTypes);//Se establece como el último en asignarse en el Mapa que se usa para la recuperación
 

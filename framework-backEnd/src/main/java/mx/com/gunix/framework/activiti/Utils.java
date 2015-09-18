@@ -70,7 +70,7 @@ public class Utils {
 				stringifiedObject.keySet().stream().filter(key -> (!key.equals(varClass)) && key.endsWith(".class")).forEach(key -> {
 					try {
 						Class<?> childClass = classLoader.loadClass(stringifiedObject.get(key).toString());
-						String newKey = key.substring(0, key.length() - 6 /* ".class".length() */);
+						String newKey = key.substring(0, key.length() - 6);
 						childTypes.put(newKey, childClass.newInstance());
 					} catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
 						throw new RuntimeException(e);
@@ -88,7 +88,15 @@ public class Utils {
 							if ((value instanceof String) && value.toString().startsWith(NESTED_REFERENCE)) {
 								nestedReferences.put(key, (String) value);
 							} else {
-								pub.setNestedProperty(ans, isNotObject ? key.substring(isItereable ? key.indexOf("[") : key.indexOf("(")) : key.substring(varName.length() + 1), value);
+								String prop = isNotObject ? key.substring(isItereable ? key.indexOf("[") : key.indexOf("(")) : key.substring(varName.length() + 1);
+								if (value instanceof Double) {
+									Class<?> propType = pub.getPropertyType(ans, prop);
+									if ((propType.isPrimitive() && propType.getName().equals("float")) || Float.class.isAssignableFrom(propType)) {
+										value = ((Double) value).floatValue();
+									}
+								}
+
+								pub.setNestedProperty(ans, prop, value);
 							}
 						}
 					} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {

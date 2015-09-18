@@ -55,30 +55,49 @@ public class GunixObjectVariableType implements VariableType {
 	public void setValue(Object value, ValueFields valueFields) {
 		VariableInstanceEntity vie = (VariableInstanceEntity) valueFields;
 
+		boolean isUpdateValue = vie.getRevision() > 0;
+		boolean isExecutionContextActive = Context.isExecutionContextActive();
+		String executionId = null;
+
+		Tarea tarea = null;
+		Variable<?> variable = null;
+
 		Map<String, Object> variablesMap = new TreeMap<String, Object>();
 		variablesMap.putAll(Utils.toMap(vie.getName(), value));
-		vie.setTextValue(value.getClass().getName());
-		
-		if(Context.isExecutionContextActive()){
-			rs.setVariables(Context.getExecutionContext().getExecution().getId(), variablesMap);
-		}else{
-			Tarea tarea = currentTarea.get();
-			
-			Variable<?> variable = tarea.getVariables().stream()
-												.filter( var -> 
-															var.getNombre().equals(vie.getName()) && (var.getValor() == value || var.getValor().equals(value))
-														)
-												.findFirst()
-												.get();
-			
-			switch(variable.getScope()){
+
+		if (!isExecutionContextActive) {
+			tarea = currentTarea.get();
+			variable = tarea.getVariables().stream().filter(var -> var.getNombre().equals(vie.getName()) && (var.getValor() == value || var.getValor().equals(value))).findFirst().get();
+			if (isUpdateValue) {
+				switch (variable.getScope()) {
 				case PROCESO:
-					rs.setVariables(tarea.getInstancia().getId(), variablesMap);	
-				break;
+					deleteValue(vie.getName(), tarea.getInstancia().getId(), null);
+					break;
 				case TAREA:
-					rs.setVariablesLocal(tarea.getExecutionId(), variablesMap);
+					deleteValue(vie.getName(), null, tarea.getExecutionId());
+					break;
+				}
+			}
+		} else {
+			executionId = Context.getExecutionContext().getProcessInstance().getId();
+			if (isUpdateValue) {
+				deleteValue(vie.getName(), executionId, null);
+			}
+		}
+
+		vie.setTextValue(value.getClass().getName());
+
+		if (isExecutionContextActive) {
+			rs.setVariables(executionId, variablesMap);
+		} else {
+			switch (variable.getScope()) {
+			case PROCESO:
+				rs.setVariables(tarea.getInstancia().getId(), variablesMap);
 				break;
-			}	
+			case TAREA:
+				rs.setVariablesLocal(tarea.getExecutionId(), variablesMap);
+				break;
+			}
 		}
 	}
 
@@ -105,16 +124,16 @@ public class GunixObjectVariableType implements VariableType {
 	private Object getValue(Map<String, Object> map) {
 		Object ans = null;
 		ans = map.get(VariableInstanceMapper.LONG_KEY);
-		if(ans==null){
+		if (ans == null) {
 			ans = map.get(VariableInstanceMapper.DOUBLE_KEY);
 		}
-		if(ans==null){
+		if (ans == null) {
 			ans = map.get(VariableInstanceMapper.TEXT_KEY);
 		}
 		return ans;
 	}
-	
-	public void deleteValue(String name, String executionId, String taskId){
+
+	public void deleteValue(String name, String executionId, String taskId) {
 		List<Map<String, Object>> vars = null;
 
 		if (taskId == null) {
