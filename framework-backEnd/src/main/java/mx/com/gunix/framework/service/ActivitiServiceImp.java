@@ -51,10 +51,10 @@ public class ActivitiServiceImp implements ActivitiService {
 
 	@Autowired
 	FormService fs;
-	
+
 	@Autowired
 	HistoryService hs;
-	
+
 	@Autowired
 	RepositoryService repos;
 
@@ -68,33 +68,33 @@ public class ActivitiServiceImp implements ActivitiService {
 		Map<String, Object>[] variablesMaps = toMap(tarea.getVariables());
 		Map<String, Object> variablesProcesoMap = variablesMaps[Variable.Scope.PROCESO.ordinal()];
 		Map<String, Object> variablesTareaMap = variablesMaps[Variable.Scope.TAREA.ordinal()];
-		
+
 		GunixObjectVariableType.setCurrentTarea(tarea);
-				
+
 		if (!variablesProcesoMap.isEmpty()) {
 			rs.setVariables(tarea.getInstancia().getId(), variablesProcesoMap);
 		}
-		
+
 		if (!variablesTareaMap.isEmpty()) {
 			ts.setVariablesLocal(tarea.getId(), variablesProcesoMap);
 		}
-		
+
 		ts.complete(taskId, variablesMaps[Variable.Scope.TAREA.ordinal()]);
 		tarea.getInstancia().setTareaActual(getCurrentTask(tarea.getInstancia().getId()));
-		
-		if(tarea.getInstancia().getTareaActual()==null){
+
+		if (tarea.getInstancia().getTareaActual() == null) {
 			tarea.getInstancia().setTareaActual(Tarea.DEFAULT_END_TASK);
-		}else{
+		} else {
 			tarea.getInstancia().getTareaActual().setInstancia(tarea.getInstancia());
 			refreshVars(tarea.getInstancia().getTareaActual());
 			refreshVars(tarea.getInstancia());
-		}		
-		
-		if(tarea.getInstancia().getTareaActual().isTerminal()){
+		}
+
+		if (tarea.getInstancia().getTareaActual().isTerminal()) {
 			ts.complete(tarea.getInstancia().getTareaActual().getId());
 			hs.deleteHistoricProcessInstance(tarea.getInstancia().getId());
 		}
-		
+
 		return tarea.getInstancia();
 	}
 
@@ -104,14 +104,14 @@ public class ActivitiServiceImp implements ActivitiService {
 		Map<String, Object> variablesTareaMap = new HashMap<String, Object>();
 		Optional.ofNullable(variables).ifPresent(vars -> {
 			vars.stream().forEach(variable -> {
-				if(variable!=null && variable.getValor()!=null){					
+				if (variable != null) {
 					switch (variable.getScope()) {
-						case PROCESO:
-							variablesProcesoMap.put(variable.getNombre(), variable.getValor());
-							break;
-						case TAREA:
-							variablesTareaMap.put(variable.getNombre(), variable.getValor());
-							break;
+					case PROCESO:
+						variablesProcesoMap.put(variable.getNombre(), variable.getValor());
+						break;
+					case TAREA:
+						variablesTareaMap.put(variable.getNombre(), variable.getValor());
+						break;
 					}
 				}
 			});
@@ -152,18 +152,18 @@ public class ActivitiServiceImp implements ActivitiService {
 
 	private void refreshVars(Instancia instancia) {
 		instancia.setVariables(new ArrayList<Variable<?>>());
-		Map<String,Object> vars = rs.getVariables(instancia.getId());
-		doStoreVariables(vars,instancia.getVariables(), Scope.PROCESO);
+		Map<String, Object> vars = rs.getVariables(instancia.getId());
+		doStoreVariables(vars, instancia.getVariables(), Scope.PROCESO);
 	}
-	
+
 	private void doStoreVariables(Map<String, Object> vars, List<Variable<?>> variables, Scope scope) {
-		vars.keySet()
-		.stream()
-		.forEach(key->{
+		vars.keySet().stream().forEach(key -> {
 			Object valor = vars.get(key);
 			Variable<Serializable> var = new Variable<Serializable>();
 			var.setNombre(key);
-			var.setValor((Serializable) valor);
+			if (valor != null) {
+				var.setValor((Serializable) valor);
+			}
 			var.setScope(scope);
 			variables.add(var);
 		});
@@ -171,8 +171,8 @@ public class ActivitiServiceImp implements ActivitiService {
 
 	private void refreshVars(Tarea tarea) {
 		tarea.setVariables(new ArrayList<Variable<?>>());
-		Map<String,Object> vars = ts.getVariablesLocal(tarea.getId());
-		doStoreVariables(vars,tarea.getVariables(), Scope.TAREA);
+		Map<String, Object> vars = ts.getVariablesLocal(tarea.getId());
+		doStoreVariables(vars, tarea.getVariables(), Scope.TAREA);
 	}
 
 	private Tarea getCurrentTask(String piid) {
@@ -190,15 +190,13 @@ public class ActivitiServiceImp implements ActivitiService {
 			TaskEntity te = (TaskEntity) task;
 			ProcessDefinitionImpl pdfimp = (ProcessDefinitionImpl) repos.getProcessDefinition(te.getProcessDefinitionId());
 			List<PvmTransition> oTrans = pdfimp.findActivity(te.getTaskDefinitionKey()).getOutgoingTransitions();
-			if(oTrans.size()>=1){
-				if(oTrans.isEmpty()){
+			if (oTrans.size() >= 1) {
+				if (oTrans.isEmpty()) {
 					tarea.setTerminal(true);
-				}else{
+				} else {
 					ActivityImpl pva = (ActivityImpl) oTrans.get(0).getDestination();
-					if((pva.getActivityBehavior() instanceof TerminateEndEventActivityBehavior) || 
-					   (pva.getActivityBehavior() instanceof ErrorEndEventActivityBehavior) ||
-					   (pva.getActivityBehavior() instanceof NoneEndEventActivityBehavior) ||
-					   (pva.getActivityBehavior() instanceof CancelEndEventActivityBehavior)){
+					if ((pva.getActivityBehavior() instanceof TerminateEndEventActivityBehavior) || (pva.getActivityBehavior() instanceof ErrorEndEventActivityBehavior)
+							|| (pva.getActivityBehavior() instanceof NoneEndEventActivityBehavior) || (pva.getActivityBehavior() instanceof CancelEndEventActivityBehavior)) {
 						tarea.setTerminal(true);
 					}
 				}

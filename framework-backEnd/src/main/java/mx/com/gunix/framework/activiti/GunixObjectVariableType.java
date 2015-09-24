@@ -12,6 +12,7 @@ import mx.com.gunix.framework.processes.domain.Variable;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.activiti.engine.impl.variable.NullType;
 import org.activiti.engine.impl.variable.SerializableType;
 import org.activiti.engine.impl.variable.ValueFields;
 import org.activiti.engine.impl.variable.VariableType;
@@ -19,7 +20,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
-public class GunixObjectVariableType implements VariableType {
+public class GunixObjectVariableType extends NullType implements VariableType {
 	public static final String GUNIX_OBJECT = SerializableType.TYPE_NAME;
 
 	private static final ThreadLocal<Tarea> currentTarea = new ThreadLocal<Tarea>();
@@ -48,27 +49,26 @@ public class GunixObjectVariableType implements VariableType {
 
 	@Override
 	public boolean isAbleToStore(Object value) {
-		return value != null && !BeanUtils.isSimpleProperty(value.getClass()) && (value instanceof Serializable);
+		return (value != null && !BeanUtils.isSimpleProperty(value.getClass()) && (value instanceof Serializable)) || super.isAbleToStore(value);
 	}
 
 	@Override
 	public void setValue(Object value, ValueFields valueFields) {
 		VariableInstanceEntity vie = (VariableInstanceEntity) valueFields;
-
-		boolean isUpdateValue = vie.getRevision() > 0;
 		boolean isExecutionContextActive = Context.isExecutionContextActive();
-		String executionId = null;
+		String executionId = isExecutionContextActive ? Context.getExecutionContext().getProcessInstance().getId() : null;
+		boolean isUpdateValue = vie.getRevision() > 0;
 
 		Tarea tarea = null;
 		Variable<?> variable = null;
 
-		Map<String, Object> variablesMap = new TreeMap<String, Object>();
-		variablesMap.putAll(Utils.toMap(vie.getName(), value));
-
 		if (!isExecutionContextActive) {
 			tarea = currentTarea.get();
-			variable = tarea.getVariables().stream().filter(var -> var.getNombre().equals(vie.getName()) && (var.getValor() == value || var.getValor().equals(value))).findFirst().get();
-			if (isUpdateValue) {
+			variable = tarea.getVariables().stream().filter(var -> var.getNombre().equals(vie.getName()) && (var.getValor() == value || (var.getValor() != null && var.getValor().equals(value)))).findFirst().get();
+		}
+
+		if (isUpdateValue) {
+			if (!isExecutionContextActive) {
 				switch (variable.getScope()) {
 				case PROCESO:
 					deleteValue(vie.getName(), tarea.getInstancia().getId(), null);
@@ -77,26 +77,28 @@ public class GunixObjectVariableType implements VariableType {
 					deleteValue(vie.getName(), null, tarea.getExecutionId());
 					break;
 				}
-			}
-		} else {
-			executionId = Context.getExecutionContext().getProcessInstance().getId();
-			if (isUpdateValue) {
+			} else {
 				deleteValue(vie.getName(), executionId, null);
 			}
 		}
 
-		vie.setTextValue(value.getClass().getName());
+		if (value != null) {
+			Map<String, Object> variablesMap = new TreeMap<String, Object>();
+			variablesMap.putAll(Utils.toMap(vie.getName(), value));
 
-		if (isExecutionContextActive) {
-			rs.setVariables(executionId, variablesMap);
-		} else {
-			switch (variable.getScope()) {
-			case PROCESO:
-				rs.setVariables(tarea.getInstancia().getId(), variablesMap);
-				break;
-			case TAREA:
-				rs.setVariablesLocal(tarea.getExecutionId(), variablesMap);
-				break;
+			vie.setTextValue(value.getClass().getName());
+
+			if (isExecutionContextActive) {
+				rs.setVariables(executionId, variablesMap);
+			} else {
+				switch (variable.getScope()) {
+				case PROCESO:
+					rs.setVariables(tarea.getInstancia().getId(), variablesMap);
+					break;
+				case TAREA:
+					rs.setVariablesLocal(tarea.getExecutionId(), variablesMap);
+					break;
+				}
 			}
 		}
 	}
@@ -118,7 +120,7 @@ public class GunixObjectVariableType implements VariableType {
 			mappedObject.put((String) map.get("key"), getValue(map));
 		});
 
-		return Utils.fromMap(vie.getName(), mappedObject, getClass().getClassLoader());
+		return mappedObject.isEmpty() ? super.getValue(valueFields) : Utils.fromMap(vie.getName(), mappedObject, getClass().getClassLoader());
 	}
 
 	private Object getValue(Map<String, Object> map) {

@@ -1,7 +1,11 @@
 package mx.com.gunix.framework.security.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -144,5 +148,29 @@ public class Funcion implements Serializable {
 	@Override
 	public String toString() {
 		return "Funcion [idFuncion=" + idFuncion + ", modulo=" + modulo + ", titulo=" + titulo + ", processKey=" + processKey + "]";
+	}
+
+	public static List<Funcion> jerarquizaFunciones(Modulo modulo, List<Funcion> funciones) {
+		Objects.requireNonNull(funciones);
+		List<Funcion> funcionesReacomodadas = new ArrayList<Funcion>();
+		funciones.stream().forEach(funcion -> {
+			funcion.setModulo(modulo);
+			if (funcion.getPadre() != null) {
+				Optional<Funcion> padre = funciones.stream().filter(posiblePadre -> (posiblePadre.getIdFuncion().equals(funcion.getPadre().getIdFuncion()))).findFirst();
+				padre.ifPresent(p -> {
+					funcion.setPadre(p);
+					List<Funcion> hijas = p.getHijas();
+					if (hijas == null) {
+						p.setHijas((hijas = new ArrayList<Funcion>()));
+					}
+					hijas.add(funcion);
+					funcionesReacomodadas.add(funcion);
+				});
+			}
+		});
+
+		return funciones.stream()
+						.filter(funcion -> (!funcionesReacomodadas.contains(funcion)))
+						.collect(Collectors.toList());
 	}
 }

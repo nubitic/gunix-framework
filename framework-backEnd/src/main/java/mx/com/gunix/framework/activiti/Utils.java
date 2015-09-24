@@ -20,6 +20,9 @@ import org.springframework.beans.BeanUtils;
 public class Utils {
 	private static final String NESTED_REFERENCE = "\"#\"";
 
+	private static final String EMPTY_COLLECTION_NESTED_REFERENCE = NESTED_REFERENCE + Iterable.class + "|1";
+	private static final String EMPTY_MAP_NESTED_REFERENCE = NESTED_REFERENCE + Map.class + "|0";
+
 	@SuppressWarnings({ "rawtypes" })
 	public static Object fromMap(String varName, TreeMap<String, Object> stringifiedObject, ClassLoader classLoader) {
 		final Object ans;
@@ -134,27 +137,36 @@ public class Utils {
 		return ans;
 	}
 
-	private static boolean doAssignNestedReference(PropertyUtilsBean pub, Object ans, boolean isNotObject, boolean isItereable, String varName, Map<String, Object> childTypes, String propertyPath,
-			String nestedReferenceHash) {
+	private static boolean doAssignNestedReference(PropertyUtilsBean pub, Object ans, boolean isNotObject, boolean isItereable, String varName, Map<String, Object> childTypes, String propertyPath, String nestedReferenceHash) {
 		Boolean[] boolAns = new Boolean[] { Boolean.FALSE };
 		String actualPropertyPath = isNotObject ? propertyPath.substring(isItereable ? propertyPath.indexOf("[") : propertyPath.indexOf("(")) : propertyPath.substring(varName.length() + 1);
 		try {
 			if (pub.getNestedProperty(ans, actualPropertyPath) != null) {
 				boolAns[0] = Boolean.TRUE;
 			} else {
-				childTypes.forEach((childKey, childValue) -> {
-					Class<?> clazz = childValue.getClass();
-					String classHash = getClassHash(clazz, childValue);
-					try {
-						if (nestedReferenceHash.equals(classHash)) {
-							pub.setNestedProperty(ans, actualPropertyPath, childValue);
-							boolAns[0] = Boolean.TRUE;
-							return;
-						}
-					} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-						throw new RuntimeException(e);
+				if (EMPTY_COLLECTION_NESTED_REFERENCE.equals(nestedReferenceHash)) {
+					pub.setNestedProperty(ans, actualPropertyPath, new GunixArrayList());
+					boolAns[0] = Boolean.TRUE;
+				} else {
+					if (EMPTY_MAP_NESTED_REFERENCE.equals(nestedReferenceHash)) {
+						pub.setNestedProperty(ans, actualPropertyPath, new HashMap<Object,Object>());
+						boolAns[0] = Boolean.TRUE;
+					} else {
+						childTypes.forEach((childKey, childValue) -> {
+							Class<?> clazz = childValue.getClass();
+							String classHash = getClassHash(clazz, childValue);
+							try {
+								if (nestedReferenceHash.equals(classHash)) {
+									pub.setNestedProperty(ans, actualPropertyPath, childValue);
+									boolAns[0] = Boolean.TRUE;
+									return;
+								}
+							} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+								throw new RuntimeException(e);
+							}
+						});
 					}
-				});
+				}
 			}
 		} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 			throw new RuntimeException(e);
