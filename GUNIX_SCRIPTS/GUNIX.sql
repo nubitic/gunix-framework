@@ -1,6 +1,3 @@
-﻿DROP function if exists FUNCIONES_ROL(text, text);
-DROP TABLE if exists CLIENTE;
-
 create or replace function FUNCIONES_ROL(id_aplicacion text, id_rol text)
   returns table (
 	ID_APLICACION text,
