@@ -11,5 +11,8 @@ import com.hunteron.core.Hessian;
 @Hessian("/activitiService")
 public interface ActivitiService {
 	public Instancia completaTarea(Tarea tarea);
+
 	public Instancia iniciaProceso(String processKey, List<Variable<?>> variables, String comentario);
+
+	public void eliminaTodasLasInstanciasVolatilesTerminadasOIniciadasHaceMasDe35Minutos();
 }

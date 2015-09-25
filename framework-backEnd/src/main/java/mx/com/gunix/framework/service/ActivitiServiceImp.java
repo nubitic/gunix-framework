@@ -1,8 +1,11 @@
 package mx.com.gunix.framework.service;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +25,7 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.form.TaskFormData;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
@@ -30,9 +34,11 @@ import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -203,5 +209,24 @@ public class ActivitiServiceImp implements ActivitiService {
 			}
 		}
 		return tarea;
+	}
+
+	// A las 00:00 todos los días
+	@Scheduled(cron = "0 0 0 * * *")
+	public void eliminaTodasLasInstanciasVolatilesTerminadasOIniciadasHaceMasDe35Minutos() {
+		List<ProcessDefinition> pDefsVolatiles = repos.createProcessDefinitionQuery().processDefinitionCategory("VOLATIL").latestVersion().list();
+		Date hace35Minutos = Date.from(Instant.now().minus(35, ChronoUnit.MINUTES));
+		pDefsVolatiles.parallelStream().forEach(
+				pd -> {				
+					List<HistoricProcessInstance> hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).startedBefore(hace35Minutos).list();
+					hpis.parallelStream().forEach(hpi -> {
+						rs.deleteProcessInstance(hpi.getId(), "");
+					});
+					
+					hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).finished().list();
+					hpis.parallelStream().forEach(hpi -> {
+						hs.deleteHistoricProcessInstance(hpi.getId());
+					});
+				});
 	}
 }

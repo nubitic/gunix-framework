@@ -40,14 +40,18 @@ public class PersistenceConfig {
 		
 		config.setAutoCommit(false);
 		config.setMaximumPoolSize(15);
-		config.addDataSourceProperty("ssl", "true");
 		config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
+		
+		config.addDataSourceProperty("ssl", "true");
 		config.addDataSourceProperty("sslfactory", "org.postgresql.ssl.NonValidatingFactory");
 		
 		config.addDataSourceProperty("password", System.getenv("DB_PASSWORD"));
 		config.addDataSourceProperty("user", System.getenv("DB_USER"));
 		config.addDataSourceProperty("databaseName", System.getenv("DB_NAME"));
 		config.addDataSourceProperty("serverName", System.getenv("DB_SERVER_NAME"));
+		config.addDataSourceProperty("prepareThreshold", "1");
+		config.addDataSourceProperty("preparedStatementCacheQueries", "1024");
+		config.addDataSourceProperty("preparedStatementCacheSizeMiB", "20");		
 
 		return new HikariDataSource(config);
 	}

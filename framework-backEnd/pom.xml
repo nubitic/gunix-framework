@@ -7,6 +7,10 @@
 		<version>1.0</version>
 	</parent>
 	<artifactId>framework-backEnd</artifactId>
+	<properties>
+		<openl.version>5.16.0</openl.version>
+		<dozer.version>5.5.1</dozer.version>
+	</properties>
 	<repositories>
 		<repository>
 			<id>gunix-mvn-repo</id>
@@ -27,13 +31,18 @@
 	</repositories>
 	<dependencies>
 		<dependency>
+			<groupId>javax.enterprise.concurrent</groupId>
+			<artifactId>javax.enterprise.concurrent-api</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
 			<groupId>mx.com.gunix</groupId>
 			<artifactId>framework-commons</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.activiti</groupId>
 			<artifactId>activiti-spring</artifactId>
-			<version>5.17.0</version>
+			<version>5.18.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework</groupId>
@@ -60,6 +69,17 @@
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis</artifactId>
 			<version>3.2.8</version>
+			<!-- 3.3.0 no juega bien con activiti dado que el método private void 
+				applyIncludes(Node source, final Properties variablesContext) de org.apache.ibatis.builder.xml.XMLIncludeTransformer 
+				hace un reemplazo de variables que antes no hacía: if (source.getNodeType() 
+				== Node.TEXT_NODE && !variablesContext.isEmpty()) { // replace variables 
+				ins all text nodes source.setNodeValue(PropertyParser.parse(source.getNodeValue(), 
+				variablesContext)); } -->
+		</dependency>
+		<dependency>
+			<groupId>org.mybatis.caches</groupId>
+			<artifactId>mybatis-ehcache</artifactId>
+			<version>1.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -84,7 +104,7 @@
 		<dependency>
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis-spring</artifactId>
-			<version>1.2.2</version>
+			<version>1.2.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -103,7 +123,7 @@
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
-			<version>2.9.0</version>
+			<version>2.10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -159,17 +179,17 @@
 		<dependency>
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>
-			<version>2.3.8</version>
+			<version>2.4.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.4-1201-jdbc41</version>
+			<version>9.4-1203-jdbc42</version>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
-			<version>2.4.3</version>
+			<version>2.4.4</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-logging</groupId>
