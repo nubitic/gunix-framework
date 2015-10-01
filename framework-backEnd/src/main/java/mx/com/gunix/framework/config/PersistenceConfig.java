@@ -42,9 +42,11 @@ public class PersistenceConfig {
 		config.setMaximumPoolSize(15);
 		config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
 		
-		config.addDataSourceProperty("ssl", "true");
-		config.addDataSourceProperty("sslfactory", "org.postgresql.ssl.NonValidatingFactory");
-		
+		if(Boolean.valueOf(System.getenv("DB_USE_SSL"))) {
+			config.addDataSourceProperty("ssl", "true");
+			config.addDataSourceProperty("sslfactory", "org.postgresql.ssl.NonValidatingFactory");	
+		}
+				
 		config.addDataSourceProperty("password", System.getenv("DB_PASSWORD"));
 		config.addDataSourceProperty("user", System.getenv("DB_USER"));
 		config.addDataSourceProperty("databaseName", System.getenv("DB_NAME"));

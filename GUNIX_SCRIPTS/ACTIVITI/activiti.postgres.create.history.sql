@@ -1,4 +1,4 @@
-﻿create table ACT_HI_PROCINST (
+create table ACT_HI_PROCINST (
     ID_ varchar(64) not null,
     PROC_INST_ID_ varchar(64) not null,
     BUSINESS_KEY_ varchar(255),

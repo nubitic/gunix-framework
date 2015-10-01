@@ -7,6 +7,7 @@ DROP TABLE if exists ROL_FUNCION  cascade;
 DROP TYPE if exists NIVEL_ACCESO;
 DROP TABLE if exists PARAM_FUNCION  cascade;
 DROP TABLE if exists FUNCION cascade;
+DROP TYPE if exists HORARIO_OPERACION;
 DROP TABLE if exists MODULO cascade;
 DROP TABLE if exists USUARIO_ROL cascade;
 DROP TABLE if exists ROL cascade;
