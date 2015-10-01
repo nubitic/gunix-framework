@@ -97,6 +97,13 @@ public class Utils {
 									if ((propType.isPrimitive() && propType.getName().equals("float")) || Float.class.isAssignableFrom(propType)) {
 										value = ((Double) value).floatValue();
 									}
+								} else {
+									if (value instanceof Long) {
+										Class<?> propType = pub.getPropertyType(ans, prop);
+										if ((propType.isPrimitive() && propType.getName().equals("boolean")) || Boolean.class.isAssignableFrom(propType)) {
+											value = ((Long)value == 1);
+										}
+									}
 								}
 
 								pub.setNestedProperty(ans, prop, value);
@@ -109,24 +116,29 @@ public class Utils {
 
 				childTypes.put("", ans);
 
-				Boolean[] allAssigned = new Boolean[] { null };
 				int controlCount = 0;
+				int tope50Ciclos = nestedReferences.size()*50;
 				do {
-					allAssigned[0] = Boolean.TRUE;
-					nestedReferences.forEach((propertyPath, nestedReferenceHash) -> {
+					String assignedPropertyPath = null;
+					for(String propertyPath : nestedReferences.keySet()){
+						String nestedReferenceHash = nestedReferences.get(propertyPath);
 						Boolean assigned = Boolean.FALSE;
 						if (!(assigned = doAssignNestedReference(pub, ans, isNotObject, isItereable, varName, childTypes, propertyPath, nestedReferenceHash))) {
 							assigned = doAssignNestedReference(pub, ans, isNotObject, isItereable, varName, iterableMapTypes, propertyPath, nestedReferenceHash);
 						}
-						if (allAssigned[0] && !assigned) {
-							allAssigned[0] = Boolean.FALSE;
+						if(assigned) {
+							assignedPropertyPath = propertyPath;
+							break;
 						}
-					});
+					}
+					if(assignedPropertyPath!=null) {
+						nestedReferences.remove(assignedPropertyPath);
+					}
 					controlCount++;
-					if (controlCount > 50) {
+					if (!nestedReferences.isEmpty() && (controlCount > tope50Ciclos)) {
 						throw new IllegalStateException("No fue posible resolver todas las dependencias anidadas dentro de 50 ciclos");
 					}
-				} while (!allAssigned[0]);
+				} while (!nestedReferences.isEmpty());
 
 			} catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
 				throw new RuntimeException(e);

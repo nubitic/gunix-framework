@@ -10,11 +10,29 @@ import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import mx.com.gunix.framework.domain.HashCodeByTimeStampAware;
 import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
 import mx.com.gunix.framework.security.domain.validation.ValidaFuncion;
 
 @ValidaFuncion(groups = BeanValidations.class)
-public class Funcion implements Serializable {
+public class Funcion extends HashCodeByTimeStampAware implements Serializable {
+	public static enum Horario {
+		LD24("Lunes a Domingo 24 Horas"), LV24("Lunes a Viernes 24 Horas"), LV9_18("Lunes a Viernes de 09 a 18"), PERSONALIZADO("Personalizado...");
+		private final String label;
+
+		private Horario(String label) {
+			this.label = label;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+	}
+
+	public static enum Acceso {
+		COMPLETO, PUNTUAL;
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	@NotNull
@@ -37,6 +55,27 @@ public class Funcion implements Serializable {
 
 	@NotNull
 	private float orden;
+
+	@NotNull
+	private Horario horario;
+
+	private Acceso acceso;
+
+	public Acceso getAcceso() {
+		return acceso;
+	}
+
+	public void setAcceso(Acceso acceso) {
+		this.acceso = acceso;
+	}
+
+	public Horario getHorario() {
+		return horario;
+	}
+
+	public void setHorario(Horario horario) {
+		this.horario = horario;
+	}
 
 	private Funcion padre;
 	private List<Funcion> hijas;
@@ -115,7 +154,7 @@ public class Funcion implements Serializable {
 	}
 
 	@Override
-	public int hashCode() {
+	public int doHashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((idFuncion == null) ? 0 : idFuncion.hashCode());
@@ -169,8 +208,6 @@ public class Funcion implements Serializable {
 			}
 		});
 
-		return funciones.stream()
-						.filter(funcion -> (!funcionesReacomodadas.contains(funcion)))
-						.collect(Collectors.toList());
+		return funciones.stream().filter(funcion -> (!funcionesReacomodadas.contains(funcion))).collect(Collectors.toList());
 	}
 }

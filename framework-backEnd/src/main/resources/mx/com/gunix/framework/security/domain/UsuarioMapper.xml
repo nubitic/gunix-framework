@@ -25,6 +25,7 @@
 		      	<result property="descripcion" column="DESCRIPCION_FUNCION" />
 		      	<result property="processKey" column="PROCESS_KEY" />
 		      	<result property="orden" column="ORDEN" />
+		      	<result property="horario" column="HORARIO" typeHandler="org.apache.ibatis.type.EnumTypeHandler" />
 		      	<association property="padre" javaType="mx.com.gunix.framework.security.domain.Funcion">
 			      	<id property="idFuncion" column="ID_FUNCION_PADRE"/>
 			      	<result property="titulo" column="TITULO_PADRE" />

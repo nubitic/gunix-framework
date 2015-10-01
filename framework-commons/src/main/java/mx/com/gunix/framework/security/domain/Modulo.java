@@ -6,9 +6,10 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import mx.com.gunix.framework.domain.HashCodeByTimeStampAware;
 import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
 
-public class Modulo implements Serializable {
+public class Modulo extends HashCodeByTimeStampAware implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@NotNull
@@ -71,7 +72,7 @@ public class Modulo implements Serializable {
 	}
 
 	@Override
-	public int hashCode() {
+	public int doHashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((aplicacion == null) ? 0 : aplicacion.hashCode());
@@ -105,5 +106,4 @@ public class Modulo implements Serializable {
 	public String toString() {
 		return "Modulo [idModulo=" + idModulo + ", aplicacion=" + aplicacion + "]";
 	}
-
 }

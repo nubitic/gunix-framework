@@ -6,9 +6,10 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import mx.com.gunix.framework.domain.HashCodeByTimeStampAware;
 import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
 
-public class Rol implements Serializable {
+public class Rol extends HashCodeByTimeStampAware implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@NotNull
@@ -25,6 +26,8 @@ public class Rol implements Serializable {
 	@NotNull(groups = BeanValidations.class)
 	@Size(min = 1, groups = BeanValidations.class)
 	private List<Modulo> modulos;
+
+	private boolean habilitado;
 
 	public String getIdRol() {
 		return idRol;
@@ -59,7 +62,7 @@ public class Rol implements Serializable {
 	}
 
 	@Override
-	public int hashCode() {
+	public int doHashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((aplicacion == null) ? 0 : aplicacion.hashCode());
@@ -92,6 +95,14 @@ public class Rol implements Serializable {
 	@Override
 	public String toString() {
 		return "Rol [idRol=" + idRol + ", aplicacion=" + aplicacion + "]";
+	}
+
+	public boolean isHabilitado() {
+		return habilitado;
+	}
+
+	public void setHabilitado(boolean habilitado) {
+		this.habilitado = habilitado;
 	}
 
 }

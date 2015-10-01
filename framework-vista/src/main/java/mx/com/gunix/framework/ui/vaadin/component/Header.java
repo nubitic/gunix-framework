@@ -1,5 +1,7 @@
 package mx.com.gunix.framework.ui.vaadin.component;
 
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +36,7 @@ import com.vaadin.ui.Image;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.SingleComponentContainer;
 import com.vaadin.ui.UI;
@@ -85,13 +88,13 @@ public class Header extends CustomComponent {
 		public void setTareaActual(Tarea tareaActual) {
 			this.tareaActual = tareaActual;
 		}
-		
+
 		@Override
 		protected NavigationStateManager getStateManager() {
 			return null;
 		}
 
-		public Tarea getTareaActual(){
+		public Tarea getTareaActual() {
 			return tareaActual;
 		}
 	}
@@ -122,25 +125,25 @@ public class Header extends CustomComponent {
 		setCompositionRoot(mainLayout);
 		navigator = new TareaActualNavigator(UI.getCurrent(), panelContenido);
 		breadCrumbLayout.setSpacing(false);
-		
+
 		setSizeFull();
 	}
 
 	private void initBreadCrumb() {
-		if(breadCrumb!=null){
+		if (breadCrumb != null) {
 			breadCrumbLayout.removeComponent(breadCrumb);
 		}
 		breadCrumb = new Breadcrumb();
 		breadCrumb.setShowAnimationSpeed(Breadcrumb.AnimSpeed.SLOW);
-        breadCrumb.setHideAnimationSpeed(Breadcrumb.AnimSpeed.SLOW);
-        breadCrumb.setUseDefaultClickBehaviour(false);
-        Button homeButton = new Button();
-        homeButton.addClickListener(clevnt->{
-        	rolCBox.valueChange(new ValueChangeEvent(rolCBox));
-        });
-        breadCrumb.addLink(homeButton);
-        breadCrumb.setLinkEnabled(true, 0);
-        breadCrumbLayout.setVisible(false);
+		breadCrumb.setHideAnimationSpeed(Breadcrumb.AnimSpeed.SLOW);
+		breadCrumb.setUseDefaultClickBehaviour(false);
+		Button homeButton = new Button();
+		homeButton.addClickListener(clevnt -> {
+			rolCBox.valueChange(new ValueChangeEvent(rolCBox));
+		});
+		breadCrumb.addLink(homeButton);
+		breadCrumb.setLinkEnabled(true, 0);
+		breadCrumbLayout.setVisible(false);
 		breadCrumbLayout.addComponent(breadCrumb);
 		breadCrumbLayout.setComponentAlignment(breadCrumb, Alignment.MIDDLE_LEFT);
 	}
@@ -174,27 +177,27 @@ public class Header extends CustomComponent {
 			modulosLayout.setRows(3);// Rows Iniciales
 			modulosLayout.setColumns((MODULOS_POR_FILA * 2) + 1);
 
-			Optional<Rol> rolSelOpt =  aplicacion.getRoles().stream().filter(rol -> rol.getIdRol().equals(rolCBox.getValue())).findFirst();
-			
-			rolSelOpt.ifPresent(rolSel->{
+			Optional<Rol> rolSelOpt = aplicacion.getRoles().stream().filter(rol -> rol.getIdRol().equals(rolCBox.getValue())).findFirst();
+
+			rolSelOpt.ifPresent(rolSel -> {
 				int filasModulos = ((filasModulos = rolSel.getModulos().size()) % MODULOS_POR_FILA == 0) ? filasModulos / MODULOS_POR_FILA : (filasModulos / MODULOS_POR_FILA) + 1;
-				boolean isOneModulo = rolSel.getModulos().size()==1;
+				boolean isOneModulo = rolSel.getModulos().size() == 1;
 				if (filasModulos > 1) {
 					modulosLayout.setRows(1 + (filasModulos * 2));
 				}
 
 				int modulosProcesados = 0;
-				int rowIncr=1;
+				int rowIncr = 1;
 				for (int row = 0; row < filasModulos; row++) {
 					if (row % 2 != 0) {
 						modulosLayout.setRowExpandRatio(row, 1);
 					} else {
 						modulosLayout.setRowExpandRatio(row, 2);
 					}
-					int colIncr=isOneModulo?3:1;
+					int colIncr = isOneModulo ? 3 : 1;
 					for (int col = 0; col < MODULOS_POR_FILA; col++) {
 						Modulo modulo = rolSel.getModulos().get(modulosProcesados);
-						Image button = new Image(modulo.getDescripcion(),new ThemeResource("img/"+modulo.getIcono()));
+						Image button = new Image(modulo.getDescripcion(), new ThemeResource("img/" + modulo.getIcono()));
 						button.addStyleName("moduleImageButton");
 						button.addClickListener(clickEvnt -> {
 							menuBar.removeItems();
@@ -235,36 +238,75 @@ public class Header extends CustomComponent {
 
 	private void recorreFuncionesHijas(MenuItem padre, Optional<List<Funcion>> optHijas) {
 		optHijas.ifPresent(hijas -> {
-			hijas.stream().forEach(funcion -> {
-				Optional<List<Funcion>> optHijas2 = Optional.ofNullable(funcion.getHijas());
-				MenuItem nvoPadre = null;
-				if (optHijas2.isPresent()) {
-					nvoPadre = padre.addItem(funcion.getTitulo(), null);
-				} else {
-					nvoPadre = padre.addItem(funcion.getTitulo(), selectedItem -> {
-						Instancia instancia = as.iniciaProceso(funcion.getProcessKey(), Variable.fromParametros(funcion.getParametros()), "");
-						try {
-							navigator.setTareaActual(instancia.getTareaActual());
-							navigator.navigateTo(instancia.getTareaActual().getVista());
-							modulosLayout.setVisible(false);
-							panelContenido.setVisible(true);
-							panelContenido.setEnabled(true);
-							initBreadCrumb();
-							updateBreadcrumb(funcion);
-					        breadCrumbLayout.setVisible(true);
-						} finally {
-							navigator.setTareaActual(null);
+			hijas.stream().forEach(
+					funcion -> {
+						Optional<List<Funcion>> optHijas2 = Optional.ofNullable(funcion.getHijas());
+						MenuItem nvoPadre = null;
+						if (optHijas2.isPresent()) {
+							nvoPadre = padre.addItem(funcion.getTitulo(), null);
+						} else {
+							nvoPadre = padre.addItem(funcion.getTitulo(), selectedItem -> {
+								LocalDateTime now = LocalDateTime.now();
+								DayOfWeek today = now.getDayOfWeek();
+								switch (funcion.getHorario()) {
+								case LV24:
+									switch (today) {
+									case SUNDAY:
+									case SATURDAY:
+										Notification.show("Funcionalidad Cerrada", "La funcionalidad seleccionada se encuentra disponible sólo de lunes a viernes", Type.ERROR_MESSAGE);
+										break;
+									default:
+										iniciaProceso(funcion);
+										break;
+									}
+									break;
+								case LV9_18:
+									switch (today) {
+									case SUNDAY:
+									case SATURDAY:
+										Notification.show("Funcionalidad Cerrada", "La funcionalidad seleccionada se encuentra disponible sólo de lunes a viernes en el Horario de 09:00 a 18:00", Type.ERROR_MESSAGE);
+										break;
+									default:
+										int hora = now.getHour();
+										if (hora >= 9 && hora <= 18) {
+											iniciaProceso(funcion);
+										} else {
+											Notification.show("Funcionalidad Cerrada", "La funcionalidad seleccionada se encuentra disponible sólo de lunes a viernes en el Horario de 09:00 a 18:00", Type.ERROR_MESSAGE);
+										}
+										break;
+									}
+									break;
+								case PERSONALIZADO:
+									break;
+								default:
+									iniciaProceso(funcion);
+								}
+							});
 						}
+						nvoPadre.setEnabled(true);
+						recorreFuncionesHijas(nvoPadre, optHijas2);
 					});
-				}
-				nvoPadre.setEnabled(true);
-				recorreFuncionesHijas(nvoPadre, optHijas2);
-			});
 		});
 	}
 
+	private void iniciaProceso(Funcion funcion) {
+		Instancia instancia = as.iniciaProceso(funcion.getProcessKey(), Variable.fromParametros(funcion.getParametros()), "");
+		try {
+			navigator.setTareaActual(instancia.getTareaActual());
+			navigator.navigateTo(instancia.getTareaActual().getVista());
+			modulosLayout.setVisible(false);
+			panelContenido.setVisible(true);
+			panelContenido.setEnabled(true);
+			initBreadCrumb();
+			updateBreadcrumb(funcion);
+			breadCrumbLayout.setVisible(true);
+		} finally {
+			navigator.setTareaActual(null);
+		}
+	}
+
 	private void updateBreadcrumb(Funcion funcion) {
-		if(funcion.getPadre()!=null){
+		if (funcion.getPadre() != null) {
 			updateBreadcrumb(funcion.getPadre());
 		}
 		Button button = new Button(funcion.getTitulo());
@@ -280,16 +322,16 @@ public class Header extends CustomComponent {
 		mainLayout.setWidth("100%");
 		mainLayout.setHeight("100%");
 		mainLayout.setMargin(false);
-		
+
 		// top-level component properties
 		setWidth("100.0%");
 		setHeight("100.0%");
-		
+
 		// userDetailsPanel
 		userDetailsPanel = buildUserDetailsPanel();
 		mainLayout.addComponent(userDetailsPanel);
 		mainLayout.setComponentAlignment(userDetailsPanel, new Alignment(6));
-		
+
 		// breadCrumbLayout
 		breadCrumbLayout = new HorizontalLayout();
 		breadCrumbLayout.setImmediate(false);
@@ -297,7 +339,7 @@ public class Header extends CustomComponent {
 		breadCrumbLayout.setHeight("-1px");
 		breadCrumbLayout.setMargin(false);
 		mainLayout.addComponent(breadCrumbLayout);
-		
+
 		// modulosLayout
 		modulosLayout = new GridLayout();
 		modulosLayout.setImmediate(false);
@@ -308,12 +350,12 @@ public class Header extends CustomComponent {
 		mainLayout.addComponent(modulosLayout);
 		mainLayout.setExpandRatio(modulosLayout, 20.0f);
 		mainLayout.setComponentAlignment(modulosLayout, new Alignment(48));
-		
+
 		// panelContenido
 		panelContenido = buildPanelContenido();
 		mainLayout.addComponent(panelContenido);
 		mainLayout.setComponentAlignment(panelContenido, new Alignment(48));
-		
+
 		return mainLayout;
 	}
 
@@ -324,11 +366,11 @@ public class Header extends CustomComponent {
 		userDetailsPanel.setImmediate(false);
 		userDetailsPanel.setWidth("100.0%");
 		userDetailsPanel.setHeight("90px");
-		
+
 		// horizontalLayout_2
 		horizontalLayout_2 = buildHorizontalLayout_2();
 		userDetailsPanel.setContent(horizontalLayout_2);
-		
+
 		return userDetailsPanel;
 	}
 
@@ -341,7 +383,7 @@ public class Header extends CustomComponent {
 		horizontalLayout_2.setHeight("100.0%");
 		horizontalLayout_2.setMargin(true);
 		horizontalLayout_2.setSpacing(true);
-		
+
 		// rolCBox
 		rolCBox = new ComboBox();
 		rolCBox.setCaption("Rol");
@@ -350,7 +392,7 @@ public class Header extends CustomComponent {
 		rolCBox.setHeight("-1px");
 		horizontalLayout_2.addComponent(rolCBox);
 		horizontalLayout_2.setExpandRatio(rolCBox, 1.0f);
-		
+
 		// menuBar
 		menuBar = new MenuBar();
 		menuBar.setEnabled(false);
@@ -360,7 +402,7 @@ public class Header extends CustomComponent {
 		horizontalLayout_2.addComponent(menuBar);
 		horizontalLayout_2.setExpandRatio(menuBar, 3.0f);
 		horizontalLayout_2.setComponentAlignment(menuBar, new Alignment(33));
-		
+
 		return horizontalLayout_2;
 	}
 
@@ -373,7 +415,7 @@ public class Header extends CustomComponent {
 		panelContenido.setVisible(false);
 		panelContenido.setWidth("100.0%");
 		panelContenido.setHeight("100.0%");
-		
+
 		// verticalLayout_2
 		verticalLayout_2 = new VerticalLayout();
 		verticalLayout_2.setEnabled(false);
@@ -383,7 +425,7 @@ public class Header extends CustomComponent {
 		verticalLayout_2.setHeight("100.0%");
 		verticalLayout_2.setMargin(false);
 		panelContenido.setContent(verticalLayout_2);
-		
+
 		return panelContenido;
 	}
 }
