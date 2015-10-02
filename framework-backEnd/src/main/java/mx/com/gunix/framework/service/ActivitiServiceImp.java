@@ -214,19 +214,21 @@ public class ActivitiServiceImp implements ActivitiService {
 	// A las 00:00 todos los días
 	@Scheduled(cron = "0 0 0 * * *")
 	public void eliminaTodasLasInstanciasVolatilesTerminadasOIniciadasHaceMasDe35Minutos() {
-		List<ProcessDefinition> pDefsVolatiles = repos.createProcessDefinitionQuery().processDefinitionCategory("VOLATIL").latestVersion().list();
-		Date hace35Minutos = Date.from(Instant.now().minus(35, ChronoUnit.MINUTES));
-		pDefsVolatiles.parallelStream().forEach(
-				pd -> {				
-					List<HistoricProcessInstance> hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).startedBefore(hace35Minutos).list();
-					hpis.parallelStream().forEach(hpi -> {
-						rs.deleteProcessInstance(hpi.getId(), "");
-					});
-					
-					hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).finished().list();
-					hpis.parallelStream().forEach(hpi -> {
-						hs.deleteHistoricProcessInstance(hpi.getId());
-					});
+		if(Boolean.valueOf(System.getenv("ACTIVITI_MASTER"))) {
+			List<ProcessDefinition> pDefsVolatiles = repos.createProcessDefinitionQuery().processDefinitionCategory("VOLATIL").latestVersion().list();
+			Date hace35Minutos = Date.from(Instant.now().minus(35, ChronoUnit.MINUTES));
+			pDefsVolatiles.parallelStream().forEach(
+					pd -> {				
+						List<HistoricProcessInstance> hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).startedBefore(hace35Minutos).list();
+						hpis.parallelStream().forEach(hpi -> {
+							rs.deleteProcessInstance(hpi.getId(), "");
+						});
+						
+						hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).finished().list();
+						hpis.parallelStream().forEach(hpi -> {
+							hs.deleteHistoricProcessInstance(hpi.getId());
 				});
+			});
+		}
 	}
 }

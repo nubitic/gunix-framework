@@ -58,9 +58,11 @@ public class ActivitiConfig {
 		speConf.setBatchSizeTasks(1000);
 		speConf.setEnableSafeBpmnXml(true);
 
-		speConf.setAsyncExecutor(asyncExecutor());
-		speConf.setAsyncExecutorEnabled(true);
-		speConf.setAsyncExecutorActivate(true);
+		if (Boolean.valueOf(System.getenv("ACTIVITI_MASTER"))) {
+			speConf.setAsyncExecutor(asyncExecutor());
+			speConf.setAsyncExecutorEnabled(true);
+			speConf.setAsyncExecutorActivate(true);
+		}
 
 		speConf.setIdGenerator(idGenerator());
 		speConf.setDeploymentMode(ResourceParentFolderAutoDeploymentStrategy.DEPLOYMENT_MODE);
