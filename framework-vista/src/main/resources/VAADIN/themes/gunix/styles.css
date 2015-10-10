@@ -12806,20 +12806,3 @@ div.v-layout.v-horizontal.v-widget {
 	opacity: 1;
 	filter: alpha(opacity=100);
 }
-
-.gunix .v-gridlayout-slot {
-	display: table;
-	padding-top: 0px !important;
-}
-
-.gunix .v-image-moduleImageButton {
-	cursor: pointer;
-	cursor: hand;
-	display: table-header-group;
-}
-
-.gunix .v-caption-moduleImageButton {
-	display: table-header-group;
-	text-align: center;
-	position: relative !important;
-}

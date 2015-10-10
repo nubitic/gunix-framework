@@ -12,6 +12,7 @@ import com.vaadin.ui.Upload;
 
 public class GunixUploadField extends UploadField {
 	private static final long serialVersionUID = 1L;
+	private boolean readOnly;
 
 	public GunixUploadField() {
 		super();
@@ -48,7 +49,8 @@ public class GunixUploadField extends UploadField {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void setPropertyDataSource(Property newDataSource) {
-		Transactional propertyProxy = (Transactional) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { Transactional.class, ValueChangeNotifier.class, ReadOnlyStatusChangeNotifier.class }, (proxy, method, args) -> {
+		Transactional propertyProxy = (Transactional) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { Transactional.class, ValueChangeNotifier.class,
+				ReadOnlyStatusChangeNotifier.class }, (proxy, method, args) -> {
 			Object result = null;
 			if (method.getName().equals("getType")) {
 				result = File.class;
@@ -60,4 +62,37 @@ public class GunixUploadField extends UploadField {
 		super.setPropertyDataSource(propertyProxy);
 	}
 
+	@Override
+	protected void updateDisplay() {
+		if (readOnly) {
+			getRootLayout().removeAllComponents();
+			updateDisplayComponent();
+		} else {
+			super.updateDisplay();
+		}
+	}
+
+	@Override
+	public void setReadOnly(boolean readOnly) {
+		this.readOnly = readOnly;
+
+		updateDisplay();
+
+		super.setReadOnly(readOnly);
+	}
+
+	@Override
+	protected String getDisplayDetails() {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("<em>");
+		Object value = getValue();
+		String string = value == null ? null : value.toString();
+		if (string.length() > 200) {
+			string = string.substring(0, 199) + "...";
+		}
+		sb.append(string);
+		sb.append("</em>");
+		return sb.toString();
+	}
 }

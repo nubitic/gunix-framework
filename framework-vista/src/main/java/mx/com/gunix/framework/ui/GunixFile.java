@@ -43,7 +43,7 @@ public class GunixFile implements Serializable {
 
 	@Override
 	public String toString() {
-		return "";
+		return fileName != null ? fileName : "";
 	}
 
 	@Override

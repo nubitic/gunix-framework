@@ -38,6 +38,21 @@
 				<updatePolicy>always</updatePolicy>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>josso-m2-repo</id>
+			<name>JOSSO Maven2 Repository</name>
+			<url>http://repository.josso.org</url>
+
+			<releases>
+				<checksumPolicy>fail</checksumPolicy>
+				<enabled>true</enabled>
+			</releases>
+
+			<snapshots>
+				<checksumPolicy>fail</checksumPolicy>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
 	<dependencyManagement>
 		<dependencies>
@@ -51,6 +66,16 @@
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
+		<dependency>
+			<groupId>org.josso</groupId>
+			<artifactId>josso-protocol-client</artifactId>
+			<version>${josso.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-discovery</groupId>
+			<artifactId>commons-discovery</artifactId>
+			<version>0.5</version>
+		</dependency>
 		<dependency>
 			<groupId>mx.com.gunix</groupId>
 			<artifactId>framework-commons</artifactId>

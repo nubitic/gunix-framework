@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import mx.com.gunix.framework.security.PersistentTokenBasedRememberMeServices;
+import mx.com.gunix.framework.security.josso.JOSSOAuthenticationProvider;
 import mx.com.gunix.framework.service.UsuarioService;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -37,11 +38,12 @@ public class HessianServiceAdvice {
 							     (pjp.getSignature().getName().equals("getAnonymous") || 							// UsuarioService.getAnonymous(),
 							      (pjp.getSignature().getName().equals("getUsuario") && 							// UsuarioService.getUsuario() siempre y cuando provenga de:
 							       ((controlFlow= ControlFlowFactory.createControlFlow()).under(PersistentTokenBasedRememberMeServices.class, "processAutoLoginCookie") || // PersistentTokenBasedRememberMeServices.processAutoLoginCookie ó 
-							    		   									  controlFlow.under(UsernamePasswordAuthenticationFilter.class, "attemptAuthentication"))))) ||// UsernamePasswordAuthenticationFilter.attemptAuthentication,
+							    		   									  controlFlow.under(UsernamePasswordAuthenticationFilter.class, "attemptAuthentication") 	|| // UsernamePasswordAuthenticationFilter.attemptAuthentication ó 
+							    		   									  controlFlow.under(JOSSOAuthenticationProvider.class, "authenticate")))))			|| // JOSSOAuthenticationProvider.authenticate,
 							    (pjp.getSignature().getDeclaringType().equals(PersistentTokenRepository.class) &&	// ó 
 							     (pjp.getSignature().getName().equals("getTokenForSeries") || 						// PersistentTokenRepository.getTokenForSeries() ó
-							      pjp.getSignature().getName().equals("updateToken") || 						// PersistentTokenRepository.getTokenForSeries() ó
-							      pjp.getSignature().getName().equals("removeUserTokens")) 								// PersistentTokenRepository.removeUserTokens
+							      pjp.getSignature().getName().equals("updateToken") || 							// PersistentTokenRepository.getTokenForSeries() ó
+							      pjp.getSignature().getName().equals("removeUserTokens")) 							// PersistentTokenRepository.removeUserTokens
 							    )))?																				
 								null
 								:SecurityContextHolder.getContext().getAuthentication().getPrincipal();

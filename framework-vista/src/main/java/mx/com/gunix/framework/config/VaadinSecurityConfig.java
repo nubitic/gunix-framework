@@ -12,7 +12,6 @@ import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.vaadin.spring.security.VaadinSecurity;
 import org.vaadin.spring.security.VaadinSecurityContext;
@@ -95,7 +94,7 @@ public class VaadinSecurityConfig  extends AbstractSecurityConfig{
 	}
 
 	@Override
-	protected void doConfigure(HttpSecurity http) throws Exception {
+	protected String doConfigure(HttpSecurity http) throws Exception {
 		http
 			.authorizeRequests()
 				.antMatchers("/login/**").permitAll()
@@ -104,7 +103,6 @@ public class VaadinSecurityConfig  extends AbstractSecurityConfig{
 				.antMatchers("/HEARTBEAT/**").authenticated()
 				.antMatchers("/**").authenticated()
 				.anyRequest().authenticated();
-		http.exceptionHandling()
-			.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"));
+		return "/login";
 	}
 }
