@@ -216,6 +216,8 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 			gsl = new WebserviceGatewayServiceLocator();
 			gsl.setEndpoint(System.getenv("VIEW_SSO_GATEWAY_ENDPOINT"));
 			gsl.setServicesWebContext(System.getenv("VIEW_SSO_GATEWAY_ENDPOINT_WEB_CONTEXT"));
+			gsl.setUsername("wsclient");
+			gsl.setPassword(System.getenv("VIEW_SSO_GATEWAY_ENDPOINT_PASSWORD"));
 		}
 		return gsl;
 	}

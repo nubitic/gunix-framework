@@ -34,7 +34,6 @@
 		<jetty.port>8080</jetty.port>
 	</properties>
 
-
 	<dependencies>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -145,6 +144,18 @@
 			<groupId>org.josso</groupId>
 			<artifactId>josso-protocol</artifactId>
 			<version>${josso.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>struts</groupId>
+					<artifactId>struts</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>struts</groupId>
+			<artifactId>struts</artifactId>
+			<version>1.2.9</version>
 		</dependency>
 
 		<dependency>
@@ -278,7 +289,7 @@
 			<artifactId>commons-discovery</artifactId>
 			<version>0.5</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
