@@ -7,6 +7,7 @@
 	<version>1.0</version>
 	<packaging>pom</packaging>
 	<modules>
+		<module>activiti-engine-job-prefix-fix</module>
 		<module>framework-commons</module>
 		<module>framework-vista</module>
 		<module>framework-backEnd</module>

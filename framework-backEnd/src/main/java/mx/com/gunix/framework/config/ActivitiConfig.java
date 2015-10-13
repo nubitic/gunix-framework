@@ -53,6 +53,9 @@ public class ActivitiConfig {
 		speConf.setDataSource(dataSource);
 		speConf.setDatabaseType(ProcessEngineConfigurationImpl.DATABASE_TYPE_POSTGRES);
 		speConf.setTransactionManager(transactionManager);
+		speConf.setTablePrefixIsSchema(true);
+		speConf.setDatabaseTablePrefix("activiti.");
+		speConf.setDatabaseSchema("activiti");
 		speConf.setDatabaseSchemaUpdate("false");
 		speConf.setDbIdentityUsed(false);
 		speConf.setBatchSizeTasks(1000);

@@ -76,7 +76,7 @@ public abstract class ACLTypeService<T extends ACLType> extends GunixActivitServ
 			}
 
 		} else {
-			Long newId = shm.nextVal("acl_object_identity", "object_id_identity");
+			Long newId = shm.nextVal("seguridad.acl_object_identity", "object_id_identity");
 			ObjectIdentity oi = new ObjectIdentityImpl(aclType.getClass(), newId);
 			MutableAcl mAcl = aclService.createAcl(oi);
 			Sid sid = new PrincipalSid(SecurityContextHolder.getContext().getAuthentication());

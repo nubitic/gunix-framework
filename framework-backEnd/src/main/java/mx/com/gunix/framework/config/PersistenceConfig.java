@@ -1,5 +1,7 @@
 package mx.com.gunix.framework.config;
 
+import java.util.Optional;
+
 import javax.sql.DataSource;
 
 import mx.com.gunix.framework.security.domain.UsuarioMapperInterceptor;
@@ -37,23 +39,27 @@ public class PersistenceConfig {
 	@Bean
 	public DataSource dataSource() {
 		HikariConfig config = new HikariConfig();
-		
+
 		config.setAutoCommit(false);
-		config.setMaximumPoolSize(15);
+		config.setMaximumPoolSize(Integer.valueOf(Optional.ofNullable(System.getenv("DB_MAX_POOL_SIZE")).orElse("15")));
 		config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
-		
-		if(Boolean.valueOf(System.getenv("DB_USE_SSL"))) {
+
+		if (Boolean.valueOf(System.getenv("DB_USE_SSL"))) {
 			config.addDataSourceProperty("ssl", "true");
-			config.addDataSourceProperty("sslfactory", "org.postgresql.ssl.NonValidatingFactory");	
+			config.addDataSourceProperty("sslfactory", "org.postgresql.ssl.NonValidatingFactory");
 		}
-				
+
 		config.addDataSourceProperty("password", System.getenv("DB_PASSWORD"));
 		config.addDataSourceProperty("user", System.getenv("DB_USER"));
 		config.addDataSourceProperty("databaseName", System.getenv("DB_NAME"));
 		config.addDataSourceProperty("serverName", System.getenv("DB_SERVER_NAME"));
+		config.addDataSourceProperty("currentSchema", System.getenv("DB_APP_SCHEMA"));
 		config.addDataSourceProperty("prepareThreshold", "1");
+		if (Boolean.valueOf(System.getenv("DB_ENABLE_LOG"))) {
+			config.addDataSourceProperty("loglevel", org.postgresql.Driver.INFO);
+		}
 		config.addDataSourceProperty("preparedStatementCacheQueries", "1024");
-		config.addDataSourceProperty("preparedStatementCacheSizeMiB", "20");		
+		config.addDataSourceProperty("preparedStatementCacheSizeMiB", "20");
 
 		return new HikariDataSource(config);
 	}

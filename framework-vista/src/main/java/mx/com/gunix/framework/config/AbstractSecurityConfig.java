@@ -194,7 +194,7 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 		if (Boolean.parseBoolean(System.getenv("VIEW_ENABLE_SSO"))) {
 			jspf = new JOSSOSessionPingFilter(System.getenv("VIEW_SSO_PARTNER_ID"));
 			jspf.setGatewayServiceLocator(gatewayServiceLocator());
-			jspf.setLogoutUrl("logout");
+			jspf.setLogoutUrl("/logout");
 		}
 		return jspf;
 	}

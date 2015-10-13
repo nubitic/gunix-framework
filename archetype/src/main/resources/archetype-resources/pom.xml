@@ -45,6 +45,14 @@
 				<updatePolicy>always</updatePolicy>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>activiti-engine-job-prefix-fix-mvn-repo</id>
+			<url>https://raw.github.com/loloq123/activiti-engine-job-prefix-fix/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
 	</repositories>
 
 	<dependencyManagement>

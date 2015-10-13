@@ -31,7 +31,7 @@ public interface VariableInstanceMapper {
 			"	  " + TEXT_KEY + " ,"+
 			"	  text2_"+
 			"	FROM"+
-			"	  ACT_RU_VARIABLE"+
+			"	  ACTIVITI.ACT_RU_VARIABLE"+
 			"	WHERE"+
 			"	  TASK_ID_ = #{taskId} "+
 			"	and type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"'"+
@@ -52,7 +52,7 @@ public interface VariableInstanceMapper {
 			"	  text_ ,"+
 			"	  text2_"+
 			"	FROM"+
-			"	  ACT_RU_VARIABLE"+
+			"	  ACTIVITI.ACT_RU_VARIABLE"+
 			"	WHERE"+
 			"	  TASK_ID_ = #{taskId} "+
 			"	AND type_ = '"+GunixObjectVariableType.GUNIX_OBJECT+"'")
@@ -74,7 +74,7 @@ public interface VariableInstanceMapper {
 			"	  " + TEXT_KEY + " ,"+
 			"	  text2_"+
 			"	FROM"+
-			"	  ACT_RU_VARIABLE"+
+			"	  ACTIVITI.ACT_RU_VARIABLE"+
 			"	WHERE"+
 			"	  EXECUTION_ID_ = #{executionId} and TASK_ID_ is null "+
 			"	and type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"'"+
@@ -95,7 +95,7 @@ public interface VariableInstanceMapper {
 			"	  text_ ,"+
 			"	  text2_"+
 			"	FROM"+
-			"	  ACT_RU_VARIABLE"+
+			"	  ACTIVITI.ACT_RU_VARIABLE"+
 			"	WHERE"+
 			"	  EXECUTION_ID_ = #{executionId} and TASK_ID_ is null"+
 			"	AND type_ = '"+GunixObjectVariableType.GUNIX_OBJECT+"'")
@@ -112,7 +112,7 @@ public interface VariableInstanceMapper {
 			"	  " + LONG_KEY + " ,"+
 			"	  text_||COALESCE(text2_,'')   as " + TEXT_KEY + 
 			"	FROM"+
-			"	  ACT_RU_VARIABLE"+
+			"	  ACTIVITI.ACT_RU_VARIABLE"+
 			"	WHERE"+
 			"	  EXECUTION_ID_ = #{executionId} and TASK_ID_ is null"+
 			"	AND type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}.%' or name_ LIKE '${varName}[%')")
@@ -128,7 +128,7 @@ public interface VariableInstanceMapper {
 			"	  " + LONG_KEY + " ,"+
 			"	  text_||COALESCE(text2_,'')   as " + TEXT_KEY +
 			"	FROM"+
-			"	  ACT_RU_VARIABLE"+
+			"	  ACTIVITI.ACT_RU_VARIABLE"+
 			"	WHERE"+
 			"	  TASK_ID_ = #{taskId}"+
 			"	AND type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}.%' or name_ LIKE '${varName}[%')")
@@ -137,6 +137,6 @@ public interface VariableInstanceMapper {
 	public List<Map<String,Object>> findGunixObjectByNameAndTaskId(@Param("taskId") String taskId, @Param("varName") String varName);
 	
 	
-	@Delete("delete from ACT_RU_VARIABLE where ID_ = #{id,jdbcType=VARCHAR} and REV_ = #{revision}")
+	@Delete("delete from ACTIVITI.ACT_RU_VARIABLE where ID_ = #{id,jdbcType=VARCHAR} and REV_ = #{revision}")
 	public void delete(@Param("id") String id, @Param("revision") int revision);
 }

@@ -49,6 +49,21 @@
 					<artifactId>spring-beans</artifactId>
 				</exclusion>
 				<exclusion>
+					<groupId>org.activiti</groupId>
+					<artifactId>activiti-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>mx.com.gunix</groupId>
+			<artifactId>activiti-engine-job-prefix-fix</artifactId>
+			<version>1.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-beans</artifactId>
+				</exclusion>
+				<exclusion>
 					<groupId>org.mybatis</groupId>
 					<artifactId>mybatis</artifactId>
 				</exclusion>
