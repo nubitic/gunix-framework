@@ -33,6 +33,7 @@
 				<version>2.6</version>
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
+					<packagingExcludes>WEB-INF/lib/activiti-engine-5.18.0.jar</packagingExcludes>
 				</configuration>
 			</plugin>
 			<plugin>

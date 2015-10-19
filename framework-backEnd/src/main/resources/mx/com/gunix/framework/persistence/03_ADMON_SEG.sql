@@ -1,7 +1,7 @@
-﻿declare @owner_user;
-SET @owner_user = 'exsipqluzgntfw';
+﻿/*declare @owner_user;
+SET @owner_user = 'exsipqluzgntfw';*/
 
-CREATE SCHEMA IF NOT EXISTS ADMON_SEG AUTHORIZATION @owner_user;
+CREATE SCHEMA IF NOT EXISTS ADMON_SEG /*AUTHORIZATION @owner_user*/;
 set search_path to ADMON_SEG;
 
 create or replace function FUNCIONES_ROL(id_aplicacion text, id_rol text)

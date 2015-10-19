@@ -4,7 +4,9 @@ import java.util.Optional;
 
 import javax.sql.DataSource;
 
+import mx.com.gunix.framework.persistence.EmbeddedPostgreSQLManager;
 import mx.com.gunix.framework.security.domain.UsuarioMapperInterceptor;
+import mx.com.gunix.framework.security.domain.persistence.GunixPersistentTokenRepository;
 
 import org.activiti.engine.impl.persistence.ByteArrayRefTypeHandler;
 import org.activiti.engine.impl.variable.VariableType;
@@ -22,7 +24,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -37,14 +38,22 @@ public class PersistenceConfig {
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
 	@Bean
-	public DataSource dataSource() {
+	public synchronized DataSource dataSource() {
+		String host = null;
+		if (Boolean.valueOf(System.getenv("DB_USE_EMBEDDED"))) {
+			EmbeddedPostgreSQLManager.start(System.getenv("DB_EMBEDDED_HOME"), System.getenv("DB_USER"), System.getenv("DB_PASSWORD"), System.getenv("DB_NAME"), getClass().getClassLoader());
+			host = "localhost";
+		} else {
+			host = System.getenv("DB_SERVER_NAME");
+		}
+
 		HikariConfig config = new HikariConfig();
 
 		config.setAutoCommit(false);
 		config.setMaximumPoolSize(Integer.valueOf(Optional.ofNullable(System.getenv("DB_MAX_POOL_SIZE")).orElse("15")));
 		config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
 
-		if (Boolean.valueOf(System.getenv("DB_USE_SSL"))) {
+		if (!"localhost".equals(host) && Boolean.valueOf(System.getenv("DB_USE_SSL"))) {
 			config.addDataSourceProperty("ssl", "true");
 			config.addDataSourceProperty("sslfactory", "org.postgresql.ssl.NonValidatingFactory");
 		}
@@ -52,7 +61,7 @@ public class PersistenceConfig {
 		config.addDataSourceProperty("password", System.getenv("DB_PASSWORD"));
 		config.addDataSourceProperty("user", System.getenv("DB_USER"));
 		config.addDataSourceProperty("databaseName", System.getenv("DB_NAME"));
-		config.addDataSourceProperty("serverName", System.getenv("DB_SERVER_NAME"));
+		config.addDataSourceProperty("serverName", host);
 		config.addDataSourceProperty("currentSchema", System.getenv("DB_APP_SCHEMA"));
 		config.addDataSourceProperty("prepareThreshold", "1");
 		if (Boolean.valueOf(System.getenv("DB_ENABLE_LOG"))) {
@@ -83,7 +92,7 @@ public class PersistenceConfig {
 
 	@Bean
 	public PersistentTokenRepository persistentTokenRepository() {
-		JdbcTokenRepositoryImpl ptr = new JdbcTokenRepositoryImpl();
+		GunixPersistentTokenRepository ptr = new GunixPersistentTokenRepository();
 		ptr.setDataSource(dataSource());
 		return ptr;
 	}

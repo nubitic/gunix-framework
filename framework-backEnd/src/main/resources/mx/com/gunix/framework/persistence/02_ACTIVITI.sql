@@ -1,7 +1,7 @@
-﻿declare @owner_user;
-SET @owner_user = 'exsipqluzgntfw';
+﻿/*declare @owner_user;
+SET @owner_user = 'exsipqluzgntfw';*/
 
-CREATE SCHEMA IF NOT EXISTS ACTIVITI AUTHORIZATION @owner_user;
+CREATE SCHEMA IF NOT EXISTS ACTIVITI /*AUTHORIZATION @owner_user*/;
 set search_path to ACTIVITI;
 
 create table ACT_GE_PROPERTY (
