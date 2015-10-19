@@ -21,6 +21,7 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -84,7 +85,33 @@ public class PersistenceConfig {
 		sessionFactory.setDataSource(dataSource());
 		sessionFactory.setDatabaseIdProvider(new VendorDatabaseIdProvider());
 		sessionFactory.setPlugins(new Interceptor[] { new UsuarioMapperInterceptor() });
-		sessionFactory.setMapperLocations(resourcePatternResolver.getResources("classpath*:/mx/com/gunix/**/*Mapper.xml"));
+
+		Resource[] appResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/domain/persistence/**/*Mapper.xml");
+		Resource[] activitiAppResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/framework/activiti/persistence/entity/*Mapper.xml");
+		Resource[] resources = null;
+
+		if (appResources != null && appResources.length > 0) {
+			resources = new Resource[appResources.length + activitiAppResources.length];
+			System.arraycopy(activitiAppResources, 0, resources, 0, activitiAppResources.length);
+			System.arraycopy(appResources, 0, resources, appResources.length, appResources.length);
+		} else {
+			resources = activitiAppResources;
+		}
+
+		if (Boolean.valueOf(System.getenv("STANDALONE_APP"))) {
+			Resource[] adminAppResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/adminapp/domain/persistence/*Mapper.xml");
+			Resource[] securityAppResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/framework/security/domain/*Mapper.xml");
+
+			Resource[] finalResources = new Resource[resources.length + adminAppResources.length + securityAppResources.length];
+			System.arraycopy(adminAppResources, 0, finalResources, 0, adminAppResources.length);
+			System.arraycopy(resources, 0, finalResources, adminAppResources.length, resources.length);
+			System.arraycopy(securityAppResources, 0, finalResources, resources.length + adminAppResources.length, securityAppResources.length);
+
+			sessionFactory.setMapperLocations(finalResources);
+		} else {
+			sessionFactory.setMapperLocations(resources);
+		}
+
 		sessionFactory.setTypeAliases(new Class<?>[] { ByteArrayRefTypeHandlerAlias.class });
 		sessionFactory.setTypeHandlers(new TypeHandler[] { new ByteArrayRefTypeHandlerAlias(), new IbatisVariableTypeHandler() });
 		return sessionFactory;

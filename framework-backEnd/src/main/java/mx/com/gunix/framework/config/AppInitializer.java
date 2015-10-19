@@ -6,7 +6,9 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 
 	@Override
 	protected Class<?>[] getRootConfigClasses() {
-		return new Class<?>[]{MethodSecurityConfig.class, ServerServiceConfig.class,ActivitiConfig.class,DozerConfig.class,AspectJConfig.class};
+		return Boolean.valueOf(System.getenv("STANDALONE_APP")) ? 
+					new Class<?>[] { MethodSecurityConfig.class, ServerServiceConfig.class, AdminAppServicesConfig.class, ActivitiConfig.class, DozerConfig.class, AspectJConfig.class } : 
+   			   new Class<?>[] { MethodSecurityConfig.class, ServerServiceConfig.class, ActivitiConfig.class, DozerConfig.class, AspectJConfig.class };
 	}
 
 	@Override

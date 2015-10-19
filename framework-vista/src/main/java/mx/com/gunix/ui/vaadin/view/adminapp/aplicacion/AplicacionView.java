@@ -98,8 +98,12 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 		}
 		guardarButton.setEnabled(true);
 		guardarButton.setDisableOnClick(true);
-		cancelarButton.setEnabled(false);
-		cancelarButton.setVisible(false);
+
+		if (cancelarButton != null) {
+			cancelarButton.setEnabled(false);
+			cancelarButton.setVisible(false);
+		}
+
 		if (esConsulta || esModificacion) {
 			aplicacion.getModulos().forEach(modulo -> {
 				addModuloTab(modulo);

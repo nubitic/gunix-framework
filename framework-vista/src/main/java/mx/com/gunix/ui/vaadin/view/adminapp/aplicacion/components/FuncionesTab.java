@@ -97,7 +97,7 @@ public class FuncionesTab extends CustomComponent {
 						// Styling for row
 						String idFuncion = (String) table.getItem(itemId).getItemProperty("idFuncion").getValue();
 						if (idFuncion.startsWith(DESC_MODULO)) {
-							style = "highlight-text-bold";
+							style = "admin-app-highlight-text-bold";
 						}
 					}
 					return style;

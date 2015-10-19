@@ -31,6 +31,7 @@ import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.activiti.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -69,7 +70,22 @@ public class ActivitiConfig {
 
 		speConf.setIdGenerator(idGenerator());
 		speConf.setDeploymentMode(ResourceParentFolderAutoDeploymentStrategy.DEPLOYMENT_MODE);
-		speConf.setDeploymentResources(resourcePatternResolver.getResources("classpath*:/mx/com/gunix/procesos/**/*.bpmn"));
+		if (Boolean.valueOf(System.getenv("STANDALONE_APP"))) {
+			Resource[] appResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/procesos/**/*.bpmn");
+			Resource[] adminAppResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/adminapp/procesos/*.bpmn");
+			Resource[] resources = null;
+
+			if (appResources != null && appResources.length > 0) {
+				resources = new Resource[appResources.length + adminAppResources.length];
+				System.arraycopy(adminAppResources, 0, resources, 0, adminAppResources.length);
+				System.arraycopy(appResources, 0, resources, appResources.length, appResources.length);
+			} else {
+				resources = adminAppResources;
+			}
+			speConf.setDeploymentResources(resources);
+		} else {
+			speConf.setDeploymentResources(resourcePatternResolver.getResources("classpath*:/mx/com/gunix/procesos/**/*.bpmn"));
+		}
 
 		VariableInstanceEntityManager vim = variableInstanceEntityManager();
 
@@ -80,13 +96,8 @@ public class ActivitiConfig {
 		List<VariableType> varTypes = new ArrayList<VariableType>();
 		varTypes.add(gunixObjectVariableType());
 		varTypes.add(new FloatType());
-		speConf.setCustomPreVariableTypes(varTypes);// Se establece primero en
-													// la lista que se usa para
-													// el guardado
-		speConf.setCustomPostVariableTypes(varTypes);// Se establece como el
-														// último en asignarse
-														// en el Mapa que se usa
-														// para la recuperación
+		speConf.setCustomPreVariableTypes(varTypes);// Se establece primero en la lista que se usa para el guardado
+		speConf.setCustomPostVariableTypes(varTypes);// Se establece como el último en asignarse en el Mapa que se usa para la recuperación
 
 		return speConf;
 	}

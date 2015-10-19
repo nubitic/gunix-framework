@@ -1,0 +1,5 @@
+/* Aquí se deberán indicar las licencias de las imagenes que se utilicen en la aplicación 
+P. ej:
+
+1436568412_demo.png http://www.everaldo.com/ under LGPL
+*/
