@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+	<Environment name="BACKEND_HOST" value="http://localhost:8081/admin-app-backEnd" type="java.lang.String" />
+</Context>

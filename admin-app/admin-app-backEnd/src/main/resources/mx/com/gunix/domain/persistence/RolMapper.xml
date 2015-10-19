@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.com.gunix.domain.persistence.RolMapper">
+	<resultMap type="mx.com.gunix.framework.security.domain.Funcion" id="funcionesRolMap">
+		<id property="modulo.aplicacion.idAplicacion" column="ID_APLICACION" />
+		<id property="modulo.idModulo" column="ID_MODULO" />
+		<id property="idFuncion" column="ID_FUNCION" />
+		<result property="acceso" column="NIV_ACC" typeHandler="org.apache.ibatis.type.EnumTypeHandler" />
+		<association property="padre" javaType="mx.com.gunix.framework.security.domain.Funcion">
+			<id property="modulo.aplicacion.idAplicacion" column="ID_APLICACION" />
+			<id property="modulo.idModulo" column="ID_MODULO" />
+			<id property="idFuncion" column="ID_FUNCION_PADRE" />
+		</association>
+	</resultMap>
+</mapper>

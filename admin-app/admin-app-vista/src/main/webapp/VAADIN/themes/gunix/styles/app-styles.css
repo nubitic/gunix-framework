@@ -1,0 +1,4 @@
+.v-table-row.v-table-row-highlight-text-bold,
+.v-table-row-odd.v-table-row-highlight-text-bold {
+  font-weight: bold;
+}

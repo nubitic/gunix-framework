@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.com.gunix.domain.persistence.FuncionMapper">
+	<insert id="inserta">
+		INSERT INTO SEGURIDAD.FUNCION(ID_APLICACION,ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,
+		
+		<if test="hijas == null or hijas.size() == 0">PROCESS_KEY,</if>
+		<if test="padre != null">ID_FUNCION_PADRE,</if>
+		
+		ORDEN)
+		
+		VALUES(#{modulo.aplicacion.idAplicacion},#{modulo.idModulo},#{idFuncion},#{titulo},#{descripcion},
+		
+		<if test="hijas == null or hijas.size() == 0">#{processKey},</if>
+		<if test="padre != null">#{padre.idFuncion},</if>
+		
+		#{orden})
+	</insert>
+	<resultMap type="mx.com.gunix.framework.security.domain.Funcion" id="funcionMap">
+		<id property="modulo.aplicacion.idAplicacion" column="ID_APLICACION" />
+		<id property="modulo.idModulo" column="ID_MODULO" />
+		<id property="idFuncion" column="ID_FUNCION" />
+		<result property="titulo" column="TITULO"/>
+		<result property="processKey" column="PROCESS_KEY"/>
+		<result property="descripcion" column="DESCRIPCION"/>
+		<result property="orden" column="ORDEN"/>
+		<association property="padre" column="{idAplicacion=ID_APLICACION,idModulo=ID_MODULO,idFuncion=ID_FUNCION_PADRE}" select="mx.com.gunix.domain.persistence.FuncionMapper.getByIdFuncion"/>
+	</resultMap>
+	<select id="getByIdFuncion" resultMap="funcionMap" parameterType="java.util.HashMap">
+		Select 
+			ID_APLICACION, 
+			ID_MODULO, 
+			ID_FUNCION, 
+			TITULO, 
+			DESCRIPCION, 
+			PROCESS_KEY, 
+			ORDEN, 
+			ID_FUNCION_PADRE 
+		from SEGURIDAD.FUNCION
+		where 
+			ID_APLICACION=#{idAplicacion} AND 
+			ID_MODULO=#{idModulo} AND 
+			ID_FUNCION=#{idFuncion}
+	</select>
+</mapper>
