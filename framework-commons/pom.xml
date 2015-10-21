@@ -8,6 +8,15 @@
 	</parent>
 	<artifactId>framework-commons</artifactId>
 	<repositories>
+	 	<repository>
+	      <id>central</id>
+	      <name>Central Repository</name>
+	      <url>http://repo.maven.apache.org/maven2</url>
+	      <layout>default</layout>
+	      <snapshots>
+	        <enabled>false</enabled>
+	      </snapshots>
+	    </repository>
 		<repository>
 			<id>gunix-mvn-repo</id>
 			<url>https://raw.github.com/loloq123/gunix/mvn-repo/</url>

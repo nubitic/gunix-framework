@@ -348,6 +348,15 @@
 	</dependencies>
 
 	<repositories>
+	 	<repository>
+	      <id>central</id>
+	      <name>Central Repository</name>
+	      <url>http://repo.maven.apache.org/maven2</url>
+	      <layout>default</layout>
+	      <snapshots>
+	        <enabled>false</enabled>
+	      </snapshots>
+	    </repository>
 		<!-- Dependencies not on central repo -->
 		<repository>
 			<id>josso-m2-repo</id>
