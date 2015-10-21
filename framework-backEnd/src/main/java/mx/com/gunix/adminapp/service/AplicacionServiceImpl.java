@@ -70,8 +70,9 @@ public class AplicacionServiceImpl extends ACLTypeService<Aplicacion> {
 		am.inserta(aplicacion);
 		aplicacion.getModulos().forEach(modulo -> {
 			mm.inserta(modulo);
+			int orden= 0;
 			modulo.getFunciones().forEach(funcion -> {
-				doInsertFuncion(funcion);
+				doInsertFuncion(funcion, orden+1);
 			});
 		});
 		aplicacion.getRoles().forEach(
@@ -128,7 +129,8 @@ public class AplicacionServiceImpl extends ACLTypeService<Aplicacion> {
 		});
 	}
 
-	private void doInsertFuncion(Funcion funcion) {
+	private void doInsertFuncion(Funcion funcion, int orden) {
+		funcion.setOrden(orden);
 		fm.inserta(funcion);
 		if (funcion.getParametros() != null) {
 			for (Parametro param : funcion.getParametros()) {
@@ -137,7 +139,7 @@ public class AplicacionServiceImpl extends ACLTypeService<Aplicacion> {
 		}
 		if (funcion.getHijas() != null) {
 			funcion.getHijas().forEach(funcionHija -> {
-				doInsertFuncion(funcionHija);
+				doInsertFuncion(funcionHija, orden+1);
 			});
 		}
 	}

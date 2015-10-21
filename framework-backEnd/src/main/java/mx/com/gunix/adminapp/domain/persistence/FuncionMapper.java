@@ -13,7 +13,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 
 public interface FuncionMapper {
-	@Select("Select ID_APLICACION, ID_MODULO, ID_FUNCION, TITULO, DESCRIPCION, PROCESS_KEY, ORDEN, ID_FUNCION_PADRE from SEGURIDAD.FUNCION where ID_APLICACION=#{idAplicacion} AND ID_MODULO=#{idModulo}")
+	@Select("Select ID_APLICACION, ID_MODULO, ID_FUNCION, TITULO, DESCRIPCION, PROCESS_KEY, ORDEN, ID_FUNCION_PADRE from SEGURIDAD.FUNCION where ID_APLICACION=#{idAplicacion} AND ID_MODULO=#{idModulo} ORDER BY ORDEN, TITULO")
 	@ResultMap("funcionMap")
 	public List<Funcion> getByIdModulo(@Param("idAplicacion") String idAplicacion, @Param("idModulo") String idModulo);
 

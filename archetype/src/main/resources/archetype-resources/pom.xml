@@ -30,6 +30,14 @@
 			</snapshots>
 		</repository>
 		<repository>
+			<id>framework-commons-mvn-repo</id>
+			<url>https://raw.github.com/loloq123/framework-commons/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
 			<id>framework-vista-mvn-repo</id>
 			<url>https://raw.github.com/loloq123/framework-vista/mvn-repo/</url>
 			<snapshots>

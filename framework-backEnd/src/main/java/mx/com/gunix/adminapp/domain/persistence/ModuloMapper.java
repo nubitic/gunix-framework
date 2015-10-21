@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 
 public interface ModuloMapper {
-	@Select("Select ID_APLICACION, ID_MODULO, DESCRIPCION, ICONO from SEGURIDAD.MODULO where ID_APLICACION=#{idAplicacion}")
+	@Select("Select ID_APLICACION, ID_MODULO, DESCRIPCION, ICONO from SEGURIDAD.MODULO where ID_APLICACION=#{idAplicacion} ORDER BY ID_MODULO")
  	@Results({@Result(id=true,column="ID_APLICACION",property="aplicacion.idAplicacion"),
 		  @Result(id=true,column="ID_MODULO",property="idModulo"),
 		  @Result(column="DESCRIPCION",property="descripcion"),

@@ -162,8 +162,7 @@ public class FuncionesTab extends CustomComponent {
 	@SuppressWarnings("unchecked")
 	private void addFunciones(Funcion funcionPadre, List<Funcion> funciones, List<Funcion> funcionesSel, Set<Funcion> selItems) {
 		if (funcionPadre != null
-				&& ((!esParaRoles && !esSoloLectura && funcionesTreeTable.getItemIds().stream().filter(bI -> ((BeanItem<Funcion>) bI).getBean().equals(funcionPadre)).findFirst().isPresent()) || funcionesTreeTable
-						.getItem(funcionPadre) == null)) {
+				&& ((!esParaRoles && !esSoloLectura && !funcionesTreeTable.getItemIds().stream().filter(bI -> ((BeanItem<Funcion>) bI).getBean().equals(funcionPadre)).findFirst().isPresent()) || ( !(!esParaRoles && !esSoloLectura) && funcionesTreeTable.getItem(funcionPadre) == null))) {
 			if (!esParaRoles && !esSoloLectura) {
 				initFuncion(funcionPadre, null);
 			} else {
@@ -267,12 +266,12 @@ public class FuncionesTab extends CustomComponent {
 
 			funcionesTreeTable.setParent(beanItem, ((GunixBeanFieldGroup<Funcion>) button.getData()).getItemDataSource());
 		} else {
-			container.getItem(beanItem).getItemProperty("idFuncion").setValue(f.getIdFuncion());
-			container.getItem(beanItem).getItemProperty("descripcion").setValue(f.getDescripcion());
+			container.getItem(beanItem).getItemProperty("idFuncion").setValue(f.getIdFuncion() == null ? "" : f.getIdFuncion());
+			container.getItem(beanItem).getItemProperty("descripcion").setValue(f.getDescripcion() == null ? "" : f.getDescripcion());
 			if (f.getHijas() == null || f.getHijas().isEmpty()) {
-				container.getItem(beanItem).getItemProperty("processKey").setValue(f.getProcessKey());
+				container.getItem(beanItem).getItemProperty("processKey").setValue(f.getProcessKey() == null ? "" : f.getProcessKey());
 			}
-			container.getItem(beanItem).getItemProperty("titulo").setValue(f.getTitulo());
+			container.getItem(beanItem).getItemProperty("titulo").setValue(f.getTitulo() == null ? "" : f.getTitulo());
 			if (f.getPadre() != null) {
 				funcionesTreeTable.setParent(beanItem, funcionesTreeTable.getItemIds().stream().filter(bI -> ((BeanItem<Funcion>) bI).getBean().equals(f.getPadre())).findFirst().get());
 			}
