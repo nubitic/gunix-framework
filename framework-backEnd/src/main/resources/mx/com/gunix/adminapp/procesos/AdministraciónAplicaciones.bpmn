@@ -35,7 +35,7 @@
       <startEvent id="startevent3" name="Start"></startEvent>
       <userTask id="usertask4" name="Formulario Búsqueda" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.aplicacion.AplicacionSearchView"></userTask>
       <sequenceFlow id="flow14" sourceRef="startevent3" targetRef="usertask4"></sequenceFlow>
-      <serviceTask id="servicetask3" name="Consulta" activiti:expression="${aplicacionService.consulta(esMaestro,aplicacion)}" activiti:resultVariableName="resultado"></serviceTask>
+      <serviceTask id="servicetask3" name="Consulta" activiti:expression="${aplicacionService.getByExample(esMaestro,aplicacion)}" activiti:resultVariableName="resultado"></serviceTask>
       <sequenceFlow id="flow15" sourceRef="usertask4" targetRef="servicetask3"></sequenceFlow>
       <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway"></exclusiveGateway>
       <sequenceFlow id="flow16" sourceRef="servicetask3" targetRef="exclusivegateway3"></sequenceFlow>
@@ -56,7 +56,7 @@
       <startEvent id="startevent4" name="Start"></startEvent>
       <userTask id="usertask7" name="Formulario Búsqueda" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.aplicacion.AplicacionSearchView"></userTask>
       <sequenceFlow id="flow20" sourceRef="startevent4" targetRef="usertask7"></sequenceFlow>
-      <serviceTask id="servicetask4" name="Consulta" activiti:expression="${aplicacionService.consulta(esMaestro,aplicacion)}" activiti:resultVariableName="resultado"></serviceTask>
+      <serviceTask id="servicetask4" name="Consulta" activiti:expression="${aplicacionService.getByExample(esMaestro,aplicacion)}" activiti:resultVariableName="resultado"></serviceTask>
       <sequenceFlow id="flow21" sourceRef="usertask7" targetRef="servicetask4"></sequenceFlow>
       <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway"></exclusiveGateway>
       <sequenceFlow id="flow22" sourceRef="servicetask4" targetRef="exclusivegateway4"></sequenceFlow>
@@ -72,7 +72,7 @@
       <sequenceFlow id="flow26" name="cancelar" sourceRef="exclusivegateway5" targetRef="startevent4">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${acción=="Cancelar"}]]></conditionExpression>
       </sequenceFlow>
-      <serviceTask id="servicetask5" name="Guarda" activiti:expression="${aplicacionService.update(aplicacion)}"></serviceTask>
+      <serviceTask id="servicetask5" name="Guarda" activiti:expression="${aplicacionService.update(aplicacion, aplicacionActualizada)}"></serviceTask>
       <sequenceFlow id="flow27" name="guardar" sourceRef="exclusivegateway5" targetRef="servicetask5">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${acción=="Guardar"}]]></conditionExpression>
       </sequenceFlow>

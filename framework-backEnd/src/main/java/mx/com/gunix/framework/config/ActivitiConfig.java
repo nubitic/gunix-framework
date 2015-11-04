@@ -1,6 +1,8 @@
 package mx.com.gunix.framework.config;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,16 +21,32 @@ import org.activiti.engine.ManagementService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.delegate.VariableScope;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.asyncexecutor.ManagedAsyncJobExecutor;
+import org.activiti.engine.impl.bpmn.data.ItemInstance;
 import org.activiti.engine.impl.cfg.IdGenerator;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.activiti.engine.impl.el.ReadOnlyMapELResolver;
+import org.activiti.engine.impl.el.VariableScopeElResolver;
 import org.activiti.engine.impl.interceptor.SessionFactory;
+import org.activiti.engine.impl.javax.el.ArrayELResolver;
+import org.activiti.engine.impl.javax.el.BeanELResolver;
+import org.activiti.engine.impl.javax.el.CompositeELResolver;
+import org.activiti.engine.impl.javax.el.DynamicBeanPropertyELResolver;
+import org.activiti.engine.impl.javax.el.ELContext;
+import org.activiti.engine.impl.javax.el.ELResolver;
+import org.activiti.engine.impl.javax.el.ListELResolver;
+import org.activiti.engine.impl.javax.el.MapELResolver;
+import org.activiti.engine.impl.javax.el.MethodNotFoundException;
 import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.engine.impl.variable.VariableType;
+import org.activiti.spring.ApplicationContextElResolver;
 import org.activiti.spring.ProcessEngineFactoryBean;
+import org.activiti.spring.SpringExpressionManager;
 import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.activiti.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
@@ -36,6 +54,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.util.ReflectionUtils;
 
 @Configuration
 @EnableScheduling
@@ -131,10 +150,75 @@ public class ActivitiConfig {
 
 	@Bean
 	public ProcessEngineFactoryBean processEngineFactoryBean(SpringProcessEngineConfiguration speConf) throws Exception {
-		ProcessEngineFactoryBean pefbean = new ProcessEngineFactoryBean();
+		ProcessEngineFactoryBean pefbean = new ProcessEngineFactoryBean() {
+
+			protected void configureExpressionManager() {
+				if (processEngineConfiguration.getExpressionManager() == null && applicationContext != null) {
+					processEngineConfiguration.setExpressionManager(new SpringExpressionManager(applicationContext, processEngineConfiguration.getBeans()) {
+						@Override
+						protected ELResolver createElResolver(VariableScope variableScope) {
+							CompositeELResolver elResolver = new CompositeELResolver();
+							elResolver.add(new VariableScopeElResolver(variableScope));
+
+							if (beans != null) {
+								// Only expose limited set of beans in expressions
+								elResolver.add(new ReadOnlyMapELResolver(beans));
+							} else {
+								// Expose full application-context in expressions
+								elResolver.add(new ApplicationContextElResolver(applicationContext));
+							}
+
+							elResolver.add(new ArrayELResolver());
+							elResolver.add(new ListELResolver());
+							elResolver.add(new MapELResolver());
+							elResolver.add(new DynamicBeanPropertyELResolver(ItemInstance.class, "getFieldValue", "setFieldValue")); // TODO: needs verification
+							elResolver.add(new BeanELResolver() {
+								@Override
+								public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
+									try {
+										return super.invoke(context, base, method, paramTypes, params);
+									} catch (MethodNotFoundException mnfe) {
+										if (AopUtils.isAopProxy(base)) {
+											Class<?> targetClass = AopUtils.getTargetClass(base);
+											Method m = null;
+											if (paramTypes != null) {
+												m = ReflectionUtils.findMethod(targetClass, method.toString(), paramTypes);
+											} else {
+												String name = method.toString();
+												int paramCount = params == null ? 0 : params.length;
+												for (Method mf : targetClass.getMethods()) {
+													if (mf.getName().equals(name)) {
+														int formalParamCount = mf.getParameterTypes().length;
+														if ((mf.isVarArgs() && paramCount >= formalParamCount - 1) || (paramCount == formalParamCount)) {
+															m = mf;
+															break;
+														}
+													}
+												}
+											}
+
+											try {
+												Object result = Proxy.getInvocationHandler(base).invoke(base, m, params);
+												context.setPropertyResolved(true);
+												return result;
+											} catch (Throwable e) {
+												throw new MethodNotFoundException("Cannot find method " + method + " with " + params.length + " parameters in " + base.getClass(), e);
+											}
+										} else {
+											throw mnfe;
+										}
+									}
+								}
+
+							});
+							return elResolver;
+						}
+					});
+				}
+			}
+		};
 		pefbean.setProcessEngineConfiguration(speConf);
 		return pefbean;
-
 	}
 
 	@Bean

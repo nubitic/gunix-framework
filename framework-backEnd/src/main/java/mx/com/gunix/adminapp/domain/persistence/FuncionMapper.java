@@ -1,7 +1,10 @@
 package mx.com.gunix.adminapp.domain.persistence;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
+import mx.com.gunix.framework.persistence.DescriptorCambios;
 import mx.com.gunix.framework.security.domain.Funcion;
 import mx.com.gunix.framework.security.domain.Parametro;
 
@@ -27,4 +30,8 @@ public interface FuncionMapper {
 
 	@Insert("INSERT INTO SEGURIDAD.PARAM_FUNCION VALUES (#{funcion.modulo.aplicacion.idAplicacion},#{funcion.modulo.idModulo},#{funcion.idFuncion},#{parametro.nombre},#{parametro.valor})")
 	public void insertaParametro(@Param("funcion") Funcion funcion, @Param("parametro") Parametro parametro);
+
+	public void update(DescriptorCambios dcFunc);
+
+	public void updateParametro(@Param("idMapFuncion") Map<String, Serializable> idMapFuncion, @Param("dcParam") DescriptorCambios dcParam);
 }

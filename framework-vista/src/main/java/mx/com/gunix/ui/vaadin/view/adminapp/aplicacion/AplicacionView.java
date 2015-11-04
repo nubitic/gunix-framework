@@ -185,14 +185,17 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 		guardarButton.addClickListener(event -> {
 			try {
 				if (!esConsulta) {
+					commitModulos();
 					commitRoles();
 					updateRoles();
 					commit(ibve -> {
 						flyt.setComponentError(new UserError(ibve.getMessage()));
 					});
 					GunixFile iconoF = (GunixFile) iconoFile.getValue();
-					Files.copy(iconoF.getFile().toPath(), new File(VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/VAADIN/themes/gunix/img/" + aplicacion.getIcono()).toPath(),
-							REPLACE_EXISTING);
+					if ((esModificacion && iconoF != null && iconoF.getFile() != null) || !esModificacion) {
+						Files.copy(iconoF.getFile().toPath(), new File(VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/VAADIN/themes/gunix/img/" + aplicacion.getIcono()).toPath(),
+								REPLACE_EXISTING);
+					}
 				}
 				completaTarea();
 			} catch (CommitException ce) {
@@ -280,19 +283,39 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 		return sinError;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected List<Variable<?>> getVariablesTarea() {
 		List<Variable<?>> vars = new ArrayList<Variable<?>>();
-		Variable<Aplicacion> aplicacionVar = new Variable<Aplicacion>();
-		aplicacionVar.setValor(esConsulta ? null : deepCopy(aplicacion, new Aplicacion()));
-		aplicacionVar.setNombre("aplicacion");
-		vars.add(aplicacionVar);
-		if (esConsulta) {
-			Variable<ArrayList<Aplicacion>> resultadoVar = new Variable<ArrayList<Aplicacion>>();
-			resultadoVar.setValor(null);
-			resultadoVar.setNombre("resultado");
-			vars.add(resultadoVar);
+
+		if (esModificacion && !cancelar) {
+			Variable<Aplicacion> aplicacionActualizadaVar = new Variable<Aplicacion>();
+			aplicacionActualizadaVar.setValor(esConsulta ? null : deepCopy(aplicacion, new Aplicacion()));
+			aplicacionActualizadaVar.setNombre("aplicacionActualizada");
+			vars.add(aplicacionActualizadaVar);
+
+			Variable<Aplicacion> aplicacionVar = new Variable<Aplicacion>();
+			aplicacionVar.setValor(((List<Aplicacion>) $("resultado")).get(0));
+			aplicacionVar.setNombre("aplicacion");
+			vars.add(aplicacionVar);
 		} else {
+			Variable<Aplicacion> aplicacionVar = new Variable<Aplicacion>();
+			aplicacionVar.setNombre("aplicacion");
+			if (esConsulta || (esModificacion && cancelar)) {
+				aplicacionVar.setValor(null);
+			} else {
+				aplicacionVar.setValor(deepCopy(aplicacion, new Aplicacion()));
+			}
+			vars.add(aplicacionVar);
+		}
+
+		if (esConsulta || esModificacion) {
+			if (esConsulta || (esModificacion && cancelar)) {
+				Variable<ArrayList<Aplicacion>> resultadoVar = new Variable<ArrayList<Aplicacion>>();
+				resultadoVar.setValor(null);
+				resultadoVar.setNombre("resultado");
+				vars.add(resultadoVar);
+			}
 			if (esModificacion) {
 				Variable<String> accionVar = new Variable<String>();
 				accionVar.setNombre("acción");
@@ -522,7 +545,10 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 
 		for (Modulo m : aplicacion.getModulos()) {
 			Modulo mRol = null;
-			ft.addOrUpdateFuncionesModulo(m, (esConsulta || esModificacion) && (mRol = r.getModulos().stream().filter(moduloRol -> (moduloRol.getIdModulo().equals(m.getIdModulo()))).findFirst().orElse(null)) != null ? mRol : null);
+			ft.addOrUpdateFuncionesModulo(m, 
+							((esConsulta || esModificacion) && r.getModulos()!=null) && (mRol = r.getModulos().stream().filter(moduloRol -> (moduloRol.getIdModulo().equals(m.getIdModulo()))).findFirst().orElse(null)) != null ? 
+									mRol : 
+							null);
 		}
 
 		Tab newTab = rolesTabS.addTab(ft);

@@ -1,16 +1,12 @@
 package mx.com.gunix.framework.service;
 
-import java.util.List;
-
 import mx.com.gunix.framework.security.domain.ACLType;
 import mx.com.gunix.framework.security.domain.persistence.SequenceHelperMapper;
 
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PostFilter;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.method.P;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.domain.PrincipalSid;
@@ -20,7 +16,7 @@ import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-public abstract class ACLTypeService<T extends ACLType> extends GunixActivitServiceSupport{
+public abstract class ACLTypeServiceSupport<T extends ACLType> extends GunixActivitServiceSupport<T> implements ACLTypeService<T> {
 
 	@Autowired
 	SequenceHelperMapper shm;
@@ -28,45 +24,18 @@ public abstract class ACLTypeService<T extends ACLType> extends GunixActivitServ
 	@Autowired
 	MutableAclService aclService;
 
-	/**
-	 * Retrieves a single ACLType.
-	 * <p>
-	 * Access-control will be evaluated after this method is invoked.
-	 * returnObject refers to the returned object.
-	 */
-	@PostAuthorize("hasPermission(returnObject, 'READ')")
-	public abstract T getById(Long id);
+	@Override
+	public void update(@P("original") T original, T anterior) {
+		doUpdate(original, anterior);
+	}
 
-	/**
-	 * Retrieves all ACLType.
-	 * <p>
-	 * Access-control will be evaluated after this method is invoked.
-	 * filterObject refers to the returned object list.
-	 */
-	@PostFilter("hasPermission(filterObject, 'READ')")
-	public abstract List<T> getAll();
-
-	/**
-	 * Edits an ACLType.
-	 * <p>
-	 * Access-control will be evaluated before this method is invoked.
-	 * <b>#post</b> refers to the current object in the method argument.
-	 */
-	@PreAuthorize("hasPermission(#aclType, 'WRITE')")
-	public abstract void update(T aclType);
-
-	/**
-	 * Deletes a ACLType.
-	 * <p>
-	 * Access-control will be evaluated before this method is invoked.
-	 * <b>#post</b> refers to the current object in the method argument.
-	 */
-	@PreAuthorize("hasPermission(#aclType, 'DELETE')")
-	public abstract void delete(T aclType);
+	@Override
+	public void delete(@P("objeto") T objeto) {
+		doDelete(objeto);
+	}
 
 	@SuppressWarnings("unchecked")
-	@PreAuthorize("hasRole('ACL_ADMIN')")
-	public final long insert(T aclType) {
+	public final long insert(@P("objeto") T aclType) {
 		if (AopUtils.isCglibProxy(this)) {
 			try {
 				ACLTypeService<T> target = (ACLTypeService<T>) ((TargetSource) getClass().getMethod("getTargetSource", new Class<?>[] {}).invoke(this, new Object[] {})).getTarget();
@@ -92,5 +61,9 @@ public abstract class ACLTypeService<T extends ACLType> extends GunixActivitServ
 		}
 	}
 
-	protected abstract void doInsert(T aclType);
+	protected abstract void doInsert(T objeto);
+
+	protected abstract void doUpdate(T original, T anterior);
+
+	protected abstract void doDelete(T objeto);
 }

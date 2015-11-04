@@ -1,12 +1,9 @@
 package mx.com.gunix.framework.config;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.sql.DataSource;
 
-import mx.com.gunix.framework.security.RolAccessDecisionVoter;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 
@@ -19,22 +16,9 @@ import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.access.AccessDecisionManager;
-import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
-import org.springframework.security.access.expression.method.ExpressionBasedAnnotationAttributeFactory;
-import org.springframework.security.access.expression.method.ExpressionBasedPostInvocationAdvice;
-import org.springframework.security.access.expression.method.ExpressionBasedPreInvocationAdvice;
-import org.springframework.security.access.intercept.AfterInvocationProviderManager;
-import org.springframework.security.access.intercept.aspectj.AspectJMethodSecurityInterceptor;
-import org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource;
-import org.springframework.security.access.method.MethodSecurityMetadataSource;
-import org.springframework.security.access.prepost.PostInvocationAdviceProvider;
-import org.springframework.security.access.prepost.PreInvocationAuthorizationAdviceVoter;
-import org.springframework.security.access.prepost.PrePostAnnotationSecurityMetadataSource;
-import org.springframework.security.access.vote.AuthenticatedVoter;
-import org.springframework.security.access.vote.UnanimousBased;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.acls.AclPermissionEvaluator;
 import org.springframework.security.acls.domain.AclAuthorizationStrategy;
 import org.springframework.security.acls.domain.AclAuthorizationStrategyImpl;
@@ -70,15 +54,6 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration impl
 	public static final String ACL_ADMIN_ROLE = "ACL_ADMIN";
 	private BeanFactory beanFactory;
 
-	
-	@Bean(name="expressionHandler")
-    public DefaultMethodSecurityExpressionHandler aclExpressionHandler() throws CacheException, IOException {
-        DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
-        expressionHandler.setPermissionEvaluator(aclPermissionEvaluator());
-        return expressionHandler;
-
-    }
-	
     @Bean(name = "cacheManager")
     public CacheManager ehCacheManager() throws IOException {
         //CacheManager manager = CacheManager.getCacheManager(CacheManager.DEFAULT_NAME);
@@ -183,74 +158,17 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration impl
         return new AclPermissionEvaluator(aclService());
     }
 	
-    @Bean
-    public ExpressionBasedAnnotationAttributeFactory expressionBasedAnnotationAttributeFactory() throws CacheException, IOException {
-        return new ExpressionBasedAnnotationAttributeFactory(aclExpressionHandler());
-    }
-	
-    @Bean
-    public PrePostAnnotationSecurityMetadataSource prePostAnnotationSecurityMetadataSource() throws CacheException, IOException {
-        return new PrePostAnnotationSecurityMetadataSource(expressionBasedAnnotationAttributeFactory());
-    }
-	
-    @Bean(name = "delegatingMethodSecurityMetadataSource")
-    public DelegatingMethodSecurityMetadataSource delegatingMethodSecurityMetadataSource() throws CacheException, IOException {
-        List<MethodSecurityMetadataSource> methodSecurityMetadateSources = new ArrayList<MethodSecurityMetadataSource>();
-        methodSecurityMetadateSources.add(prePostAnnotationSecurityMetadataSource());
 
-        return new DelegatingMethodSecurityMetadataSource(methodSecurityMetadateSources);
-    }
-	
-    @Bean
-    public ExpressionBasedPostInvocationAdvice expressionBasedPostInvocationAdvice() throws CacheException, IOException {
-        return new ExpressionBasedPostInvocationAdvice(aclExpressionHandler());
-    }
-    
-    @Bean
-    public PostInvocationAdviceProvider postInvocationAdviceProvider() throws CacheException, IOException {
-        return new PostInvocationAdviceProvider(expressionBasedPostInvocationAdvice());
-    }
-    
-    @SuppressWarnings("unchecked")
-    @Bean
-    public AfterInvocationProviderManager afterInvocationProviderManager() throws CacheException, IOException {
-
-        @SuppressWarnings("rawtypes")
-        List list = new ArrayList();
-        list.add(postInvocationAdviceProvider());
-
-
-        AfterInvocationProviderManager mgmt = new AfterInvocationProviderManager();
-        mgmt.setProviders(list);
-
-        return mgmt;
-    }
-    
-    @Bean
-    public AspectJMethodSecurityInterceptor aspectJMethodSecurityInterceptor() throws CacheException, IOException, Exception{
-        
-        AspectJMethodSecurityInterceptor interceptor = new AspectJMethodSecurityInterceptor();
-        interceptor.setAccessDecisionManager(accessDecisionManager());
-        interceptor.setAuthenticationManager(authenticationManager());
-        interceptor.setSecurityMetadataSource(delegatingMethodSecurityMetadataSource());
-        interceptor.setAfterInvocationManager(afterInvocationProviderManager());
-        interceptor.afterPropertiesSet();
-        return interceptor;        
-    }
-
-	@Override
-	protected AccessDecisionManager accessDecisionManager() {
-		List<AccessDecisionVoter<? extends Object>> voters = new ArrayList<AccessDecisionVoter<? extends Object>>();
-    	ExpressionBasedPreInvocationAdvice expressionAdvice = new ExpressionBasedPreInvocationAdvice();
-		try {
-			expressionAdvice.setExpressionHandler(aclExpressionHandler());
+    @Override
+    protected MethodSecurityExpressionHandler createExpressionHandler(){
+        DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+        expressionHandler.setDefaultRolePrefix("");
+        try {
+			expressionHandler.setPermissionEvaluator(aclPermissionEvaluator());
 		} catch (CacheException | IOException e) {
 			throw new RuntimeException(e);
 		}
-    	voters.add(new PreInvocationAuthorizationAdviceVoter(expressionAdvice));
-    	voters.add(new AuthenticatedVoter());
-        voters.add(new RolAccessDecisionVoter());
-        return new UnanimousBased(voters);
+        return expressionHandler;
     }
 
 	@Override

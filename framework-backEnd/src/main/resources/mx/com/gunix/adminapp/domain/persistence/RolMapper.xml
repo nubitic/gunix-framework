@@ -13,4 +13,60 @@
 			<id property="idFuncion" column="ID_FUNCION_PADRE" />
 		</association>
 	</resultMap>
+	<update id="update">
+		UPDATE SEGURIDAD.ROL
+		SET
+		<foreach collection="cambios" index="key" item="value" open="" separator=" , " close="">
+			<if test="key == 'descripcion' || key == 'habilitado'">
+				${key}=#{value}
+			</if>
+		</foreach>
+		<where>
+			<foreach collection="idMap" index="key" item="value" open="" separator=" AND " close="">
+				<choose>
+					<when test="key == 'aplicacion'">
+						<bind name="idAplicacion" value="value.idAplicacion" />
+						ID_APLICACION=#{idAplicacion}
+					</when>
+					<when test="key == 'idRol'">
+						ID_ROL=#{value}
+					</when>
+				</choose>
+			</foreach>
+		</where>
+	</update>
+	
+	<update id="updateFuncion">
+		UPDATE SEGURIDAD.ROL_FUNCION
+		SET
+		<foreach collection="dcFuncionRol.cambios" index="key" item="value" open="" separator=" , " close="">
+			<if test="key == 'acceso'">
+				NIV_ACC=#{value}::seguridad.nivel_acceso
+			</if>
+		</foreach>
+		<where>
+			<foreach collection="idRolMap" index="key" item="value" open="" separator=" AND " close="">
+				<choose>
+					<when test="key == 'aplicacion'">
+						<bind name="idAplicacion" value="value.idAplicacion" />
+						ID_APLICACION=#{idAplicacion}
+					</when>
+					<when test="key == 'idRol'">
+						ID_ROL=#{value}
+					</when>
+				</choose>
+			</foreach>
+			<foreach collection="dcFuncionRol.idMap" index="key" item="value" open=" AND " separator=" AND " close="">
+				<choose>
+					<when test="key == 'modulo'">
+						<bind name="idModulo" value="value.idModulo" />
+						ID_MODULO=#{idModulo}
+					</when>
+					<when test="key == 'idFuncion'">
+						ID_FUNCION=#{value}
+					</when>
+				</choose>
+			</foreach>
+		</where>
+	</update>
 </mapper>

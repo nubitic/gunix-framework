@@ -2,6 +2,7 @@ package mx.com.gunix.adminapp.domain.persistence;
 
 import java.util.List;
 
+import mx.com.gunix.framework.persistence.DescriptorCambios;
 import mx.com.gunix.framework.security.domain.Aplicacion;
 
 import org.apache.ibatis.annotations.Insert;
@@ -25,4 +26,6 @@ public interface AplicacionMapper {
 
 	@Insert("INSERT INTO SEGURIDAD.APLICACION VALUES(#{idAplicacion},#{id},#{descripcion},#{icono})")
 	public void inserta(Aplicacion aplicacion);
+
+	public void update(DescriptorCambios dc);
 }

@@ -14,6 +14,11 @@ public class GunixFileBuffer extends FileBuffer {
 	private UploadField uf;
 	private GunixFile value;
 
+	@Override
+	public boolean isEmpty() {
+		return value == null && super.getValue() == null;
+	}
+
 	public GunixFileBuffer(UploadField uf) {
 		super(FieldType.FILE);
 		if (uf == null) {

@@ -17,8 +17,31 @@
 	</select>
 	<resultMap id="aplicacionMap" type="mx.com.gunix.framework.security.domain.Aplicacion">
 		<id property="id" column="ID" />
-		<result column="ID_APLICACION" property="idAplicacion"/>
-		<result column="DESCRIPCION" property="descripcion"/>
-		<result column="ICONO" property="icono"/>
+		<result column="ID_APLICACION" property="idAplicacion" />
+		<result column="DESCRIPCION" property="descripcion" />
+		<result column="ICONO" property="icono" />
 	</resultMap>
+
+	<update id="update">
+		UPDATE SEGURIDAD.APLICACION
+		SET
+		<foreach collection="cambios" index="key" item="value" open="" separator=" , " close="">
+			<if test="key == 'descripcion' || key == 'icono'">
+				${key}=#{value}
+			</if>
+		</foreach>
+		<where>
+			<foreach collection="idMap" index="key" item="value" open="" separator=" AND " close="">
+				<choose>
+					<when test="key == 'idAplicacion'">
+						ID_APLICACION
+					</when>
+					<when test="key == 'id'">
+						ACL_ID
+					</when>
+				</choose>
+				=#{value}
+			</foreach>
+		</where>
+	</update>
 </mapper>

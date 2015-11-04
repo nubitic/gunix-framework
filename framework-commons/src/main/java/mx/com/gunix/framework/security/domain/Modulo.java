@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import mx.com.gunix.framework.domain.HashCodeByTimeStampAware;
+import mx.com.gunix.framework.domain.Identificador;
 import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
 
 public class Modulo extends HashCodeByTimeStampAware implements Serializable {
@@ -14,6 +15,7 @@ public class Modulo extends HashCodeByTimeStampAware implements Serializable {
 
 	@NotNull
 	@Size(min = 1, max = 30)
+	@Identificador
 	private String idModulo;
 
 	@NotNull
@@ -29,6 +31,7 @@ public class Modulo extends HashCodeByTimeStampAware implements Serializable {
 	private List<Funcion> funciones;
 
 	@NotNull(groups = BeanValidations.class)
+	@Identificador
 	private Aplicacion aplicacion;
 
 	public String getIdModulo() {
