@@ -8,13 +8,17 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>activiti-engine-job-prefix-fix</module>
+		<module>org.openl.rules.activiti</module>
 		<module>framework-commons</module>
 		<module>framework-vista</module>
 		<module>framework-backEnd</module>
+		<module>archetype</module>
 		<module>sso-gateway</module>
 	</modules>
 
 	<properties>
+		<openl.version>5.16.2</openl.version>
+		<activiti.version>5.18.0</activiti.version>
 		<javac.path>${JAVA_1_8_HOME}/bin/javac</javac.path>
 		<slf4j.version>1.7.12</slf4j.version>
 		<aspectj.version>1.8.5</aspectj.version>
@@ -102,6 +106,51 @@
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
 				<version>9.4-1203-jdbc42</version>
+			</dependency>
+			<dependency>
+				<groupId>mx.com.gunix</groupId>
+				<artifactId>org.openl.rules.activiti</artifactId>
+				<version>1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>mx.com.gunix</groupId>
+				<artifactId>activiti-engine-job-prefix-fix</artifactId>
+				<version>1.0</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-beans</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.mybatis</groupId>
+						<artifactId>mybatis</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.activiti</groupId>
+				<artifactId>activiti-spring</artifactId>
+				<version>${activiti.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-beans</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.activiti</groupId>
+						<artifactId>activiti-engine</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.openl.rules</groupId>
+				<artifactId>org.openl.rules.project</artifactId>
+				<version>${openl.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openl</groupId>
+				<artifactId>org.openl.conf.ant</artifactId>
+				<version>${openl.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

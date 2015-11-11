@@ -8,7 +8,6 @@
 	</parent>
 	<artifactId>framework-backEnd</artifactId>
 	<properties>
-		<openl.version>5.16.0</openl.version>
 		<dozer.version>5.5.1</dozer.version>
 	</properties>
 	<repositories>
@@ -37,6 +36,22 @@
 				<updatePolicy>always</updatePolicy>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>activiti-engine-job-prefix-fix-mvn-repo</id>
+			<url>https://raw.github.com/loloq123/activiti-engine-job-prefix-fix/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>org.openl.rules.activiti-repo</id>
+			<url>https://raw.github.com/loloq123/org.openl.rules.activiti/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
@@ -51,43 +66,14 @@
 		<dependency>
 			<groupId>org.activiti</groupId>
 			<artifactId>activiti-spring</artifactId>
-			<version>5.18.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-beans</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.activiti</groupId>
-					<artifactId>activiti-engine</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>mx.com.gunix</groupId>
 			<artifactId>activiti-engine-job-prefix-fix</artifactId>
-			<version>1.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-beans</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.mybatis</groupId>
-					<artifactId>mybatis</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.openl.rules</groupId>
-			<artifactId>org.openl.rules</artifactId>
-			<version>${openl.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openl</groupId>
-			<artifactId>org.openl.conf.ant</artifactId>
-			<version>${openl.version}</version>
-			<scope>provided</scope>
+			<groupId>mx.com.gunix</groupId>
+			<artifactId>org.openl.rules.activiti</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.mybatis</groupId>

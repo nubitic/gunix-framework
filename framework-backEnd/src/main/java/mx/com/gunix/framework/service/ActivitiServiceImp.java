@@ -135,9 +135,6 @@ public class ActivitiServiceImp implements ActivitiService {
 			String usuario = ((Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getIdUsuario();
 			is.setAuthenticatedUserId(usuario);
 			ProcessInstance pi = rs.startProcessInstanceByKey(processKey, toMap(variables)[Variable.Scope.PROCESO.ordinal()]);
-			Optional.ofNullable(comentario).ifPresent(comment -> {
-				ts.addComment(null, pi.getProcessInstanceId(), comment);
-			});
 
 			instancia = new Instancia();
 			instancia.setId(pi.getId());
@@ -145,11 +142,18 @@ public class ActivitiServiceImp implements ActivitiService {
 			instancia.setProcessKey(pi.getBusinessKey());
 			instancia.setUsuario(usuario);
 			instancia.setVariables(Collections.unmodifiableList(variables));
-
-			Tarea currTask = getCurrentTask(pi.getId());
-			currTask.setInstancia(instancia);
-			instancia.setTareaActual(currTask);
-			refreshVars(instancia);
+			
+			if (!pi.isEnded()) {
+				Optional.ofNullable(comentario).ifPresent(comment -> {
+					ts.addComment(null, pi.getProcessInstanceId(), comment);
+				});
+				Tarea currTask = getCurrentTask(pi.getId());
+				currTask.setInstancia(instancia);
+				instancia.setTareaActual(currTask);
+				refreshVars(instancia);
+			} else {
+				instancia.setTareaActual(Tarea.DEFAULT_END_TASK);
+			}
 		} finally {
 			is.setAuthenticatedUserId(null);
 		}

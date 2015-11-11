@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="GenJavaWrapper" default="generate" basedir="../">
+
+	<taskdef name="openlgen" classname="org.openl.conf.ant.JavaWrapperAntTask" />
+	<taskdef resource="net/sf/antcontrib/antlib.xml" />
+
+	<target name="initGeneration">
+		<foreach target="doIterate" param="processDir" inheritall="true">
+			<path>
+				<dirset dir="src/main/resources/mx/com/gunix/procesos" />
+			</path>
+		</foreach>
+		<property name="finished" value="true" />
+	</target>
+
+	<target name="doIterate">
+		<propertyregex property="processName" input="${processDir}" regexp="(?i)[:\\\sa-z-]+src\\main\\resources\\mx\\com\\gunix\\procesos\\" replace="" override="true" />
+		<if>
+			<and>
+				<not>
+					<equals arg1="${processName}" arg2="" />
+				</not>
+				<isset property="processName" />
+			</and>
+			<then>
+				<echo message="${processDir}" />
+				<foreach target="doGenerate" param="processExcel" inheritall="true">
+					<path>
+						<fileset dir="${processDir}" includes="*.xlsx" />
+					</path>
+				</foreach>
+			</then>
+		</if>
+	</target>
+	<target name="doGenerate">
+		<echo message="Generating ${processExcel}" />
+		<openlgen 
+			openlName="org.openl.xls" 
+			userHome="./" 
+			srcFile="${processExcel}" 
+			targetSrcDir="${projectPath}/src/main/java"
+			goal="generate datatypes"
+			targetClass="mx.com.gunix.reglas.${processName}.${processName}Wrapper">
+		</openlgen>
+	</target>
+</project>

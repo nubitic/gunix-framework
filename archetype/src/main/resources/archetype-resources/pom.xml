@@ -13,12 +13,8 @@
 	</modules>
 	<properties>
 		<javac.path>${JAVA_1_8_HOME}/bin/javac</javac.path>
-		<slf4j.version>1.7.12</slf4j.version>
-		<aspectj.version>1.8.5</aspectj.version>
-		<openl.version>5.14.0</openl.version>
-		<dozer.version>5.5.1</dozer.version>
-		<vaadin.version>7.4.3</vaadin.version>
-		<vaadin-spring.version>0.0.5.RELEASE</vaadin-spring.version>
+		<activiti.version>${activitiVersion}</activiti.version>
+		<openL.version>${openLVersion}</openL.version>
 	</properties>
 	<repositories>
 	 	<repository>
@@ -65,6 +61,14 @@
 		<repository>
 			<id>activiti-engine-job-prefix-fix-mvn-repo</id>
 			<url>https://raw.github.com/loloq123/activiti-engine-job-prefix-fix/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>org.openl.rules.activiti-repo</id>
+			<url>https://raw.github.com/loloq123/org.openl.rules.activiti/mvn-repo/</url>
 			<snapshots>
 				<enabled>true</enabled>
 				<updatePolicy>always</updatePolicy>

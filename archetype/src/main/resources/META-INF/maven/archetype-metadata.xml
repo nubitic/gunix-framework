@@ -63,13 +63,19 @@
             <include>**/*.*</include>
           </includes>
         </fileSet>
-        <fileSet encoding="UTF-8" >
-          <directory>build</directory>
-          <includes>
-            <include>**/*.*</include>
-          </includes>
-        </fileSet>
       </fileSets>
     </module>
   </modules>
+
+  <requiredProperties>
+    <requiredProperty key="JAVA_1_8_HOME">
+      <defaultValue>/Program Files/Java/jdk1.8.0_40</defaultValue>
+    </requiredProperty>
+    <requiredProperty key="activitiVersion">
+      <defaultValue>5.18.0</defaultValue>
+    </requiredProperty>
+    <requiredProperty key="openLVersion">
+      <defaultValue>5.16.2</defaultValue>
+    </requiredProperty>
+  </requiredProperties>
 </archetype-descriptor>

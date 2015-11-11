@@ -14,6 +14,7 @@ import mx.com.gunix.framework.security.domain.Modulo;
 import mx.com.gunix.framework.security.domain.Rol;
 import mx.com.gunix.framework.service.ActivitiService;
 import mx.com.gunix.framework.ui.vaadin.spring.SpringViewProvider;
+import mx.com.gunix.framework.ui.vaadin.view.DefaultProcessEndView;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -293,7 +294,12 @@ public class Header extends CustomComponent {
 		Instancia instancia = as.iniciaProceso(funcion.getProcessKey(), Variable.fromParametros(funcion.getParametros()), "");
 		try {
 			navigator.setTareaActual(instancia.getTareaActual());
-			navigator.navigateTo(instancia.getTareaActual().getVista());
+			
+			if (instancia.getTareaActual() == null || instancia.getTareaActual().getVista().equals(Tarea.DEFAULT_END_TASK_VIEW)) {
+				navigator.navigateTo(DefaultProcessEndView.class.getName());
+			}else {
+				navigator.navigateTo(instancia.getTareaActual().getVista());	
+			}
 			modulosLayout.setVisible(false);
 			panelContenido.setVisible(true);
 			panelContenido.setEnabled(true);

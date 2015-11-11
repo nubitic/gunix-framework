@@ -1,21 +1,24 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
- 	<parent>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
 		<groupId>mx.com.gunix</groupId>
 		<artifactId>gunix</artifactId>
 		<version>1.0</version>
 	</parent>
+	<artifactId>org.openl.rules.activiti</artifactId>
+	<name>OpenL - STUDIO - Activiti</name>
+	<description>Classes and utilities to integrate OpenL Rules Project with Activiti</description>
+	<url>//openl-tablets.org</url>
 	<repositories>
-	 	<repository>
-	      <id>central</id>
-	      <name>Central Repository</name>
-	      <url>http://repo.maven.apache.org/maven2</url>
-	      <layout>default</layout>
-	      <snapshots>
-	        <enabled>false</enabled>
-	      </snapshots>
-	    </repository>
+		<repository>
+			<id>activiti-engine-job-prefix-fix-mvn-repo</id>
+			<url>https://raw.github.com/loloq123/activiti-engine-job-prefix-fix/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
 		<repository>
 			<id>gunix-mvn-repo</id>
 			<url>https://raw.github.com/loloq123/gunix/mvn-repo/</url>
@@ -25,8 +28,31 @@
 			</snapshots>
 		</repository>
 	</repositories>
-  <artifactId>archetype</artifactId>
-  <packaging>jar</packaging>
+	<dependencies>
+		<dependency>
+			<groupId>mx.com.gunix</groupId>
+			<artifactId>activiti-engine-job-prefix-fix</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.activiti</groupId>
+			<artifactId>activiti-spring</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.openl.rules</groupId>
+			<artifactId>org.openl.rules.project</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.3.176</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 	<build>
 		<plugins>
 			<plugin>

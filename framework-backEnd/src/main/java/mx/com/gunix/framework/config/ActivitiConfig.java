@@ -22,6 +22,7 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.VariableScope;
+import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.asyncexecutor.ManagedAsyncJobExecutor;
 import org.activiti.engine.impl.bpmn.data.ItemInstance;
@@ -45,10 +46,14 @@ import org.activiti.spring.ApplicationContextElResolver;
 import org.activiti.spring.ProcessEngineFactoryBean;
 import org.activiti.spring.SpringExpressionManager;
 import org.activiti.spring.SpringProcessEngineConfiguration;
+import org.activiti.spring.autodeployment.AutoDeploymentStrategy;
 import org.activiti.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
+import org.openl.rules.activiti.spring.OpenLResourcesHandleListener;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -69,7 +74,34 @@ public class ActivitiConfig {
 
 	@Bean
 	public SpringProcessEngineConfiguration springProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager) throws IOException {
-		SpringProcessEngineConfiguration speConf = new SpringProcessEngineConfiguration();
+		SpringProcessEngineConfiguration speConf = new SpringProcessEngineConfiguration() {
+			private AutoDeploymentStrategy autoDS = new ResourceParentFolderAutoDeploymentStrategy() {
+				@Override
+				protected String determineResourceName(final Resource resource) {
+					String resourceName = null;
+
+					if (resource instanceof ContextResource) {
+						resourceName = ((ContextResource) resource).getPathWithinContext();
+
+					} else if (resource instanceof ByteArrayResource) {
+						resourceName = resource.getDescription();
+
+					} else {
+						try {
+							resourceName = resource.getFile().getName();
+						} catch (IOException e) {
+							resourceName = resource.getFilename();
+						}
+					}
+					return resourceName;
+				}
+			};
+
+			@Override
+			protected AutoDeploymentStrategy getAutoDeploymentStrategy(final String mode) {
+				return autoDS;
+			}
+		};
 		speConf.setDataSource(dataSource);
 		speConf.setDatabaseType(ProcessEngineConfigurationImpl.DATABASE_TYPE_POSTGRES);
 		speConf.setTransactionManager(transactionManager);
@@ -89,23 +121,29 @@ public class ActivitiConfig {
 
 		speConf.setIdGenerator(idGenerator());
 		speConf.setDeploymentMode(ResourceParentFolderAutoDeploymentStrategy.DEPLOYMENT_MODE);
+		
+		Resource[] appPackedBPMNResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/procesos/**/*.*");
+		Resource[] resources = new Resource[(appPackedBPMNResources != null ? appPackedBPMNResources.length : 0)];
+		
+		if (appPackedBPMNResources != null && appPackedBPMNResources.length > 0) {
+			System.arraycopy(appPackedBPMNResources, 0, resources, 0, appPackedBPMNResources.length);
+		}
+		
 		if (Boolean.valueOf(System.getenv("STANDALONE_APP"))) {
-			Resource[] appResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/procesos/**/*.bpmn");
 			Resource[] adminAppResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/adminapp/procesos/*.bpmn");
-			Resource[] resources = null;
 
-			if (appResources != null && appResources.length > 0) {
-				resources = new Resource[appResources.length + adminAppResources.length];
-				System.arraycopy(adminAppResources, 0, resources, 0, adminAppResources.length);
-				System.arraycopy(appResources, 0, resources, appResources.length, appResources.length);
+			if (resources != null && resources.length > 0) {
+				Resource[] finalResources = new Resource[resources.length + adminAppResources.length];
+				System.arraycopy(adminAppResources, 0, finalResources, 0, adminAppResources.length);
+				System.arraycopy(resources, 0, finalResources, adminAppResources.length, resources.length);
+				resources = finalResources;
 			} else {
 				resources = adminAppResources;
 			}
-			speConf.setDeploymentResources(resources);
-		} else {
-			speConf.setDeploymentResources(resourcePatternResolver.getResources("classpath*:/mx/com/gunix/procesos/**/*.bpmn"));
 		}
-
+		
+		speConf.setDeploymentResources(resources);
+		
 		VariableInstanceEntityManager vim = variableInstanceEntityManager();
 
 		List<SessionFactory> vimList = new ArrayList<SessionFactory>();
@@ -117,6 +155,10 @@ public class ActivitiConfig {
 		varTypes.add(new FloatType());
 		speConf.setCustomPreVariableTypes(varTypes);// Se establece primero en la lista que se usa para el guardado
 		speConf.setCustomPostVariableTypes(varTypes);// Se establece como el último en asignarse en el Mapa que se usa para la recuperación
+		
+		List<ActivitiEventListener> evntListners =  new ArrayList<ActivitiEventListener>();
+		evntListners.add(new OpenLResourcesHandleListener());
+		speConf.setEventListeners(evntListners);
 
 		return speConf;
 	}

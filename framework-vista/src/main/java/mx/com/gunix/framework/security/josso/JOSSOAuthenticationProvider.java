@@ -20,6 +20,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+/**
+ * https://webdevchoices.wordpress.com/2009/06/19/josso-for-spring-security-users/
+ * */
+
 public class JOSSOAuthenticationProvider implements AuthenticationProvider {
 	private static final Logger logger = Logger.getLogger(JOSSOAuthenticationProvider.class);
 
