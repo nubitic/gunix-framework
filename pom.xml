@@ -23,6 +23,7 @@
 		<slf4j.version>1.7.12</slf4j.version>
 		<aspectj.version>1.8.5</aspectj.version>
 		<josso.version>1.8.9</josso.version>
+		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
 	</properties>
 
 	<dependencyManagement>
