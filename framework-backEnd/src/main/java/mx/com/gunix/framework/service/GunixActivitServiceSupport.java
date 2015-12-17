@@ -102,7 +102,7 @@ public class GunixActivitServiceSupport<T extends Serializable> {
 
 				if ((!idObj1.isEmpty() && idObj1.equals(idObj2)) || (itProp1Obj.equals(itProp2Obj))) {
 					if (fa != null) {
-						hayCambios = fa.doFoundAction(itProp1Obj, itProp2Obj);
+						hayCambios = (fa.doFoundAction(itProp1Obj, itProp2Obj) || hayCambios);
 					}
 					objt1Found = true;
 					break;

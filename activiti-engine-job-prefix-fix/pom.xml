@@ -31,7 +31,7 @@
 								<artifactItem>
 									<groupId>org.activiti</groupId>
 									<artifactId>activiti-engine</artifactId>
-									<version>5.18.0</version>
+									<version>${activiti.version}</version>
 									<type>jar</type>
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/classes</outputDirectory>

@@ -23,7 +23,7 @@ public interface RolMapper {
 		  @Result(column="DESCRIPCION",property="descripcion")})
  	public List<Rol> getByIdAplicacion(String idAplicacion);
 	
-	@Select("select ID_APLICACION, ID_MODULO, ID_FUNCION, ID_FUNCION_PADRE from FUNCIONES_ROL(#{idAplicacion},#{idRol})")
+	@Select("select ID_APLICACION, ID_MODULO, ID_FUNCION, ID_FUNCION_PADRE from ADMON_SEG.FUNCIONES_ROL(#{idAplicacion},#{idRol})")
 	@ResultMap("funcionesRolMap")
 	public List<Funcion> getFuncionesByIdRol(@Param("idAplicacion") String idAplicacion, @Param("idRol") String idRol);
 

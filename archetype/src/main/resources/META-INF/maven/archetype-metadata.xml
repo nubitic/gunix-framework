@@ -72,7 +72,7 @@
       <defaultValue>/Program Files/Java/jdk1.8.0_40</defaultValue>
     </requiredProperty>
     <requiredProperty key="activitiVersion">
-      <defaultValue>5.18.0</defaultValue>
+      <defaultValue>5.19.0</defaultValue>
     </requiredProperty>
     <requiredProperty key="openLVersion">
       <defaultValue>5.16.2</defaultValue>

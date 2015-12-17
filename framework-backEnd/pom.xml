@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>mx.com.gunix</groupId>
@@ -12,15 +11,15 @@
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
 	</properties>
 	<repositories>
-	 	<repository>
-	      <id>central</id>
-	      <name>Central Repository</name>
-	      <url>http://repo.maven.apache.org/maven2</url>
-	      <layout>default</layout>
-	      <snapshots>
-	        <enabled>false</enabled>
-	      </snapshots>
-	    </repository>
+		<repository>
+			<id>central</id>
+			<name>Central Repository</name>
+			<url>http://repo.maven.apache.org/maven2</url>
+			<layout>default</layout>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 		<repository>
 			<id>gunix-mvn-repo</id>
 			<url>https://raw.github.com/loloq123/gunix/mvn-repo/</url>
@@ -80,12 +79,14 @@
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis</artifactId>
 			<version>3.2.8</version>
-			<!-- 3.3.0 no juega bien con activiti dado que el método private void 
-				applyIncludes(Node source, final Properties variablesContext) de org.apache.ibatis.builder.xml.XMLIncludeTransformer 
-				hace un reemplazo de variables que antes no hacía: if (source.getNodeType() 
-				== Node.TEXT_NODE && !variablesContext.isEmpty()) { // replace variables 
-				ins all text nodes source.setNodeValue(PropertyParser.parse(source.getNodeValue(), 
-				variablesContext)); } -->
+			<!-- 3.3.0 no juega bien con activiti dado que el método 
+			private void applyIncludes(Node source, final Properties variablesContext) de org.apache.ibatis.builder.xml.XMLIncludeTransformer 
+				hace un reemplazo de variables que antes no hacía:
+				 
+				if (source.getNodeType() == Node.TEXT_NODE && !variablesContext.isEmpty()) { // replace variables ins all text nodes 
+					source.setNodeValue(PropertyParser.parse(source.getNodeValue(),variablesContext)); 
+				} 
+			-->
 		</dependency>
 		<dependency>
 			<groupId>org.mybatis.caches</groupId>

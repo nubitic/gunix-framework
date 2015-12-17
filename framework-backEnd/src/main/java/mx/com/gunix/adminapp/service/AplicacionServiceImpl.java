@@ -270,7 +270,15 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 							if (dcMod.getCambios().containsKey("funciones")) {
 								List<DescriptorCambios> dcFuncs = (List<DescriptorCambios>) dcMod.getCambios().get("funciones");
 								updateFunciones(dcFuncs);
-							}	
+							}
+							
+							if (dcMod.getInserciones() != null) {
+								// Agregando las nuevas hijas
+								if (dcMod.getInserciones().containsKey("funciones")) {
+									List hijas = dcMod.getInserciones().get("funciones");
+									doInsertaNuevasFunciones(hijas);
+								}
+							}
 						}
 					});
 				}
