@@ -104,7 +104,7 @@ public class HessianSkeleton extends com.caucho.hessian.server.HessianSkeleton {
 		try {
 			result = method.invoke(service, values);
 		} catch (Exception e) {
-			log.log(Level.SEVERE,"Error en invocación remota", e);
+			log.log(Level.SEVERE,"Error en invocaciÃ³n remota", e);
 			Throwable e1 = e;
 			if (e1 instanceof InvocationTargetException)
 				e1 = ((InvocationTargetException) e).getTargetException();

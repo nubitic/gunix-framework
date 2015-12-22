@@ -1,6 +1,6 @@
 /**
- * Aquí se deben depositar las clases simples de java (Java Beans)
- * sobre los que se soporta el Negocio de la Aplicación.
+ * AquÃ­ se deben depositar las clases simples de java (Java Beans)
+ * sobre los que se soporta el Negocio de la AplicaciÃ³n.
  *
  * Ejemplo:
  *

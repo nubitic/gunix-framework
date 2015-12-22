@@ -59,7 +59,7 @@ public class GunixActivitServiceSupport<T extends Serializable> {
 				varName = getVarNameToUpdate(ee.getParent(), var);
 			} else {
 				throw new IllegalArgumentException(
-						"No se encontró la variable a actualizar en el contexto de la ejecución actual, ¿será que es nueva y mas bien necesitas 'agregarla' en vez de actualizarla?");
+						"No se encontrÃ³ la variable a actualizar en el contexto de la ejecuciÃ³n actual, Â¿serÃ¡ que es nueva y mas bien necesitas 'agregarla' en vez de actualizarla?");
 			}
 		}
 		return varName;

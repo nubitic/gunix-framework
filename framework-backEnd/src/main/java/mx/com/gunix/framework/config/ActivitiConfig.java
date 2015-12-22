@@ -154,7 +154,7 @@ public class ActivitiConfig {
 		varTypes.add(gunixObjectVariableType());
 		varTypes.add(new FloatType());
 		speConf.setCustomPreVariableTypes(varTypes);// Se establece primero en la lista que se usa para el guardado
-		speConf.setCustomPostVariableTypes(varTypes);// Se establece como el último en asignarse en el Mapa que se usa para la recuperación
+		speConf.setCustomPostVariableTypes(varTypes);// Se establece como el Ãºltimo en asignarse en el Mapa que se usa para la recuperaciÃ³n
 		
 		List<ActivitiEventListener> evntListners =  new ArrayList<ActivitiEventListener>();
 		evntListners.add(new OpenLResourcesHandleListener());

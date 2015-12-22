@@ -8,7 +8,7 @@
 	<artifactId>framework-backEnd</artifactId>
 	<properties>
 		<dozer.version>5.5.1</dozer.version>
-		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<repositories>
 		<repository>
@@ -79,9 +79,9 @@
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis</artifactId>
 			<version>3.2.8</version>
-			<!-- 3.3.0 no juega bien con activiti dado que el método 
+			<!-- 3.3.0 no juega bien con activiti dado que el mÃ©todo 
 			private void applyIncludes(Node source, final Properties variablesContext) de org.apache.ibatis.builder.xml.XMLIncludeTransformer 
-				hace un reemplazo de variables que antes no hacía:
+				hace un reemplazo de variables que antes no hacÃ­a:
 				 
 				if (source.getNodeType() == Node.TEXT_NODE && !variablesContext.isEmpty()) { // replace variables ins all text nodes 
 					source.setNodeValue(PropertyParser.parse(source.getNodeValue(),variablesContext)); 
@@ -277,6 +277,21 @@
 					</execution>
 				</executions>
 			</plugin>
+	 <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <version>2.10</version>
+        <configuration>
+          <additionalConfig>
+            <file>
+              <name>.settings/org.eclipse.core.resources.prefs</name>
+              <content>
+                <![CDATA[eclipse.preferences.version=1${line.separator}encoding/<project>=${project.build.sourceEncoding}${line.separator}]]>
+              </content>
+            </file>
+          </additionalConfig>
+        </configuration>
+      </plugin>
 		</plugins>
 	</build>
 </project>

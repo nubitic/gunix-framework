@@ -11,7 +11,7 @@
 		<tiles.version>3.0.5</tiles.version>
 		<vaadin.version>7.5.6</vaadin.version>
 		<vaadin-spring.version>0.0.5.RELEASE</vaadin-spring.version>
-		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<repositories>
 	 	<repository>
@@ -333,6 +333,21 @@
 					</execution>
 				</executions>
 			</plugin>
+	 <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <version>2.10</version>
+        <configuration>
+          <additionalConfig>
+            <file>
+              <name>.settings/org.eclipse.core.resources.prefs</name>
+              <content>
+                <![CDATA[eclipse.preferences.version=1${line.separator}encoding/<project>=${project.build.sourceEncoding}${line.separator}]]>
+              </content>
+            </file>
+          </additionalConfig>
+        </configuration>
+      </plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>

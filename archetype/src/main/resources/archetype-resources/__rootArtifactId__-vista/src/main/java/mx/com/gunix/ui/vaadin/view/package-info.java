@@ -1,5 +1,5 @@
 /**
- * Aquí se deben depositar las clases java que representan las vistas
+ * AquÃ­ se deben depositar las clases java que representan las vistas
  * del sistema
  *
  * Ejemplo:
@@ -37,7 +37,7 @@
  * 	protected void doConstruct() {
  * 		FormLayout flyt = new FormLayout();
  * 		
- * 		flyt.setCaption(new StringBuilder($("operación").toString()).append(" de Cliente").toString());
+ * 		flyt.setCaption(new StringBuilder($("operaciÃ³n").toString()).append(" de Cliente").toString());
  * 		
  * 		nombre = new TextField("Nombre");
  * 		nombre.setNullRepresentation("");

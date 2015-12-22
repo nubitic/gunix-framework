@@ -8,7 +8,7 @@ public class VaadinAuthenticationFailureHandler implements org.vaadin.spring.sec
 
 	@Override
 	public void onAuthenticationFailure(AuthenticationException exception) throws Exception {
-		Notification.show("Usuario y/o Contraseña incorrectos");
+		Notification.show("Usuario y/o ContraseÃ±a incorrectos");
 	}
 
 }

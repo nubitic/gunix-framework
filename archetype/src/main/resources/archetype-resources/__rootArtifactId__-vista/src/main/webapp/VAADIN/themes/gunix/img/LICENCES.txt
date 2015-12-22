@@ -1,4 +1,4 @@
-/* Aquí se deberán indicar las licencias de las imagenes que se utilicen en la aplicación 
+/* AquÃ­ se deberÃ¡n indicar las licencias de las imagenes que se utilicen en la aplicaciÃ³n 
 P. ej:
 
 1436568412_demo.png http://www.everaldo.com/ under LGPL

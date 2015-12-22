@@ -20,7 +20,7 @@
   ~
   --%>
 
-<%@ page contentType="text/html; charset=iso-8859-1" language="java" %>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ taglib uri="/WEB-INF/tlds/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/tlds/struts-bean.tld" prefix="bean" %>
 

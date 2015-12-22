@@ -10,6 +10,9 @@
 	<name>OpenL - STUDIO - Activiti</name>
 	<description>Classes and utilities to integrate OpenL Rules Project with Activiti</description>
 	<url>//openl-tablets.org</url>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 	<repositories>
 		<repository>
 			<id>activiti-engine-job-prefix-fix-mvn-repo</id>
@@ -102,6 +105,21 @@
 					</execution>
 				</executions>
 			</plugin>
+	 <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <version>2.10</version>
+        <configuration>
+          <additionalConfig>
+            <file>
+              <name>.settings/org.eclipse.core.resources.prefs</name>
+              <content>
+                <![CDATA[eclipse.preferences.version=1${line.separator}encoding/<project>=${project.build.sourceEncoding}${line.separator}]]>
+              </content>
+            </file>
+          </additionalConfig>
+        </configuration>
+      </plugin>
 		</plugins>
 	</build>
 </project>

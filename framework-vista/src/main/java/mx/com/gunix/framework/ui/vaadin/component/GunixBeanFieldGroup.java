@@ -26,7 +26,7 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 	public GunixBeanFieldGroup(Class<BT> beanType) {
 		super(beanType);
 		if (!isBeanValidationImplementationAvailable()) {
-			throw new IllegalStateException("No se encontró una implementación de JSR-303 bean validation");
+			throw new IllegalStateException("No se encontrÃ³ una implementaciÃ³n de JSR-303 bean validation");
 		}
 	}
 
@@ -76,7 +76,7 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 					onBVECallback.callback(ive);
 					throw new CommitException(erroresString, this, new FieldGroupInvalidValueException(invalidValueExceptions));
 				} else {
-					throw new IllegalStateException("No se asoció (bind) ningún campo al grupo ni tampoco se indicó un callback para atender los errores en la validación");
+					throw new IllegalStateException("No se asociÃ³ (bind) ningÃºn campo al grupo ni tampoco se indicÃ³ un callback para atender los errores en la validaciÃ³n");
 				}
 			}
 		}

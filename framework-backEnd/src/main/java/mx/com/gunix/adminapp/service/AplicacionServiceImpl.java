@@ -123,7 +123,7 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 					funcionSeleccionada.setAcceso(Acceso.PUNTUAL);
 				}
 			} else {
-				throw new IllegalStateException("RelaciÛn funciÛn-rol inv·lida: Se intentÛ asociar una funciÛn con hijas que de acuerdo al mÛdulo correspondiente no tiene hijas");
+				throw new IllegalStateException("Relaci√≥n funci√≥n-rol inv√°lida: Se intent√≥ asociar una funci√≥n con hijas que de acuerdo al m√≥dulo correspondiente no tiene hijas");
 			}
 		} else {
 			if (funcionesPadre.contains(funcionSeleccionada) && (funcionSeleccionada.getHijas() == null || funcionSeleccionada.getHijas().isEmpty())) {
@@ -159,12 +159,12 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 		boolean isValid = false;
 		Set<ConstraintViolation<Aplicacion>> result = valida(aplicacion, Default.class, BeanValidations.class);
 		if (result.isEmpty()) {
-			if (aplicacion.getId() == null && "Alta".equals($("operaciÛn"))) {
+			if (aplicacion.getId() == null && "Alta".equals($("operaci√≥n"))) {
 				if (am.getByidAplicacion(aplicacion.getIdAplicacion()) == null) {
 					isValid = true;
 				} else {
 					List<String> errores = new ArrayList<String>();
-					errores.add("La aplicaciÛn no se puede dar de Alta porque ya existe una aplicaciÛn con id " + aplicacion.getIdAplicacion());
+					errores.add("La aplicaci√≥n no se puede dar de Alta porque ya existe una aplicaci√≥n con id " + aplicacion.getIdAplicacion());
 					agregaVariable("errores", errores);
 				}
 			} else {
@@ -189,7 +189,7 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 			if (!apps.isEmpty()) {
 				Aplicacion app = apps.get(0);
 				if(app==null) {
-					throw new IllegalArgumentException("No se encontrÛ el detalle de la aplicaciÛn con id: "+aplicacion.getIdAplicacion());
+					throw new IllegalArgumentException("No se encontr√≥ el detalle de la aplicaci√≥n con id: "+aplicacion.getIdAplicacion());
 				}
 				app.setModulos(mm.getByIdAplicacion(app.getIdAplicacion()));
 				if (app.getModulos() != null) {
@@ -253,7 +253,7 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 		
 		if (dc != null) {
 			if (dc.getCambios() != null) {
-				// Actualizando las propiedades simples de la AplicaciÛn
+				// Actualizando las propiedades simples de la Aplicaci√≥n
 				if (dc.getCambios().containsKey("descripcion") || dc.getCambios().containsKey("icono")) {
 					am.update(dc);
 				}
@@ -262,7 +262,7 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 					List<DescriptorCambios> dcMods = (List<DescriptorCambios>) dc.getCambios().get("modulos");
 					dcMods.forEach(dcMod -> {
 						if(dcMod.getCambios() != null) {
-							// Actualizando las propiedades simples del MÛdulo
+							// Actualizando las propiedades simples del M√≥dulo
 							if (dcMod.getCambios().containsKey("descripcion") || dcMod.getCambios().containsKey("icono")) {
 								mm.update(dcMod);
 							}
@@ -346,7 +346,7 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 	private void updateFuncionesRol(DescriptorCambios dcRol, List<DescriptorCambios> dcFuncs) {
 		dcFuncs.forEach(dcFunc -> {
 			if (dcFunc.getCambios() != null) {
-				// Actualizando las propiedades simples de la funciÛn-rol
+				// Actualizando las propiedades simples de la funci√≥n-rol
 				if (dcFunc.getCambios().containsKey("acceso")) {
 					rm.updateFuncion(dcRol.getIdMap(), dcFunc);
 				}
@@ -367,7 +367,7 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 					}
 				}
 
-				// Actualizando las hijas de la funciÛn
+				// Actualizando las hijas de la funci√≥n
 				if (dcFunc.getCambios().containsKey("hijas")) {
 					updateFuncionesRol(dcRol, (List<DescriptorCambios>) dcFunc.getCambios().get("hijas"));
 				}
@@ -388,7 +388,7 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 	private void updateFunciones(List<DescriptorCambios> dcFuncs) {
 		dcFuncs.forEach(dcFunc -> {
 			if(dcFunc.getCambios() != null) {
-				// Actualizando las propiedades simples de la funciÛn
+				// Actualizando las propiedades simples de la funci√≥n
 				if (dcFunc.getCambios().containsKey("titulo") || 
 					dcFunc.getCambios().containsKey("descripcion") ||
 					dcFunc.getCambios().containsKey("processKey") ||
@@ -396,12 +396,12 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 					dcFunc.getCambios().containsKey("horario")) {
 					fm.update(dcFunc);
 				}
-				// Actualizando los par·metros de la funciÛn
+				// Actualizando los par√°metros de la funci√≥n
 				if (dcFunc.getCambios().containsKey("parametros")) {
 					List<DescriptorCambios> dcParams = (List<DescriptorCambios>) dcFunc.getCambios().get("parametros");
 					dcParams.forEach(dcParam -> {
 						if (dcParam.getCambios() != null) {
-							// Actualizando el valor del par·metro
+							// Actualizando el valor del par√°metro
 							if (dcParam.getCambios().containsKey("valor")) {
 								fm.updateParametro(dcFunc.getIdMap(), dcParam);
 							}
@@ -410,7 +410,7 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 				}
 
 				if (dcFunc.getInserciones() != null) {
-					// Agregando los nuevos par·metros
+					// Agregando los nuevos par√°metros
 					if (dcFunc.getInserciones().containsKey("parametros")) {
 						Funcion f = new Funcion();
 						f.setModulo((Modulo) dcFunc.getIdMap().get("modulo"));
@@ -426,7 +426,7 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 					}
 				}
 
-				// Actualizando las hijas de la funciÛn
+				// Actualizando las hijas de la funci√≥n
 				if (dcFunc.getCambios().containsKey("hijas")) {
 					updateFunciones((List<DescriptorCambios>) dcFunc.getCambios().get("hijas"));
 				}

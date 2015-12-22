@@ -1,6 +1,6 @@
 /**
- * Aquí se deben depositar las implementaciones de las interfaces java que
- * indican que funcionalidad de negocio se puede ejecutar en la aplicación.
+ * AquÃ­ se deben depositar las implementaciones de las interfaces java que
+ * indican que funcionalidad de negocio se puede ejecutar en la aplicaciÃ³n.
  *
  * Ejemplo:
  *

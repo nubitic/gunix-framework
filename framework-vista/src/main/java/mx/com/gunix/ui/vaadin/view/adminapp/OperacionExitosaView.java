@@ -18,7 +18,7 @@ public class OperacionExitosaView extends AbstractGunixView implements SecuredVi
 
 	@Override
 	protected void doConstruct() {
-		addComponent(new Label($("operación")+" Exitosa<\br>Cliente:"+$("cliente"), ContentMode.HTML));
+		addComponent(new Label($("operaciÃ³n")+" Exitosa<\br>Cliente:"+$("cliente"), ContentMode.HTML));
 		
 	}
 

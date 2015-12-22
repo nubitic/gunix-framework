@@ -54,7 +54,7 @@ public class ParametrosForm extends CustomComponent {
 		buildMainLayout();
 		setCompositionRoot(mainLayout);
 		parametrosTable.setTableFieldFactory(new GunixTableFieldFactory());
-		parametrosTable.addContainerProperty("nombre", String.class, "", "Par·metro", null, null);
+		parametrosTable.addContainerProperty("nombre", String.class, "", "Par√°metro", null, null);
 		parametrosTable.addContainerProperty("valor", String.class, "", "Valor", null, null);
 
 		parametrosTable.setColumnExpandRatio("nombre", 1f);
@@ -77,7 +77,7 @@ public class ParametrosForm extends CustomComponent {
 
 		cerrarButton.addClickListener(clickEvnt -> {
 			if (!esSoloLectura && !commit()) {
-				Notification.show("Alguno de los par·metros tiene errores, favor de verificar", Type.ERROR_MESSAGE);
+				Notification.show("Alguno de los par√°metros tiene errores, favor de verificar", Type.ERROR_MESSAGE);
 			} else {
 				window.close();
 			}

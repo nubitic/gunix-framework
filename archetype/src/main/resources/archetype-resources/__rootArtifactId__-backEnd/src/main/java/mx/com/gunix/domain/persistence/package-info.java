@@ -1,5 +1,5 @@
 /**
- * Aquí se deben depositar las interfaces java que indican como mapear los métodos
+ * AquÃ­ se deben depositar las interfaces java que indican como mapear los mÃ©todos
  * de negocio hacia la Base de Datos
  *
  * Ejemplo:

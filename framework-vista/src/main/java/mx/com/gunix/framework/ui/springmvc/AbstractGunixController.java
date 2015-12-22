@@ -38,7 +38,7 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 	@SuppressWarnings("unchecked")
 	protected final S getBean() {
 		if (binder == null) {
-			throw new IllegalStateException("No se puede obtener el Bean dado que no se indicó el tipo específico para la clase genérica AbstractGunixController");
+			throw new IllegalStateException("No se puede obtener el Bean dado que no se indicÃ³ el tipo especÃ­fico para la clase genÃ©rica AbstractGunixController");
 		}
 		return (S) binder.getTarget();
 	}

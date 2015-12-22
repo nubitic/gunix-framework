@@ -1,6 +1,6 @@
-En esta carpeta se deben depositar los recursos utilizados por la vista de la Aplicación
+En esta carpeta se deben depositar los recursos utilizados por la vista de la AplicaciÃ³n
 
-En la subcarpeta img/ las imágenes.
-En el archivo styles/app-styles.css se deben definir las reglas de estilos para la aplicación.
+En la subcarpeta img/ las imÃ¡genes.
+En el archivo styles/app-styles.css se deben definir las reglas de estilos para la aplicaciÃ³n.
 
-Para mayor información consulta: https://vaadin.com/book/vaadin7/-/page/application.resources.html#application.resources.theme
+Para mayor informaciÃ³n consulta: https://vaadin.com/book/vaadin7/-/page/application.resources.html#application.resources.theme

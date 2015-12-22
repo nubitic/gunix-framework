@@ -215,7 +215,7 @@ public class ActivitiServiceImp implements ActivitiService {
 		return tarea;
 	}
 
-	// A las 00:00 todos los días
+	// A las 00:00 todos los dÃ­as
 	@Scheduled(cron = "0 0 0 * * *")
 	public void eliminaTodasLasInstanciasVolatilesTerminadasOIniciadasHaceMasDe35Minutos() {
 		if(Boolean.valueOf(System.getenv("ACTIVITI_MASTER"))) {

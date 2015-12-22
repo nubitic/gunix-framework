@@ -129,11 +129,11 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 	@Override
 	protected void doConstruct() {
 
-		esConsulta = "Consulta".equals($("operaci髇"));
-		esModificacion = "Modificaci髇".equals($("operaci髇"));
+		esConsulta = "Consulta".equals($("operaci贸n"));
+		esModificacion = "Modificaci贸n".equals($("operaci贸n"));
 
 		flyt.setIcon(new ThemeResource("img/1440816106_window.png"));
-		flyt.setCaption(new StringBuilder($("operaci髇").toString()).append(" de Aplicaciones").toString());
+		flyt.setCaption(new StringBuilder($("operaci贸n").toString()).append(" de Aplicaciones").toString());
 
 		buildMainLayout();
 		modulosRolesAcc.getTab(0).setIcon(new ThemeResource("img/1440815258_blockdevice.png"));
@@ -318,7 +318,7 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 			}
 			if (esModificacion) {
 				Variable<String> accionVar = new Variable<String>();
-				accionVar.setNombre("acci髇");
+				accionVar.setNombre("acci贸n");
 				accionVar.setValor(cancelar ? "Cancelar" : "Guardar");
 				vars.add(accionVar);
 			}
@@ -432,7 +432,7 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 	}
 
 	private void showModuloPopup(Modulo mod, boolean soloLectura) {
-		final Window window = new Window("Nuevo M骴ulo");
+		final Window window = new Window("Nuevo M贸dulo");
 		window.setWidth("25%");
 		window.setModal(true);
 		window.setClosable(false);
@@ -452,7 +452,7 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 			if ((m = ((ModuloForm) window.getContent()).getModulo()) != null) {
 				if (moduloExiste(m)) {
 					showModuloPopup(m, false);
-					Notification.show("Ya existe un m骴ulo con el id " + m.getIdModulo(), Type.ERROR_MESSAGE);
+					Notification.show("Ya existe un m贸dulo con el id " + m.getIdModulo(), Type.ERROR_MESSAGE);
 				} else {
 					addModuloTab(m);
 				}
@@ -475,7 +475,7 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 				aplicacion.setModulos(new ArrayList<Modulo>());
 			}
 			
-			if (esModificacion && aplicacion.getModulos().indexOf(m) < 0) { //Solo si es modificaci髇 nos interesa verificar si el modulo ya existe antes de agregarlo
+			if (esModificacion && aplicacion.getModulos().indexOf(m) < 0) { //Solo si es modificaci贸n nos interesa verificar si el modulo ya existe antes de agregarlo
 				aplicacion.getModulos().add(m);
 			} else {
 				if(!esModificacion) {
@@ -599,7 +599,7 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 
 		// descripcion
 		descripcion = new TextField();
-		descripcion.setCaption("Descripci髇");
+		descripcion.setCaption("Descripci贸n");
 		descripcion.setImmediate(false);
 		descripcion.setWidth("-1px");
 		descripcion.setHeight("-1px");
@@ -638,7 +638,7 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 
 		// modulosPanel
 		modulosPanel = buildModulosPanel();
-		modulosRolesAcc.addTab(modulosPanel, "M骴ulos", null);
+		modulosRolesAcc.addTab(modulosPanel, "M贸dulos", null);
 
 		// rolesPanel
 		rolesPanel = buildRolesPanel();

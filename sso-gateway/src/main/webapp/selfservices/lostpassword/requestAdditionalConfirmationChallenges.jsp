@@ -20,7 +20,7 @@
   ~
   --%>
 
-<%@page contentType="text/html; charset=iso-8859-1" language="java" session="true" %>
+<%@page contentType="text/html; charset=UTF-8" language="java" session="true" %>
 <!--
 Redirects the user to the proper login page.  Configured as the login url the web.xml for this application.
 -->

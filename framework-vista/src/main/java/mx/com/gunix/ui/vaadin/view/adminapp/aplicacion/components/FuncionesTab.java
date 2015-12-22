@@ -48,7 +48,7 @@ public class FuncionesTab extends CustomComponent {
 
 	/*- VaadinEditorProperties={"grid":"RegularGrid,20","showGrid":true,"snapToGrid":true,"snapToObject":true,"movingGuides":false,"snappingDistance":10} */
 	private static final long serialVersionUID = 1L;
-	private static final String DESC_MODULO = "Módulo ";
+	private static final String DESC_MODULO = "MÃ³dulo ";
 
 	/**
 	 * The constructor should first build the main layout, set the composition
@@ -62,9 +62,9 @@ public class FuncionesTab extends CustomComponent {
 		setCompositionRoot(mainLayout);
 
 		funcionesTreeTable.setTableFieldFactory(new GunixTableFieldFactory());
-		funcionesTreeTable.addContainerProperty("idFuncion", String.class, "", "Id Función", null, null);
-		funcionesTreeTable.addContainerProperty("titulo", String.class, "", "Título", null, null);
-		funcionesTreeTable.addContainerProperty("descripcion", String.class, "", "Descripción", null, null);
+		funcionesTreeTable.addContainerProperty("idFuncion", String.class, "", "Id FunciÃ³n", null, null);
+		funcionesTreeTable.addContainerProperty("titulo", String.class, "", "TÃ­tulo", null, null);
+		funcionesTreeTable.addContainerProperty("descripcion", String.class, "", "DescripciÃ³n", null, null);
 		funcionesTreeTable.addContainerProperty("processKey", String.class, "", "Proceso", null, null);
 
 		if (!soloLectura && !esParaRoles) {
@@ -284,8 +284,8 @@ public class FuncionesTab extends CustomComponent {
 	}
 
 	private Button buildParametrosButton(Funcion f, boolean esSoloLectura) {
-		Button button = new Button("Parámetros", newFuncButtonEvent -> {
-			final Window window = new Window("Parámetros");
+		Button button = new Button("ParÃ¡metros", newFuncButtonEvent -> {
+			final Window window = new Window("ParÃ¡metros");
 			window.setWidth("25%");
 			window.setModal(true);
 			window.setClosable(false);
@@ -410,7 +410,7 @@ public class FuncionesTab extends CustomComponent {
 		funcionesTreeTable.setComponentError(null);
 		HierarchicalContainer container = (HierarchicalContainer) funcionesTreeTable.getContainerDataSource();
 		if (!validaFunciones(container, modulo.getFunciones())) {
-			throw new CommitException("El módulo " + modulo.getIdModulo() + " tiene errores");
+			throw new CommitException("El mÃ³dulo " + modulo.getIdModulo() + " tiene errores");
 		} else {
 			moduloBFG.commit(ibve -> {
 			});
@@ -524,7 +524,7 @@ public class FuncionesTab extends CustomComponent {
 
 		// agregarFuncion
 		agregarFuncion = new Button();
-		agregarFuncion.setCaption("Agregar Menú");
+		agregarFuncion.setCaption("Agregar MenÃº");
 		agregarFuncion.setImmediate(true);
 		agregarFuncion.setWidth("-1px");
 		agregarFuncion.setHeight("-1px");

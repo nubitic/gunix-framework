@@ -29,7 +29,7 @@ public final class EmbeddedPostgreSQLManager {
 
 	public static void start(String pgsqlHome, String usuario, String password, String database, ClassLoader classLoader) {
 		log.warn("Iniciando servidor local PostgreSQL (no se recomienda el uso de este servidor para un ambiente diferente a DESARROLLO)");
-		// Validando si en el home indicado ya existe una instalaciÛn de postgreSQL
+		// Validando si en el home indicado ya existe una instalaci√≥n de postgreSQL
 		File pgsqlHomeFile = null;
 		String os = null;
 
@@ -43,7 +43,7 @@ public final class EmbeddedPostgreSQLManager {
 
 		File realPgsqlHomeFile = "pgsql".equalsIgnoreCase(pgsqlHomeFile.getName()) ? pgsqlHomeFile : new File(pgsqlHomeFile, "pgsql");
 		if (!realPgsqlHomeFile.exists()) {
-			// Como no existe una instalaciÛn de postgresql se procede a instalarlo
+			// Como no existe una instalaci√≥n de postgresql se procede a instalarlo
 			os = System.getProperty("os.name").toLowerCase();
 			String arch = null;
 			String osType = null;
@@ -67,7 +67,7 @@ public final class EmbeddedPostgreSQLManager {
 				log.info("Descargando PostgreSQL");
 				downloadPostgreSQLDist(pgsqlHomeFile, osType, arch);
 			} catch (IOException e) {
-				throw new RuntimeException("No fue posible descargar la distribuciÛn de PostgreSQL", e);
+				throw new RuntimeException("No fue posible descargar la distribuci√≥n de PostgreSQL", e);
 			}
 		}
 		pgsqlHomeFile = realPgsqlHomeFile;
@@ -80,7 +80,7 @@ public final class EmbeddedPostgreSQLManager {
 			passwordWriter.write(password);
 			passwordWriter.close();
 		} catch (IOException e) {
-			throw new RuntimeException("No fue posible crear el archivo para la contraseÒa");
+			throw new RuntimeException("No fue posible crear el archivo para la contrase√±a");
 		}
 		boolean isNewServer = false;
 		if (!dataDir.exists() || !(new File(dataDir, "postgresql.conf").exists())) {
@@ -113,7 +113,7 @@ public final class EmbeddedPostgreSQLManager {
 		log.info("host: localhost");
 		log.info("puerto: 5432");
 		log.info("usuario: " + usuario);
-		log.info("contraseÒa: " + password);
+		log.info("contrase√±a: " + password);
 		log.info("base de datos: " + database);
 	}
 
@@ -150,7 +150,7 @@ public final class EmbeddedPostgreSQLManager {
 				throw new RuntimeException("No fue posible ejecuar el script ");
 			}
 		} catch (IOException | InterruptedException e) {
-			throw new RuntimeException("No fue posible verificar si la base de datos ya se est· ejecutando", e);
+			throw new RuntimeException("No fue posible verificar si la base de datos ya se est√° ejecutando", e);
 		}
 	}
 
@@ -173,7 +173,7 @@ public final class EmbeddedPostgreSQLManager {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			String readedLine = null;
 			while ((readedLine = reader.readLine()) != null) {
-				// Si la lÌnea actual es la columna existe_seguridad, leo dos posiciones m·s para determinar si el esquema existe o no
+				// Si la l√≠nea actual es la columna existe_seguridad, leo dos posiciones m√°s para determinar si el esquema existe o no
 				if (readedLine.contains("existe_seguridad") && (readedLine = reader.readLine()) != null && "1".equals(readedLine = reader.readLine().trim())) {
 					reader.close();
 					return true;
@@ -181,7 +181,7 @@ public final class EmbeddedPostgreSQLManager {
 			}
 			return false;
 		} catch (IOException | InterruptedException e) {
-			throw new RuntimeException("No fue posible verificar si la base de datos ya se est· ejecutando", e);
+			throw new RuntimeException("No fue posible verificar si la base de datos ya se est√° ejecutando", e);
 		}
 	}
 
@@ -234,7 +234,7 @@ public final class EmbeddedPostgreSQLManager {
 		return new File(new File(pgsqlHomeFile, "bin"), command).getAbsolutePath();
 	}
 
-	private static void start(File pgsqlHomeFile, String dataDir, String usuario, String contraseÒa) {
+	private static void start(File pgsqlHomeFile, String dataDir, String usuario, String contrase√±a) {
 		try {
 			List<String> cmd = new ArrayList<String>();
 			cmd.add(getCommandPath(pgsqlHomeFile, "postgres"));
@@ -247,12 +247,12 @@ public final class EmbeddedPostgreSQLManager {
 			Process process = processBuilder.start();
 
 			if (process.isAlive()) {
-				while (!started(pgsqlHomeFile, usuario, contraseÒa)) {
+				while (!started(pgsqlHomeFile, usuario, contrase√±a)) {
 					Thread.sleep(3000);
 				}
 			} else {
 				log(process);
-				if (!started(pgsqlHomeFile, usuario, contraseÒa)) {
+				if (!started(pgsqlHomeFile, usuario, contrase√±a)) {
 					throw new RuntimeException("No fue posible iniciar la base de datos");
 				}
 			}
@@ -262,7 +262,7 @@ public final class EmbeddedPostgreSQLManager {
 
 	}
 
-	private static boolean started(File pgsqlHomeFile, String usuario, String contraseÒa) {
+	private static boolean started(File pgsqlHomeFile, String usuario, String contrase√±a) {
 		try {
 			List<String> cmd = new ArrayList<String>();
 			cmd.add(getCommandPath(pgsqlHomeFile, "psql"));
@@ -277,7 +277,7 @@ public final class EmbeddedPostgreSQLManager {
 			log(process);
 			return process.exitValue() == 0;
 		} catch (IOException | InterruptedException e) {
-			throw new RuntimeException("No fue posible verificar si la base de datos ya se est· ejecutando", e);
+			throw new RuntimeException("No fue posible verificar si la base de datos ya se est√° ejecutando", e);
 		}
 	}
 
@@ -382,7 +382,7 @@ public final class EmbeddedPostgreSQLManager {
 					;
 
 			} catch (Exception e) {
-				throw new RuntimeException("No fue posible instalar las librerÌas de Visual Studio C++ necesarias para ejecutar postgreSQL", e);
+				throw new RuntimeException("No fue posible instalar las librer√≠as de Visual Studio C++ necesarias para ejecutar postgreSQL", e);
 			}
 		}
 	}
@@ -419,7 +419,7 @@ public final class EmbeddedPostgreSQLManager {
 		zis.closeEntry();
 		zis.close();
 
-		log.info("extracciÛn completada con Èxito!!");
+		log.info("extracci√≥n completada con √©xito!!");
 	}
 
 	private static void extractTar(File downloadedFile, String postgreSQLAbsPath) throws IOException {
@@ -462,6 +462,6 @@ public final class EmbeddedPostgreSQLManager {
 		/** Close the input stream **/
 
 		tarIn.close();
-		log.info("extracciÛn completada con Èxito!!");
+		log.info("extracci√≥n completada con √©xito!!");
 	}
 }

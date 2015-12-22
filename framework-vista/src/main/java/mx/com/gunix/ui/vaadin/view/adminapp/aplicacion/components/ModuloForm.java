@@ -160,7 +160,7 @@ public class ModuloForm extends CustomComponent {
 
 		// descripcion
 		descripcion = new TextField();
-		descripcion.setCaption("Descripción");
+		descripcion.setCaption("DescripciÃ³n");
 		descripcion.setImmediate(false);
 		descripcion.setWidth("-1px");
 		descripcion.setHeight("-1px");

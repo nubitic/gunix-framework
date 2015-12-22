@@ -1,5 +1,5 @@
 /**
- * Aquí se deben depositar las clases java que representan las vistas
+ * AquÃ­ se deben depositar las clases java que representan las vistas
  * del sistema
  *
  * Ejemplo:

@@ -34,15 +34,15 @@ public class HessianServiceAdvice {
 			ControlFlow controlFlow = null;
 			
 			Object principal = (SecurityContextHolder.getContext().getAuthentication()==null && 
-								((pjp.getSignature().getDeclaringType().equals(UsuarioService.class) &&				// Excepciones para las que se acepta autenticación null
+								((pjp.getSignature().getDeclaringType().equals(UsuarioService.class) &&				// Excepciones para las que se acepta autenticaciÃ³n null
 							     (pjp.getSignature().getName().equals("getAnonymous") || 							// UsuarioService.getAnonymous(),
 							      (pjp.getSignature().getName().equals("getUsuario") && 							// UsuarioService.getUsuario() siempre y cuando provenga de:
-							       ((controlFlow= ControlFlowFactory.createControlFlow()).under(PersistentTokenBasedRememberMeServices.class, "processAutoLoginCookie") || // PersistentTokenBasedRememberMeServices.processAutoLoginCookie ó 
-							    		   									  controlFlow.under(UsernamePasswordAuthenticationFilter.class, "attemptAuthentication") 	|| // UsernamePasswordAuthenticationFilter.attemptAuthentication ó 
+							       ((controlFlow= ControlFlowFactory.createControlFlow()).under(PersistentTokenBasedRememberMeServices.class, "processAutoLoginCookie") || // PersistentTokenBasedRememberMeServices.processAutoLoginCookie Ã³ 
+							    		   									  controlFlow.under(UsernamePasswordAuthenticationFilter.class, "attemptAuthentication") 	|| // UsernamePasswordAuthenticationFilter.attemptAuthentication Ã³ 
 							    		   									  controlFlow.under(JOSSOAuthenticationProvider.class, "authenticate")))))			|| // JOSSOAuthenticationProvider.authenticate,
-							    (pjp.getSignature().getDeclaringType().equals(PersistentTokenRepository.class) &&	// ó 
-							     (pjp.getSignature().getName().equals("getTokenForSeries") || 						// PersistentTokenRepository.getTokenForSeries() ó
-							      pjp.getSignature().getName().equals("updateToken") || 							// PersistentTokenRepository.getTokenForSeries() ó
+							    (pjp.getSignature().getDeclaringType().equals(PersistentTokenRepository.class) &&	// Ã³ 
+							     (pjp.getSignature().getName().equals("getTokenForSeries") || 						// PersistentTokenRepository.getTokenForSeries() Ã³
+							      pjp.getSignature().getName().equals("updateToken") || 							// PersistentTokenRepository.getTokenForSeries() Ã³
 							      pjp.getSignature().getName().equals("removeUserTokens")) 							// PersistentTokenRepository.removeUserTokens
 							    )))?																				
 								null

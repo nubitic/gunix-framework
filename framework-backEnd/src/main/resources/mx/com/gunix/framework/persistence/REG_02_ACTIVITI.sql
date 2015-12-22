@@ -1,4 +1,4 @@
-﻿SET SEARCH_PATH=ACTIVITI;
+SET SEARCH_PATH=ACTIVITI;
 
 drop table if exists ACT_ID_INFO cascade;
 drop table if exists ACT_ID_GROUP cascade;

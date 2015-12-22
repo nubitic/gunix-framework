@@ -1,3 +1,3 @@
-En esta carpeta se deben depositar las definiciones de los procesos de negocio utilizados en la Aplicación
+En esta carpeta se deben depositar las definiciones de los procesos de negocio utilizados en la AplicaciÃ³n
 
-Para mayor información consulta: http://www.activiti.org/userguide/#activitiDesigner
+Para mayor informaciÃ³n consulta: http://www.activiti.org/userguide/#activitiDesigner

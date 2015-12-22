@@ -124,7 +124,7 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 
 	protected final S getBean() {
 		if (fieldGroup == null) {
-			throw new IllegalStateException("No se puede obtener el Bean dado que no se indicó el tipo específico para la clase genérica AbstractGunixView");
+			throw new IllegalStateException("No se puede obtener el Bean dado que no se indicÃ³ el tipo especÃ­fico para la clase genÃ©rica AbstractGunixView");
 		}
 		return fieldGroup.getItemDataSource().getBean();
 	}
@@ -141,7 +141,7 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 
 	private void validaFieldGroup() {
 		if (fieldGroup == null) {
-			throw new IllegalStateException("No se puede dar commit dado que no se indicó el tipo específico para la clase genérica AbstractGunixView");
+			throw new IllegalStateException("No se puede dar commit dado que no se indicÃ³ el tipo especÃ­fico para la clase genÃ©rica AbstractGunixView");
 		}
 	}
 

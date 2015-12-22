@@ -1,4 +1,4 @@
-En esta carpeta se deben depositar las Java Server Pages de la Aplicaci髇
+En esta carpeta se deben depositar las Java Server Pages de la Aplicaci贸n
 
 Ejemplo:
 
@@ -8,7 +8,7 @@ Ejemplo:
 
 <article class="module width_full">
 	<header>
-		<h3>${operaci髇} de Cliente</h3>
+		<h3>${operaci贸n} de Cliente</h3>
 	</header>
 	<div class="module_content">
 		<c:if test="${not empty errores}">
@@ -23,7 +23,7 @@ Ejemplo:
 			<form:input path="rfc" />
 			<form:errors path="rfc" cssClass="alert_error" element="h4"/>
 			
-			<label>Raz髇 Social</label>
+			<label>Raz贸n Social</label>
 			<form:input path="razonSocial" />
 			<form:errors path="razonSocial" cssClass="alert_error" element="h4"/>
 		</fieldset>
@@ -36,7 +36,7 @@ Ejemplo:
 	</footer>
 </article>
 
-Para mayor informaci髇 consulta: 
+Para mayor informaci贸n consulta: 
 
 http://docs.spring.io/spring/docs/current/spring-framework-reference/html/view.html#view-jsp
 http://docs.oracle.com/javaee/5/tutorial/doc/bnake.html

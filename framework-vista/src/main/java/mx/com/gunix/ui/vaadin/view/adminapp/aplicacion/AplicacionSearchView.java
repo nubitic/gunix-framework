@@ -55,7 +55,7 @@ public class AplicacionSearchView extends AbstractGunixView<Aplicacion> {
 	protected void doConstruct() {
 
 		flyt.setIcon(new ThemeResource("img/1440816106_window.png"));
-		flyt.setCaption(new StringBuilder($("operaci髇").toString()).append(" de Aplicaciones").toString());
+		flyt.setCaption(new StringBuilder($("operaci贸n").toString()).append(" de Aplicaciones").toString());
 
 		idAplicacion = new TextField();
 		idAplicacion.setCaption("Id Aplicacion");
@@ -68,7 +68,7 @@ public class AplicacionSearchView extends AbstractGunixView<Aplicacion> {
 		flyt.addComponent(idAplicacion);
 
 		descripcion = new TextField();
-		descripcion.setCaption("Descripci髇");
+		descripcion.setCaption("Descripci贸n");
 		descripcion.setImmediate(false);
 		descripcion.setRequired(false);
 		descripcion.setNullRepresentation("");
@@ -102,8 +102,8 @@ public class AplicacionSearchView extends AbstractGunixView<Aplicacion> {
 		resultadosTable.setSelectable(true);
 		resultadosTable.setMultiSelect(false);
 
-		resultadosTable.addContainerProperty("idAplicacion", String.class, "", "Id Aplicaci髇", null, null);
-		resultadosTable.addContainerProperty("descripcion", String.class, "", "Descripci髇", null, null);
+		resultadosTable.addContainerProperty("idAplicacion", String.class, "", "Id Aplicaci贸n", null, null);
+		resultadosTable.addContainerProperty("descripcion", String.class, "", "Descripci贸n", null, null);
 
 		resultadosTable.setColumnExpandRatio("idAplicacion", 0.5f);
 		resultadosTable.setColumnExpandRatio("descripcion", 1f);

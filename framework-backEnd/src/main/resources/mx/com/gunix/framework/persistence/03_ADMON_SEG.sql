@@ -1,4 +1,4 @@
-﻿/*declare @owner_user;
+/*declare @owner_user;
 SET @owner_user = 'exsipqluzgntfw';*/
 
 CREATE SCHEMA IF NOT EXISTS ADMON_SEG /*AUTHORIZATION @owner_user*/;

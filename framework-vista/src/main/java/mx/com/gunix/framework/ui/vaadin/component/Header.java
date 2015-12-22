@@ -254,7 +254,7 @@ public class Header extends CustomComponent {
 									switch (today) {
 									case SUNDAY:
 									case SATURDAY:
-										Notification.show("Funcionalidad Cerrada", "La funcionalidad seleccionada se encuentra disponible sólo de lunes a viernes", Type.ERROR_MESSAGE);
+										Notification.show("Funcionalidad Cerrada", "La funcionalidad seleccionada se encuentra disponible sÃ³lo de lunes a viernes", Type.ERROR_MESSAGE);
 										break;
 									default:
 										iniciaProceso(funcion);
@@ -265,14 +265,14 @@ public class Header extends CustomComponent {
 									switch (today) {
 									case SUNDAY:
 									case SATURDAY:
-										Notification.show("Funcionalidad Cerrada", "La funcionalidad seleccionada se encuentra disponible sólo de lunes a viernes en el Horario de 09:00 a 18:00", Type.ERROR_MESSAGE);
+										Notification.show("Funcionalidad Cerrada", "La funcionalidad seleccionada se encuentra disponible sÃ³lo de lunes a viernes en el Horario de 09:00 a 18:00", Type.ERROR_MESSAGE);
 										break;
 									default:
 										int hora = now.getHour();
 										if (hora >= 9 && hora <= 18) {
 											iniciaProceso(funcion);
 										} else {
-											Notification.show("Funcionalidad Cerrada", "La funcionalidad seleccionada se encuentra disponible sólo de lunes a viernes en el Horario de 09:00 a 18:00", Type.ERROR_MESSAGE);
+											Notification.show("Funcionalidad Cerrada", "La funcionalidad seleccionada se encuentra disponible sÃ³lo de lunes a viernes en el Horario de 09:00 a 18:00", Type.ERROR_MESSAGE);
 										}
 										break;
 									}

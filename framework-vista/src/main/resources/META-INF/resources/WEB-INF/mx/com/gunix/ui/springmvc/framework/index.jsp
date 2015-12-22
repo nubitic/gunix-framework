@@ -48,7 +48,7 @@
 		<section id="secondary_bar">
 			<div class="user">
 				<p><sec:authentication property="principal.username" /></p>
-				<a class="logout_user" href="<spring:url value="/logout"/>" title="Logout">Cerrar Sesión</a>
+				<a class="logout_user" href="<spring:url value="/logout"/>" title="Logout">Cerrar SesiÃ³n</a>
 			</div>
 			<div class="breadcrumbs_container" id="breadcrumb">
 			</div>

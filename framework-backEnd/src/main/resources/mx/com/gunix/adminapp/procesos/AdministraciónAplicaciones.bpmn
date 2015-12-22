@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="VOLATIL">
-  <process id="AdministraciónAplicaciones" name="Administración de Aplicaciones Gunix" isExecutable="true" activiti:candidateStarterGroups="ADMINISTRADOR">
+  <process id="AdministraciÃ³nAplicaciones" name="AdministraciÃ³n de Aplicaciones Gunix" isExecutable="true" activiti:candidateStarterGroups="ADMINISTRADOR">
     <startEvent id="startevent1" name="Start"></startEvent>
     <endEvent id="terminateendevent1" name="TerminateEndEvent">
       <terminateEventDefinition></terminateEventDefinition>
@@ -9,7 +9,7 @@
       <startEvent id="startevent2" name="Start"></startEvent>
       <userTask id="usertask1" name="Formulario" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.aplicacion.AplicacionView"></userTask>
       <sequenceFlow id="flow4" sourceRef="startevent2" targetRef="usertask1"></sequenceFlow>
-      <serviceTask id="servicetask1" name="Validación" activiti:expression="${aplicacionService.isValid(aplicacion)}" activiti:resultVariableName="esValido"></serviceTask>
+      <serviceTask id="servicetask1" name="ValidaciÃ³n" activiti:expression="${aplicacionService.isValid(aplicacion)}" activiti:resultVariableName="esValido"></serviceTask>
       <sequenceFlow id="flow5" sourceRef="usertask1" targetRef="servicetask1"></sequenceFlow>
       <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
       <sequenceFlow id="flow6" sourceRef="servicetask1" targetRef="exclusivegateway2"></sequenceFlow>
@@ -27,13 +27,13 @@
     </subProcess>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="exclusivegateway1"></sequenceFlow>
-    <sequenceFlow id="flowAlta" name="operación == 'Alta'" sourceRef="exclusivegateway1" targetRef="alta">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${operación=="Alta"}]]></conditionExpression>
+    <sequenceFlow id="flowAlta" name="operaciÃ³n == 'Alta'" sourceRef="exclusivegateway1" targetRef="alta">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${operaciÃ³n=="Alta"}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow3" sourceRef="alta" targetRef="terminateendevent1"></sequenceFlow>
     <subProcess id="consulta" name="Consulta de Aplicaciones">
       <startEvent id="startevent3" name="Start"></startEvent>
-      <userTask id="usertask4" name="Formulario Búsqueda" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.aplicacion.AplicacionSearchView"></userTask>
+      <userTask id="usertask4" name="Formulario BÃºsqueda" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.aplicacion.AplicacionSearchView"></userTask>
       <sequenceFlow id="flow14" sourceRef="startevent3" targetRef="usertask4"></sequenceFlow>
       <serviceTask id="servicetask3" name="Consulta" activiti:expression="${aplicacionService.getByExample(esMaestro,aplicacion)}" activiti:resultVariableName="resultado"></serviceTask>
       <sequenceFlow id="flow15" sourceRef="usertask4" targetRef="servicetask3"></sequenceFlow>
@@ -48,13 +48,13 @@
       </sequenceFlow>
       <sequenceFlow id="flow19" sourceRef="usertask5" targetRef="startevent3"></sequenceFlow>
     </subProcess>
-    <sequenceFlow id="flowConsulta" name="operación == 'Consulta'" sourceRef="exclusivegateway1" targetRef="consulta">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${operación=="Consulta"}]]></conditionExpression>
+    <sequenceFlow id="flowConsulta" name="operaciÃ³n == 'Consulta'" sourceRef="exclusivegateway1" targetRef="consulta">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${operaciÃ³n=="Consulta"}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow13" sourceRef="consulta" targetRef="terminateendevent1"></sequenceFlow>
-    <subProcess id="modificacion" name="Modificación de Aplicaciones">
+    <subProcess id="modificacion" name="ModificaciÃ³n de Aplicaciones">
       <startEvent id="startevent4" name="Start"></startEvent>
-      <userTask id="usertask7" name="Formulario Búsqueda" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.aplicacion.AplicacionSearchView"></userTask>
+      <userTask id="usertask7" name="Formulario BÃºsqueda" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.aplicacion.AplicacionSearchView"></userTask>
       <sequenceFlow id="flow20" sourceRef="startevent4" targetRef="usertask7"></sequenceFlow>
       <serviceTask id="servicetask4" name="Consulta" activiti:expression="${aplicacionService.getByExample(esMaestro,aplicacion)}" activiti:resultVariableName="resultado"></serviceTask>
       <sequenceFlow id="flow21" sourceRef="usertask7" targetRef="servicetask4"></sequenceFlow>
@@ -70,24 +70,24 @@
       <exclusiveGateway id="exclusivegateway5" name="Exclusive Gateway"></exclusiveGateway>
       <sequenceFlow id="flow25" sourceRef="usertask8" targetRef="exclusivegateway5"></sequenceFlow>
       <sequenceFlow id="flow26" name="cancelar" sourceRef="exclusivegateway5" targetRef="startevent4">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${acción=="Cancelar"}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${acciÃ³n=="Cancelar"}]]></conditionExpression>
       </sequenceFlow>
       <serviceTask id="servicetask5" name="Guarda" activiti:expression="${aplicacionService.update(aplicacion, aplicacionActualizada)}"></serviceTask>
       <sequenceFlow id="flow27" name="guardar" sourceRef="exclusivegateway5" targetRef="servicetask5">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${acción=="Guardar"}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${acciÃ³n=="Guardar"}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="usertask9" name="Modificación Exitosa" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.OperacionExitosaView"></userTask>
+      <userTask id="usertask9" name="ModificaciÃ³n Exitosa" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.OperacionExitosaView"></userTask>
       <sequenceFlow id="flow28" sourceRef="servicetask5" targetRef="usertask9"></sequenceFlow>
       <endEvent id="endevent2" name="End"></endEvent>
       <sequenceFlow id="flow29" sourceRef="usertask9" targetRef="endevent2"></sequenceFlow>
     </subProcess>
-    <sequenceFlow id="flow30" name="operación=='Modificación'" sourceRef="exclusivegateway1" targetRef="modificacion">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${operación=="Modificación"}]]></conditionExpression>
+    <sequenceFlow id="flow30" name="operaciÃ³n=='ModificaciÃ³n'" sourceRef="exclusivegateway1" targetRef="modificacion">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${operaciÃ³n=="ModificaciÃ³n"}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow31" sourceRef="modificacion" targetRef="terminateendevent1"></sequenceFlow>
   </process>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_AdministraciónAplicaciones">
-    <bpmndi:BPMNPlane bpmnElement="AdministraciónAplicaciones" id="BPMNPlane_AdministraciónAplicaciones">
+  <bpmndi:BPMNDiagram id="BPMNDiagram_AdministraciÃ³nAplicaciones">
+    <bpmndi:BPMNPlane bpmnElement="AdministraciÃ³nAplicaciones" id="BPMNPlane_AdministraciÃ³nAplicaciones">
       <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
         <omgdc:Bounds height="35.0" width="35.0" x="30.0" y="563.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>

@@ -1,4 +1,4 @@
-﻿set search_path to SEGURIDAD;
+set search_path to SEGURIDAD;
 
 drop function if exists MENU_USUARIO(text);
 DROP TABLE if exists PERSISTENT_LOGINS cascade;
