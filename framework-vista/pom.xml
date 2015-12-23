@@ -14,15 +14,15 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<repositories>
-	 	<repository>
-	      <id>central</id>
-	      <name>Central Repository</name>
-	      <url>http://repo.maven.apache.org/maven2</url>
-	      <layout>default</layout>
-	      <snapshots>
-	        <enabled>false</enabled>
-	      </snapshots>
-	    </repository>
+		<repository>
+			<id>central</id>
+			<name>Central Repository</name>
+			<url>http://repo.maven.apache.org/maven2</url>
+			<layout>default</layout>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 		<repository>
 			<id>vaadin-addons</id>
 			<url>http://maven.vaadin.com/vaadin-addons</url>
@@ -57,6 +57,11 @@
 				<checksumPolicy>fail</checksumPolicy>
 				<enabled>false</enabled>
 			</snapshots>
+		</repository>
+		<repository>
+			<id>central red</id>
+			<name>Central Repository</name>
+			<url>http://repo.maven.apache.org/maven2</url>
 		</repository>
 		<repository>
 			<id>lexaden</id>
@@ -333,21 +338,21 @@
 					</execution>
 				</executions>
 			</plugin>
-	 <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-eclipse-plugin</artifactId>
-        <version>2.10</version>
-        <configuration>
-          <additionalConfig>
-            <file>
-              <name>.settings/org.eclipse.core.resources.prefs</name>
-              <content>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.10</version>
+				<configuration>
+					<additionalConfig>
+						<file>
+							<name>.settings/org.eclipse.core.resources.prefs</name>
+							<content>
                 <![CDATA[eclipse.preferences.version=1${line.separator}encoding/<project>=${project.build.sourceEncoding}${line.separator}]]>
-              </content>
-            </file>
-          </additionalConfig>
-        </configuration>
-      </plugin>
+							</content>
+						</file>
+					</additionalConfig>
+				</configuration>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
