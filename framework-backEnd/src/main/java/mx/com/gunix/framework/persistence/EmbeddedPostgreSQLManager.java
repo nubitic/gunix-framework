@@ -1,7 +1,5 @@
 package mx.com.gunix.framework.persistence;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,9 +16,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.log4j.Logger;
 
@@ -32,6 +27,7 @@ public final class EmbeddedPostgreSQLManager {
 		// Validando si en el home indicado ya existe una instalación de postgreSQL
 		File pgsqlHomeFile = null;
 		String os = null;
+		String esMXLocale=null;
 
 		pgsqlHomeFile = new File(pgsqlHome);
 
@@ -52,7 +48,9 @@ public final class EmbeddedPostgreSQLManager {
 				String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
 				arch = arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64") ? "64" : "32";
 				osType = "win";
+				esMXLocale="es-MX";
 			} else {
+				esMXLocale="es_MX.utf8";
 				if (os.indexOf("mac") >= 0) {
 					osType = "mac";
 				} else {
@@ -88,7 +86,7 @@ public final class EmbeddedPostgreSQLManager {
 			// Si no existe un servidor configurado, se procede a inicializar
 			// uno
 			dataDir.mkdir();
-			initServer(pgsqlHomeFile, usuario, passwordFile.getAbsolutePath(), database, dataDir.getAbsolutePath());
+			initServer(pgsqlHomeFile, usuario, passwordFile.getAbsolutePath(), database, dataDir.getAbsolutePath(), esMXLocale);
 			isNewServer = true;
 		}
 
@@ -185,7 +183,7 @@ public final class EmbeddedPostgreSQLManager {
 		}
 	}
 
-	private static void initServer(File pgsqlHomeFile, String usuario, String password, String database, String dataDir) {
+	private static void initServer(File pgsqlHomeFile, String usuario, String password, String database, String dataDir, String esMXLocale) {
 		try {
 			List<String> cmd = new ArrayList<String>();
 			cmd.add(getCommandPath(pgsqlHomeFile, "initdb"));
@@ -196,7 +194,7 @@ public final class EmbeddedPostgreSQLManager {
 			cmd.add("-E");
 			cmd.add("UTF8");
 			cmd.add("--locale");
-			cmd.add("es-MX");
+			cmd.add(esMXLocale);
 			cmd.add("--pwfile");
 			cmd.add(password);
 
@@ -424,44 +422,27 @@ public final class EmbeddedPostgreSQLManager {
 
 	private static void extractTar(File downloadedFile, String postgreSQLAbsPath) throws IOException {
 		log.info("Extrayendo: " + downloadedFile.getName());
-		/** create a TarArchiveInputStream object. **/
+		
+		new File(postgreSQLAbsPath).mkdirs();
 
-		FileInputStream fin = new FileInputStream(downloadedFile);
-		BufferedInputStream in = new BufferedInputStream(fin);
-		GzipCompressorInputStream gzIn = new GzipCompressorInputStream(in);
-		TarArchiveInputStream tarIn = new TarArchiveInputStream(gzIn);
+		List<String> cmd = new ArrayList<String>();
+		
+		cmd.add("tar");
+		cmd.add("-zxvf");
+		cmd.add(downloadedFile.getAbsolutePath());
+		cmd.add("-C");
+		cmd.add(postgreSQLAbsPath);
 
-		TarArchiveEntry entry = null;
-
-		/** Read the tar entries using the getNextEntry method **/
-
-		while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
-			/** If the entry is a directory, create the directory. **/
-
-			if (entry.isDirectory()) {
-
-				File f = new File(postgreSQLAbsPath + entry.getName());
-				f.mkdirs();
-			}
-			/**
-			 * If the entry is a file,write the decompressed file to the disk and close destination stream.
-			 **/
-			else {
-				int count;
-				byte data[] = new byte[4096];
-
-				FileOutputStream fos = new FileOutputStream(postgreSQLAbsPath + entry.getName());
-				BufferedOutputStream dest = new BufferedOutputStream(fos, 4096);
-				while ((count = tarIn.read(data, 0, 4096)) != -1) {
-					dest.write(data, 0, count);
-				}
-				dest.close();
-			}
+		ProcessBuilder processBuilder = new ProcessBuilder(cmd);
+		processBuilder.redirectErrorStream(true);
+		final Process process = processBuilder.start();
+		try {
+			log(process);
+			process.waitFor();
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
 		}
 
-		/** Close the input stream **/
-
-		tarIn.close();
 		log.info("extracción completada con éxito!!");
 	}
 }
