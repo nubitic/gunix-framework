@@ -50,11 +50,12 @@ public final class EmbeddedPostgreSQLManager {
 				osType = "win";
 				esMXLocale="es-MX";
 			} else {
-				esMXLocale="es_MX.utf8";
 				if (os.indexOf("mac") >= 0) {
+					esMXLocale="es_ES.UTF-8";
 					osType = "mac";
 				} else {
 					if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") > 0 || os.indexOf("sunos") >= 0) {
+						esMXLocale="es_MX.utf8";
 						arch = System.getProperty("os.arch");
 						arch = arch.endsWith("64") ? "64" : "32";
 						osType = "*nix";
@@ -356,7 +357,7 @@ public final class EmbeddedPostgreSQLManager {
 
 		String postgreSQLAbsPath = pgsqlHomeFile.getAbsolutePath() + File.separator;
 		File downloadedFile = descargaArchivo(fileURL, "postgreSQLDist", null);
-		if ("*nix".equals(osType)) {
+		if ("*nix".equals(osType) || "mac".equals(osType)) {
 			extractTar(downloadedFile, postgreSQLAbsPath);
 		} else {
 			extractZip(downloadedFile, postgreSQLAbsPath);
