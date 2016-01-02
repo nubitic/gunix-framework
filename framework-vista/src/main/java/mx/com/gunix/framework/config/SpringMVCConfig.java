@@ -23,7 +23,7 @@ import org.springframework.web.servlet.view.tiles3.TilesConfigurer;
 
 @EnableWebMvc
 @Configuration
-@ComponentScan({"mx.com.gunix.ui"})
+@ComponentScan({"mx.com.gunix.ui","mx.com.gunix.framework.ui"})
 public class SpringMVCConfig extends WebMvcConfigurerAdapter {
 	@Override
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {

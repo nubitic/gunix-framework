@@ -1,0 +1,305 @@
+@font-face{
+	font-family: Arial;
+}
+
+/* Estilo para el tipo de letra */
+
+.sep-font-title {
+	font-family:Arial !important;
+	font-size:x-large;
+}
+
+.sep-font {
+	font-family:Arial !important;
+	font-size: 11pt !important;
+}
+
+.sep-font-bold{
+	font-weight:bold;
+}
+
+.sep-font-form{
+	font-size:small;
+	cursor:default;
+}
+
+/* Estilo para el cursor */
+.sep-cursor-default{
+	cursor:default;
+}
+
+/* Estilo para fieldset */
+.sep-fieldset{
+	margin: 1.125rem;
+}
+
+/* Estilo de encabezado y menú */
+.sep-main-header {
+	max-width: 100%;
+	background: #FAFAFA;
+	line-height: 2rem;
+	border: solid 1px #EEEEEE;
+	margin-left: 0 !important;
+	margin-right: 0 !important;
+}
+
+.sep-label-header{
+	margin: 0;
+	line-height: 1.5;
+}
+
+.sep-menu{
+	background: #EEEEEE;
+}
+
+.top-bar-section.menu li:not(.has-form) a:not(.button) {
+	font-family:arial !important;
+	size:11px;
+    background: #EEEEEE;
+    color: black;
+   	border-right: solid 1px #FFFFFF;
+   	border-bottom: solid 1px #FFFFFF;
+}   	
+
+.top-bar-section.menu li a:not(.button):hover {
+	background: #949494;
+}
+
+/* Estilo de subtítulos*/
+.sep-subtitle {
+	max-width: 100%;
+	background: #BEBEBE;
+	line-height: 2rem;
+	border: solid 1px #FFFFFF;
+	margin-left: 0 !important;
+	margin-right: 0 !important;
+}
+
+/* Estilo para espacios y posicionamiento*/
+.sep-no-left-padding{
+	padding-left: 0;
+}
+
+.sep-no-side-margin{
+	max-width: 100%;
+	margin-left: 0 !important;
+	margin-right: 0 !important;
+}
+
+.sep-no-margin-no-padding {
+    margin: 0;
+    padding: 0;
+}
+
+/* Estilo para select */
+.sep-select-medium{
+	font-family: Arial !important;
+	padding: 0;
+	margin: 0;
+	height: 1.3125rem
+}
+
+/* Estilo para cajas de texto*/
+.sep-text-medium{
+	height: 1.3125rem !important;
+	padding:0 !important;
+	width: 100%;
+}
+
+/* Estilo para droopdown button*/
+.sep-dropdown-double-length{
+	width:200% !important;
+	top:65px !important;
+}
+
+/* Estilo para botones */
+.sep-button-tiny{
+	font-family:Arial !important;
+	margin: 0;
+	padding: 10px !important;
+	width: 55px !important;
+	background-color:#ADADAD;
+	color: black;
+	border-color:#ADADAD;
+	-webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+.sep-button-tiny2{
+	font-family:Arial !important;
+	margin: 0;
+	text-align: center;
+	padding: 10px !important;
+	width: 110px !important;
+	background-color:#ADADAD;
+	color: black;
+	border-color:#ADADAD;
+	-webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+.sep-button-tiny3{
+	font-family:Arial !important;
+	margin: 0;
+	padding: 10px !important;
+	width: 130px !important;
+	background-color:#ADADAD;
+	color: black;
+	border-color:#ADADAD;
+	-webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.button:hover:not([id*='Tree']) .button:hover:not([id*='tree']){
+	background: #949494 !important;
+	color: black;
+}
+
+.button:focus:not([id*='tree']){
+	background: #949494 !important;
+	color: black;	
+}
+
+/* Estilo para accordean*/
+.sep-dd{
+	border-right: solid 1px #DDDDDD;
+	border-left: solid 1px #DDDDDD;
+	border-bottom: solid 1px #DDDDDD;
+}
+
+.sep-dd2{
+	border: solid 1px #DDDDDD;
+}
+
+/* Estilos para el plugin multiselect*/
+.multiselectable {
+	width:500px; 
+	display:block; 
+	overflow: hidden; 
+	width: 100%;
+}
+.multiselectable select, .multiselectable div {
+	width: 300px;
+	float:left;
+	height: auto;
+	margin: 1em;
+}
+.multiselectable div * {
+	/*display: block;*/
+	margin: 0 auto;
+}
+.multiselectable div {
+	display: inline;
+}
+.multiselectable .m-selectable-controls {
+	margin-top: 3em;
+	width: 50px;
+}
+.multiselectable .m-selectable-controls button {
+	margin-top: 1em;
+}
+
+
+.breadcrumbs-sep {
+  display: block;
+  padding: 0.5625rem 0.875rem 0.5625rem;
+  overflow: hidden;
+  margin-left: 0;
+  list-style: none;
+  border-style: solid;
+  border-width: 1px;
+  background-color: #C0C0C0;
+  border-color: gainsboro;
+  -webkit-border-radius: 3px;
+  border-radius: 3px; }
+  .breadcrumbs-sep > * {
+    margin: 0;
+    float: left;
+    font-size: 0.85rem;
+    text-transform: none; }
+    .breadcrumbs-sep > *:hover a, .breadcrumbs-sep > *:focus a {
+      text-decoration: none; }
+    .breadcrumbs-sep > * a,
+    .breadcrumbs-sep > * span {
+      text-transform: none;
+      color: #008cba; }
+    .breadcrumbs-sep > *.current {
+      cursor: default;
+      color: #333333; }
+      .breadcrumbs-sep > *.current a {
+        cursor: default;
+        color: #333333; }
+      .breadcrumbs-sep > *.current:hover, .breadcrumbs-sep > *.current:hover a, .breadcrumbs-sep > *.current:focus, .breadcrumbs-sep > *.current:focus a {
+        text-decoration: none; }
+    .breadcrumbs-sep > *.unavailable {
+      color: #999999; }
+      .breadcrumbs-sep > *.unavailable a {
+        color: #999999; }
+      .breadcrumbs-sep > *.unavailable:hover, .breadcrumbs-sep > *.unavailable:hover a, .breadcrumbs-sep > *.unavailable:focus,
+      .breadcrumbs-sep > *.unavailable a:focus {
+        text-decoration: none;
+        color: #999999;
+        cursor: default; }
+    .breadcrumbs-sep > *:before {
+      content: "/";
+      color: #aaaaaa;
+      margin: 0 0.75rem;
+      position: relative;
+      top: 1px; }
+    .breadcrumbs-sep > *:first-child:before {
+      content: " ";
+      margin: 0; }
+      
+ 
+.breadcrumbs-sep-division {
+  display: block;
+  padding: 0.5625rem 0.875rem 0.5625rem;
+  overflow: hidden;
+  margin-left: 0;
+  list-style: none;
+  border-style: solid;
+  border-width: 1px;
+  background-color: #C0C0C0;
+  border-color: gainsboro;
+  -webkit-border-radius: 3px;
+  border-radius: 3px; }
+  .breadcrumbs-sep-division > * {
+    margin: 0;
+    float: left;
+    font-size: 0.85rem;
+    text-transform: none; }
+    .breadcrumbs-sep-division > *:hover a, .breadcrumbs-sep-division > *:focus a {
+      text-decoration: none; }
+    .breadcrumbs-sep-division > * a,
+    .breadcrumbs-sep-division > * span {
+      text-transform: none;
+      color: #008cba; }
+    .breadcrumbs-sep-division > *.current {
+      cursor: default;
+      color: #333333; }
+      .breadcrumbs-sep-division > *.current a {
+        cursor: default;
+        color: #333333; }
+      .breadcrumbs-sep-division > *.current:hover, .breadcrumbs-sep-division > *.current:hover a, .breadcrumbs-sep-division > *.current:focus, .breadcrumbs-sep-division > *.current:focus a {
+        text-decoration: none; }
+    .breadcrumbs-sep-division > *.unavailable {
+      color: #999999; }
+      .breadcrumbs-sep-division > *.unavailable a {
+        color: #999999; }
+      .breadcrumbs-sep-division > *.unavailable:hover, .breadcrumbs-sep-division > *.unavailable:hover a, .breadcrumbs-sep-division > *.unavailable:focus,
+      .breadcrumbs-sep-division > *.unavailable a:focus {
+        text-decoration: none;
+        color: #999999;
+        cursor: default; }
+    .breadcrumbs-sep-division > *:before {
+      content: "";
+      color: #aaaaaa;
+      margin: 0 0.75rem;
+      position: relative;
+      top: 1px; }
+    .breadcrumbs-sep-division > *:first-child:before {
+      content: " ";
+      margin: 0; }    
+      
+.sistema {
+	color: white !important 
+	
+}
