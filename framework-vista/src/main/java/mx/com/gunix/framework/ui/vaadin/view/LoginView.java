@@ -3,9 +3,11 @@ package mx.com.gunix.framework.ui.vaadin.view;
 import mx.com.gunix.framework.ui.vaadin.LoginUI;
 import mx.com.gunix.framework.ui.vaadin.spring.GunixVaadinView;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
 import org.vaadin.spring.security.VaadinSecurity;
+
 
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.navigator.View;
@@ -17,6 +19,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -30,7 +33,7 @@ public class LoginView extends VerticalLayout implements View {
 
 	private TextField username;
 	private PasswordField password;
-	private CheckBox rememberMe = new CheckBox("Remember me", true);
+	private CheckBox rememberMe = new CheckBox("Mantener la sesión iniciada", true);
 
 	public LoginView() {
 		setSizeFull();
@@ -61,13 +64,13 @@ public class LoginView extends VerticalLayout implements View {
 		HorizontalLayout fields = new HorizontalLayout();
 		fields.setSpacing(true);
 
-		username = new TextField("Username");
+		username = new TextField("Usuario");
 		username.setIcon(FontAwesome.USER);
 
-		password = new PasswordField("Password");
+		password = new PasswordField("Contraseña");
 		password.setIcon(FontAwesome.LOCK);
 
-		final Button signin = new Button("Sign In");
+		final Button signin = new Button("Identificarse");
 
 		signin.setClickShortcut(KeyCode.ENTER);
 		signin.focus();
@@ -81,7 +84,7 @@ public class LoginView extends VerticalLayout implements View {
 				security.login(username.getValue(), password.getValue(), rememberMe.getValue());
 
 			} catch (AuthenticationException e) {
-				e.printStackTrace();
+				Notification.show("Usuario y/o contraseña incorrectos");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

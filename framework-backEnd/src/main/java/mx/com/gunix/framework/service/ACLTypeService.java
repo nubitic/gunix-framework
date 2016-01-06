@@ -25,7 +25,6 @@ public interface ACLTypeService<T extends ACLType> {
 	@PreAuthorize("hasPermission(#objeto, 'DELETE')")
 	public void delete(T objeto);
 
-	@PreAuthorize("hasRole('ACL_ADMIN')")
 	public long insert(T objeto);
 
 }

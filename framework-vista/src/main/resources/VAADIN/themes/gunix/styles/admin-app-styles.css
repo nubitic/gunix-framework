@@ -1,4 +1,10 @@
-.v-table-row.v-table-row-admin-app-highlight-text-bold,
-.v-table-row-odd.v-table-row-admin-app-highlight-text-bold {
-  font-weight: bold;
-}
+.v-table-row.v-table-row-admin-app-highlight-text-bold, .v-table-row-odd.v-table-row-admin-app-highlight-text-bold{
+	font-weight: bold;
+	}
+
+.v-verticallayout.v-layout.v-vertical.v-widget.MainViewLayout.v-verticallayout-MainViewLayout.v-has-width.v-margin-top.v-margin-right.v-margin-bottom.v-margin-left{
+	padding-top: initial !important;
+	padding-bottom: 5px !important;
+	padding-left: 17px !important;
+	padding-right: 17px !important;
+	}

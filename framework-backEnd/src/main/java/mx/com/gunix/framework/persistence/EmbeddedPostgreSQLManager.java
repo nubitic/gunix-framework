@@ -37,31 +37,32 @@ public final class EmbeddedPostgreSQLManager {
 			}
 		}
 
+		os = System.getProperty("os.name").toLowerCase();
+		String arch = null;
+		String osType = null;
+		if (os.indexOf("win") >= 0) {
+			arch = System.getenv("PROCESSOR_ARCHITECTURE");
+			String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
+			arch = arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64") ? "64" : "32";
+			osType = "win";
+			esMXLocale="es-MX";
+		} else {
+			if (os.indexOf("mac") >= 0) {
+				esMXLocale="es_ES.UTF-8";
+				osType = "mac";
+			} else {
+				if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") > 0 || os.indexOf("sunos") >= 0) {
+					esMXLocale="es_MX.utf8";
+					arch = System.getProperty("os.arch");
+					arch = arch.endsWith("64") ? "64" : "32";
+					osType = "*nix";
+				}
+			}
+		}
+		
 		File realPgsqlHomeFile = "pgsql".equalsIgnoreCase(pgsqlHomeFile.getName()) ? pgsqlHomeFile : new File(pgsqlHomeFile, "pgsql");
 		if (!realPgsqlHomeFile.exists()) {
 			// Como no existe una instalación de postgresql se procede a instalarlo
-			os = System.getProperty("os.name").toLowerCase();
-			String arch = null;
-			String osType = null;
-			if (os.indexOf("win") >= 0) {
-				arch = System.getenv("PROCESSOR_ARCHITECTURE");
-				String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
-				arch = arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64") ? "64" : "32";
-				osType = "win";
-				esMXLocale="es-MX";
-			} else {
-				if (os.indexOf("mac") >= 0) {
-					esMXLocale="es_ES.UTF-8";
-					osType = "mac";
-				} else {
-					if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") > 0 || os.indexOf("sunos") >= 0) {
-						esMXLocale="es_MX.utf8";
-						arch = System.getProperty("os.arch");
-						arch = arch.endsWith("64") ? "64" : "32";
-						osType = "*nix";
-					}
-				}
-			}
 			try {
 				log.info("Descargando PostgreSQL");
 				downloadPostgreSQLDist(pgsqlHomeFile, osType, arch);

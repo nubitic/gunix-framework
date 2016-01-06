@@ -69,9 +69,9 @@ create table acl_entry(
 CREATE INDEX acl_entry_FK4IDX ON acl_entry USING BTREE (acl_object_identity);
 CREATE INDEX acl_entry_FK5IDX ON acl_entry USING BTREE (sid);
 
-INSERT INTO USUARIO(ID_USUARIO,PASSWORD,ESTATUS) VALUES('bjvences@gmail.com',crypt('loloq123', gen_salt('bf', 16)),'ACTIVO');
+INSERT INTO USUARIO(ID_USUARIO,PASSWORD,ESTATUS) VALUES('admin@gunix.mx',crypt('loloq123', gen_salt('bf', 16)),'ACTIVO');
 INSERT INTO USUARIO(ID_USUARIO,PASSWORD,ESTATUS) VALUES('anonymous',crypt('anonymous', gen_salt('bf', 16)),'ACTIVO');
-INSERT INTO acl_sid(principal,sid) VALUES(true,'bjvences@gmail.com');
+INSERT INTO acl_sid(principal,sid) VALUES(true,'admin@gunix.mx');
 
 /****************************************************/
 
@@ -195,16 +195,16 @@ create table PERSISTENT_LOGINS
 
 
 INSERT INTO acl_class(class) values ('mx.com.gunix.framework.security.domain.Aplicacion');
-INSERT INTO acl_object_identity(object_id_class,owner_sid,entries_inheriting) values( currval(pg_get_serial_sequence('acl_class', 'id')),(select id from acl_sid where sid = 'bjvences@gmail.com'),true);
+INSERT INTO acl_object_identity(object_id_class,owner_sid,entries_inheriting) values( currval(pg_get_serial_sequence('acl_class', 'id')),(select id from acl_sid where sid = 'admin@gunix.mx'),true);
 
-INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 0, (select id from acl_sid where sid = 'bjvences@gmail.com'), 16, TRUE, FALSE, FALSE);
-INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 1, (select id from acl_sid where sid = 'bjvences@gmail.com'), 1, TRUE, FALSE, FALSE);
-INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 2, (select id from acl_sid where sid = 'bjvences@gmail.com'), 2, TRUE, FALSE, FALSE);
-INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 3, (select id from acl_sid where sid = 'bjvences@gmail.com'), 8, TRUE, FALSE, FALSE);
+/*INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 0, (select id from acl_sid where sid = 'admin@gunix.mx'), 16, TRUE, FALSE, FALSE);
+INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 1, (select id from acl_sid where sid = 'admin@gunix.mx'), 1, TRUE, FALSE, FALSE);
+INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 2, (select id from acl_sid where sid = 'admin@gunix.mx'), 2, TRUE, FALSE, FALSE);
+INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 3, (select id from acl_sid where sid = 'admin@gunix.mx'), 8, TRUE, FALSE, FALSE);*/
 
 INSERT INTO APLICACION VALUES('ADMIN_APP',currval(pg_get_serial_sequence('acl_object_identity', 'object_id_identity')),'Gunix Admin App','Gunix.png');
 
-	INSERT INTO USUARIO_APLICACION VALUES('bjvences@gmail.com','ADMIN_APP');
+	INSERT INTO USUARIO_APLICACION VALUES('admin@gunix.mx','ADMIN_APP');
 
         /* Funcionalidad Privada (Segura) */
         INSERT INTO MODULO VALUES('ADMIN_APP','APLICACIONES','Aplicaciones','window-128.png');
@@ -216,21 +216,14 @@ INSERT INTO APLICACION VALUES('ADMIN_APP',currval(pg_get_serial_sequence('acl_ob
 	                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,PROCESS_KEY,ID_FUNCION_PADRE,ORDEN) VALUES('ADMIN_APP','APLICACIONES','MODIFICACION','Modificación','Modificación de Aplicaciones','AdministraciónAplicaciones','ADMINISTRACION',3);
 	                        INSERT INTO PARAM_FUNCION VALUES ('ADMIN_APP','APLICACIONES','MODIFICACION','operación','Modificación');
 
-		INSERT INTO MODULO VALUES('ADMIN_APP','ACL','Lista de Control de Acceso','window-128.png');
-                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,ORDEN) VALUES('ADMIN_APP','ACL','ADMINISTRACION','Administración','Menú con opciones de Administración de ACL',1);
-	                INSERT INTO FUNCION(ID_APLICACION, ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,PROCESS_KEY,ID_FUNCION_PADRE,ORDEN) VALUES('ADMIN_APP','ACL','ALTA','Alta','Alta de Control de Acceso','AdministraciónACL','ADMINISTRACION',1);
-	                        INSERT INTO PARAM_FUNCION VALUES ('ADMIN_APP','ACL','ALTA','operación','Alta');
-
         INSERT INTO ROL VALUES('ADMIN_APP','ADMINISTRADOR','Administrador de Aplicaciones');
 	     	 INSERT INTO ROL_FUNCION VALUES('ADMIN_APP','ADMINISTRADOR','APLICACIONES','ADMINISTRACION','COMPLETO');
 
         INSERT INTO ROL VALUES('ADMIN_APP','ACL_ADMIN','Administrador de la Lista de Control de Acceso');
-                INSERT INTO ROL_FUNCION VALUES('ADMIN_APP','ACL_ADMIN','ACL','ADMINISTRACION','COMPLETO');
 
-        INSERT INTO USUARIO_ROL VALUES('bjvences@gmail.com','ADMIN_APP','ADMINISTRADOR');
-        INSERT INTO USUARIO_ROL VALUES('bjvences@gmail.com','ADMIN_APP','ACL_ADMIN');
+        INSERT INTO USUARIO_ROL VALUES('admin@gunix.mx','ADMIN_APP','ADMINISTRADOR');
+        INSERT INTO USUARIO_ROL VALUES('admin@gunix.mx','ADMIN_APP','ACL_ADMIN');
         
-
         /* Funcionalidad Pública */
         INSERT INTO ROL VALUES('ADMIN_APP','PUBLIC','Público en General');
         INSERT INTO MODULO VALUES('ADMIN_APP','MODULO_PRUEBA','Demostraciones','1436568412_demo.png');
