@@ -66,9 +66,7 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 	}
 
 	private static final long serialVersionUID = 1L;
-
-	private static final String MODULOS_ROLES_WIDTH = "1000px";
-
+	
 	private Button guardarButton;
 	private Button cancelarButton;
 	private Accordion modulosRolesAcc;
@@ -128,7 +126,6 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void doConstruct() {
-
 		esConsulta = "Consulta".equals($("operación"));
 		esModificacion = "Modificación".equals($("operación"));
 
@@ -138,7 +135,7 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 		buildMainLayout();
 		modulosRolesAcc.getTab(0).setIcon(new ThemeResource("img/1440815258_blockdevice.png"));
 		modulosRolesAcc.getTab(1).setIcon(new ThemeResource("img/1440815816_To_do_list.png"));
-
+		
 		if (!esConsulta) {
 			modulosAddTab = modulosTabS.addTab(new Panel());
 			modulosAddTab.setCaption("+");
@@ -146,7 +143,6 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 			modulosTabS.addFocusListener(event -> {
 				doModulosAddTab();
 			});
-
 			rolesAddTab = rolesTabS.addTab(new Panel());
 			rolesAddTab.setCaption("+");
 			rolesAddTab.setClosable(false);
@@ -211,6 +207,7 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 		if (esConsulta || esModificacion) {
 			deepCopy(((List<Aplicacion>) $("resultado")).get(0), aplicacion);
 		}
+		setSizeFull();
 	}
 
 	private void updateRoles() {
@@ -433,12 +430,11 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 
 	private void showModuloPopup(Modulo mod, boolean soloLectura) {
 		final Window window = new Window("Nuevo Módulo");
-		window.setWidth("25%");
 		window.setModal(true);
 		window.setClosable(false);
 		window.setResizable(false);
-		window.setWidth("420px");
-		window.setHeight("350px");
+		window.setWidth("350px");
+		window.setHeight("290px");
 		window.center();
 		ModuloForm mf = new ModuloForm(window, soloLectura);
 		if (mod != null) {
@@ -501,12 +497,11 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 
 	private void showRolPopup(Rol rol) {
 		final Window window = new Window("Nuevo Rol");
-		window.setWidth("25%");
 		window.setModal(true);
 		window.setClosable(false);
 		window.setResizable(false);
-		window.setWidth("420px");
-		window.setHeight("300px");
+		window.setWidth("350px");
+		window.setHeight("230px");
 		window.center();
 		RolForm rf = new RolForm(window);
 
@@ -633,9 +628,8 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 		// common part: create layout
 		modulosRolesAcc = new Accordion();
 		modulosRolesAcc.setImmediate(true);
-		modulosRolesAcc.setWidth("-1px");
+		modulosRolesAcc.setSizeFull();
 		modulosRolesAcc.setHeight("-1px");
-
 		// modulosPanel
 		modulosPanel = buildModulosPanel();
 		modulosRolesAcc.addTab(modulosPanel, "Módulos", null);
@@ -651,9 +645,8 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 		// common part: create layout
 		modulosPanel = new Panel();
 		modulosPanel.setImmediate(false);
-		modulosPanel.setWidth(MODULOS_ROLES_WIDTH);
+		modulosPanel.setSizeFull();
 		modulosPanel.setHeight("-1px");
-
 		// verticalLayout_2
 		verticalLayout_2 = buildVerticalLayout_2();
 		modulosPanel.setContent(verticalLayout_2);
@@ -665,15 +658,14 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 		// common part: create layout
 		verticalLayout_2 = new VerticalLayout();
 		verticalLayout_2.setImmediate(false);
-		verticalLayout_2.setWidth("100.0%");
-		verticalLayout_2.setHeight("100.0%");
+		verticalLayout_2.setSizeFull();
 		verticalLayout_2.setMargin(false);
+		verticalLayout_2.setSpacing(false);
 
 		// modulosTabS
 		modulosTabS = new TabSheet();
 		modulosTabS.setImmediate(false);
-		modulosTabS.setWidth("100.0%");
-		modulosTabS.setHeight("100.0%");
+		modulosTabS.setSizeFull();
 		verticalLayout_2.addComponent(modulosTabS);
 
 		return verticalLayout_2;
@@ -683,9 +675,8 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 		// common part: create layout
 		rolesPanel = new Panel();
 		rolesPanel.setImmediate(false);
-		rolesPanel.setWidth(MODULOS_ROLES_WIDTH);
+		rolesPanel.setSizeFull();
 		rolesPanel.setHeight("-1px");
-
 		// verticalLayout_3
 		verticalLayout_3 = buildVerticalLayout_3();
 		rolesPanel.setContent(verticalLayout_3);
@@ -700,7 +691,7 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 		verticalLayout_3.setWidth("100.0%");
 		verticalLayout_3.setHeight("100.0%");
 		verticalLayout_3.setMargin(false);
-
+		
 		// rolesTabS
 		rolesTabS = new TabSheet();
 		rolesTabS.setImmediate(false);

@@ -115,7 +115,6 @@ public class FuncionesTab extends CustomComponent {
 		funcionesTreeTable.setColumnExpandRatio("titulo", 1.083f);
 		funcionesTreeTable.setColumnExpandRatio("descripcion", 1.083f);
 		funcionesTreeTable.setColumnExpandRatio("processKey", 1.083f);
-		funcionesTreeTable.setPageLength(10);
 
 		this.esSoloLectura = soloLectura;
 		this.esParaRoles = esParaRoles;
@@ -286,12 +285,11 @@ public class FuncionesTab extends CustomComponent {
 	private Button buildParametrosButton(Funcion f, boolean esSoloLectura) {
 		Button button = new Button("Parámetros", newFuncButtonEvent -> {
 			final Window window = new Window("Parámetros");
-			window.setWidth("25%");
 			window.setModal(true);
 			window.setClosable(false);
 			window.setResizable(false);
-			window.setWidth("490px");
-			window.setHeight("470px");
+			window.setWidth("410px");
+			window.setHeight("390px");
 			window.center();
 			ParametrosForm pf = new ParametrosForm(window, esSoloLectura);
 			if (f.getParametros() != null && !f.getParametros().isEmpty()) {
@@ -513,8 +511,8 @@ public class FuncionesTab extends CustomComponent {
 		// common part: create layout
 		mainLayout = new VerticalLayout();
 		mainLayout.setImmediate(false);
-		mainLayout.setWidth("100%");
-		mainLayout.setHeight("100%");
+		mainLayout.setWidth("100.0%");
+		mainLayout.setHeight("100.0%");
 		mainLayout.setMargin(true);
 		mainLayout.setSpacing(true);
 
@@ -534,6 +532,7 @@ public class FuncionesTab extends CustomComponent {
 		funcionesTreeTable = new TreeTable();
 		funcionesTreeTable.setImmediate(false);
 		funcionesTreeTable.setWidth("100%");
+		funcionesTreeTable.setHeight("255px");
 		funcionesTreeTable.setInvalidAllowed(false);
 		mainLayout.addComponent(funcionesTreeTable);
 

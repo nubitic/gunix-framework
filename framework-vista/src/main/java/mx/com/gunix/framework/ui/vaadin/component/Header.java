@@ -398,6 +398,7 @@ public class Header extends CustomComponent {
 		rolCBox.setHeight("-1px");
 		horizontalLayout_2.addComponent(rolCBox);
 		horizontalLayout_2.setExpandRatio(rolCBox, 1.0f);
+		horizontalLayout_2.setComponentAlignment(rolCBox, Alignment.MIDDLE_LEFT);
 
 		// menuBar
 		menuBar = new MenuBar();
@@ -407,7 +408,6 @@ public class Header extends CustomComponent {
 		menuBar.setHeight("-1px");
 		horizontalLayout_2.addComponent(menuBar);
 		horizontalLayout_2.setExpandRatio(menuBar, 3.0f);
-		horizontalLayout_2.setComponentAlignment(menuBar, new Alignment(33));
 
 		return horizontalLayout_2;
 	}

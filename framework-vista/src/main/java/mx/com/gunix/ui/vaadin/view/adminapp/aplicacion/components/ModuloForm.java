@@ -77,7 +77,7 @@ public class ModuloForm extends CustomComponent {
 	public ModuloForm(Window window, boolean esSoloLectura) {
 		buildMainLayout();
 		setCompositionRoot(mainLayout);
-
+		setSizeFull();
 		moduloFieldGroup = new GunixBeanFieldGroup<ModuloView>(ModuloView.class);
 		moduloFieldGroup.setItemDataSource(new ModuloView());
 		moduloFieldGroup.bindMemberFields(this);
@@ -143,10 +143,6 @@ public class ModuloForm extends CustomComponent {
 		mainLayout.setHeight("100%");
 		mainLayout.setMargin(true);
 		mainLayout.setSpacing(true);
-
-		// top-level component properties
-		setWidth("100.0%");
-		setHeight("100.0%");
 
 		// idModulo
 		idModulo = new TextField();

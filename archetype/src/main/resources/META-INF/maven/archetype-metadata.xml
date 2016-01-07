@@ -75,7 +75,7 @@
       <defaultValue>5.19.0</defaultValue>
     </requiredProperty>
     <requiredProperty key="openLVersion">
-      <defaultValue>5.16.3</defaultValue>
+      <defaultValue>5.16.4</defaultValue>
     </requiredProperty>
   </requiredProperties>
 </archetype-descriptor>

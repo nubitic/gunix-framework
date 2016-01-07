@@ -320,6 +320,24 @@
  */
 
 @font-face {
+	font-family: ThemeIcons;
+	font-weight: normal;
+	font-style: normal;
+	src: url(../valo/util/bourbon/css3/../../../../base/fonts/themeicons-webfont.eot);
+	src: url(../valo/util/bourbon/css3/../../../../base/fonts/themeicons-webfont.eot?#iefix) format("embedded-opentype"), url(../valo/util/bourbon/css3/../../../../base/fonts/themeicons-webfont.woff) format("woff"), url(../valo/util/bourbon/css3/../../../../base/fonts/themeicons-webfont.ttf) format("truetype"), url(../valo/util/bourbon/css3/../../../../base/fonts/themeicons-webfont.svg#ThemeIcons) format("svg");
+}
+
+.ThemeIcons {
+	font-family: ThemeIcons;
+	font-style: normal;
+	font-weight: normal;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	display: inline-block;
+	text-align: center;
+}
+
+@font-face {
 	font-family: FontAwesome;
 	font-weight: normal;
 	font-style: normal;
@@ -446,11 +464,11 @@
 	}
 		3% {
 		width: 91%;
-		height: 7px;
+		height: 6px;
 	}
 		100% {
 		width: 96%;
-		height: 7px;
+		height: 6px;
 	}
 	}
 
@@ -461,11 +479,11 @@
 	}
 		3% {
 		width: 91%;
-		height: 7px;
+		height: 6px;
 	}
 		100% {
 		width: 96%;
-		height: 7px;
+		height: 6px;
 	}
 	}
 
@@ -476,11 +494,11 @@
 	}
 		3% {
 		width: 91%;
-		height: 7px;
+		height: 6px;
 	}
 		100% {
 		width: 96%;
-		height: 7px;
+		height: 6px;
 	}
 	}
 
@@ -699,25 +717,25 @@
 
 @-webkit-keyframes valo-grid-editor-footer-animate-in {
 		0% {
-		margin-top: -37px;
+		margin-top: -32px;
 	}
 	}
 
 @-moz-keyframes valo-grid-editor-footer-animate-in {
 		0% {
-		margin-top: -37px;
+		margin-top: -32px;
 	}
 	}
 
 @keyframes valo-grid-editor-footer-animate-in {
 		0% {
-		margin-top: -37px;
+		margin-top: -32px;
 	}
 	}
 
 @-webkit-keyframes valo-grid-editor-footer-animate-in-alt {
 		0% {
-		margin-bottom: -38px;
+		margin-bottom: -33px;
 	}
 		100% {
 		margin-bottom: -1px;
@@ -726,7 +744,7 @@
 
 @-moz-keyframes valo-grid-editor-footer-animate-in-alt {
 		0% {
-		margin-bottom: -38px;
+		margin-bottom: -33px;
 	}
 		100% {
 		margin-bottom: -1px;
@@ -735,7 +753,7 @@
 
 @keyframes valo-grid-editor-footer-animate-in-alt {
 		0% {
-		margin-bottom: -38px;
+		margin-bottom: -33px;
 	}
 		100% {
 		margin-bottom: -1px;
@@ -985,7 +1003,7 @@
  */
 
 .v-vaadin-version:after {
-	content: "7.5.6";
+	content: "7.6.0";
 }
 
 .v-widget {
@@ -1102,7 +1120,7 @@
 .v-caption {
 	display: inline-block;
 	white-space: nowrap;
-	line-height: 1.55;
+	line-height: 1.4;
 }
 
 .v-captiontext {
@@ -1234,7 +1252,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .v-gridlayout-slot {
 	position: absolute;
-	line-height: 1.55;
+	line-height: 1.4;
 }
 
 .v-gridlayout-spacing-on {
@@ -1408,7 +1426,7 @@ div.v-layout.v-horizontal.v-widget {
 	margin: 0;
 	padding: 0;
 	border: 0;
-	line-height: 1.55;
+	line-height: 1.4;
 }
 
 .v-table-resizer, .v-table-sort-indicator {
@@ -1464,19 +1482,19 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .v-tabsheet-content  > div > .v-scrollable  > .v-margin-top {
-	padding-top: 12px;
+	padding-top: 11px;
 }
 
 .v-tabsheet-content  > div > .v-scrollable  > .v-margin-right {
-	padding-right: 12px;
+	padding-right: 11px;
 }
 
 .v-tabsheet-content  > div > .v-scrollable  > .v-margin-bottom {
-	padding-bottom: 12px;
+	padding-bottom: 11px;
 }
 
 .v-tabsheet-content  > div > .v-scrollable  > .v-margin-left {
-	padding-left: 12px;
+	padding-left: 11px;
 }
 
 .v-splitpanel-vertical, .v-splitpanel-horizontal {
@@ -1544,7 +1562,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix.v-app, .gunix.v-app-loading {
-	font: 300 16px/1.55 "Open Sans", sans-serif;
+	font: 300 14px/1.4 "Open Sans", sans-serif;
 	color: #464646;
 	background-color: #fafafa;
 	cursor: default;
@@ -1564,9 +1582,9 @@ div.v-layout.v-horizontal.v-widget {
 	left: 50%;
 	width: 28px;
 	height: 28px;
-	padding: 9px;
-	margin-top: -24px;
-	margin-left: -24px;
+	padding: 8px;
+	margin-top: -22px;
+	margin-left: -22px;
 	background: #fff url(../valo/shared/img/spinner.gif) no-repeat 50%;
 	border-radius: 4px;
 }
@@ -1575,7 +1593,7 @@ div.v-layout.v-horizontal.v-widget {
 	position: fixed;
 	z-index: 100;
 	top: 45%;
-	padding-top: 47px;
+	padding-top: 44px;
 	text-align: center;
 	left: 0;
 	right: 0;
@@ -1638,11 +1656,11 @@ div.v-layout.v-horizontal.v-widget {
 .v-ie8 .gunix .v-loading-indicator, .v-ie8 .gunix .v-loading-indicator-delay, .v-ie8 .gunix .v-loading-indicator-wait, .v-ie9 .gunix .v-loading-indicator, .v-ie9 .gunix .v-loading-indicator-delay, .v-ie9 .gunix .v-loading-indicator-wait {
 	width: 28px !important;
 	height: 28px;
-	padding: 9px;
+	padding: 8px;
 	background: #fff url(../valo/shared/img/spinner.gif) no-repeat 50%;
 	border-radius: 4px;
-	top: 9px;
-	right: 9px;
+	top: 8px;
+	right: 8px;
 	left: auto;
 	filter: alpha(opacity=50);
 }
@@ -1664,7 +1682,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-caption {
-	font-size: 14px;
+	font-size: 13px;
 	font-weight: 400;
 	padding-bottom: 0.3em;
 	padding-left: 1px;
@@ -1676,7 +1694,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-icon + .v-captiontext, .gunix .v-icon + span {
-	margin-left: 7px;
+	margin-left: 6px;
 }
 
 .gunix .v-icon + .v-captiontext:empty, .gunix .v-icon + span:empty {
@@ -1686,7 +1704,7 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-errorindicator {
 	color: #ed473b;
 	font-weight: 600;
-	width: 19px;
+	width: 16px;
 	text-align: center;
 }
 
@@ -1703,7 +1721,7 @@ div.v-layout.v-horizontal.v-widget {
 	font: inherit;
 	font-weight: 400;
 	line-height: inherit;
-	padding: 5px;
+	padding: 4px;
 	margin: 0;
 	border-radius: 4px;
 	border: 1px solid #c5c5c5;
@@ -1722,7 +1740,7 @@ div.v-layout.v-horizontal.v-widget {
 .gunix button {
 	font: inherit;
 	font-weight: 400;
-	line-height: 1.55;
+	line-height: 1.4;
 }
 
 .gunix a {
@@ -1765,11 +1783,11 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
 	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
 	color: white;
-	padding: 5px 9px;
+	padding: 4px 8px;
 	border-radius: 3px;
 	max-width: 35em;
 	overflow: hidden !important;
-	font-size: 14px;
+	font-size: 12px;
 }
 
 .gunix .v-tooltip div[style*="width"] {
@@ -1780,8 +1798,8 @@ div.v-layout.v-horizontal.v-widget {
 	background-color: white;
 	background-color: #fff;
 	color: #ed473b;
-	margin: -5px -9px;
-	padding: 5px 9px;
+	margin: -4px -8px;
+	padding: 4px 8px;
 	max-height: 10em;
 	overflow: auto;
 	font-weight: 400;
@@ -1795,7 +1813,7 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-tooltip .v-tooltip-text {
 	max-height: 10em;
 	overflow: auto;
-	margin-top: 10px;
+	margin-top: 8px;
 }
 
 .gunix .v-tooltip .v-errormessage[aria-hidden="true"] + .v-tooltip-text {
@@ -1838,8 +1856,8 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-contextmenu .gwt-MenuItem {
 	cursor: pointer;
-	line-height: 27px;
-	padding: 0 20px 0 10px;
+	line-height: 23px;
+	padding: 0 16px 0 8px;
 	border-radius: 3px;
 	font-weight: 400;
 	white-space: nowrap;
@@ -1862,8 +1880,8 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-contextmenu .gwt-MenuItem .v-icon {
-	max-height: 27px;
-	margin-right: 5px;
+	max-height: 23px;
+	margin-right: 4px;
 	min-width: 1em;
 }
 
@@ -1873,6 +1891,60 @@ div.v-layout.v-horizontal.v-widget {
 	background-image: linear-gradient(to bottom,#1b87e3 2%, #166ed5 98%);
 	color: #ecf2f8;
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.05);
+}
+
+.gunix .v-reconnect-dialog {
+	color: white;
+	top: 11px;
+	right: 11px;
+	max-width: 100%;
+	border-radius: 0;
+	-webkit-box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.25);
+	box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.25);
+	padding: 11px 13px;
+	background-color: #444;
+	background-color: rgba(68, 68, 68, 0.9);
+	line-height: 20px;
+	text-align: center;
+}
+
+.gunix .v-reconnect-dialog .text {
+	display: inline-block;
+	padding-left: 10px;
+}
+
+.gunix .v-reconnect-dialog .spinner {
+	height: 24px !important;
+	width: 24px !important;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	border: 2px solid rgba(25, 125, 225, 0.2);
+	border-top-color: #197de1;
+	border-right-color: #197de1;
+	border-radius: 100%;
+	-webkit-animation: v-rotate-360 500ms infinite linear;
+	-moz-animation: v-rotate-360 500ms infinite linear;
+	animation: v-rotate-360 500ms infinite linear;
+	pointer-events: none;
+	display: none;
+	vertical-align: middle;
+}
+
+.v-ie8 .gunix .v-reconnect-dialog .spinner, .v-ie9 .gunix .v-reconnect-dialog .spinner {
+	border: none;
+	border-radius: 4px;
+	background: #fff url(../valo/shared/img/spinner.gif) no-repeat 50% 50%;
+	background-size: 80%;
+}
+
+.v-ie8 .gunix .v-reconnect-dialog .spinner {
+	min-width: 30px;
+	min-height: 30px;
+}
+
+.gunix .v-reconnect-dialog.active .spinner {
+	display: inline-block;
 }
 
 .gunix .v-absolutelayout-wrapper {
@@ -1894,24 +1966,24 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-margin-top {
-	padding-top: 37px;
+	padding-top: 32px;
 }
 
 .gunix .v-margin-right {
-	padding-right: 37px;
+	padding-right: 32px;
 }
 
 .gunix .v-margin-bottom {
-	padding-bottom: 37px;
+	padding-bottom: 32px;
 }
 
 .gunix .v-margin-left {
-	padding-left: 37px;
+	padding-left: 32px;
 }
 
 .gunix .v-spacing {
-	width: 12px;
-	height: 12px;
+	width: 11px;
+	height: 11px;
 }
 
 .gunix .v-verticallayout-well, .gunix .v-horizontallayout-well {
@@ -1930,19 +2002,19 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-verticallayout-well  > .v-margin-top, .gunix .v-horizontallayout-well  > .v-margin-top {
-	padding-top: 12px;
+	padding-top: 11px;
 }
 
 .gunix .v-verticallayout-well  > .v-margin-right, .gunix .v-horizontallayout-well  > .v-margin-right {
-	padding-right: 12px;
+	padding-right: 11px;
 }
 
 .gunix .v-verticallayout-well  > .v-margin-bottom, .gunix .v-horizontallayout-well  > .v-margin-bottom {
-	padding-bottom: 12px;
+	padding-bottom: 11px;
 }
 
 .gunix .v-verticallayout-well  > .v-margin-left, .gunix .v-horizontallayout-well  > .v-margin-left {
-	padding-left: 12px;
+	padding-left: 11px;
 }
 
 .gunix .v-verticallayout-card, .gunix .v-horizontallayout-card {
@@ -1955,19 +2027,19 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-verticallayout-card  > .v-margin-top, .gunix .v-horizontallayout-card  > .v-margin-top {
-	padding-top: 12px;
+	padding-top: 11px;
 }
 
 .gunix .v-verticallayout-card  > .v-margin-right, .gunix .v-horizontallayout-card  > .v-margin-right {
-	padding-right: 12px;
+	padding-right: 11px;
 }
 
 .gunix .v-verticallayout-card  > .v-margin-bottom, .gunix .v-horizontallayout-card  > .v-margin-bottom {
-	padding-bottom: 12px;
+	padding-bottom: 11px;
 }
 
 .gunix .v-verticallayout-card  > .v-margin-left, .gunix .v-horizontallayout-card  > .v-margin-left {
-	padding-left: 12px;
+	padding-left: 11px;
 }
 
 .gunix .v-horizontallayout-wrapping {
@@ -1975,7 +2047,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-horizontallayout-wrapping > .v-spacing + .v-slot, .gunix .v-horizontallayout-wrapping > .v-slot:first-child {
-	margin-bottom: 12px;
+	margin-bottom: 11px;
 }
 
 .gunix .v-horizontallayout-wrapping > .v-slot:first-child:last-child {
@@ -1990,8 +2062,8 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-tap-highlight-color: transparent;
 	-webkit-touch-callout: none;
 	cursor: pointer;
-	height: 37px;
-	padding: 0 16px;
+	height: 32px;
+	padding: 0 14px;
 	color: #191919;
 	font-weight: 400;
 	
@@ -2083,8 +2155,8 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-button-primary {
-	height: 37px;
-	padding: 0 16px;
+	height: 32px;
+	padding: 0 14px;
 	color: #ecf2f8;
 	font-weight: 400;
 	
@@ -2099,9 +2171,9 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-shadow: inset 0 1px 0 #4d98e6, inset 0 -1px 0 #166bca, 0 2px 3px rgba(0, 0, 0, 0.05);
 	box-shadow: inset 0 1px 0 #4d98e6, inset 0 -1px 0 #166bca, 0 2px 3px rgba(0, 0, 0, 0.05);
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.05);
-	padding: 0 19px;
+	padding: 0 16px;
 	font-weight: bold;
-	min-width: 81px;
+	min-width: 70px;
 }
 
 .gunix .v-button-primary:after {
@@ -2127,12 +2199,12 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .v-ie8 .gunix .v-button-primary {
-	min-width: 43px;
+	min-width: 38px;
 }
 
 .gunix .v-button-friendly {
-	height: 37px;
-	padding: 0 16px;
+	height: 32px;
+	padding: 0 14px;
 	color: #eaf4e9;
 	font-weight: 400;
 	
@@ -2172,8 +2244,8 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-button-danger {
-	height: 37px;
-	padding: 0 16px;
+	height: 32px;
+	padding: 0 14px;
 	color: #f9f0ef;
 	font-weight: 400;
 	
@@ -2312,11 +2384,11 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-button-tiny {
-	height: 28px;
-	padding: 0 13px;
+	height: 24px;
+	padding: 0 11px;
 	
 	
-	font-size: 12px;
+	font-size: 11px;
 	
 	border-radius: 4px;
 }
@@ -2330,11 +2402,11 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-button-small {
-	height: 31px;
-	padding: 0 14px;
+	height: 27px;
+	padding: 0 12px;
 	
 	
-	font-size: 14px;
+	font-size: 12px;
 	
 	border-radius: 4px;
 }
@@ -2348,11 +2420,11 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-button-large {
-	height: 44px;
-	padding: 0 19px;
+	height: 38px;
+	padding: 0 17px;
 	
 	
-	font-size: 20px;
+	font-size: 17px;
 	
 	border-radius: 4px;
 }
@@ -2366,11 +2438,11 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-button-huge {
-	height: 59px;
-	padding: 0 26px;
+	height: 51px;
+	padding: 0 22px;
 	
 	
-	font-size: 26px;
+	font-size: 23px;
 	
 	border-radius: 4px;
 }
@@ -2389,7 +2461,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-button-icon-align-right .v-icon {
 	float: right;
-	margin-left: 13px;
+	margin-left: 12px;
 }
 
 .gunix .v-button-icon-align-right .v-icon  + span:not(:empty) {
@@ -2398,8 +2470,8 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-button-icon-align-top {
 	height: auto;
-	padding-top: 5px;
-	padding-bottom: 5px;
+	padding-top: 4px;
+	padding-bottom: 4px;
 }
 
 .gunix .v-button-icon-align-top [class*="wrap"] {
@@ -2413,29 +2485,29 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-button-icon-align-top .v-icon  + span:not(:empty) {
-	margin-top: 7px;
+	margin-top: 6px;
 	margin-left: 0;
 }
 
 .gunix .v-button-icon-only {
-	width: 37px;
+	width: 32px;
 	padding: 0;
 }
 
 .gunix .v-button-icon-only.v-button-tiny {
-	width: 28px;
+	width: 24px;
 }
 
 .gunix .v-button-icon-only.v-button-small {
-	width: 31px;
+	width: 27px;
 }
 
 .gunix .v-button-icon-only.v-button-large {
-	width: 44px;
+	width: 38px;
 }
 
 .gunix .v-button-icon-only.v-button-huge {
-	width: 59px;
+	width: 51px;
 }
 
 .gunix .v-button-icon-only .v-button-caption {
@@ -2444,7 +2516,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-checkbox {
 	position: relative;
-	line-height: 19px;
+	line-height: 16px;
 	white-space: nowrap;
 }
 
@@ -2453,7 +2525,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 :root .gunix .v-checkbox {
-	padding-left: 25px;
+	padding-left: 21px;
 }
 
 :root .gunix .v-checkbox label {
@@ -2486,19 +2558,19 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	width: 19px;
-	height: 19px;
+	width: 16px;
+	height: 16px;
 	position: absolute;
 	top: 0;
 	left: 0;
 	border-radius: 4px;
-	font-size: 13px;
+	font-size: 11px;
 	text-align: center;
 }
 
 :root .gunix .v-checkbox > input ~ label:before {
-	height: 18.5px;
-	padding: 0 9px;
+	height: 16px;
+	padding: 0 8px;
 	color: #191919;
 	font-weight: 400;
 	
@@ -2514,12 +2586,12 @@ div.v-layout.v-horizontal.v-widget {
 	box-shadow: inset 0 1px 0 white, inset 0 -1px 0 #e7e7e7, 0 2px 3px rgba(0, 0, 0, 0.05);
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
 	padding: 0;
-	height: 19px;
+	height: 16px;
 }
 
 :root .gunix .v-checkbox > input ~ label:after {
 	content: "\f00c";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	color: transparent;
 	-webkit-transition: color 100ms;
 	-moz-transition: color 100ms;
@@ -2535,7 +2607,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-checkbox > .v-icon, .gunix .v-checkbox > label .v-icon {
-	margin: 0 6px 0 3px;
+	margin: 0 5px 0 3px;
 	min-width: 1em;
 	cursor: pointer;
 }
@@ -2573,9 +2645,9 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-checkbox-small {
 	position: relative;
-	line-height: 16px;
+	line-height: 14px;
 	white-space: nowrap;
-	font-size: 14px;
+	font-size: 12px;
 }
 
 .gunix .v-checkbox-small.v-has-width label {
@@ -2583,7 +2655,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 :root .gunix .v-checkbox-small {
-	padding-left: 21px;
+	padding-left: 18px;
 }
 
 :root .gunix .v-checkbox-small label {
@@ -2616,18 +2688,18 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	width: 16px;
-	height: 16px;
+	width: 14px;
+	height: 14px;
 	position: absolute;
 	top: 0;
 	left: 0;
 	border-radius: 4px;
-	font-size: 11px;
+	font-size: 9px;
 	text-align: center;
 }
 
 :root .gunix .v-checkbox-small > input ~ label:before {
-	height: 15.5px;
+	height: 13.5px;
 	padding: 0 7px;
 	color: #191919;
 	font-weight: 400;
@@ -2644,12 +2716,12 @@ div.v-layout.v-horizontal.v-widget {
 	box-shadow: inset 0 1px 0 white, inset 0 -1px 0 #e7e7e7, 0 2px 3px rgba(0, 0, 0, 0.05);
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
 	padding: 0;
-	height: 16px;
+	height: 14px;
 }
 
 :root .gunix .v-checkbox-small > input ~ label:after {
 	content: "\f00c";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	color: transparent;
 	-webkit-transition: color 100ms;
 	-moz-transition: color 100ms;
@@ -2665,7 +2737,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-checkbox-small > .v-icon, .gunix .v-checkbox-small > label .v-icon {
-	margin: 0 5px 0 3px;
+	margin: 0 5px 0 2px;
 	min-width: 1em;
 	cursor: pointer;
 }
@@ -2703,9 +2775,9 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-checkbox-large {
 	position: relative;
-	line-height: 22px;
+	line-height: 19px;
 	white-space: nowrap;
-	font-size: 20px;
+	font-size: 17px;
 }
 
 .gunix .v-checkbox-large.v-has-width label {
@@ -2713,7 +2785,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 :root .gunix .v-checkbox-large {
-	padding-left: 29px;
+	padding-left: 25px;
 }
 
 :root .gunix .v-checkbox-large label {
@@ -2746,19 +2818,19 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	width: 22px;
-	height: 22px;
+	width: 19px;
+	height: 19px;
 	position: absolute;
 	top: 0;
 	left: 0;
 	border-radius: 4px;
-	font-size: 15px;
+	font-size: 13px;
 	text-align: center;
 }
 
 :root .gunix .v-checkbox-large > input ~ label:before {
-	height: 22px;
-	padding: 0 10px;
+	height: 19px;
+	padding: 0 9px;
 	color: #191919;
 	font-weight: 400;
 	
@@ -2774,12 +2846,12 @@ div.v-layout.v-horizontal.v-widget {
 	box-shadow: inset 0 1px 0 white, inset 0 -1px 0 #e7e7e7, 0 2px 3px rgba(0, 0, 0, 0.05);
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
 	padding: 0;
-	height: 22px;
+	height: 19px;
 }
 
 :root .gunix .v-checkbox-large > input ~ label:after {
 	content: "\f00c";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	color: transparent;
 	-webkit-transition: color 100ms;
 	-moz-transition: color 100ms;
@@ -2795,7 +2867,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-checkbox-large > .v-icon, .gunix .v-checkbox-large > label .v-icon {
-	margin: 0 7px 0 4px;
+	margin: 0 6px 0 3px;
 	min-width: 1em;
 	cursor: pointer;
 }
@@ -2833,8 +2905,8 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-filterselect {
 	position: relative;
-	width: 185px;
-	height: 37px;
+	width: 160px;
+	height: 32px;
 	border-radius: 4px;
 	white-space: nowrap;
 }
@@ -2857,9 +2929,9 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 37px;
+	height: 32px;
 	border-radius: 4px;
-	padding: 4px 9px;
+	padding: 4px 8px;
 	border: 1px solid #c5c5c5;
 	background: white;
 	color: #474747;
@@ -2870,12 +2942,12 @@ div.v-layout.v-horizontal.v-widget {
 	transition: box-shadow 180ms, border 180ms;
 	width: 100% !important;
 	height: 100%;
-	padding-right: 44px;
+	padding-right: 33px;
 	border-radius: inherit;
 }
 
 .v-ie8 .gunix .v-filterselect [class*="input"], .v-ie9 .gunix .v-filterselect [class*="input"] {
-	line-height: 37px;
+	line-height: 32px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
@@ -2902,17 +2974,17 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-filterselect .v-icon + [class*="input"] {
-	padding-left: 37px;
+	padding-left: 32px;
 }
 
 .gunix .v-filterselect img.v-icon {
-	max-height: 37px;
-	margin-left: 9px;
+	max-height: 32px;
+	margin-left: 8px;
 }
 
 .gunix .v-filterselect span.v-icon {
 	color: #474747;
-	width: 37px;
+	width: 32px;
 	line-height: 1;
 	padding-top: 0.12em;
 }
@@ -2926,7 +2998,7 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-touch-callout: none;
 	cursor: pointer;
 	position: absolute;
-	width: 37px;
+	width: 32px;
 	top: 1px;
 	right: 1px;
 	bottom: 1px;
@@ -2940,13 +3012,13 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-filterselect [class$="button"]:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f078";
 	-webkit-transition: color 140ms;
 	-moz-transition: color 140ms;
 	transition: color 140ms;
 	position: absolute;
-	width: 37px;
+	width: 32px;
 	text-align: center;
 	top: 50%;
 	line-height: 1;
@@ -3020,7 +3092,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-filterselect-suggestpopup {
-	margin-top: 5px !important;
+	margin-top: 4px !important;
 }
 
 .gunix .v-filterselect-suggestpopup[class*="animate-in"] {
@@ -3060,8 +3132,8 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-filterselect-suggestpopup .gwt-MenuItem {
 	cursor: pointer;
-	line-height: 27px;
-	padding: 0 20px 0 10px;
+	line-height: 23px;
+	padding: 0 16px 0 8px;
 	border-radius: 3px;
 	font-weight: 400;
 	white-space: nowrap;
@@ -3083,8 +3155,8 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-filterselect-suggestpopup .gwt-MenuItem .v-icon {
-	max-height: 27px;
-	margin-right: 5px;
+	max-height: 23px;
+	margin-right: 4px;
 	min-width: 1em;
 }
 
@@ -3102,11 +3174,11 @@ div.v-layout.v-horizontal.v-widget {
 	background: rgba(212, 212, 212, 0.9);
 	color: #3b3b3b;
 	border-radius: 0 0 4px 4px;
-	height: 23px;
-	bottom: -23px;
-	font-size: 12px;
-	line-height: 23px;
-	padding: 0 6px;
+	height: 20px;
+	bottom: -20px;
+	font-size: 11px;
+	line-height: 20px;
+	padding: 0 5px;
 	cursor: default;
 	pointer-events: none;
 	-webkit-animation: valo-animate-in-slide-down 200ms 80ms backwards;
@@ -3129,11 +3201,11 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-transition: all 200ms;
 	-moz-transition: all 200ms;
 	transition: all 200ms;
-	width: 25px;
-	height: 25px;
-	line-height: 25px;
+	width: 22px;
+	height: 22px;
+	line-height: 22px;
 	text-align: center;
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	-webkit-transform: scale(0.8);
 	-moz-transform: scale(0.8);
 	-ms-transform: scale(0.8);
@@ -3292,9 +3364,9 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-filterselect-tiny {
-	height: 28px;
+	height: 24px;
 	
-	font-size: 12px;
+	font-size: 11px;
 }
 
 .gunix .v-filterselect-tiny [class*="input"] {
@@ -3315,9 +3387,9 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 28px;
+	height: 24px;
 	
-	padding: 3px 5px;
+	padding: 3px 4px;
 	
 	
 	-webkit-transition: box-shadow 180ms, border 180ms;
@@ -3325,28 +3397,28 @@ div.v-layout.v-horizontal.v-widget {
 	transition: box-shadow 180ms, border 180ms;
 	width: 100% !important;
 	height: 100%;
-	padding-right: 34px;
+	padding-right: 25px;
 	border-radius: inherit;
 }
 
 .v-ie8 .gunix .v-filterselect-tiny [class*="input"], .v-ie9 .gunix .v-filterselect-tiny [class*="input"] {
-	line-height: 28px;
+	line-height: 24px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
 
 .gunix .v-filterselect-tiny .v-icon + [class*="input"] {
-	padding-left: 28px;
+	padding-left: 24px;
 }
 
 .gunix .v-filterselect-tiny img.v-icon {
-	max-height: 28px;
-	margin-left: 5px;
+	max-height: 24px;
+	margin-left: 4px;
 }
 
 .gunix .v-filterselect-tiny span.v-icon {
 	
-	width: 28px;
+	width: 24px;
 	line-height: 1;
 	padding-top: 0.12em;
 }
@@ -3356,18 +3428,18 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-touch-callout: none;
 	cursor: pointer;
 	position: absolute;
-	width: 28px;
+	width: 24px;
 	border-radius: 0 4px 4px 0;
 }
 
 .gunix .v-filterselect-tiny [class$="button"]:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f078";
 	-webkit-transition: color 140ms;
 	-moz-transition: color 140ms;
 	transition: color 140ms;
 	position: absolute;
-	width: 28px;
+	width: 24px;
 	text-align: center;
 	top: 50%;
 	line-height: 1;
@@ -3420,7 +3492,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-filterselect-compact, .gunix .v-filterselect-small {
-	height: 31px;
+	height: 27px;
 	
 }
 
@@ -3442,9 +3514,9 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 31px;
+	height: 27px;
 	
-	padding: 3px 6px;
+	padding: 3px 5px;
 	
 	
 	-webkit-transition: box-shadow 180ms, border 180ms;
@@ -3452,28 +3524,28 @@ div.v-layout.v-horizontal.v-widget {
 	transition: box-shadow 180ms, border 180ms;
 	width: 100% !important;
 	height: 100%;
-	padding-right: 37px;
+	padding-right: 28px;
 	border-radius: inherit;
 }
 
 .v-ie8 .gunix .v-filterselect-compact [class*="input"], .v-ie9 .gunix .v-filterselect-compact [class*="input"], .v-ie8 .gunix .v-filterselect-small [class*="input"], .v-ie9 .gunix .v-filterselect-small [class*="input"] {
-	line-height: 31px;
+	line-height: 27px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
 
 .gunix .v-filterselect-compact .v-icon + [class*="input"], .gunix .v-filterselect-small .v-icon + [class*="input"] {
-	padding-left: 31px;
+	padding-left: 27px;
 }
 
 .gunix .v-filterselect-compact img.v-icon, .gunix .v-filterselect-small img.v-icon {
-	max-height: 31px;
-	margin-left: 6px;
+	max-height: 27px;
+	margin-left: 5px;
 }
 
 .gunix .v-filterselect-compact span.v-icon, .gunix .v-filterselect-small span.v-icon {
 	
-	width: 31px;
+	width: 27px;
 	line-height: 1;
 	padding-top: 0.12em;
 }
@@ -3483,18 +3555,18 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-touch-callout: none;
 	cursor: pointer;
 	position: absolute;
-	width: 31px;
+	width: 27px;
 	border-radius: 0 4px 4px 0;
 }
 
 .gunix .v-filterselect-compact [class$="button"]:before, .gunix .v-filterselect-small [class$="button"]:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f078";
 	-webkit-transition: color 140ms;
 	-moz-transition: color 140ms;
 	transition: color 140ms;
 	position: absolute;
-	width: 31px;
+	width: 27px;
 	text-align: center;
 	top: 50%;
 	line-height: 1;
@@ -3547,13 +3619,13 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-filterselect-small {
-	font-size: 14px;
+	font-size: 12px;
 }
 
 .gunix .v-filterselect-large {
-	height: 44px;
+	height: 38px;
 	
-	font-size: 20px;
+	font-size: 17px;
 }
 
 .gunix .v-filterselect-large [class*="input"] {
@@ -3574,9 +3646,9 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 44px;
+	height: 38px;
 	
-	padding: 5px 8px;
+	padding: 4px 7px;
 	
 	
 	-webkit-transition: box-shadow 180ms, border 180ms;
@@ -3584,28 +3656,28 @@ div.v-layout.v-horizontal.v-widget {
 	transition: box-shadow 180ms, border 180ms;
 	width: 100% !important;
 	height: 100%;
-	padding-right: 53px;
+	padding-right: 39px;
 	border-radius: inherit;
 }
 
 .v-ie8 .gunix .v-filterselect-large [class*="input"], .v-ie9 .gunix .v-filterselect-large [class*="input"] {
-	line-height: 44px;
+	line-height: 38px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
 
 .gunix .v-filterselect-large .v-icon + [class*="input"] {
-	padding-left: 44px;
+	padding-left: 38px;
 }
 
 .gunix .v-filterselect-large img.v-icon {
-	max-height: 44px;
-	margin-left: 8px;
+	max-height: 38px;
+	margin-left: 7px;
 }
 
 .gunix .v-filterselect-large span.v-icon {
 	
-	width: 44px;
+	width: 38px;
 	line-height: 1;
 	padding-top: 0.12em;
 }
@@ -3615,18 +3687,18 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-touch-callout: none;
 	cursor: pointer;
 	position: absolute;
-	width: 44px;
+	width: 38px;
 	border-radius: 0 4px 4px 0;
 }
 
 .gunix .v-filterselect-large [class$="button"]:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f078";
 	-webkit-transition: color 140ms;
 	-moz-transition: color 140ms;
 	transition: color 140ms;
 	position: absolute;
-	width: 44px;
+	width: 38px;
 	text-align: center;
 	top: 50%;
 	line-height: 1;
@@ -3679,9 +3751,9 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-filterselect-huge {
-	height: 59px;
+	height: 51px;
 	
-	font-size: 26px;
+	font-size: 23px;
 }
 
 .gunix .v-filterselect-huge [class*="input"] {
@@ -3702,9 +3774,9 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 59px;
+	height: 51px;
 	
-	padding: 7px 10px;
+	padding: 6px 9px;
 	
 	
 	-webkit-transition: box-shadow 180ms, border 180ms;
@@ -3712,28 +3784,28 @@ div.v-layout.v-horizontal.v-widget {
 	transition: box-shadow 180ms, border 180ms;
 	width: 100% !important;
 	height: 100%;
-	padding-right: 71px;
+	padding-right: 52px;
 	border-radius: inherit;
 }
 
 .v-ie8 .gunix .v-filterselect-huge [class*="input"], .v-ie9 .gunix .v-filterselect-huge [class*="input"] {
-	line-height: 59px;
+	line-height: 51px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
 
 .gunix .v-filterselect-huge .v-icon + [class*="input"] {
-	padding-left: 59px;
+	padding-left: 51px;
 }
 
 .gunix .v-filterselect-huge img.v-icon {
-	max-height: 59px;
-	margin-left: 10px;
+	max-height: 51px;
+	margin-left: 9px;
 }
 
 .gunix .v-filterselect-huge span.v-icon {
 	
-	width: 59px;
+	width: 51px;
 	line-height: 1;
 	padding-top: 0.12em;
 }
@@ -3743,18 +3815,18 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-touch-callout: none;
 	cursor: pointer;
 	position: absolute;
-	width: 59px;
+	width: 51px;
 	border-radius: 0 4px 4px 0;
 }
 
 .gunix .v-filterselect-huge [class$="button"]:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f078";
 	-webkit-transition: color 140ms;
 	-moz-transition: color 140ms;
 	transition: color 140ms;
 	position: absolute;
-	width: 59px;
+	width: 51px;
 	text-align: center;
 	top: 50%;
 	line-height: 1;
@@ -3822,19 +3894,19 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-csslayout-well  > .v-margin-top {
-	padding-top: 12px;
+	padding-top: 11px;
 }
 
 .gunix .v-csslayout-well  > .v-margin-right {
-	padding-right: 12px;
+	padding-right: 11px;
 }
 
 .gunix .v-csslayout-well  > .v-margin-bottom {
-	padding-bottom: 12px;
+	padding-bottom: 11px;
 }
 
 .gunix .v-csslayout-well  > .v-margin-left {
-	padding-left: 12px;
+	padding-left: 11px;
 }
 
 .gunix .v-csslayout-card {
@@ -3847,19 +3919,19 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-csslayout-card  > .v-margin-top {
-	padding-top: 12px;
+	padding-top: 11px;
 }
 
 .gunix .v-csslayout-card  > .v-margin-right {
-	padding-right: 12px;
+	padding-right: 11px;
 }
 
 .gunix .v-csslayout-card  > .v-margin-bottom {
-	padding-bottom: 12px;
+	padding-bottom: 11px;
 }
 
 .gunix .v-csslayout-card  > .v-margin-left {
-	padding-left: 12px;
+	padding-left: 11px;
 }
 
 .gunix .v-csslayout-v-component-group {
@@ -3918,7 +3990,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix [class*="spacing"] > tbody > [class*="row"] > td {
-	padding-top: 12px;
+	padding-top: 11px;
 }
 
 .gunix [class*="spacing"] > tbody > [class*="firstrow"] > td {
@@ -3926,27 +3998,27 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix [class*="margin-top"] > tbody > [class*="firstrow"] > td {
-	padding-top: 37px;
+	padding-top: 32px;
 }
 
 .gunix [class*="margin-bottom"] > tbody > [class*="lastrow"] > td {
-	padding-bottom: 37px;
+	padding-bottom: 32px;
 }
 
 .gunix [class*="margin-left"] > tbody > [class*="row"] > [class*="captioncell"] {
-	padding-left: 37px;
+	padding-left: 32px;
 }
 
 .gunix [class*="margin-left"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h2, .gunix [class*="margin-left"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h3, .gunix [class*="margin-left"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h4 {
-	left: 37px;
+	left: 32px;
 }
 
 .gunix [class*="margin-right"] > tbody > [class*="row"] > [class*="contentcell"] {
-	padding-right: 37px;
+	padding-right: 32px;
 }
 
 .gunix [class*="margin-right"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h2, .gunix [class*="margin-right"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h3, .gunix [class*="margin-right"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h4 {
-	right: 37px;
+	right: 32px;
 }
 
 .gunix .v-formlayout > table {
@@ -3959,12 +4031,12 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-formlayout-error-indicator {
-	width: 19px;
+	width: 16px;
 }
 
 .gunix .v-formlayout-captioncell {
 	vertical-align: top;
-	line-height: 36px;
+	line-height: 31px;
 }
 
 .gunix .v-formlayout-captioncell .v-caption {
@@ -3995,7 +4067,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-formlayout.light  > table > tbody > tr > td {
 	padding-top: 0;
-	height: 37px;
+	height: 32px;
 	border-bottom: 1px solid #eaeaea;
 }
 
@@ -4006,8 +4078,8 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-formlayout.light  > table > tbody > tr > [class*="captioncell"] {
 	color: #7d7d7d;
 	text-align: right;
-	padding-left: 13px;
-	line-height: 37px;
+	padding-left: 11px;
+	line-height: 32px;
 }
 
 .gunix .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"] {
@@ -4033,9 +4105,9 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 37px;
+	height: 32px;
 	border-radius: 0;
-	padding: 4px 7px;
+	padding: 4px 6px;
 	
 	-webkit-box-shadow: none;
 	box-shadow: none;
@@ -4048,7 +4120,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .v-ie8 .gunix .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-textfield, .v-ie9 .gunix .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-textfield, .v-ie8 .gunix .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-textarea, .v-ie9 .gunix .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-textarea, .v-ie8 .gunix .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-filterselect input, .v-ie9 .gunix .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-filterselect input, .v-ie8 .gunix .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-datefield input, .v-ie9 .gunix .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-datefield input, .v-ie8 .gunix .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-richtextarea, .v-ie9 .gunix .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-richtextarea {
-	line-height: 37px;
+	line-height: 32px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
@@ -4093,7 +4165,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-formlayout.light .v-richtextarea {
-	margin: 5px 0;
+	margin: 4px 0;
 }
 
 .gunix .v-formlayout.light .v-filterselect-button, .gunix .v-formlayout.light .v-datefield-button {
@@ -4110,7 +4182,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-formlayout.light .v-checkbox {
-	margin-left: 7px;
+	margin-left: 6px;
 }
 
 .gunix .v-grid {
@@ -4228,7 +4300,7 @@ div.v-layout.v-horizontal.v-widget {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	overflow: hidden;
-	font-size: 16px;
+	font-size: 14px;
 }
 
 .gunix .v-grid-cell.frozen {
@@ -4312,6 +4384,10 @@ div.v-layout.v-horizontal.v-widget {
 	z-index: 5;
 }
 
+.gunix .v-grid-sidebar.v-contextmenu.v-grid-sidebar-popup {
+	right: auto;
+}
+
 .gunix .v-grid-sidebar.v-contextmenu .v-grid-sidebar-button {
 	background: transparent;
 	border: none;
@@ -4334,8 +4410,8 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-grid-sidebar.v-contextmenu .v-grid-sidebar-button:after {
 	content: "\f0c9";
 	display: block;
-	font-family: FontAwesome, sans-serif;
-	font-size: 14px;
+	font-family: ThemeIcons, sans-serif;
+	font-size: 12px;
 }
 
 .gunix .v-grid-sidebar.v-contextmenu.closed {
@@ -4348,7 +4424,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-grid-sidebar.v-contextmenu.open .v-grid-sidebar-button:after {
 	content: "\f0c9";
-	font-size: 14px;
+	font-size: 12px;
 	line-height: 1;
 }
 
@@ -4372,13 +4448,13 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-grid-cell {
 	background-color: white;
-	padding: 0 12px;
-	line-height: 37px;
+	padding: 0 16.5px;
+	line-height: 32px;
 	text-overflow: ellipsis;
 }
 
 .gunix .v-grid-cell  > * {
-	line-height: 1.55;
+	line-height: 1.4;
 	vertical-align: middle;
 }
 
@@ -4427,7 +4503,7 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-grid-header th {
 	position: relative;
 	background-color: #fafafa;
-	font-size: 14px;
+	font-size: 12px;
 	font-weight: inherit;
 	border-left: 1px solid #d4d4d4;
 	border-bottom: 1px solid #d4d4d4;
@@ -4440,24 +4516,42 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-grid-header .sort-asc, .gunix .v-grid-header .sort-desc {
-	padding-right: 29px;
+	padding-right: 30.5px;
 }
 
 .gunix .v-grid-header .sort-asc:after, .gunix .v-grid-header .sort-desc:after {
-	font-family: FontAwesome, sans-serif;
+	font-family: ThemeIcons, sans-serif;
 	content: "\f0de" " " attr(sort-order);
 	position: absolute;
-	right: 12px;
-	font-size: 12px;
+	right: 16.5px;
+	font-size: 10px;
 }
 
 .gunix .v-grid-header .sort-desc:after {
 	content: "\f0dd" " " attr(sort-order);
 }
 
+.gunix .v-grid-column-resize-handle {
+	position: absolute;
+	width: 33px;
+	top: 0px;
+	bottom: 0px;
+	cursor: col-resize;
+	z-index: 10;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.gunix .sort-asc  > .v-grid-column-resize-handle, .gunix .sort-desc  > .v-grid-column-resize-handle {
+	right: -16.5px;
+}
+
 .gunix .v-grid-footer td {
 	background-color: #fafafa;
-	font-size: 14px;
+	font-size: 12px;
 	font-weight: inherit;
 	border-left: 1px solid #d4d4d4;
 	border-top: 1px solid #d4d4d4;
@@ -4467,6 +4561,18 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-grid-footer td:first-child {
 	border-left: none;
+}
+
+.gunix .v-grid-header .v-grid-cell, .gunix .v-grid-footer .v-grid-cell {
+	overflow: visible;
+}
+
+.gunix .v-grid-column-header-content, .gunix .v-grid-column-footer-content {
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	line-height: 32px;
+	vertical-align: baseline;
 }
 
 .gunix .v-grid-header-deco {
@@ -4529,6 +4635,10 @@ div.v-layout.v-horizontal.v-widget {
 	box-shadow: 0 0 9px rgba(0, 0, 0, 0.2);
 }
 
+.gunix .v-grid-editor.unbuffered .v-grid-editor-footer {
+	width: 100%;
+}
+
 .gunix .v-grid-editor-cells {
 	position: relative;
 	white-space: nowrap;
@@ -4556,6 +4666,22 @@ div.v-layout.v-horizontal.v-widget {
 	display: inline-block;
 }
 
+.gunix .v-grid-editor-cells  > div .v-filterselect {
+	padding-left: 0;
+}
+
+.gunix .v-grid-editor-cells  > div input[type="text"], .gunix .v-grid-editor-cells  > div input[type="text"].v-filterselect-input, .gunix .v-grid-editor-cells  > div input[type="password"] {
+	padding-left: 16.5px;
+}
+
+.gunix .v-grid-editor-cells  > div input[type="text"]:not(.v-filterselect-input), .gunix .v-grid-editor-cells  > div input[type="password"] {
+	padding-right: 8.25px;
+}
+
+.gunix .v-grid-editor-cells  > div input[type="checkbox"] {
+	margin-left: 16.5px;
+}
+
 .gunix .v-grid-editor-cells  > div .v-textfield, .gunix .v-grid-editor-cells  > div .v-datefield, .gunix .v-grid-editor-cells  > div .v-filterselect {
 	min-width: 100%;
 	max-width: 100%;
@@ -4576,6 +4702,10 @@ div.v-layout.v-horizontal.v-widget {
 	max-width: 100%;
 }
 
+.gunix .v-grid-editor-cells  > div.not-editable.v-grid-cell {
+	float: none;
+}
+
 .gunix .v-grid-editor-cells .error::before {
 	position: absolute;
 	display: block;
@@ -4592,7 +4722,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-grid-editor-footer {
 	display: table;
-	height: 37px;
+	height: 32px;
 	border-top: 1px solid #d4d4d4;
 	margin-top: -1px;
 	background: white;
@@ -4627,7 +4757,7 @@ div.v-layout.v-horizontal.v-widget {
 	width: 100%;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	line-height: 37px;
+	line-height: 32px;
 	top: 0;
 }
 
@@ -4686,6 +4816,11 @@ div.v-layout.v-horizontal.v-widget {
 	background-color: #fafafa;
 }
 
+.gunix .v-grid.v-disabled {
+	opacity: 0.5;
+	filter: alpha(opacity=50) ;
+}
+
 .gunix .v-grid-header .v-grid-cell {
 	background-color: #fafafa;
 	background-image: -webkit-linear-gradient(top, #fafafa 2%, #efefef 98%);
@@ -4702,7 +4837,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-grid-header .v-grid-cell.dragged-column-header {
-	margin-top: -19px;
+	margin-top: -16px;
 }
 
 .gunix .v-grid-footer .v-grid-cell {
@@ -4744,7 +4879,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-grid-editor-footer {
-	font-size: 14px;
+	font-size: 12px;
 	padding: 0 6px;
 	background: #fafafa;
 	-webkit-animation: valo-grid-editor-footer-animate-in 200ms 120ms backwards;
@@ -4769,9 +4904,13 @@ div.v-layout.v-horizontal.v-widget {
 	vertical-align: middle;
 }
 
+.gunix .v-grid-editor-cells > div.not-editable.v-grid-cell {
+	float: none;
+}
+
 .gunix .v-grid-editor-cells > div .error::before {
-	border-top: 9px solid #ed473b;
-	border-right: 9px solid transparent;
+	border-top: 8px solid #ed473b;
+	border-right: 8px solid transparent;
 }
 
 .gunix .v-grid-editor-cells > div .error, .gunix .v-grid-editor-cells > div .error > input {
@@ -4784,6 +4923,10 @@ div.v-layout.v-horizontal.v-widget {
 	background: transparent;
 	-webkit-box-shadow: inset 0 1px 0 #f2f2f2;
 	box-shadow: inset 0 1px 0 #f2f2f2;
+}
+
+.gunix .v-grid-editor-cells > div input[type="text"].v-datefield-textfield {
+	padding-left: 38.4px;
 }
 
 .v-ie8 .gunix .v-grid-editor-cells > div .v-datefield-button {
@@ -4799,15 +4942,19 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-grid-editor-cells > div .v-select {
-	padding-left: 6px;
-	padding-right: 6px;
+	padding-left: 8px;
+	padding-right: 8px;
 }
 
 .gunix .v-grid-editor-cells > div .v-checkbox {
-	margin: 0 6px;
+	margin: 0 8px 0 16.5px;
 }
 
-.gunix .v-grid-editor-cells > div .v-checkbox label {
+.gunix .v-grid-editor-cells > div .v-checkbox  > input[type="checkbox"] {
+	margin-left: 0;
+}
+
+.gunix .v-grid-editor-cells > div .v-checkbox  > label {
 	white-space: nowrap;
 }
 
@@ -4815,7 +4962,7 @@ div.v-layout.v-horizontal.v-widget {
 	display: inline-block;
 	color: #ed473b;
 	font-weight: 600;
-	width: 19px;
+	width: 16px;
 	text-align: center;
 	content: "!";
 }
@@ -4896,9 +5043,9 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 37px;
+	height: 32px;
 	border-radius: 4px;
-	padding: 4px 9px;
+	padding: 4px 8px;
 	border: 1px solid #c5c5c5;
 	background: white;
 	color: #474747;
@@ -4907,11 +5054,11 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-transition: box-shadow 180ms, border 180ms;
 	-moz-transition: box-shadow 180ms, border 180ms;
 	transition: box-shadow 180ms, border 180ms;
-	width: 185px;
+	width: 160px;
 }
 
 .v-ie8 .gunix .v-textfield, .v-ie9 .gunix .v-textfield {
-	line-height: 37px;
+	line-height: 32px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
@@ -4990,19 +5137,19 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 28px;
+	height: 24px;
 	border-radius: 4px;
-	padding: 3px 7px;
+	padding: 3px 6px;
 	
 	
 	-webkit-transition: box-shadow 180ms, border 180ms;
 	-moz-transition: box-shadow 180ms, border 180ms;
 	transition: box-shadow 180ms, border 180ms;
-	font-size: 12px;
+	font-size: 11px;
 }
 
 .v-ie8 .gunix .v-textfield-tiny, .v-ie9 .gunix .v-textfield-tiny {
-	line-height: 28px;
+	line-height: 24px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
@@ -5022,9 +5169,9 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 31px;
+	height: 27px;
 	border-radius: 4px;
-	padding: 3px 8px;
+	padding: 3px 7px;
 	
 	
 	-webkit-transition: box-shadow 180ms, border 180ms;
@@ -5033,13 +5180,13 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .v-ie8 .gunix .v-textfield-compact, .v-ie9 .gunix .v-textfield-compact, .v-ie8 .gunix .v-textfield-small, .v-ie9 .gunix .v-textfield-small {
-	line-height: 31px;
+	line-height: 27px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
 
 .gunix .v-textfield-small {
-	font-size: 14px;
+	font-size: 12px;
 }
 
 .gunix .v-textfield-large {
@@ -5057,19 +5204,19 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 44px;
+	height: 38px;
 	border-radius: 4px;
-	padding: 5px 10px;
+	padding: 4px 9px;
 	
 	
 	-webkit-transition: box-shadow 180ms, border 180ms;
 	-moz-transition: box-shadow 180ms, border 180ms;
 	transition: box-shadow 180ms, border 180ms;
-	font-size: 20px;
+	font-size: 17px;
 }
 
 .v-ie8 .gunix .v-textfield-large, .v-ie9 .gunix .v-textfield-large {
-	line-height: 44px;
+	line-height: 38px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
@@ -5089,19 +5236,19 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 59px;
+	height: 51px;
 	border-radius: 4px;
-	padding: 7px 12px;
+	padding: 6px 11px;
 	
 	
 	-webkit-transition: box-shadow 180ms, border 180ms;
 	-moz-transition: box-shadow 180ms, border 180ms;
 	transition: box-shadow 180ms, border 180ms;
-	font-size: 26px;
+	font-size: 23px;
 }
 
 .v-ie8 .gunix .v-textfield-huge, .v-ie9 .gunix .v-textfield-huge {
-	line-height: 59px;
+	line-height: 51px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
@@ -5115,7 +5262,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-caption-inline-icon .v-captiontext {
-	font-size: 14px;
+	font-size: 13px;
 	font-weight: 400;
 	padding-bottom: 0.3em;
 	padding-left: 1px;
@@ -5130,19 +5277,19 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-caption-inline-icon span.v-icon {
 	left: 1px;
 	bottom: 1px;
-	width: 37px;
-	line-height: 35px;
+	width: 32px;
+	line-height: 30px;
 	text-align: center;
-	font-size: 16px;
+	font-size: 14px;
 }
 
 .gunix .v-caption-inline-icon img.v-icon {
-	left: 11px;
-	bottom: 11px;
+	left: 8px;
+	bottom: 8px;
 }
 
 .gunix .v-textfield-inline-icon  {
-	padding-left: 37px;
+	padding-left: 32px;
 }
 
 .gunix .v-slot-inline-icon.v-slot-tiny {
@@ -5154,7 +5301,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-caption-inline-icon.v-caption-tiny .v-captiontext {
-	font-size: 14px;
+	font-size: 13px;
 	font-weight: 400;
 	padding-bottom: 0.3em;
 	padding-left: 1px;
@@ -5169,19 +5316,19 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-caption-inline-icon.v-caption-tiny span.v-icon {
 	left: 1px;
 	bottom: 1px;
-	width: 28px;
-	line-height: 26px;
+	width: 24px;
+	line-height: 22px;
 	text-align: center;
-	font-size: 12px;
+	font-size: 11px;
 }
 
 .gunix .v-caption-inline-icon.v-caption-tiny img.v-icon {
-	left: 6px;
-	bottom: 6px;
+	left: 4px;
+	bottom: 4px;
 }
 
 .gunix .v-textfield-inline-icon.v-textfield-tiny  {
-	padding-left: 28px;
+	padding-left: 24px;
 }
 
 .gunix .v-slot-inline-icon.v-slot-compact {
@@ -5193,7 +5340,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-caption-inline-icon.v-caption-compact .v-captiontext {
-	font-size: 14px;
+	font-size: 13px;
 	font-weight: 400;
 	padding-bottom: 0.3em;
 	padding-left: 1px;
@@ -5208,19 +5355,19 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-caption-inline-icon.v-caption-compact span.v-icon {
 	left: 1px;
 	bottom: 1px;
-	width: 31px;
-	line-height: 29px;
+	width: 27px;
+	line-height: 25px;
 	text-align: center;
-	font-size: 16px;
+	font-size: 14px;
 }
 
 .gunix .v-caption-inline-icon.v-caption-compact img.v-icon {
-	left: 8px;
-	bottom: 8px;
+	left: 6px;
+	bottom: 6px;
 }
 
 .gunix .v-textfield-inline-icon.v-textfield-compact  {
-	padding-left: 31px;
+	padding-left: 27px;
 }
 
 .gunix .v-slot-inline-icon.v-slot-small {
@@ -5232,7 +5379,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-caption-inline-icon.v-caption-small .v-captiontext {
-	font-size: 14px;
+	font-size: 13px;
 	font-weight: 400;
 	padding-bottom: 0.3em;
 	padding-left: 1px;
@@ -5247,19 +5394,19 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-caption-inline-icon.v-caption-small span.v-icon {
 	left: 1px;
 	bottom: 1px;
-	width: 31px;
-	line-height: 29px;
+	width: 27px;
+	line-height: 25px;
 	text-align: center;
-	font-size: 14px;
+	font-size: 12px;
 }
 
 .gunix .v-caption-inline-icon.v-caption-small img.v-icon {
-	left: 8px;
-	bottom: 8px;
+	left: 6px;
+	bottom: 6px;
 }
 
 .gunix .v-textfield-inline-icon.v-textfield-small  {
-	padding-left: 31px;
+	padding-left: 27px;
 }
 
 .gunix .v-slot-inline-icon.v-slot-large {
@@ -5271,7 +5418,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-caption-inline-icon.v-caption-large .v-captiontext {
-	font-size: 14px;
+	font-size: 13px;
 	font-weight: 400;
 	padding-bottom: 0.3em;
 	padding-left: 1px;
@@ -5286,19 +5433,19 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-caption-inline-icon.v-caption-large span.v-icon {
 	left: 1px;
 	bottom: 1px;
-	width: 44px;
-	line-height: 42px;
+	width: 38px;
+	line-height: 36px;
 	text-align: center;
-	font-size: 20px;
+	font-size: 17px;
 }
 
 .gunix .v-caption-inline-icon.v-caption-large img.v-icon {
-	left: 14px;
-	bottom: 14px;
+	left: 11px;
+	bottom: 11px;
 }
 
 .gunix .v-textfield-inline-icon.v-textfield-large  {
-	padding-left: 44px;
+	padding-left: 38px;
 }
 
 .gunix .v-slot-inline-icon.v-slot-huge {
@@ -5310,7 +5457,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-caption-inline-icon.v-caption-huge .v-captiontext {
-	font-size: 14px;
+	font-size: 13px;
 	font-weight: 400;
 	padding-bottom: 0.3em;
 	padding-left: 1px;
@@ -5325,19 +5472,19 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-caption-inline-icon.v-caption-huge span.v-icon {
 	left: 1px;
 	bottom: 1px;
-	width: 59px;
-	line-height: 57px;
+	width: 51px;
+	line-height: 49px;
 	text-align: center;
-	font-size: 26px;
+	font-size: 23px;
 }
 
 .gunix .v-caption-inline-icon.v-caption-huge img.v-icon {
-	left: 22px;
-	bottom: 22px;
+	left: 18px;
+	bottom: 18px;
 }
 
 .gunix .v-textfield-inline-icon.v-textfield-huge  {
-	padding-left: 59px;
+	padding-left: 51px;
 }
 
 .gunix .v-textfield-align-right {
@@ -5363,9 +5510,9 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 37px;
+	height: 32px;
 	border-radius: 4px;
-	padding: 6px;
+	padding: 5px;
 	border: 1px solid #c5c5c5;
 	background: white;
 	color: #474747;
@@ -5377,11 +5524,11 @@ div.v-layout.v-horizontal.v-widget {
 	height: auto;
 	resize: none;
 	white-space: pre-wrap;
-	width: 185px;
+	width: 160px;
 }
 
 .v-ie8 .gunix .v-textarea, .v-ie9 .gunix .v-textarea {
-	line-height: 37px;
+	line-height: 32px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
@@ -5466,9 +5613,9 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 28px;
+	height: 24px;
 	border-radius: 4px;
-	padding: 6px;
+	padding: 5px;
 	
 	
 	
@@ -5478,11 +5625,11 @@ div.v-layout.v-horizontal.v-widget {
 	height: auto;
 	resize: none;
 	white-space: pre-wrap;
-	font-size: 12px;
+	font-size: 11px;
 }
 
 .v-ie8 .gunix .v-textarea-tiny, .v-ie9 .gunix .v-textarea-tiny {
-	line-height: 28px;
+	line-height: 24px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
@@ -5508,9 +5655,9 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 31px;
+	height: 27px;
 	border-radius: 4px;
-	padding: 6px;
+	padding: 5px;
 	
 	
 	
@@ -5520,11 +5667,11 @@ div.v-layout.v-horizontal.v-widget {
 	height: auto;
 	resize: none;
 	white-space: pre-wrap;
-	font-size: 14px;
+	font-size: 12px;
 }
 
 .v-ie8 .gunix .v-textarea-small, .v-ie9 .gunix .v-textarea-small {
-	line-height: 31px;
+	line-height: 27px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
@@ -5550,9 +5697,9 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 44px;
+	height: 38px;
 	border-radius: 4px;
-	padding: 6px;
+	padding: 5px;
 	
 	
 	
@@ -5562,19 +5709,19 @@ div.v-layout.v-horizontal.v-widget {
 	height: auto;
 	resize: none;
 	white-space: pre-wrap;
-	font-size: 20px;
+	font-size: 17px;
 }
 
 .v-ie8 .gunix .v-textarea-large, .v-ie9 .gunix .v-textarea-large {
-	line-height: 44px;
+	line-height: 38px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
 
 .v-ie8 .gunix .v-textarea-large, .v-ie9 .gunix .v-textarea-large {
 	line-height: inherit;
-	padding-top: 5px;
-	padding-bottom: 5px;
+	padding-top: 4px;
+	padding-bottom: 4px;
 }
 
 .gunix .v-textarea-huge {
@@ -5592,9 +5739,9 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 59px;
+	height: 51px;
 	border-radius: 4px;
-	padding: 6px;
+	padding: 5px;
 	
 	
 	
@@ -5604,19 +5751,19 @@ div.v-layout.v-horizontal.v-widget {
 	height: auto;
 	resize: none;
 	white-space: pre-wrap;
-	font-size: 26px;
+	font-size: 23px;
 }
 
 .v-ie8 .gunix .v-textarea-huge, .v-ie9 .gunix .v-textarea-huge {
-	line-height: 59px;
+	line-height: 51px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
 
 .v-ie8 .gunix .v-textarea-huge, .v-ie9 .gunix .v-textarea-huge {
 	line-height: inherit;
-	padding-top: 7px;
-	padding-bottom: 7px;
+	padding-top: 6px;
+	padding-bottom: 6px;
 }
 
 .gunix .v-textarea-align-right {
@@ -5629,8 +5776,8 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-datefield {
 	position: relative;
-	width: 185px;
-	height: 37px;
+	width: 160px;
+	height: 32px;
 	border-radius: 4px;
 }
 
@@ -5652,9 +5799,9 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 37px;
+	height: 32px;
 	border-radius: 4px;
-	padding: 4px 9px;
+	padding: 4px 8px;
 	border: 1px solid #c5c5c5;
 	background: white;
 	color: #474747;
@@ -5663,14 +5810,14 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-transition: box-shadow 180ms, border 180ms;
 	-moz-transition: box-shadow 180ms, border 180ms;
 	transition: box-shadow 180ms, border 180ms;
-	padding-left: 44.4px;
+	padding-left: 38.4px;
 	width: 100%;
 	height: 100%;
 	border-radius: inherit;
 }
 
 .v-ie8 .gunix .v-datefield [class*="textfield"], .v-ie9 .gunix .v-datefield [class*="textfield"] {
-	line-height: 37px;
+	line-height: 32px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
@@ -5709,8 +5856,8 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 0;
 	position: absolute;
 	z-index: 10;
-	width: 37px;
-	line-height: 35px;
+	width: 32px;
+	line-height: 30px;
 	text-align: center;
 	font: inherit;
 	outline: none;
@@ -5729,7 +5876,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-datefield [class*="button"]:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f073";
 	-webkit-transition: color 140ms;
 	-moz-transition: color 140ms;
@@ -5794,19 +5941,19 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-datefield-full {
-	width: 240px;
+	width: 210px;
 }
 
 .gunix .v-datefield-day {
-	width: 185px;
+	width: 160px;
 }
 
 .gunix .v-datefield-month {
-	width: 120px;
+	width: 105px;
 }
 
 .gunix .v-datefield-year {
-	width: 104px;
+	width: 91px;
 }
 
 .gunix .v-datefield-popup {
@@ -5820,9 +5967,9 @@ div.v-layout.v-horizontal.v-widget {
 	-moz-backface-visibility: hidden;
 	-ms-backface-visibility: hidden;
 	backface-visibility: hidden;
-	margin-top: 5px !important;
-	margin-bottom: 5px !important;
-	margin-right: 5px !important;
+	margin-top: 4px !important;
+	margin-bottom: 4px !important;
+	margin-right: 4px !important;
 	cursor: default;
 	width: auto;
 }
@@ -5850,7 +5997,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-datefield-popup .v-datefield-calendarpanel {
-	font-size: 16px;
+	font-size: 14px;
 	text-align: center;
 }
 
@@ -5862,12 +6009,12 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	width: 30px;
-	height: 26px;
+	width: 26px;
+	height: 22px;
 	border: 1px solid transparent;
-	line-height: 26px;
+	line-height: 22px;
 	text-align: center;
-	font-size: 14px;
+	font-size: 13px;
 	background: #fafafa;
 	border-radius: 2px;
 	-webkit-transition: color 200ms;
@@ -5920,13 +6067,13 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-datefield-popup .v-datefield-calendarpanel-weekdays {
-	height: 26px;
+	height: 22px;
 	color: rgba(133, 133, 133, 0.85);
 }
 
 .gunix .v-datefield-popup .v-datefield-calendarpanel-weekdays strong {
 	font: inherit;
-	font-size: 14px;
+	font-size: 13px;
 }
 
 .gunix .v-datefield-popup .v-datefield-calendarpanel-header {
@@ -5946,8 +6093,8 @@ div.v-layout.v-horizontal.v-widget {
 	cursor: pointer;
 	color: transparent;
 	font-size: 0;
-	width: 19px;
-	height: 25px;
+	width: 16px;
+	height: 21px;
 	outline: none;
 	position: relative;
 	vertical-align: middle;
@@ -5955,8 +6102,8 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-datefield-popup td[class*="year"] button:before, .gunix .v-datefield-popup td[class*="month"] button:before {
 	color: #a0a0a0;
-	font-size: 21px;
-	line-height: 24px;
+	font-size: 18px;
+	line-height: 21px;
 	-webkit-transition: color 200ms;
 	-moz-transition: color 200ms;
 	transition: color 200ms;
@@ -5977,38 +6124,38 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-datefield-popup .v-button-prevyear:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f100";
 }
 
 .gunix .v-datefield-popup .v-button-prevmonth:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f104";
 }
 
 .gunix .v-datefield-popup .v-button-nextyear:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f101";
 }
 
 .gunix .v-datefield-popup .v-button-nextmonth:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f105";
 }
 
 .gunix .v-datefield-popup td.v-datefield-calendarpanel-month {
-	width: 148px;
+	width: 128px;
 	color: #197de1;
 }
 
 .gunix .v-datefield-popup .v-datefield-calendarpanel-year td.v-datefield-calendarpanel-month {
-	width: 74px;
+	width: 64px;
 }
 
 .gunix .v-datefield-popup .v-datefield-calendarpanel-weeknumber, .gunix .v-datefield-popup .v-datefield-calendarpanel-weekdays.v-datefield-calendarpanel-weeknumbers td:first-child {
-	width: 30px;
+	width: 26px;
 	color: rgba(133, 133, 133, 0.85);
-	font-size: 14px;
+	font-size: 13px;
 	display: inline-block;
 	text-align: left;
 }
@@ -6020,10 +6167,10 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-datefield-popup .v-datefield-calendarpanel-weeknumbers .v-first:before {
 	content: "";
 	position: absolute;
-	top: 38px;
+	top: 32px;
 	bottom: 0;
 	left: 0;
-	width: 34px;
+	width: 30px;
 	border-top: 1px solid #eaeaea;
 	border-right: 1px solid #eaeaea;
 	border-top-right-radius: 4px;
@@ -6033,7 +6180,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-datefield-popup td.v-datefield-calendarpanel-time {
 	width: 100%;
-	font-size: 14px;
+	font-size: 13px;
 }
 
 .gunix .v-datefield-popup td.v-datefield-calendarpanel-time .v-label {
@@ -6043,7 +6190,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-datefield-calendarpanel {
-	font-size: 16px;
+	font-size: 14px;
 	text-align: center;
 }
 
@@ -6055,12 +6202,12 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	width: 30px;
-	height: 26px;
+	width: 26px;
+	height: 22px;
 	border: 1px solid transparent;
-	line-height: 26px;
+	line-height: 22px;
 	text-align: center;
-	font-size: 14px;
+	font-size: 13px;
 	background: #fafafa;
 	border-radius: 2px;
 	-webkit-transition: color 200ms;
@@ -6113,13 +6260,13 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-datefield-calendarpanel-weekdays {
-	height: 26px;
+	height: 22px;
 	color: rgba(133, 133, 133, 0.85);
 }
 
 .gunix .v-datefield-calendarpanel-weekdays strong {
 	font: inherit;
-	font-size: 14px;
+	font-size: 13px;
 }
 
 .gunix .v-datefield-calendarpanel-header {
@@ -6139,8 +6286,8 @@ div.v-layout.v-horizontal.v-widget {
 	cursor: pointer;
 	color: transparent;
 	font-size: 0;
-	width: 19px;
-	height: 25px;
+	width: 16px;
+	height: 21px;
 	outline: none;
 	position: relative;
 	vertical-align: middle;
@@ -6148,8 +6295,8 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix td[class*="year"] button:before, .gunix td[class*="month"] button:before {
 	color: #a0a0a0;
-	font-size: 21px;
-	line-height: 24px;
+	font-size: 18px;
+	line-height: 21px;
 	-webkit-transition: color 200ms;
 	-moz-transition: color 200ms;
 	transition: color 200ms;
@@ -6170,38 +6317,38 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-button-prevyear:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f100";
 }
 
 .gunix .v-button-prevmonth:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f104";
 }
 
 .gunix .v-button-nextyear:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f101";
 }
 
 .gunix .v-button-nextmonth:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f105";
 }
 
 .gunix td.v-datefield-calendarpanel-month {
-	width: 148px;
+	width: 128px;
 	color: #197de1;
 }
 
 .gunix .v-datefield-calendarpanel-year td.v-datefield-calendarpanel-month {
-	width: 74px;
+	width: 64px;
 }
 
 .gunix .v-datefield-calendarpanel-weeknumber, .gunix .v-datefield-calendarpanel-weekdays.v-datefield-calendarpanel-weeknumbers td:first-child {
-	width: 30px;
+	width: 26px;
 	color: rgba(133, 133, 133, 0.85);
-	font-size: 14px;
+	font-size: 13px;
 	display: inline-block;
 	text-align: left;
 }
@@ -6213,10 +6360,10 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-datefield-calendarpanel-weeknumbers .v-first:before {
 	content: "";
 	position: absolute;
-	top: 38px;
+	top: 32px;
 	bottom: 0;
 	left: 0;
-	width: 34px;
+	width: 30px;
 	border-top: 1px solid #eaeaea;
 	border-right: 1px solid #eaeaea;
 	border-top-right-radius: 4px;
@@ -6226,7 +6373,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix td.v-datefield-calendarpanel-time {
 	width: 100%;
-	font-size: 14px;
+	font-size: 13px;
 }
 
 .gunix td.v-datefield-calendarpanel-time .v-label {
@@ -6271,9 +6418,9 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-datefield-tiny {
-	height: 28px;
+	height: 24px;
 	border-radius: 4px;
-	font-size: 12px;
+	font-size: 11px;
 }
 
 .gunix .v-datefield-tiny [class*="textfield"] {
@@ -6294,23 +6441,23 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 28px;
+	height: 24px;
 	border-radius: 4px;
-	padding: 3px 7px;
+	padding: 3px 6px;
 	
 	
 	
 	-webkit-transition: box-shadow 180ms, border 180ms;
 	-moz-transition: box-shadow 180ms, border 180ms;
 	transition: box-shadow 180ms, border 180ms;
-	padding-left: 33.6px;
+	padding-left: 28.8px;
 	width: 100%;
 	height: 100%;
 	border-radius: inherit;
 }
 
 .v-ie8 .gunix .v-datefield-tiny [class*="textfield"], .v-ie9 .gunix .v-datefield-tiny [class*="textfield"] {
-	line-height: 28px;
+	line-height: 24px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
@@ -6324,8 +6471,8 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 0;
 	position: absolute;
 	z-index: 10;
-	width: 28px;
-	line-height: 28px;
+	width: 24px;
+	line-height: 24px;
 	text-align: center;
 	font: inherit;
 	outline: none;
@@ -6334,7 +6481,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-datefield-tiny [class*="button"]:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f073";
 	-webkit-transition: color 140ms;
 	-moz-transition: color 140ms;
@@ -6387,7 +6534,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-datefield-compact, .gunix .v-datefield-small {
-	height: 31px;
+	height: 27px;
 	border-radius: 4px;
 }
 
@@ -6409,23 +6556,23 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 31px;
+	height: 27px;
 	border-radius: 4px;
-	padding: 3px 8px;
+	padding: 3px 7px;
 	
 	
 	
 	-webkit-transition: box-shadow 180ms, border 180ms;
 	-moz-transition: box-shadow 180ms, border 180ms;
 	transition: box-shadow 180ms, border 180ms;
-	padding-left: 37.2px;
+	padding-left: 32.4px;
 	width: 100%;
 	height: 100%;
 	border-radius: inherit;
 }
 
 .v-ie8 .gunix .v-datefield-compact [class*="textfield"], .v-ie9 .gunix .v-datefield-compact [class*="textfield"], .v-ie8 .gunix .v-datefield-small [class*="textfield"], .v-ie9 .gunix .v-datefield-small [class*="textfield"] {
-	line-height: 31px;
+	line-height: 27px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
@@ -6439,8 +6586,8 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 0;
 	position: absolute;
 	z-index: 10;
-	width: 31px;
-	line-height: 31px;
+	width: 27px;
+	line-height: 27px;
 	text-align: center;
 	font: inherit;
 	outline: none;
@@ -6449,7 +6596,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-datefield-compact [class*="button"]:before, .gunix .v-datefield-small [class*="button"]:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f073";
 	-webkit-transition: color 140ms;
 	-moz-transition: color 140ms;
@@ -6502,13 +6649,13 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-datefield-small {
-	font-size: 14px;
+	font-size: 12px;
 }
 
 .gunix .v-datefield-large {
-	height: 44px;
+	height: 38px;
 	border-radius: 4px;
-	font-size: 20px;
+	font-size: 17px;
 }
 
 .gunix .v-datefield-large [class*="textfield"] {
@@ -6529,23 +6676,23 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 44px;
+	height: 38px;
 	border-radius: 4px;
-	padding: 5px 10px;
+	padding: 4px 9px;
 	
 	
 	
 	-webkit-transition: box-shadow 180ms, border 180ms;
 	-moz-transition: box-shadow 180ms, border 180ms;
 	transition: box-shadow 180ms, border 180ms;
-	padding-left: 52.8px;
+	padding-left: 45.6px;
 	width: 100%;
 	height: 100%;
 	border-radius: inherit;
 }
 
 .v-ie8 .gunix .v-datefield-large [class*="textfield"], .v-ie9 .gunix .v-datefield-large [class*="textfield"] {
-	line-height: 44px;
+	line-height: 38px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
@@ -6559,8 +6706,8 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 0;
 	position: absolute;
 	z-index: 10;
-	width: 44px;
-	line-height: 44px;
+	width: 38px;
+	line-height: 38px;
 	text-align: center;
 	font: inherit;
 	outline: none;
@@ -6569,7 +6716,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-datefield-large [class*="button"]:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f073";
 	-webkit-transition: color 140ms;
 	-moz-transition: color 140ms;
@@ -6622,9 +6769,9 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-datefield-huge {
-	height: 59px;
+	height: 51px;
 	border-radius: 4px;
-	font-size: 26px;
+	font-size: 23px;
 }
 
 .gunix .v-datefield-huge [class*="textfield"] {
@@ -6645,23 +6792,23 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 59px;
+	height: 51px;
 	border-radius: 4px;
-	padding: 7px 12px;
+	padding: 6px 11px;
 	
 	
 	
 	-webkit-transition: box-shadow 180ms, border 180ms;
 	-moz-transition: box-shadow 180ms, border 180ms;
 	transition: box-shadow 180ms, border 180ms;
-	padding-left: 70.8px;
+	padding-left: 61.2px;
 	width: 100%;
 	height: 100%;
 	border-radius: inherit;
 }
 
 .v-ie8 .gunix .v-datefield-huge [class*="textfield"], .v-ie9 .gunix .v-datefield-huge [class*="textfield"] {
-	line-height: 59px;
+	line-height: 51px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
@@ -6675,8 +6822,8 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 0;
 	position: absolute;
 	z-index: 10;
-	width: 59px;
-	line-height: 59px;
+	width: 51px;
+	line-height: 51px;
 	text-align: center;
 	font: inherit;
 	outline: none;
@@ -6685,7 +6832,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-datefield-huge [class*="button"]:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f073";
 	-webkit-transition: color 140ms;
 	-moz-transition: color 140ms;
@@ -6738,7 +6885,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-inline-datefield-calendarpanel {
-	font-size: 16px;
+	font-size: 14px;
 	text-align: center;
 }
 
@@ -6750,12 +6897,12 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	width: 30px;
-	height: 26px;
+	width: 26px;
+	height: 22px;
 	border: 1px solid transparent;
-	line-height: 26px;
+	line-height: 22px;
 	text-align: center;
-	font-size: 14px;
+	font-size: 13px;
 	background: #fafafa;
 	border-radius: 2px;
 	-webkit-transition: color 200ms;
@@ -6808,13 +6955,13 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-inline-datefield-calendarpanel-weekdays {
-	height: 26px;
+	height: 22px;
 	color: rgba(133, 133, 133, 0.85);
 }
 
 .gunix .v-inline-datefield-calendarpanel-weekdays strong {
 	font: inherit;
-	font-size: 14px;
+	font-size: 13px;
 }
 
 .gunix .v-inline-datefield-calendarpanel-header {
@@ -6834,8 +6981,8 @@ div.v-layout.v-horizontal.v-widget {
 	cursor: pointer;
 	color: transparent;
 	font-size: 0;
-	width: 19px;
-	height: 25px;
+	width: 16px;
+	height: 21px;
 	outline: none;
 	position: relative;
 	vertical-align: middle;
@@ -6843,8 +6990,8 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix td[class*="year"] button:before, .gunix td[class*="month"] button:before {
 	color: #a0a0a0;
-	font-size: 21px;
-	line-height: 24px;
+	font-size: 18px;
+	line-height: 21px;
 	-webkit-transition: color 200ms;
 	-moz-transition: color 200ms;
 	transition: color 200ms;
@@ -6865,38 +7012,38 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-button-prevyear:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f100";
 }
 
 .gunix .v-button-prevmonth:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f104";
 }
 
 .gunix .v-button-nextyear:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f101";
 }
 
 .gunix .v-button-nextmonth:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f105";
 }
 
 .gunix td.v-inline-datefield-calendarpanel-month {
-	width: 148px;
+	width: 128px;
 	color: #197de1;
 }
 
 .gunix .v-inline-datefield-calendarpanel-year td.v-inline-datefield-calendarpanel-month {
-	width: 74px;
+	width: 64px;
 }
 
 .gunix .v-inline-datefield-calendarpanel-weeknumber, .gunix .v-inline-datefield-calendarpanel-weekdays.v-inline-datefield-calendarpanel-weeknumbers td:first-child {
-	width: 30px;
+	width: 26px;
 	color: rgba(133, 133, 133, 0.85);
-	font-size: 14px;
+	font-size: 13px;
 	display: inline-block;
 	text-align: left;
 }
@@ -6908,10 +7055,10 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-inline-datefield-calendarpanel-weeknumbers .v-first:before {
 	content: "";
 	position: absolute;
-	top: 38px;
+	top: 32px;
 	bottom: 0;
 	left: 0;
-	width: 34px;
+	width: 30px;
 	border-top: 1px solid #eaeaea;
 	border-right: 1px solid #eaeaea;
 	border-top-right-radius: 4px;
@@ -6921,7 +7068,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix td.v-inline-datefield-calendarpanel-time {
 	width: 100%;
-	font-size: 14px;
+	font-size: 13px;
 }
 
 .gunix td.v-inline-datefield-calendarpanel-time .v-label {
@@ -6933,28 +7080,28 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-inline-datefield-calendarpanel {
 	position: relative;
 	background: white;
-	padding: 6px;
+	padding: 5px;
 }
 
 .gunix .v-gridlayout-margin-top {
-	padding-top: 37px;
+	padding-top: 32px;
 }
 
 .gunix .v-gridlayout-margin-bottom {
-	padding-bottom: 37px;
+	padding-bottom: 32px;
 }
 
 .gunix .v-gridlayout-margin-left {
-	padding-left: 37px;
+	padding-left: 32px;
 }
 
 .gunix .v-gridlayout-margin-right {
-	padding-right: 37px;
+	padding-right: 32px;
 }
 
 .gunix .v-gridlayout-spacing-on {
-	padding-left: 12px;
-	padding-top: 12px;
+	padding-left: 11px;
+	padding-top: 11px;
 }
 
 .gunix .v-menubar {
@@ -6965,8 +7112,8 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-tap-highlight-color: transparent;
 	-webkit-touch-callout: none;
 	cursor: pointer;
-	height: 37px;
-	padding: 0 16px;
+	height: 32px;
+	padding: 0 14px;
 	color: #191919;
 	font-weight: 400;
 	
@@ -6983,7 +7130,7 @@ div.v-layout.v-horizontal.v-widget {
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
 	padding: 0;
 	text-align: left;
-	line-height: 35px;
+	line-height: 30px;
 }
 
 .gunix .v-menubar:after {
@@ -7029,11 +7176,11 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-menubar  > .v-menubar-menuitem {
-	padding: 0 14px;
+	padding: 0 12px;
 }
 
 .gunix .v-menubar  > .v-menubar-menuitem[class*="-icon-only"] {
-	width: 37px;
+	width: 32px;
 }
 
 .gunix .v-menubar:active:after {
@@ -7047,8 +7194,8 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	height: 37px;
-	padding: 0 15px;
+	height: 32px;
+	padding: 0 13px;
 	color: inherit;
 	font-weight: 400;
 	
@@ -7111,12 +7258,12 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-menubar > .v-menubar-menuitem .v-icon {
-	margin: 0 4px 0 -4px;
+	margin: 0 3px 0 -3px;
 	cursor: inherit;
 }
 
 .gunix .v-menubar > .v-menubar-menuitem[class*="-icon-only"] {
-	width: 37px;
+	width: 32px;
 	padding: 0;
 }
 
@@ -7176,7 +7323,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-menubar .v-menubar-submenu-indicator  + .v-menubar-menuitem-caption:after {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f078";
 	font-size: 0.7em;
 	vertical-align: 0.15em;
@@ -7200,7 +7347,7 @@ div.v-layout.v-horizontal.v-widget {
 	-ms-backface-visibility: hidden;
 	backface-visibility: hidden;
 	padding: 4px 4px;
-	margin: 5px 0 0 1px !important;
+	margin: 4px 0 0 1px !important;
 }
 
 .gunix .v-menubar-popup[class*="animate-in"] {
@@ -7222,14 +7369,14 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-menubar-popup .v-menubar-menuitem {
 	display: block;
 	cursor: pointer;
-	line-height: 27px;
-	padding: 0 20px 0 10px;
+	line-height: 23px;
+	padding: 0 16px 0 8px;
 	border-radius: 3px;
 	font-weight: 400;
 	white-space: nowrap;
 	position: relative;
-	padding-left: 32px;
-	padding-right: 37px;
+	padding-left: 27px;
+	padding-right: 32px;
 	position: relative;
 }
 
@@ -7248,8 +7395,8 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-menubar-popup .v-menubar-menuitem .v-icon {
-	max-height: 27px;
-	margin-right: 5px;
+	max-height: 23px;
+	margin-right: 4px;
 	min-width: 1em;
 }
 
@@ -7259,10 +7406,10 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-menubar-popup .v-menubar-submenu-indicator  + .v-menubar-menuitem-caption:after {
 	position: absolute;
-	right: 10px;
-	font-family: FontAwesome;
+	right: 8px;
+	font-family: ThemeIcons;
 	content: "\f054";
-	line-height: 29px;
+	line-height: 25px;
 }
 
 .gunix .v-menubar-popup .v-menubar-menuitem-selected {
@@ -7283,9 +7430,9 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-menubar-popup [class*="checked"] .v-menubar-menuitem-caption:before {
 	content: "\f00c";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	position: absolute;
-	left: 10px;
+	left: 8px;
 }
 
 .gunix .v-menubar-popup [class*="unchecked"] .v-menubar-menuitem-caption:before {
@@ -7297,8 +7444,8 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-menubar-small {
-	height: 31px;
-	padding: 0 14px;
+	height: 27px;
+	padding: 0 12px;
 	
 	font-weight: 400;
 	
@@ -7306,8 +7453,8 @@ div.v-layout.v-horizontal.v-widget {
 	border-radius: 4px;
 	padding: 0;
 	text-align: left;
-	line-height: 29px;
-	font-size: 14px;
+	line-height: 25px;
+	font-size: 12px;
 }
 
 .gunix .v-menubar-small:after {
@@ -7319,11 +7466,11 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-menubar-small  > .v-menubar-menuitem {
-	padding: 0 12px;
+	padding: 0 10px;
 }
 
 .gunix .v-menubar-small  > .v-menubar-menuitem[class*="-icon-only"] {
-	width: 31px;
+	width: 27px;
 }
 
 .gunix .v-menubar-borderless {
@@ -7348,7 +7495,7 @@ div.v-layout.v-horizontal.v-widget {
 	margin-right: 1px;
 	border-radius: 4px;
 	color: #197de1;
-	padding: 0 12px;
+	padding: 0 11px;
 	-webkit-transition: color 140ms;
 	-moz-transition: color 140ms;
 	transition: color 140ms;
@@ -7395,7 +7542,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-radiobutton {
 	position: relative;
-	line-height: 19px;
+	line-height: 16px;
 	white-space: nowrap;
 }
 
@@ -7404,7 +7551,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 :root .gunix .v-radiobutton {
-	padding-left: 25px;
+	padding-left: 21px;
 }
 
 :root .gunix .v-radiobutton label {
@@ -7437,19 +7584,19 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	width: 19px;
-	height: 19px;
+	width: 16px;
+	height: 16px;
 	position: absolute;
 	top: 0;
 	left: 0;
 	border-radius: 4px;
-	font-size: 13px;
+	font-size: 11px;
 	text-align: center;
 }
 
 :root .gunix .v-radiobutton > input ~ label:before {
-	height: 18.5px;
-	padding: 0 9px;
+	height: 16px;
+	padding: 0 8px;
 	color: #191919;
 	font-weight: 400;
 	
@@ -7465,12 +7612,12 @@ div.v-layout.v-horizontal.v-widget {
 	box-shadow: inset 0 1px 0 white, inset 0 -1px 0 #e7e7e7, 0 2px 3px rgba(0, 0, 0, 0.05);
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
 	padding: 0;
-	height: 19px;
+	height: 16px;
 }
 
 :root .gunix .v-radiobutton > input ~ label:after {
 	content: "\f00c";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	color: transparent;
 	-webkit-transition: color 100ms;
 	-moz-transition: color 100ms;
@@ -7486,7 +7633,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-radiobutton > .v-icon, .gunix .v-radiobutton > label .v-icon {
-	margin: 0 6px 0 3px;
+	margin: 0 5px 0 3px;
 	min-width: 1em;
 	cursor: pointer;
 }
@@ -7523,10 +7670,10 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 :root .gunix .v-radiobutton > input:checked ~ label:after {
-	width: 7px;
-	height: 7px;
-	top: 6px;
-	left: 6px;
+	width: 6px;
+	height: 6px;
+	top: 5px;
+	left: 5px;
 	background: #197de1;
 }
 
@@ -7537,15 +7684,15 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-select-optiongroup .v-radiobutton, .gunix .v-select-optiongroup .v-checkbox {
 	display: block;
-	margin: 9px 16px 0 0;
+	margin: 8px 14px 0 0;
 }
 
 .gunix .v-select-optiongroup .v-radiobutton:first-child, .gunix .v-select-optiongroup .v-checkbox:first-child {
-	margin-top: 6px;
+	margin-top: 5px;
 }
 
 .gunix .v-select-optiongroup .v-radiobutton:last-child, .gunix .v-select-optiongroup .v-checkbox:last-child {
-	margin-bottom: 6px;
+	margin-bottom: 5px;
 }
 
 .gunix .v-select-optiongroup.v-has-width label {
@@ -7553,12 +7700,12 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-select-optiongroup-small {
-	font-size: 14px;
+	font-size: 12px;
 }
 
 .gunix .v-select-optiongroup-small .v-checkbox {
 	position: relative;
-	line-height: 16px;
+	line-height: 14px;
 	white-space: nowrap;
 }
 
@@ -7567,7 +7714,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 :root .gunix .v-select-optiongroup-small .v-checkbox {
-	padding-left: 21px;
+	padding-left: 18px;
 }
 
 :root .gunix .v-select-optiongroup-small .v-checkbox label {
@@ -7600,18 +7747,18 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	width: 16px;
-	height: 16px;
+	width: 14px;
+	height: 14px;
 	position: absolute;
 	top: 0;
 	left: 0;
 	border-radius: 4px;
-	font-size: 11px;
+	font-size: 9px;
 	text-align: center;
 }
 
 :root .gunix .v-select-optiongroup-small .v-checkbox > input ~ label:before {
-	height: 15.5px;
+	height: 13.5px;
 	padding: 0 7px;
 	color: #191919;
 	font-weight: 400;
@@ -7628,12 +7775,12 @@ div.v-layout.v-horizontal.v-widget {
 	box-shadow: inset 0 1px 0 white, inset 0 -1px 0 #e7e7e7, 0 2px 3px rgba(0, 0, 0, 0.05);
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
 	padding: 0;
-	height: 16px;
+	height: 14px;
 }
 
 :root .gunix .v-select-optiongroup-small .v-checkbox > input ~ label:after {
 	content: "\f00c";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	color: transparent;
 	-webkit-transition: color 100ms;
 	-moz-transition: color 100ms;
@@ -7649,7 +7796,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-select-optiongroup-small .v-checkbox > .v-icon, .gunix .v-select-optiongroup-small .v-checkbox > label .v-icon {
-	margin: 0 5px 0 3px;
+	margin: 0 5px 0 2px;
 	min-width: 1em;
 	cursor: pointer;
 }
@@ -7687,7 +7834,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-select-optiongroup-small .v-radiobutton {
 	position: relative;
-	line-height: 16px;
+	line-height: 14px;
 	white-space: nowrap;
 }
 
@@ -7696,7 +7843,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 :root .gunix .v-select-optiongroup-small .v-radiobutton {
-	padding-left: 21px;
+	padding-left: 18px;
 }
 
 :root .gunix .v-select-optiongroup-small .v-radiobutton label {
@@ -7729,18 +7876,18 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	width: 16px;
-	height: 16px;
+	width: 14px;
+	height: 14px;
 	position: absolute;
 	top: 0;
 	left: 0;
 	border-radius: 4px;
-	font-size: 11px;
+	font-size: 9px;
 	text-align: center;
 }
 
 :root .gunix .v-select-optiongroup-small .v-radiobutton > input ~ label:before {
-	height: 15.5px;
+	height: 13.5px;
 	padding: 0 7px;
 	color: #191919;
 	font-weight: 400;
@@ -7757,12 +7904,12 @@ div.v-layout.v-horizontal.v-widget {
 	box-shadow: inset 0 1px 0 white, inset 0 -1px 0 #e7e7e7, 0 2px 3px rgba(0, 0, 0, 0.05);
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
 	padding: 0;
-	height: 16px;
+	height: 14px;
 }
 
 :root .gunix .v-select-optiongroup-small .v-radiobutton > input ~ label:after {
 	content: "\f00c";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	color: transparent;
 	-webkit-transition: color 100ms;
 	-moz-transition: color 100ms;
@@ -7778,7 +7925,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-select-optiongroup-small .v-radiobutton > .v-icon, .gunix .v-select-optiongroup-small .v-radiobutton > label .v-icon {
-	margin: 0 5px 0 3px;
+	margin: 0 5px 0 2px;
 	min-width: 1em;
 	cursor: pointer;
 }
@@ -7815,8 +7962,8 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 :root .gunix .v-select-optiongroup-small .v-radiobutton > input:checked ~ label:after {
-	width: 6px;
-	height: 6px;
+	width: 5px;
+	height: 5px;
 	top: 5px;
 	left: 5px;
 	background: #197de1;
@@ -7829,7 +7976,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-select-optiongroup-small .v-radiobutton, .gunix .v-select-optiongroup-small .v-checkbox {
 	display: block;
-	margin: 8px 16px 0 0;
+	margin: 7px 14px 0 0;
 }
 
 .gunix .v-select-optiongroup-small .v-radiobutton:first-child, .gunix .v-select-optiongroup-small .v-checkbox:first-child {
@@ -7845,12 +7992,12 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-select-optiongroup-large {
-	font-size: 20px;
+	font-size: 17px;
 }
 
 .gunix .v-select-optiongroup-large .v-checkbox {
 	position: relative;
-	line-height: 22px;
+	line-height: 19px;
 	white-space: nowrap;
 }
 
@@ -7859,7 +8006,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 :root .gunix .v-select-optiongroup-large .v-checkbox {
-	padding-left: 29px;
+	padding-left: 25px;
 }
 
 :root .gunix .v-select-optiongroup-large .v-checkbox label {
@@ -7892,19 +8039,19 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	width: 22px;
-	height: 22px;
+	width: 19px;
+	height: 19px;
 	position: absolute;
 	top: 0;
 	left: 0;
 	border-radius: 4px;
-	font-size: 15px;
+	font-size: 13px;
 	text-align: center;
 }
 
 :root .gunix .v-select-optiongroup-large .v-checkbox > input ~ label:before {
-	height: 22px;
-	padding: 0 10px;
+	height: 19px;
+	padding: 0 9px;
 	color: #191919;
 	font-weight: 400;
 	
@@ -7920,12 +8067,12 @@ div.v-layout.v-horizontal.v-widget {
 	box-shadow: inset 0 1px 0 white, inset 0 -1px 0 #e7e7e7, 0 2px 3px rgba(0, 0, 0, 0.05);
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
 	padding: 0;
-	height: 22px;
+	height: 19px;
 }
 
 :root .gunix .v-select-optiongroup-large .v-checkbox > input ~ label:after {
 	content: "\f00c";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	color: transparent;
 	-webkit-transition: color 100ms;
 	-moz-transition: color 100ms;
@@ -7941,7 +8088,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-select-optiongroup-large .v-checkbox > .v-icon, .gunix .v-select-optiongroup-large .v-checkbox > label .v-icon {
-	margin: 0 7px 0 4px;
+	margin: 0 6px 0 3px;
 	min-width: 1em;
 	cursor: pointer;
 }
@@ -7979,7 +8126,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-select-optiongroup-large .v-radiobutton {
 	position: relative;
-	line-height: 22px;
+	line-height: 19px;
 	white-space: nowrap;
 }
 
@@ -7988,7 +8135,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 :root .gunix .v-select-optiongroup-large .v-radiobutton {
-	padding-left: 29px;
+	padding-left: 25px;
 }
 
 :root .gunix .v-select-optiongroup-large .v-radiobutton label {
@@ -8021,19 +8168,19 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	width: 22px;
-	height: 22px;
+	width: 19px;
+	height: 19px;
 	position: absolute;
 	top: 0;
 	left: 0;
 	border-radius: 4px;
-	font-size: 15px;
+	font-size: 13px;
 	text-align: center;
 }
 
 :root .gunix .v-select-optiongroup-large .v-radiobutton > input ~ label:before {
-	height: 22px;
-	padding: 0 10px;
+	height: 19px;
+	padding: 0 9px;
 	color: #191919;
 	font-weight: 400;
 	
@@ -8049,12 +8196,12 @@ div.v-layout.v-horizontal.v-widget {
 	box-shadow: inset 0 1px 0 white, inset 0 -1px 0 #e7e7e7, 0 2px 3px rgba(0, 0, 0, 0.05);
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
 	padding: 0;
-	height: 22px;
+	height: 19px;
 }
 
 :root .gunix .v-select-optiongroup-large .v-radiobutton > input ~ label:after {
 	content: "\f00c";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	color: transparent;
 	-webkit-transition: color 100ms;
 	-moz-transition: color 100ms;
@@ -8070,7 +8217,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-select-optiongroup-large .v-radiobutton > .v-icon, .gunix .v-select-optiongroup-large .v-radiobutton > label .v-icon {
-	margin: 0 7px 0 4px;
+	margin: 0 6px 0 3px;
 	min-width: 1em;
 	cursor: pointer;
 }
@@ -8107,10 +8254,10 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 :root .gunix .v-select-optiongroup-large .v-radiobutton > input:checked ~ label:after {
-	width: 8px;
-	height: 8px;
-	top: 7px;
-	left: 7px;
+	width: 7px;
+	height: 7px;
+	top: 6px;
+	left: 6px;
 	background: #197de1;
 }
 
@@ -8121,15 +8268,15 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-select-optiongroup-large .v-radiobutton, .gunix .v-select-optiongroup-large .v-checkbox {
 	display: block;
-	margin: 11px 16px 0 0;
+	margin: 10px 14px 0 0;
 }
 
 .gunix .v-select-optiongroup-large .v-radiobutton:first-child, .gunix .v-select-optiongroup-large .v-checkbox:first-child {
-	margin-top: 7px;
+	margin-top: 6px;
 }
 
 .gunix .v-select-optiongroup-large .v-radiobutton:last-child, .gunix .v-select-optiongroup-large .v-checkbox:last-child {
-	margin-bottom: 7px;
+	margin-bottom: 6px;
 }
 
 .gunix .v-select-optiongroup-large.v-has-width label {
@@ -8185,11 +8332,11 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-link-small {
-	font-size: 14px;
+	font-size: 12px;
 }
 
 .gunix .v-link-large {
-	font-size: 20px;
+	font-size: 17px;
 }
 
 .gunix .v-window {
@@ -8206,8 +8353,8 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1), 0 16px 80px -6px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.09098);
 	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1), 0 16px 80px -6px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.09098);
 	padding: 0;
-	min-width: 148px !important;
-	min-height: 37px !important;
+	min-width: 128px !important;
+	min-height: 32px !important;
 	white-space: nowrap;
 	overflow: hidden !important;
 	-webkit-transition: width 200ms, height 200ms, top 200ms, left 200ms;
@@ -8291,9 +8438,9 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-window-header {
-	line-height: 36px;
-	padding-left: 12px;
-	margin-right: 74px;
+	line-height: 31px;
+	padding-left: 11px;
+	margin-right: 64px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -8301,11 +8448,11 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-window-restorebox-disabled  ~ .v-window-closebox ~ .v-window-header, .gunix .v-window-maximizebox-disabled  ~ .v-window-closebox ~ .v-window-header {
-	margin-right: 37px;
+	margin-right: 32px;
 }
 
 .gunix .v-window-restorebox-disabled  ~ .v-window-closebox-disabled ~ .v-window-header, .gunix .v-window-maximizebox-disabled  ~ .v-window-closebox-disabled ~ .v-window-header {
-	margin-right: 12px;
+	margin-right: 11px;
 }
 
 .gunix .v-window-closebox, .gunix .v-window-maximizebox, .gunix .v-window-restorebox {
@@ -8316,13 +8463,13 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	width: 33px;
-	height: 36px;
+	width: 28px;
+	height: 31px;
 	background-color: white;
-	line-height: 34px;
+	line-height: 29px;
 	text-align: center;
 	cursor: pointer;
-	font-size: 21px;
+	font-size: 18px;
 	color: #999999;
 	-webkit-transition: color 140ms;
 	-moz-transition: color 140ms;
@@ -8353,7 +8500,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-window-maximizebox, .gunix .v-window-restorebox {
-	right: 33px;
+	right: 28px;
 	padding-left: 4px;
 	border-radius: 0 0 0 4px;
 }
@@ -8367,7 +8514,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-window-closebox-disabled  + .v-window-closebox, .gunix .v-window-resizebox-disabled  + .v-window-closebox, .gunix .v-window-restorebox-disabled  + .v-window-closebox, .gunix .v-window-maximizebox-disabled  + .v-window-closebox {
-	width: 37px;
+	width: 32px;
 	padding-right: 0;
 	border-bottom-left-radius: 4px;
 }
@@ -8397,43 +8544,43 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-window-contents  > .v-scrollable  > .v-margin-top {
-	padding-top: 12px;
+	padding-top: 11px;
 }
 
 .gunix .v-window-contents  > .v-scrollable  > .v-margin-right {
-	padding-right: 12px;
+	padding-right: 11px;
 }
 
 .gunix .v-window-contents  > .v-scrollable  > .v-margin-bottom {
-	padding-bottom: 12px;
+	padding-bottom: 11px;
 }
 
 .gunix .v-window-contents  > .v-scrollable  > .v-margin-left {
-	padding-left: 12px;
+	padding-left: 11px;
 }
 
 .gunix .v-window-contents  > .v-scrollable  > .v-formlayout [class*="margin-top"] > tbody > [class*="firstrow"] > td {
-	padding-top: 12px;
+	padding-top: 11px;
 }
 
 .gunix .v-window-contents  > .v-scrollable  > .v-formlayout [class*="margin-bottom"] > tbody > [class*="lastrow"] > td {
-	padding-bottom: 12px;
+	padding-bottom: 11px;
 }
 
 .gunix .v-window-contents  > .v-scrollable  > .v-formlayout [class*="margin-left"] > tbody > [class*="row"] > [class*="captioncell"] {
-	padding-left: 12px;
+	padding-left: 11px;
 }
 
 .gunix .v-window-contents  > .v-scrollable  > .v-formlayout [class*="margin-left"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h2, .gunix .v-window-contents  > .v-scrollable  > .v-formlayout [class*="margin-left"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h3, .gunix .v-window-contents  > .v-scrollable  > .v-formlayout [class*="margin-left"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h4 {
-	left: 12px;
+	left: 11px;
 }
 
 .gunix .v-window-contents  > .v-scrollable  > .v-formlayout [class*="margin-right"] > tbody > [class*="row"] > [class*="contentcell"] {
-	padding-right: 12px;
+	padding-right: 11px;
 }
 
 .gunix .v-window-contents  > .v-scrollable  > .v-formlayout [class*="margin-right"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h2, .gunix .v-window-contents  > .v-scrollable  > .v-formlayout [class*="margin-right"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h3, .gunix .v-window-contents  > .v-scrollable  > .v-formlayout [class*="margin-right"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h4 {
-	right: 12px;
+	right: 11px;
 }
 
 .gunix .v-window-contents  > .v-scrollable:focus {
@@ -8468,8 +8615,8 @@ div.v-layout.v-horizontal.v-widget {
 	z-index: 1000;
 	right: 0;
 	bottom: 0;
-	width: 19px;
-	height: 19px;
+	width: 16px;
+	height: 16px;
 	cursor: nwse-resize;
 }
 
@@ -8493,7 +8640,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-window-top-toolbar .v-label, .gunix .v-window-bottom-toolbar .v-label {
-	line-height: 36px;
+	line-height: 31px;
 }
 
 .gunix .v-window-top-toolbar .v-spacing, .gunix .v-window-bottom-toolbar .v-spacing {
@@ -8501,7 +8648,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-window-top-toolbar.v-layout {
-	padding: 7px 12px;
+	padding: 6px 11px;
 	position: relative;
 	z-index: 2;
 	border-top: 1px solid #dfdfdf;
@@ -8510,20 +8657,20 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-window-top-toolbar.v-menubar {
-	margin: 12px 12px 6px;
+	margin: 11px 11px 5px;
 }
 
 .gunix .v-window-top-toolbar.v-menubar-borderless {
-	padding-left: 6px;
-	padding-right: 6px;
-	margin: 5px 0;
+	padding-left: 5px;
+	padding-right: 5px;
+	margin: 4px 0;
 }
 
 .gunix .v-window-bottom-toolbar.v-layout {
-	padding: 7px 12px;
+	padding: 6px 11px;
 	background-color: #fafafa;
-	background-image: -webkit-linear-gradient(top, #f0f0f0 0, #fafafa 4px);
-	background-image: linear-gradient(to bottom,#f0f0f0 0, #fafafa 4px);
+	background-image: -webkit-linear-gradient(top, #f0f0f0 0, #fafafa 3px);
+	background-image: linear-gradient(to bottom,#f0f0f0 0, #fafafa 3px);
 	border-top: 1px solid #dfdfdf;
 	border-radius: 0 0 4px 4px;
 }
@@ -8532,7 +8679,7 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-sizing: content-box;
 	-moz-box-sizing: content-box;
 	box-sizing: content-box;
-	margin: -12px -12px 0;
+	margin: -11px -11px 0;
 }
 
 .gunix .v-margin-left.v-margin-right.v-margin-top .v-window-top-toolbar.v-menubar {
@@ -8548,7 +8695,7 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-sizing: content-box;
 	-moz-box-sizing: content-box;
 	box-sizing: content-box;
-	margin: 0 -12px -12px;
+	margin: 0 -11px -11px;
 }
 
 .gunix .v-tree {
@@ -8566,7 +8713,7 @@ div.v-layout.v-horizontal.v-widget {
 	display: inline-block;
 	z-index: 3;
 	width: 1.9em;
-	height: 28px;
+	height: 25px;
 	cursor: pointer;
 	background: red;
 	opacity: 0;
@@ -8577,7 +8724,7 @@ div.v-layout.v-horizontal.v-widget {
 	margin-left: -1.9em;
 	vertical-align: top;
 	content: "\f0da";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	text-align: center;
 	background: transparent;
 }
@@ -8587,8 +8734,8 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-tree-node-caption {
-	height: 28px;
-	line-height: 27px;
+	height: 25px;
+	line-height: 24px;
 	overflow: hidden;
 	white-space: nowrap;
 	vertical-align: top;
@@ -8603,7 +8750,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-tree-node-caption > div:before {
 	content: "\f0da";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	display: inline-block;
 	width: 0.5em;
 	text-align: center;
@@ -8618,7 +8765,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-tree-node-caption span {
-	padding-right: 28px;
+	padding-right: 25px;
 	cursor: pointer;
 	display: inline-block;
 	width: 100%;
@@ -8641,9 +8788,9 @@ div.v-layout.v-horizontal.v-widget {
 	position: absolute;
 	z-index: 1;
 	left: 0;
-	margin-top: -28px;
+	margin-top: -25px;
 	width: 100%;
-	height: 28px;
+	height: 25px;
 	border-radius: 4px;
 	opacity: 0;
 	-webkit-transition: opacity 120ms;
@@ -8666,12 +8813,12 @@ div.v-layout.v-horizontal.v-widget {
 	-o-transform: rotate(90deg);
 	transform: rotate(90deg);
 	content: "\f0da";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 }
 
 .v-ie8 .gunix .v-tree-node-expanded:before {
 	content: "\f0d7";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 }
 
 .gunix .v-tree-node-leaf:before, .gunix .v-tree-node-leaf > .v-tree-node-caption > div:before {
@@ -8707,7 +8854,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-tree-node-children {
-	padding-left: 19px;
+	padding-left: 16px;
 }
 
 .v-ie8 .gunix .v-tree-node-children {
@@ -8721,7 +8868,7 @@ div.v-layout.v-horizontal.v-widget {
 	height: 2px;
 	width: 100%;
 	background: #197de1;
-	font-size: 32px;
+	font-size: 28px;
 	line-height: 2px;
 	color: #197de1;
 	text-indent: -4px;
@@ -8775,7 +8922,7 @@ div.v-layout.v-horizontal.v-widget {
 	background-image: -webkit-linear-gradient(top, #fafafa 2%, #efefef 98%);
 	background-image: linear-gradient(to bottom,#fafafa 2%, #efefef 98%);
 	white-space: nowrap;
-	font-size: 14px;
+	font-size: 12px;
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
@@ -8795,18 +8942,18 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-table-footer-container, .gunix .v-table-caption-container {
 	overflow: hidden;
 	line-height: 1;
-	min-height: 37px;
+	min-height: 32px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
 
 .v-ie8 .gunix .v-table-footer-container, .v-ie8 .gunix .v-table-caption-container {
-	min-height: 14px;
+	min-height: 13px;
 }
 
 .gunix .v-table-footer-container {
-	padding: 11px 12px 12px;
+	padding: 9px 11px 10px;
 	float: right;
 }
 
@@ -8815,7 +8962,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-table-caption-container, .gunix .v-table-header-drag {
-	padding: 12px 12px 11px;
+	padding: 10px 11px 9px;
 	border-left: 1px solid #d4d4d4;
 }
 
@@ -8824,20 +8971,20 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-table-resizer {
-	height: 37px;
-	width: 8px;
+	height: 32px;
+	width: 7px;
 	cursor: e-resize;
 	cursor: col-resize;
 	position: relative;
 	right: -4px;
 	z-index: 1;
-	margin-left: -8px;
+	margin-left: -7px;
 }
 
 .gunix .v-table-cell-content {
 	border-left: 1px solid #d4d4d4;
 	overflow: hidden;
-	height: 37px;
+	height: 32px;
 	vertical-align: middle;
 }
 
@@ -8852,7 +8999,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-table-cell-wrapper {
 	line-height: 1;
-	padding: 0 12px;
+	padding: 0 11px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -8889,7 +9036,7 @@ div.v-layout.v-horizontal.v-widget {
 	border-top: 1px solid #d4d4d4;
 }
 
-.gunix .v-table-table tr:first-child td {
+.gunix .v-table-table tr:first-child > td {
 	border-top: none;
 }
 
@@ -8935,10 +9082,10 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-table-header-cell-asc .v-table-sort-indicator, .gunix .v-table-header-cell-desc .v-table-sort-indicator {
 	background: transparent;
-	width: 19px;
-	height: 37px;
-	line-height: 37px;
-	margin-left: -19px;
+	width: 16px;
+	height: 32px;
+	line-height: 32px;
+	margin-left: -16px;
 }
 
 .gunix .v-table-header-cell-asc .v-table-sort-indicator:before, .gunix .v-table-header-cell-desc .v-table-sort-indicator:before {
@@ -8949,12 +9096,12 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-table-header-cell-asc .v-table-sort-indicator:before {
 	content: "\f0de";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 }
 
 .gunix .v-table-header-cell-desc .v-table-sort-indicator:before {
 	content: "\f0dd";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 }
 
 .gunix [class*="rowheader"] span.v-icon {
@@ -8974,7 +9121,7 @@ div.v-layout.v-horizontal.v-widget {
 	position: absolute;
 	opacity: 0.9;
 	filter: alpha(opacity=90) ;
-	margin-top: -19px;
+	margin-top: -16px;
 	z-index: 30000;
 	line-height: 1;
 }
@@ -8982,7 +9129,7 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-table-focus-slot-right {
 	border-right: 3px solid #197de1;
 	right: -2px;
-	margin-left: -11px !important;
+	margin-left: -10px !important;
 }
 
 .gunix .v-table-focus-slot-left {
@@ -8991,12 +9138,12 @@ div.v-layout.v-horizontal.v-widget {
 	left: -1px;
 	right: auto;
 	margin-left: 0 !important;
-	margin-right: -11px;
+	margin-right: -10px;
 }
 
 .gunix .v-table-column-selector {
-	height: 37px;
-	padding: 0 16px;
+	height: 32px;
+	padding: 0 14px;
 	color: #191919;
 	font-weight: 400;
 	
@@ -9015,9 +9162,9 @@ div.v-layout.v-horizontal.v-widget {
 	z-index: 2;
 	top: 0;
 	right: 0;
-	width: 19px;
-	height: 19px;
-	line-height: 19px;
+	width: 16px;
+	height: 16px;
+	line-height: 16px;
 	padding: 0;
 	border-top-width: 0;
 	border-right-width: 0;
@@ -9068,7 +9215,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-table-column-selector:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f013";
 }
 
@@ -9082,9 +9229,9 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-on:before, .gunix .v-off:before {
 	content: "\f00c";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	font-size: 0.9em;
-	margin-right: 6px;
+	margin-right: 5px;
 }
 
 .gunix .v-on div, .gunix .v-off div {
@@ -9127,9 +9274,9 @@ div.v-layout.v-horizontal.v-widget {
 	position: absolute;
 	top: 50%;
 	width: 100%;
-	height: 37px;
-	line-height: 37px;
-	margin: -19px 0 0 !important;
+	height: 32px;
+	line-height: 32px;
+	margin: -16px 0 0 !important;
 	text-align: center;
 }
 
@@ -9158,7 +9305,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-table-row-drag-bottom td.v-table-cell-content {
 	border-bottom: 2px solid #197de1;
-	height: 35px;
+	height: 30px;
 }
 
 .gunix .v-table-row-drag-bottom .v-table-cell-wrapper {
@@ -9167,7 +9314,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-table-row-drag-top td.v-table-cell-content {
 	border-top: 2px solid #197de1;
-	height: 36px;
+	height: 31px;
 }
 
 .gunix .v-table-row-drag-top .v-table-cell-wrapper {
@@ -9184,7 +9331,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-table-no-vertical-lines.v-treetable .v-table-cell-content {
-	padding-left: 13px;
+	padding-left: 12px;
 }
 
 .gunix .v-table-no-horizontal-lines .v-table-cell-content {
@@ -9193,7 +9340,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-table-no-horizontal-lines .v-table-row-drag-top .v-table-cell-content, .gunix .v-table-no-horizontal-lines .v-table-row-drag-bottom .v-table-cell-content {
-	height: 36px;
+	height: 31px;
 }
 
 .gunix .v-table-no-header .v-table-header-wrap {
@@ -9213,16 +9360,16 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-table-compact .v-table-header-wrap, .gunix .v-table-compact .v-table-footer-wrap, .gunix .v-table-compact .v-table-header-drag, .gunix .v-table-small .v-table-header-wrap, .gunix .v-table-small .v-table-footer-wrap, .gunix .v-table-small .v-table-header-drag {
-	font-size: 14px;
+	font-size: 12px;
 }
 
 .gunix .v-table-compact .v-table-footer-container, .gunix .v-table-small .v-table-footer-container {
-	padding: 8px 7px 9px;
+	padding: 7px 7px 8px;
 }
 
 .gunix .v-table-compact .v-table-caption-container, .gunix .v-table-compact .v-table-header-drag, .gunix .v-table-small .v-table-caption-container, .gunix .v-table-small .v-table-header-drag {
-	padding-top: 9px;
-	padding-bottom: 8px;
+	padding-top: 8px;
+	padding-bottom: 7px;
 	padding-left: 6px;
 	padding-right: 6px;
 }
@@ -9232,11 +9379,11 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-table-compact .v-table-resizer, .gunix .v-table-small .v-table-resizer {
-	height: 31px;
+	height: 27px;
 }
 
 .gunix .v-table-compact .v-table-cell-content, .gunix .v-table-small .v-table-cell-content {
-	height: 31px;
+	height: 27px;
 }
 
 .gunix .v-table-compact .v-table-cell-wrapper, .gunix .v-table-small .v-table-cell-wrapper {
@@ -9258,18 +9405,18 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-table-compact .v-table-header-cell-asc .v-table-sort-indicator, .gunix .v-table-compact .v-table-header-cell-desc .v-table-sort-indicator, .gunix .v-table-small .v-table-header-cell-asc .v-table-sort-indicator, .gunix .v-table-small .v-table-header-cell-desc .v-table-sort-indicator {
-	height: 31px;
-	line-height: 31px;
+	height: 27px;
+	line-height: 27px;
 }
 
 .gunix .v-table-compact .v-table-header-drag, .gunix .v-table-small .v-table-header-drag {
-	margin-top: -16px;
+	margin-top: -14px;
 }
 
 .gunix .v-table-compact.v-treetable .v-table-cell-wrapper, .gunix .v-table-small.v-treetable .v-table-cell-wrapper {
 	padding-left: 0;
 	padding-right: 0;
-	min-height: 16px;
+	min-height: 14px;
 }
 
 .gunix .v-table-compact.v-treetable .v-table-cell-content, .gunix .v-table-small.v-treetable .v-table-cell-content {
@@ -9287,15 +9434,15 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-table-compact .v-table-row-drag-top .v-table-cell-content, .gunix .v-table-compact .v-table-row-drag-bottom .v-table-cell-content, .gunix .v-table-small .v-table-row-drag-top .v-table-cell-content, .gunix .v-table-small .v-table-row-drag-bottom .v-table-cell-content {
-	height: 30px;
+	height: 26px;
 }
 
 .gunix .v-table-small {
-	font-size: 14px;
+	font-size: 12px;
 }
 
 .gunix .v-table-small.v-treetable .v-table-cell-wrapper {
-	min-height: 14px;
+	min-height: 12px;
 }
 
 .gunix .v-treetable [class*="caption-container"], .gunix .v-treetable [class*="footer-container"], .gunix .v-treetable [class*="cell-wrapper"] {
@@ -9307,51 +9454,51 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-treetable [class*="caption-container"], .gunix .v-treetable [class*="footer-container"] {
-	min-height: 14px;
+	min-height: 13px;
 }
 
 .gunix .v-treetable [class*="cell-wrapper"] {
-	min-height: 16px;
+	min-height: 14px;
 }
 
 .gunix .v-treetable [class*="caption-container"] {
-	padding-left: 12px;
+	padding-left: 11px;
 }
 
 .gunix .v-treetable [class*="caption-container-align-right"] {
-	padding-left: 20px;
+	padding-left: 18px;
 }
 
 .gunix .v-treetable [class*="footer-container"] {
-	padding-right: 12px;
+	padding-right: 11px;
 }
 
 .gunix .v-treetable [class*="cell-content"] {
-	padding-left: 12px;
-	padding-right: 12px;
+	padding-left: 11px;
+	padding-right: 11px;
 }
 
 .gunix .v-treetable [class*="cell-content"]:first-child {
-	padding-left: 13px;
+	padding-left: 12px;
 }
 
 .gunix .v-treetable-treespacer {
 	display: inline-block;
 	position: absolute;
-	width: 19px !important;
-	margin-left: -25px;
+	width: 16px !important;
+	margin-left: -22px;
 	text-align: center;
 	cursor: pointer;
 }
 
 .gunix .v-treetable-node-closed:before {
 	content: "\f0da";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 }
 
 .gunix .v-treetable-node-open:before {
 	content: "\f0d7";
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 }
 
 .gunix .v-splitpanel-horizontal  > div > .v-splitpanel-hsplitter {
@@ -9359,13 +9506,13 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-splitpanel-horizontal  > div > .v-splitpanel-hsplitter:after {
-	left: -6px;
-	right: -6px;
+	left: -5px;
+	right: -5px;
 }
 
 .gunix .v-splitpanel-horizontal  > div > .v-splitpanel-hsplitter div:before {
-	height: 37px;
-	padding: 0 16px;
+	height: 32px;
+	padding: 0 14px;
 	color: #191919;
 	font-weight: 400;
 	
@@ -9419,13 +9566,13 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-splitpanel-vertical  > div > .v-splitpanel-vsplitter:after {
-	top: -6px;
-	bottom: -6px;
+	top: -5px;
+	bottom: -5px;
 }
 
 .gunix .v-splitpanel-vertical  > div > .v-splitpanel-vsplitter div:before {
-	height: 37px;
-	padding: 0 16px;
+	height: 32px;
+	padding: 0 14px;
 	color: #191919;
 	font-weight: 400;
 	
@@ -9468,7 +9615,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-splitpanel-horizontal.large  > div > .v-splitpanel-hsplitter {
-	width: 12px;
+	width: 11px;
 }
 
 .gunix .v-splitpanel-horizontal.large  > div > .v-splitpanel-hsplitter:after {
@@ -9477,8 +9624,8 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-splitpanel-horizontal.large  > div > .v-splitpanel-hsplitter div:before {
-	height: 37px;
-	padding: 0 16px;
+	height: 32px;
+	padding: 0 14px;
 	color: #191919;
 	font-weight: 400;
 	
@@ -9532,17 +9679,17 @@ div.v-layout.v-horizontal.v-widget {
 	top: 50%;
 	left: 50%;
 	width: 0;
-	height: 37px;
+	height: 32px;
 	margin-left: -1px;
-	margin-top: -19px;
+	margin-top: -16px;
 }
 
 .gunix .v-splitpanel-horizontal.large  > div > .v-splitpanel-second-container {
-	margin-left: 12px;
+	margin-left: 11px;
 }
 
 .gunix .v-splitpanel-vertical.large  > div > .v-splitpanel-vsplitter {
-	height: 12px;
+	height: 11px;
 }
 
 .gunix .v-splitpanel-vertical.large  > div > .v-splitpanel-vsplitter:after {
@@ -9551,8 +9698,8 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-splitpanel-vertical.large  > div > .v-splitpanel-vsplitter div:before {
-	height: 37px;
-	padding: 0 16px;
+	height: 32px;
+	padding: 0 14px;
 	color: #191919;
 	font-weight: 400;
 	
@@ -9602,22 +9749,22 @@ div.v-layout.v-horizontal.v-widget {
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	width: 37px;
+	width: 32px;
 	height: 0;
-	margin-left: -19px;
+	margin-left: -16px;
 	margin-top: -1px;
 }
 
 .gunix .v-progressbar-wrapper {
 	border-radius: 4px;
-	height: 9px;
+	height: 8px;
 	background-color: #d4d4d4;
 	background-image: -webkit-linear-gradient(bottom, #d7d7d7 2%, #c7c7c7 98%);
 	background-image: linear-gradient(to top,#d7d7d7 2%, #c7c7c7 98%);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	min-width: 74px;
+	min-width: 64px;
 }
 
 .gunix .v-progressbar-indicator {
@@ -9663,7 +9810,7 @@ div.v-layout.v-horizontal.v-widget {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	max-width: 100%;
-	width: 9px;
+	width: 8px;
 	vertical-align: top;
 }
 
@@ -9722,16 +9869,16 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-slider-base {
 	border-radius: 4px;
-	height: 9px;
+	height: 8px;
 	background-color: #d4d4d4;
 	background-image: -webkit-linear-gradient(bottom, #d7d7d7 2%, #c7c7c7 98%);
 	background-image: linear-gradient(to top,#d7d7d7 2%, #c7c7c7 98%);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	min-width: 74px;
-	height: 6px;
-	margin: 16px 11px;
+	min-width: 64px;
+	height: 4px;
+	margin: 14px 9px;
 	white-space: nowrap;
 	overflow: hidden;
 	
@@ -9740,9 +9887,9 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-slider-base:before {
 	content: "";
 	position: absolute;
-	top: 16px;
-	bottom: 16px;
-	left: 11px;
+	top: 14px;
+	bottom: 14px;
+	left: 9px;
 	width: 8px;
 	border-radius: 4px;
 	border-left: 1px solid #1362b1;
@@ -9770,7 +9917,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .v-ie8 .gunix .v-slider-base:after {
 	position: relative;
-	left: -11px;
+	left: -9px;
 }
 
 .gunix .v-has-width > .v-slider-base {
@@ -9778,15 +9925,15 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-slider-handle {
-	margin-top: -16px;
+	margin-top: -14px;
 	width: 0.1px;
 	display: inline-block;
 	vertical-align: top;
 }
 
 .gunix .v-slider-handle:before {
-	height: 37px;
-	padding: 0 16px;
+	height: 32px;
+	padding: 0 14px;
 	color: #191919;
 	font-weight: 400;
 	
@@ -9846,13 +9993,13 @@ div.v-layout.v-horizontal.v-widget {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	padding: 0;
-	width: 22px;
-	height: 22px;
-	border-radius: 11px;
+	width: 18px;
+	height: 18px;
+	border-radius: 9px;
 	position: absolute;
 	z-index: 1;
-	margin-top: 8px;
-	margin-left: -11px;
+	margin-top: 7px;
+	margin-left: -9px;
 }
 
 .gunix .v-slider-feedback {
@@ -9861,33 +10008,33 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
 	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
 	color: white;
-	padding: 5px 9px;
+	padding: 4px 8px;
 	border-radius: 3px;
 	max-width: 35em;
 	overflow: hidden !important;
-	font-size: 14px;
+	font-size: 12px;
 }
 
 .gunix .v-slider-vertical {
-	padding: 11px 0;
-	height: 96px;
+	padding: 9px 0;
+	height: 82px;
 }
 
 .gunix .v-slider-vertical .v-slider-base {
 	background-color: #d4d4d4;
 	background-image: -webkit-linear-gradient(right, #d7d7d7 2%, #c7c7c7 98%);
 	background-image: linear-gradient(to left,#d7d7d7 2%, #c7c7c7 98%);
-	width: 6px;
+	width: 4px;
 	height: 100% !important;
 	min-width: 0;
-	margin: 0 16px;
+	margin: 0 14px;
 }
 
 .gunix .v-slider-vertical .v-slider-base:before {
 	top: auto;
-	bottom: 11px;
-	left: 16px;
-	right: 16px;
+	bottom: 9px;
+	left: 14px;
+	right: 14px;
 	width: auto;
 	height: 8px;
 	border-left: none;
@@ -9903,7 +10050,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .v-ie8 .gunix .v-slider-vertical .v-slider-base:after {
-	top: 11px;
+	top: 9px;
 	left: 0;
 	height: 130%;
 }
@@ -9911,15 +10058,15 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-slider-vertical .v-slider-handle {
 	width: 0;
 	height: 0.1px;
-	width: 37px;
+	width: 32px;
 	display: block;
 }
 
 .gunix .v-slider-vertical .v-slider-handle:before, .gunix .v-slider-vertical .v-slider-handle:after {
-	width: 22px;
-	height: 22px;
-	margin-top: -11px;
-	margin-left: -8px;
+	width: 18px;
+	height: 18px;
+	margin-top: -9px;
+	margin-left: -7px;
 }
 
 .gunix .v-slider-no-indicator .v-slider-base:before, .gunix .v-slider-no-indicator .v-slider-base:after {
@@ -9965,15 +10112,15 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-tabsheet-tabitemcell .v-caption {
-	margin-left: 19px;
-	padding: 0 4px;
+	margin-left: 16px;
+	padding: 0 3px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	cursor: pointer;
 	text-align: center;
-	line-height: 37px;
-	font-size: 15px;
+	line-height: 32px;
+	font-size: 13px;
 	font-weight: 300;
 	color: #696969;
 	width: auto !important;
@@ -9991,7 +10138,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-tabsheet-tabitemcell .v-caption .v-icon + .v-captiontext {
-	margin-left: 9px;
+	margin-left: 8px;
 }
 
 .gunix .v-tabsheet-tabitemcell .v-caption:hover {
@@ -10023,21 +10170,21 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-tabsheet-tabitemcell .v-caption-closable {
-	padding-right: 22px;
+	padding-right: 18px;
 }
 
 .gunix .v-tabsheet-tabitemcell.icons-on-top .v-caption-closable {
-	padding-right: 4px;
+	padding-right: 3px;
 }
 
 .gunix .v-tabsheet-tabitemcell .v-tabsheet-caption-close {
 	position: absolute;
 	right: 0;
 	top: 50%;
-	margin: -8px 0 0;
-	font-size: 18px;
-	line-height: 18px;
-	width: 18px;
+	margin: -7px 0 0;
+	font-size: 15px;
+	line-height: 15px;
+	width: 15px;
 	text-align: center;
 	border-radius: 2px;
 	color: #969696;
@@ -10058,7 +10205,7 @@ div.v-layout.v-horizontal.v-widget {
 	top: 0;
 	right: 0;
 	bottom: 0;
-	padding-left: 19px;
+	padding-left: 16px;
 	background-color: transparent;
 	background-image: -webkit-linear-gradient(right, #fafafa 70%, rgba(250, 250, 250, 0) 100%);
 	background-image: linear-gradient(to left,#fafafa 70%, rgba(250, 250, 250, 0) 100%);
@@ -10098,7 +10245,7 @@ div.v-layout.v-horizontal.v-widget {
 	color: inherit;
 	height: 100%;
 	margin: 0;
-	padding: 0 9px;
+	padding: 0 8px;
 	outline: none;
 	cursor: pointer;
 	pointer-events: auto;
@@ -10124,20 +10271,20 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-tabsheet-scroller [class*="Next"] {
-	padding-left: 5px;
+	padding-left: 4px;
 }
 
 .gunix .v-tabsheet-scroller [class*="Next"]:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f054";
 }
 
 .gunix .v-tabsheet-scroller [class*="Prev"] {
-	padding-right: 5px;
+	padding-right: 4px;
 }
 
 .gunix .v-tabsheet-scroller [class*="Prev"]:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f053";
 }
 
@@ -10155,8 +10302,8 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-tabsheet-deco {
-	height: 20px !important;
-	width: 20px !important;
+	height: 16px !important;
+	width: 16px !important;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -10172,9 +10319,9 @@ div.v-layout.v-horizontal.v-widget {
 	position: absolute;
 	z-index: 1;
 	bottom: 50%;
-	margin-bottom: -29px;
+	margin-bottom: -24px;
 	left: 50%;
-	margin-left: -10px;
+	margin-left: -8px;
 }
 
 .v-ie8 .gunix .v-tabsheet-deco, .v-ie9 .gunix .v-tabsheet-deco {
@@ -10212,11 +10359,11 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-tabsheet-framed  > .v-tabsheet-tabcontainer .v-caption {
-	margin-left: 4px;
-	padding: 0 12px;
+	margin-left: 3px;
+	padding: 0 11px;
 	background-color: #fafafa;
 	border: 1px solid transparent;
-	line-height: 36px;
+	line-height: 31px;
 	border-radius: 4px 4px 0 0;
 	font-weight: 400;
 	-webkit-transition: background-color 160ms;
@@ -10234,7 +10381,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-tabsheet-framed  > .v-tabsheet-tabcontainer .v-caption-closable {
-	padding-right: 30px;
+	padding-right: 26px;
 }
 
 .gunix .v-tabsheet-framed  > .v-tabsheet-tabcontainer .v-tabsheet-caption-close {
@@ -10271,11 +10418,11 @@ div.v-layout.v-horizontal.v-widget {
 	border: 1px solid #dfdfdf;
 	border-bottom: none;
 	background: #fafafa;
-	padding-top: 6px;
+	padding-top: 5px;
 }
 
 .gunix .v-tabsheet-framed.icons-on-top  > .v-tabsheet-tabcontainer .v-tabsheet-tabitem-selected .v-caption {
-	padding-bottom: 7px;
+	padding-bottom: 6px;
 }
 
 .gunix .v-tabsheet-centered-tabs  > .v-tabsheet-tabcontainer {
@@ -10287,12 +10434,12 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-tabsheet-padded-tabbar  > .v-tabsheet-tabcontainer .v-tabsheet-tabs {
-	padding: 0 9px;
+	padding: 0 8px;
 }
 
 .gunix .v-tabsheet-icons-on-top  > .v-tabsheet-tabcontainer .v-caption {
-	padding-top: 6px;
-	padding-bottom: 6px;
+	padding-top: 5px;
+	padding-bottom: 5px;
 	line-height: 1.2;
 }
 
@@ -10305,7 +10452,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-tabsheet-icons-on-top  > .v-tabsheet-tabcontainer .v-caption-closable {
-	padding-right: 12px;
+	padding-right: 11px;
 }
 
 .gunix .v-tabsheet-icons-on-top  > .v-tabsheet-tabcontainer .v-tabsheet-caption-close {
@@ -10330,11 +10477,11 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-colorpicker-popup .v-tabsheet-tabs {
-	padding: 0 9px;
+	padding: 0 8px;
 }
 
 .gunix .v-colorpicker-popup [class$="sliders"] {
-	padding: 12px;
+	padding: 11px;
 }
 
 .gunix .v-colorpicker-popup [class$="sliders"] .v-widget {
@@ -10344,22 +10491,22 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-colorpicker-popup [class$="sliders"] .v-has-caption {
 	white-space: nowrap;
-	padding-left: 48px;
+	padding-left: 42px;
 }
 
 .gunix .v-colorpicker-popup [class$="sliders"] .v-caption {
 	display: inline-block;
-	margin-left: -48px;
-	width: 48px;
+	margin-left: -42px;
+	width: 42px;
 }
 
 .gunix .v-colorpicker-popup [class$="sliders"] .v-slot-hue-slider + .v-slot .v-has-caption {
-	padding-left: 80px;
+	padding-left: 70px;
 }
 
 .gunix .v-colorpicker-popup [class$="sliders"] .v-slot-hue-slider + .v-slot .v-caption {
-	margin-left: -80px;
-	width: 80px;
+	margin-left: -70px;
+	width: 70px;
 }
 
 .gunix .v-colorpicker-popup .v-slider-red .v-slider-base:after {
@@ -10395,8 +10542,8 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-colorpicker-popup .resize-button:before {
-	font-family: FontAwesome;
-	content: "\F141";
+	font-family: ThemeIcons;
+	content: "\f141";
 }
 
 .gunix .v-colorpicker-popup .resize-button-caption {
@@ -10405,7 +10552,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-colorpicker-popup .v-horizontallayout {
 	height: auto !important;
-	padding: 9px 0;
+	padding: 8px 0;
 	background-color: #fafafa;
 	border-top: 1px solid #ededed;
 }
@@ -10421,7 +10568,7 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-colorpicker-preview {
 	width: 100% !important;
 	height: auto !important;
-	padding: 9px;
+	padding: 8px;
 }
 
 .gunix .v-colorpicker-preview-textfield {
@@ -10436,17 +10583,17 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-colorpicker-button-color {
 	position: absolute;
-	top: 6px;
-	right: 6px;
-	bottom: 6px;
-	left: 6px;
+	top: 5px;
+	right: 5px;
+	bottom: 5px;
+	left: 5px;
 	border-radius: 3px;
 	border: 1px solid rgba(0, 0, 0, 0.5);
-	max-width: 23px;
+	max-width: 19px;
 }
 
 .gunix .v-colorpicker-button-color  + .v-button-caption:not(:empty) {
-	margin-left: 19px;
+	margin-left: 16px;
 }
 
 .v-ie8 .gunix .v-colorpicker-button-color {
@@ -10455,15 +10602,15 @@ div.v-layout.v-horizontal.v-widget {
 	right: auto;
 	bottom: auto;
 	left: auto;
-	width: 16px;
-	height: 16px;
+	width: 14px;
+	height: 14px;
 	display: inline-block;
 	vertical-align: middle;
-	margin: 0 -8px;
+	margin: 0 -7px;
 }
 
 .v-ie8 .gunix .v-colorpicker-button-color  + .v-button-caption {
-	margin-left: 19px;
+	margin-left: 16px;
 }
 
 .gunix .v-panel {
@@ -10480,15 +10627,15 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding: 0 12px;
-	line-height: 36px;
+	padding: 0 11px;
+	line-height: 31px;
 	border-bottom: 1px solid #d5d5d5;
 	background-color: #fafafa;
 	background-image: -webkit-linear-gradient(top, #fafafa 2%, #f6f6f6 98%);
 	background-image: linear-gradient(to bottom,#fafafa 2%, #f6f6f6 98%);
 	color: #464646;
 	font-weight: 400;
-	font-size: 14px;
+	font-size: 13px;
 	-webkit-box-shadow: inset 0 1px 0 white, inset 0 -1px 0 #eeeeee;
 	box-shadow: inset 0 1px 0 white, inset 0 -1px 0 #eeeeee;
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -10504,19 +10651,19 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-panel-content  > .v-margin-top {
-	padding-top: 12px;
+	padding-top: 11px;
 }
 
 .gunix .v-panel-content  > .v-margin-right {
-	padding-right: 12px;
+	padding-right: 11px;
 }
 
 .gunix .v-panel-content  > .v-margin-bottom {
-	padding-bottom: 12px;
+	padding-bottom: 11px;
 }
 
 .gunix .v-panel-content  > .v-margin-left {
-	padding-left: 12px;
+	padding-left: 11px;
 }
 
 .gunix .v-panel-borderless {
@@ -10534,7 +10681,7 @@ div.v-layout.v-horizontal.v-widget {
 	box-shadow: none;
 	color: inherit;
 	padding: 0;
-	margin: 0 12px;
+	margin: 0 11px;
 	border-bottom: none;
 }
 
@@ -10590,7 +10737,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-panel-caption.v-horizontallayout .v-label {
-	line-height: 37px;
+	line-height: 32px;
 }
 
 .gunix .v-accordion {
@@ -10645,15 +10792,15 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding: 0 12px;
-	line-height: 36px;
+	padding: 0 11px;
+	line-height: 31px;
 	border-bottom: 1px solid #d5d5d5;
 	background-color: #fafafa;
 	background-image: -webkit-linear-gradient(top, #fafafa 2%, #f6f6f6 98%);
 	background-image: linear-gradient(to bottom,#fafafa 2%, #f6f6f6 98%);
 	color: #464646;
 	font-weight: 400;
-	font-size: 14px;
+	font-size: 13px;
 	-webkit-box-shadow: inset 0 1px 0 white, inset 0 -1px 0 #eeeeee;
 	box-shadow: inset 0 1px 0 white, inset 0 -1px 0 #eeeeee;
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -10694,19 +10841,19 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-accordion-item-content  > .v-margin-top {
-	padding-top: 12px;
+	padding-top: 11px;
 }
 
 .gunix .v-accordion-item-content  > .v-margin-right {
-	padding-right: 12px;
+	padding-right: 11px;
 }
 
 .gunix .v-accordion-item-content  > .v-margin-bottom {
-	padding-bottom: 12px;
+	padding-bottom: 11px;
 }
 
 .gunix .v-accordion-item-content  > .v-margin-left {
-	padding-left: 12px;
+	padding-left: 11px;
 }
 
 .gunix .v-accordion-borderless {
@@ -10740,15 +10887,15 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-select-twincol .v-textfield, .gunix .v-select-twincol .v-nativebutton {
 	width: auto !important;
-	margin-top: 9px;
+	margin-top: 8px;
 }
 
 .gunix .v-select-twincol .v-nativebutton {
-	margin-left: 9px;
+	margin-left: 8px;
 }
 
 .gunix .v-select-twincol-caption-left, .gunix .v-select-twincol-caption-right {
-	font-size: 14px;
+	font-size: 13px;
 	font-weight: 400;
 	padding-bottom: 0.3em;
 	padding-left: 1px;
@@ -10771,9 +10918,9 @@ div.v-layout.v-horizontal.v-widget {
 	text-align: left;
 	white-space: normal;
 	position: absolute;
-	left: 9px;
-	right: 9px;
-	top: 36px;
+	left: 8px;
+	right: 8px;
+	top: 31px;
 	padding: 0;
 	text-align: center;
 }
@@ -10799,12 +10946,12 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-select-twincol-buttons .v-button-wrap:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f053";
 }
 
 .gunix .v-select-twincol-buttons .v-button:first-child .v-button-wrap:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f054";
 }
 
@@ -10828,18 +10975,18 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-select-select  + .v-textfield {
 	width: auto !important;
-	margin-top: 9px;
+	margin-top: 8px;
 }
 
 .gunix .v-select-select  + .v-textfield  + .v-nativebutton {
-	margin-top: 9px;
-	margin-left: 9px;
+	margin-top: 8px;
+	margin-left: 8px;
 }
 
 .gunix .v-calendar-header-day {
 	font-weight: 400;
 	text-align: center;
-	padding: 7px 0;
+	padding: 6px 0;
 }
 
 .gunix .v-calendar-header-week .v-calendar-back, .gunix .v-calendar-header-week .v-calendar-next {
@@ -10874,12 +11021,12 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-calendar-header-week .v-calendar-back:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f053";
 }
 
 .gunix .v-calendar-header-week .v-calendar-next:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f054";
 }
 
@@ -10915,13 +11062,13 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-calendar-bottom-spacer, .gunix .v-calendar-spacer, .gunix .v-calendar-bottom-spacer-empty {
-	height: 19px;
+	height: 17px;
 	margin-bottom: 3px;
 }
 
 .gunix .v-calendar-bottom-spacer {
 	font-size: 0.8em;
-	padding: 0 5px;
+	padding: 0 4px;
 	cursor: pointer;
 }
 
@@ -10930,10 +11077,10 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-calendar-day-number {
-	line-height: 25px;
-	font-size: 16px;
+	line-height: 21px;
+	font-size: 14px;
 	text-align: right;
-	margin: 0 5px;
+	margin: 0 4px;
 	white-space: nowrap;
 	border-top: 1px solid #f2f2f2;
 	cursor: pointer;
@@ -10951,9 +11098,9 @@ div.v-layout.v-horizontal.v-widget {
 	font-weight: 400;
 	color: #197de1;
 	border-top: 2px solid #197de1;
-	line-height: 24px;
+	line-height: 20px;
 	margin: 0;
-	padding: 0 5px;
+	padding: 0 4px;
 }
 
 .gunix .v-calendar-month-day-selected {
@@ -10974,7 +11121,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-calendar-weekly-longevents .v-calendar-event-all-day {
-	height: 22px;
+	height: 19px;
 	line-height: 1.6;
 	margin-bottom: 3px;
 }
@@ -10996,7 +11143,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-calendar-time {
 	text-align: right;
-	padding-right: 9px;
+	padding-right: 8px;
 	margin-top: -6px;
 	padding-bottom: 6px;
 }
@@ -11023,7 +11170,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-calendar .v-datecellslot, .gunix .v-calendar .v-datecellslot-even {
-	margin-right: 5px;
+	margin-right: 4px;
 }
 
 .gunix .v-calendar-current-time {
@@ -11079,21 +11226,21 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-calendar-event-month {
-	padding: 0 5px;
+	padding: 0 4px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	margin-bottom: 3px;
 	white-space: nowrap;
 	text-overflow: ellipsis;
-	height: 19px;
-	line-height: 19px;
+	height: 17px;
+	line-height: 17px;
 }
 
 .gunix .v-calendar-event-month .v-calendar-event-time {
 	float: right;
 	font-size: 0.9em;
-	line-height: 19px;
+	line-height: 17px;
 	opacity: 0.5;
 	filter: alpha(opacity=50) ;
 }
@@ -11104,12 +11251,12 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-calendar-event-all-day {
-	padding: 0 5px;
+	padding: 0 4px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	height: 19px;
-	line-height: 19px;
+	height: 17px;
+	line-height: 17px;
 	border-radius: 0;
 	margin-left: -1px;
 	white-space: nowrap;
@@ -11132,23 +11279,23 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .v-calendar-event-start {
 	border-top-left-radius: 4px;
 	border-bottom-left-radius: 4px;
-	margin-left: 5px;
+	margin-left: 4px;
 }
 
 .gunix .v-calendar-event-end {
 	border-top-right-radius: 4px;
 	border-bottom-right-radius: 4px;
-	margin-right: 5px;
+	margin-right: 4px;
 }
 
 .gunix .v-calendar-event-caption {
 	font-weight: 500;
 	line-height: 1.2;
-	padding: 5px 0;
+	padding: 4px 0;
 	position: absolute;
 	overflow: hidden;
-	right: 9px;
-	left: 5px;
+	right: 8px;
+	left: 4px;
 	bottom: 0;
 	top: 0;
 }
@@ -11167,7 +11314,7 @@ div.v-layout.v-horizontal.v-widget {
 	border-radius: 5px;
 	border: 1px solid #fafafa;
 	padding-top: 3px;
-	margin-right: 5px;
+	margin-right: 4px;
 }
 
 .gunix .v-calendar-event-month:before {
@@ -11313,7 +11460,7 @@ div.v-layout.v-horizontal.v-widget {
 .gunix h4, .gunix .v-label-h4 {
 	line-height: 1.1;
 	font-weight: 500;
-	font-size: 14px;
+	font-size: 12px;
 	color: #414141;
 	text-transform: uppercase;
 	letter-spacing: 0;
@@ -11322,11 +11469,11 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-csslayout  > h1:first-child, .gunix .v-csslayout  > h2:first-child, .gunix .v-csslayout  > h3:first-child, .gunix .v-csslayout  > h4 > .v-label-h1:first-child, .gunix .v-csslayout  > .v-label-h2:first-child, .gunix .v-csslayout  > .v-label-h3:first-child, .gunix .v-csslayout  > .v-label-h4:first-child {
-	margin-top: 16px;
+	margin-top: 14px;
 }
 
 .gunix .v-verticallayout > .v-slot:first-child h1, .gunix .v-verticallayout > .v-slot:first-child .v-label-h1, .gunix .v-verticallayout > .v-slot:first-child h2, .gunix .v-verticallayout > .v-slot:first-child .v-label-h2, .gunix .v-verticallayout > .v-slot:first-child h3, .gunix .v-verticallayout > .v-slot:first-child .v-label-h3, .gunix .v-verticallayout > .v-slot:first-child h4, .gunix .v-verticallayout > .v-slot:first-child .v-label-h4, .gunix .v-verticallayout > div > .v-slot:first-child h1, .gunix .v-verticallayout > div > .v-slot:first-child .v-label-h1, .gunix .v-verticallayout > div > .v-slot:first-child h2, .gunix .v-verticallayout > div > .v-slot:first-child .v-label-h2, .gunix .v-verticallayout > div > .v-slot:first-child h3, .gunix .v-verticallayout > div > .v-slot:first-child .v-label-h3, .gunix .v-verticallayout > div > .v-slot:first-child h4, .gunix .v-verticallayout > div > .v-slot:first-child .v-label-h4 {
-	margin-top: 16px;
+	margin-top: 14px;
 }
 
 .gunix .v-verticallayout > .v-slot:first-child .v-formlayout-contentcell h1, .gunix .v-verticallayout > .v-slot:first-child .v-formlayout-contentcell .v-label-h1, .gunix .v-verticallayout > .v-slot:first-child .v-formlayout-contentcell h2, .gunix .v-verticallayout > .v-slot:first-child .v-formlayout-contentcell .v-label-h2, .gunix .v-verticallayout > .v-slot:first-child .v-formlayout-contentcell h3, .gunix .v-verticallayout > .v-slot:first-child .v-formlayout-contentcell .v-label-h3, .gunix .v-verticallayout > .v-slot:first-child .v-formlayout-contentcell h4, .gunix .v-verticallayout > .v-slot:first-child .v-formlayout-contentcell .v-label-h4, .gunix .v-verticallayout > div > .v-slot:first-child .v-formlayout-contentcell h1, .gunix .v-verticallayout > div > .v-slot:first-child .v-formlayout-contentcell .v-label-h1, .gunix .v-verticallayout > div > .v-slot:first-child .v-formlayout-contentcell h2, .gunix .v-verticallayout > div > .v-slot:first-child .v-formlayout-contentcell .v-label-h2, .gunix .v-verticallayout > div > .v-slot:first-child .v-formlayout-contentcell h3, .gunix .v-verticallayout > div > .v-slot:first-child .v-formlayout-contentcell .v-label-h3, .gunix .v-verticallayout > div > .v-slot:first-child .v-formlayout-contentcell h4, .gunix .v-verticallayout > div > .v-slot:first-child .v-formlayout-contentcell .v-label-h4 {
@@ -11342,19 +11489,19 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-label-large {
-	font-size: 20px;
+	font-size: 17px;
 }
 
 .gunix .v-label-small {
-	font-size: 14px;
-}
-
-.gunix .v-label-tiny {
 	font-size: 12px;
 }
 
+.gunix .v-label-tiny {
+	font-size: 11px;
+}
+
 .gunix .v-label-huge {
-	font-size: 26px;
+	font-size: 23px;
 }
 
 .gunix .v-label-bold {
@@ -11407,16 +11554,16 @@ div.v-layout.v-horizontal.v-widget {
 	color: #474747;
 	border: 2px solid #2c9720;
 	border-radius: 4px;
-	padding: 7px 19px 7px 37px;
+	padding: 6px 16px 6px 32px;
 	font-weight: 400;
-	font-size: 15px;
+	font-size: 13px;
 }
 
 .gunix .v-label-success:before, .gunix .v-label-failure:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f00c";
 	margin-right: 0.5em;
-	margin-left: -19px;
+	margin-left: -16px;
 	color: #2c9720;
 }
 
@@ -11550,12 +11697,12 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-select-select  + .v-textfield {
 	width: auto !important;
-	margin-top: 9px;
+	margin-top: 8px;
 }
 
 .gunix .v-select-select  + .v-textfield  + .v-nativebutton {
-	margin-top: 9px;
-	margin-left: 9px;
+	margin-top: 8px;
+	margin-left: 8px;
 }
 
 .gunix .v-popupview {
@@ -11603,23 +11750,23 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-popupview-popup .popupContent  > .v-margin-top {
-	padding-top: 12px;
+	padding-top: 11px;
 }
 
 .gunix .v-popupview-popup .popupContent  > .v-margin-right {
-	padding-right: 12px;
+	padding-right: 11px;
 }
 
 .gunix .v-popupview-popup .popupContent  > .v-margin-bottom {
-	padding-bottom: 12px;
+	padding-bottom: 11px;
 }
 
 .gunix .v-popupview-popup .popupContent  > .v-margin-left {
-	padding-left: 12px;
+	padding-left: 11px;
 }
 
 .gunix .v-popupview-loading {
-	margin: 12px 12px;
+	margin: 11px 11px;
 	height: 24px !important;
 	width: 24px !important;
 	-webkit-box-sizing: border-box;
@@ -11662,7 +11809,7 @@ div.v-layout.v-horizontal.v-widget {
 	
 	font-weight: 400;
 	line-height: normal;
-	height: 37px;
+	height: 32px;
 	border-radius: 4px;
 	padding: 0;
 	border: 1px solid #c5c5c5;
@@ -11678,7 +11825,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .v-ie8 .gunix .v-richtextarea, .v-ie9 .gunix .v-richtextarea {
-	line-height: 37px;
+	line-height: 32px;
 	padding-top: 0;
 	padding-bottom: 0;
 }
@@ -11699,8 +11846,8 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .v-richtextarea .gwt-ToggleButton, .gunix .v-richtextarea .gwt-PushButton {
 	display: inline-block;
-	line-height: 37px;
-	width: 37px;
+	line-height: 32px;
+	width: 32px;
 	text-align: center;
 	outline: none;
 }
@@ -11720,7 +11867,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-richtextarea .gwt-RichTextToolbar-top div:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 }
 
 .gunix .v-richtextarea .gwt-RichTextToolbar-top div[title="Toggle Bold"]:before {
@@ -11796,12 +11943,12 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-richtextarea .gwt-RichTextToolbar-bottom {
-	font-size: 13px;
-	padding: 0 9px 9px 0;
+	font-size: 11px;
+	padding: 0 8px 8px 0;
 }
 
 .gunix .v-richtextarea .gwt-RichTextToolbar-bottom select {
-	margin: 9px 0 0 9px;
+	margin: 8px 0 0 8px;
 }
 
 .gunix .v-richtextarea .gwt-RichTextArea {
@@ -11811,7 +11958,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-richtextarea-readonly {
-	padding: 5px 7px;
+	padding: 4px 6px;
 	background: transparent;
 }
 
@@ -11835,26 +11982,26 @@ div.v-layout.v-horizontal.v-widget {
 	z-index: -1;
 	position: absolute;
 	right: 0;
-	height: 37px;
+	height: 32px;
 	text-align: right;
 	border: none;
 	background: transparent;
 }
 
 .gunix .v-Notification.v-position-top {
-	top: 12px;
+	top: 11px;
 }
 
 .gunix .v-Notification.v-position-right {
-	right: 12px;
+	right: 11px;
 }
 
 .gunix .v-Notification.v-position-bottom {
-	bottom: 12px;
+	bottom: 11px;
 }
 
 .gunix .v-Notification.v-position-left {
-	left: 12px;
+	left: 11px;
 }
 
 .gunix .v-Notification.v-position-assistive {
@@ -11903,12 +12050,12 @@ div.v-layout.v-horizontal.v-widget {
 	background: white;
 	-webkit-box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.15);
 	box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.15);
-	padding: 19px 22px;
+	padding: 16px 19px;
 }
 
 .gunix .v-Notification .v-Notification-caption {
 	color: #197de1;
-	font-size: 19px;
+	font-size: 17px;
 	line-height: 1;
 }
 
@@ -11937,11 +12084,11 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-Notification-caption ~ .v-Notification-description, .gunix .v-Notification-caption ~ .v-Notification-details {
-	margin-left: 24px;
+	margin-left: 21px;
 }
 
 .gunix .v-icon + .v-Notification-caption {
-	margin-left: 16px;
+	margin-left: 14px;
 }
 
 .gunix .v-Notification-system {
@@ -11952,11 +12099,11 @@ div.v-layout.v-horizontal.v-widget {
 	border-radius: 0;
 	-webkit-box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.25);
 	box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.25);
-	padding: 12px 15px;
+	padding: 11px 13px;
 	background-color: #444;
 	background-color: rgba(68, 68, 68, 0.9);
 	font-weight: 400;
-	line-height: 22px;
+	line-height: 20px;
 }
 
 .gunix .v-Notification-system .v-Notification-description, .gunix .v-Notification-system .v-Notification-details {
@@ -12048,7 +12195,7 @@ div.v-layout.v-horizontal.v-widget {
 	background-color: #444;
 	background-color: rgba(68, 68, 68, 0.9);
 	font-weight: 400;
-	line-height: 22px;
+	line-height: 20px;
 }
 
 .gunix .v-Notification.dark .v-Notification-caption {
@@ -12068,7 +12215,7 @@ div.v-layout.v-horizontal.v-widget {
 	border-radius: 0;
 	-webkit-box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.25);
 	box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.25);
-	padding: 12px 15px;
+	padding: 11px 13px;
 }
 
 .gunix .v-Notification.bar .v-Notification-description, .gunix .v-Notification.bar .v-Notification-details {
@@ -12108,19 +12255,19 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-Notification.small {
-	padding: 11px 13px;
+	padding: 10px 11px;
 }
 
 .gunix .v-Notification.small .v-Notification-caption {
-	font-size: 16px;
-}
-
-.gunix .v-Notification.small .v-Notification-description {
 	font-size: 14px;
 }
 
+.gunix .v-Notification.small .v-Notification-description {
+	font-size: 12px;
+}
+
 .gunix .v-Notification.closable {
-	padding-right: 59px;
+	padding-right: 51px;
 	overflow: hidden !important;
 	cursor: pointer;
 }
@@ -12130,11 +12277,11 @@ div.v-layout.v-horizontal.v-widget {
 	font-size: 1.5em;
 	position: absolute;
 	top: 50%;
-	margin-top: -12px;
-	right: 12px;
-	width: 25px;
-	height: 25px;
-	line-height: 24px;
+	margin-top: -11px;
+	right: 11px;
+	width: 21px;
+	height: 21px;
+	line-height: 20px;
 	cursor: pointer;
 	color: #000;
 	opacity: 0.5;
@@ -12175,7 +12322,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-Notification.closable.tray:after {
-	top: 16px;
+	top: 14px;
 	margin-top: 0;
 }
 
@@ -12191,7 +12338,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-Notification.success .v-Notification-caption:before, .gunix .v-Notification.failure .v-Notification-caption:before {
-	font-family: FontAwesome;
+	font-family: ThemeIcons;
 	content: "\f00c";
 	margin-right: 0.5em;
 }
@@ -12215,11 +12362,11 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .valo-menu {
 	height: 100%;
 	background-color: #4b4b4b;
-	background-image: -webkit-linear-gradient(right, #414141 0%, #4b4b4b 9px);
-	background-image: linear-gradient(to left,#414141 0%, #4b4b4b 9px);
+	background-image: -webkit-linear-gradient(right, #414141 0%, #4b4b4b 8px);
+	background-image: linear-gradient(to left,#414141 0%, #4b4b4b 8px);
 	color: #a5a5a5;
-	font-size: 14px;
-	line-height: 30px;
+	font-size: 13px;
+	line-height: 26px;
 	border-right: 1px solid #3b3b3b;
 	white-space: nowrap;
 }
@@ -12236,7 +12383,7 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .valo-menu-part {
 	border-left: 1px solid #414141;
 	height: 100%;
-	padding-bottom: 37px;
+	padding-bottom: 32px;
 	overflow: auto;
 }
 
@@ -12253,7 +12400,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .valo-menu-title .valo-menu-badge, .gunix .valo-menu-subtitle .valo-menu-badge, .gunix .valo-menu-item .valo-menu-badge {
 	position: absolute;
-	right: 19px;
+	right: 16px;
 }
 
 .gunix .valo-menu-title {
@@ -12263,8 +12410,8 @@ div.v-layout.v-horizontal.v-widget {
 	background-image: linear-gradient(to bottom,#1b87e3 2%, #166ed5 98%);
 	color: white;
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.05);
-	padding: 12px 19px;
-	font-size: 14px;
+	padding: 11px 16px;
+	font-size: 13px;
 	border-bottom: 1px solid #1362b1;
 	-webkit-box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
 	box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
@@ -12285,7 +12432,7 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-shadow: inset 0 1px 0 #4d98e6, inset 0 -1px 0 #166bca;
 	box-shadow: inset 0 1px 0 #4d98e6, inset 0 -1px 0 #166bca;
 	text-shadow: inherit;
-	font-size: 16px;
+	font-size: 14px;
 	border-color: inherit;
 }
 
@@ -12304,7 +12451,7 @@ div.v-layout.v-horizontal.v-widget {
 	text-shadow: none;
 	background: transparent;
 	color: inherit;
-	margin: 19px 7px;
+	margin: 16px 6px;
 	display: block;
 	overflow: hidden;
 	text-align: center;
@@ -12323,7 +12470,7 @@ div.v-layout.v-horizontal.v-widget {
 	margin-right: 1px;
 	border-radius: 4px;
 	color: #197de1;
-	padding: 0 12px;
+	padding: 0 11px;
 	-webkit-transition: color 140ms;
 	-moz-transition: color 140ms;
 	transition: color 140ms;
@@ -12376,9 +12523,9 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .gunix .v-menubar-user-menu  > .v-menubar-menuitem img.v-icon {
-	width: 56px;
-	height: 56px;
-	border-radius: 29px;
+	width: 48px;
+	height: 48px;
+	border-radius: 25px;
 	box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
 	display: block;
 	margin: 0 auto 0.3em;
@@ -12398,7 +12545,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .valo-menu-subtitle {
 	color: #868686;
-	margin: 7px 0 7px 19px;
+	margin: 6px 0 6px 16px;
 	border-bottom: 1px solid #666666;
 }
 
@@ -12413,7 +12560,7 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .valo-menu-item {
 	outline: none;
 	font-weight: 400;
-	padding: 0 37px 0 19px;
+	padding: 0 32px 0 16px;
 	cursor: pointer;
 	position: relative;
 	overflow: hidden;
@@ -12428,7 +12575,7 @@ div.v-layout.v-horizontal.v-widget {
 	display: inline-block;
 	width: 90%;
 	max-width: 15em;
-	padding-right: 19px;
+	padding-right: 16px;
 	text-overflow: ellipsis;
 	overflow: hidden;
 }
@@ -12458,7 +12605,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .valo-menu-item span.v-icon {
 	min-width: 1em;
-	margin-right: 19px;
+	margin-right: 16px;
 	text-align: center;
 	vertical-align: middle;
 	-webkit-mask-image: -webkit-gradient(linear, left top, left bottom, from(black), to(rgba(0, 0, 0, 0.75)));
@@ -12474,21 +12621,21 @@ div.v-layout.v-horizontal.v-widget {
 	-moz-transition: background-color 300ms;
 	transition: background-color 300ms;
 	line-height: 1;
-	padding: 4px 6px;
-	min-width: 11px;
+	padding: 4px 5px;
+	min-width: 9px;
 	text-align: center;
-	top: 4px;
+	top: 2.5px;
 	border-radius: 4px;
 }
 
 .gunix .valo-menu-part.large-icons {
 	background-color: #4b4b4b;
-	min-width: 74px;
-	max-width: 111px;
+	min-width: 64px;
+	max-width: 96px;
 }
 
 .gunix .valo-menu-part.large-icons .valo-menu-title {
-	font-size: 12px;
+	font-size: 11px;
 }
 
 .gunix .valo-menu-part.large-icons .valo-menu-title .v-label-undef-w {
@@ -12498,28 +12645,28 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .valo-menu-part.large-icons .v-menubar-user-menu {
 	margin-left: 0;
 	margin-right: 0;
-	font-size: 11px;
+	font-size: 10px;
 }
 
 .gunix .valo-menu-part.large-icons .v-menubar-user-menu img.v-icon {
-	width: 28px;
-	height: 28px;
+	width: 25px;
+	height: 25px;
 }
 
 .gunix .valo-menu-part.large-icons [class*="subtitle"] {
-	margin: 9px 0 0;
-	padding: 7px 25px 7px 9px;
+	margin: 8px 0 0;
+	padding: 6px 21px 6px 8px;
 	line-height: 1;
 	border: none;
 	text-overflow: ellipsis;
 	overflow: hidden;
 	background: #3c3c3c;
-	font-size: 13px;
+	font-size: 11px;
 	box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
 }
 
 .gunix .valo-menu-part.large-icons [class*="subtitle"] [class*="badge"] {
-	right: 9px;
+	right: 8px;
 }
 
 .gunix .valo-menu-part.large-icons [class*="subtitle"]  + .valo-menu-item {
@@ -12528,9 +12675,9 @@ div.v-layout.v-horizontal.v-widget {
 
 .gunix .valo-menu-part.large-icons .valo-menu-item {
 	display: block;
-	font-size: 26px;
+	font-size: 22px;
 	line-height: 1;
-	padding: 12px;
+	padding: 11px;
 	text-align: center;
 	border-top: 1px solid #555555;
 }
@@ -12544,7 +12691,7 @@ div.v-layout.v-horizontal.v-widget {
 	width: auto;
 	margin: 0.3em 0 0;
 	padding: 0;
-	font-size: 11px;
+	font-size: 10px;
 	line-height: 1.3;
 }
 
@@ -12571,25 +12718,25 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .valo-menu-part.large-icons .valo-menu-item [class*="badge"] {
 	padding-left: 4px;
 	padding-right: 4px;
-	top: 7px;
-	right: 7px;
+	top: 6px;
+	right: 6px;
 	border: 2px solid #4b4b4b;
 }
 
 .gunix .valo-menu-logo {
 	display: block;
 	overflow: hidden;
-	width: 44px !important;
-	height: 44px;
+	width: 38px !important;
+	height: 38px;
 	border-radius: 4px;
 	text-align: center;
 	background-color: #197de1;
 	background-image: -webkit-linear-gradient(top, #1b87e3 2%, #166ed5 98%);
 	background-image: linear-gradient(to bottom,#1b87e3 2%, #166ed5 98%);
 	color: white;
-	font-size: 25px;
-	line-height: 44px;
-	margin: 19px auto;
+	font-size: 21px;
+	line-height: 38px;
+	margin: 16px auto;
 	-webkit-box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
 	box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
 }
@@ -12598,184 +12745,184 @@ div.v-layout.v-horizontal.v-widget {
 	outline: none;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part {
+.gunix .valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part {
 	background-color: #4b4b4b;
-	min-width: 74px;
-	max-width: 111px;
+	min-width: 64px;
+	max-width: 96px;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-title {
-	font-size: 12px;
-}
-
-.gunix .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-title .v-label-undef-w {
-	white-space: normal;
-}
-
-.gunix .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .v-menubar-user-menu {
-	margin-left: 0;
-	margin-right: 0;
+.gunix .valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-title {
 	font-size: 11px;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .v-menubar-user-menu img.v-icon {
-	width: 28px;
-	height: 28px;
+.gunix .valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-title .v-label-undef-w {
+	white-space: normal;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part [class*="subtitle"] {
-	margin: 9px 0 0;
-	padding: 7px 25px 7px 9px;
+.gunix .valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .v-menubar-user-menu {
+	margin-left: 0;
+	margin-right: 0;
+	font-size: 10px;
+}
+
+.gunix .valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .v-menubar-user-menu img.v-icon {
+	width: 25px;
+	height: 25px;
+}
+
+.gunix .valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part [class*="subtitle"] {
+	margin: 8px 0 0;
+	padding: 6px 21px 6px 8px;
 	line-height: 1;
 	border: none;
 	text-overflow: ellipsis;
 	overflow: hidden;
 	background: #3c3c3c;
-	font-size: 13px;
+	font-size: 11px;
 	box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part [class*="subtitle"] [class*="badge"] {
-	right: 9px;
+.gunix .valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part [class*="subtitle"] [class*="badge"] {
+	right: 8px;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part [class*="subtitle"]  + .valo-menu-item {
+.gunix .valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part [class*="subtitle"]  + .valo-menu-item {
 	border-top: none;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item {
+.gunix .valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item {
 	display: block;
-	font-size: 26px;
+	font-size: 22px;
 	line-height: 1;
-	padding: 12px;
+	padding: 11px;
 	text-align: center;
 	border-top: 1px solid #555555;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item:first-child {
+.gunix .valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item:first-child {
 	border-top: none;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item [class*="caption"] {
+.gunix .valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item [class*="caption"] {
 	display: block;
 	width: auto;
 	margin: 0.3em 0 0;
 	padding: 0;
-	font-size: 11px;
+	font-size: 10px;
 	line-height: 1.3;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item .v-icon {
+.gunix .valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item .v-icon {
 	margin: 0;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item span.v-icon {
+.gunix .valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item span.v-icon {
 	opacity: 0.8;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item.selected {
+.gunix .valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item.selected {
 	background: #434343;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item.selected .v-icon {
+.gunix .valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item.selected .v-icon {
 	opacity: 1;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item.selected [class*="badge"] {
+.gunix .valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item.selected [class*="badge"] {
 	border-color: #434343;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item [class*="badge"] {
+.gunix .valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item [class*="badge"] {
 	padding-left: 4px;
 	padding-right: 4px;
-	top: 7px;
-	right: 7px;
+	top: 6px;
+	right: 6px;
 	border: 2px solid #4b4b4b;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="0-800px"] {
-	padding-top: 37px;
+.gunix .valo-menu-responsive[width-range~="0-800px"] {
+	padding-top: 32px;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="0-800px"] .v-loading-indicator {
-	top: 37px;
+.gunix .valo-menu-responsive[width-range~="0-800px"] .v-loading-indicator {
+	top: 32px;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="0-800px"]  > .v-widget {
+.gunix .valo-menu-responsive[width-range~="0-800px"]  > .v-widget {
 	position: relative !important;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menu {
+.gunix .valo-menu-responsive[width-range~="0-800px"] .valo-menu {
 	border-right: none;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menu-part {
+.gunix .valo-menu-responsive[width-range~="0-800px"] .valo-menu-part {
 	overflow: visible;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menu-toggle {
+.gunix .valo-menu-responsive[width-range~="0-800px"] .valo-menu-toggle {
 	display: inline-block;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menu-title {
+.gunix .valo-menu-responsive[width-range~="0-800px"] .valo-menu-title {
 	position: fixed;
 	z-index: 100;
 	top: 0;
 	left: 0;
 	right: 0;
-	height: 37px !important;
+	height: 32px !important;
 	padding-top: 0;
 	padding-bottom: 0;
 	-webkit-backface-visibility: hidden;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menu .v-menubar-user-menu {
+.gunix .valo-menu-responsive[width-range~="0-800px"] .valo-menu .v-menubar-user-menu {
 	position: fixed;
 	z-index: 100;
 	top: 0;
 	right: 0;
 	margin: 0;
 	padding: 0;
-	height: 37px;
+	height: 32px;
 	color: #97bee5;
 	max-width: 30%;
 	-webkit-backface-visibility: hidden;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menu .v-menubar-user-menu .v-menubar-menuitem {
-	line-height: 36px;
+.gunix .valo-menu-responsive[width-range~="0-800px"] .valo-menu .v-menubar-user-menu .v-menubar-menuitem {
+	line-height: 31px;
 	white-space: nowrap;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menu .v-menubar-user-menu img.v-icon {
+.gunix .valo-menu-responsive[width-range~="0-800px"] .valo-menu .v-menubar-user-menu img.v-icon {
 	display: inline-block;
-	margin: 0 6px 0 0;
-	width: 19px;
-	height: 19px;
-	border-radius: 10px;
+	margin: 0 5px 0 0;
+	width: 16px;
+	height: 16px;
+	border-radius: 8px;
 	border: none;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menuitems {
+.gunix .valo-menu-responsive[width-range~="0-800px"] .valo-menuitems {
 	height: 100%;
 	background-color: #4b4b4b;
-	background-image: -webkit-linear-gradient(right, #414141 0%, #4b4b4b 9px);
-	background-image: linear-gradient(to left,#414141 0%, #4b4b4b 9px);
+	background-image: -webkit-linear-gradient(right, #414141 0%, #4b4b4b 8px);
+	background-image: linear-gradient(to left,#414141 0%, #4b4b4b 8px);
 	color: #a5a5a5;
-	font-size: 14px;
-	line-height: 30px;
+	font-size: 13px;
+	line-height: 26px;
 	border-right: 1px solid #3b3b3b;
 	white-space: nowrap;
 	position: fixed;
-	z-index: 200;
-	top: 37px;
+	z-index: 9000;
+	top: 32px;
 	bottom: 0;
 	height: auto;
 	max-width: 100%;
 	overflow: auto;
-	padding: 19px 0;
+	padding: 16px 0;
 	-webkit-transform: translatex(-100%);
 	-moz-transform: translatex(-100%);
 	-ms-transform: translatex(-100%);
@@ -12786,7 +12933,7 @@ div.v-layout.v-horizontal.v-widget {
 	transition: all 300ms;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menu-visible .valo-menuitems {
+.gunix .valo-menu-responsive[width-range~="0-800px"] .valo-menu-visible .valo-menuitems {
 	-webkit-transform: translatex(0%);
 	-moz-transform: translatex(0%);
 	-ms-transform: translatex(0%);
@@ -12794,17 +12941,22 @@ div.v-layout.v-horizontal.v-widget {
 	transform: translatex(0%);
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="0-500px"] .valo-menu-toggle .v-button-caption {
+.gunix .valo-menu-responsive[width-range~="0-500px"] .valo-menu-toggle .v-button-caption {
 	display: none;
 }
 
-.gunix .v-ui.valo-menu-responsive[width-range~="0-500px"] .valo-menu .v-menubar-user-menu .v-menubar-menuitem-caption {
+.gunix .valo-menu-responsive[width-range~="0-500px"] .valo-menu .v-menubar-user-menu .v-menubar-menuitem-caption {
 	display: inline-block;
-	width: 19px;
+	width: 16px;
 	overflow: hidden;
 }
 
 .gunix .v-button-link.v-disabled.xbreadcrumbbutton {
 	opacity: 1;
 	filter: alpha(opacity=100);
+}
+
+.gunix .v-caption.v-caption-moduleImageButton {
+	top: 0 !important;
+	left: 26% !important;
 }

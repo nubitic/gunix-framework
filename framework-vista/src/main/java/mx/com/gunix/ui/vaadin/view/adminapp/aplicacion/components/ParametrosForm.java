@@ -53,6 +53,8 @@ public class ParametrosForm extends CustomComponent {
 	public ParametrosForm(Window window, boolean esSoloLectura) {
 		buildMainLayout();
 		setCompositionRoot(mainLayout);
+
+		setSizeFull();
 		parametrosTable.setTableFieldFactory(new GunixTableFieldFactory());
 		parametrosTable.addContainerProperty("nombre", String.class, "", "Parámetro", null, null);
 		parametrosTable.addContainerProperty("valor", String.class, "", "Valor", null, null);
