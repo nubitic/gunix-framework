@@ -3,6 +3,7 @@ package mx.com.gunix.framework.activiti;
 import java.io.ObjectStreamException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -101,7 +102,11 @@ public class Utils {
 									if (value instanceof Long) {
 										Class<?> propType = pub.getPropertyType(ans, prop);
 										if ((propType.isPrimitive() && propType.getName().equals("boolean")) || Boolean.class.isAssignableFrom(propType)) {
-											value = ((Long)value == 1);
+											value = ((Long) value == 1);
+										} else {
+											if (propType.isAssignableFrom(Date.class)) {
+												value = new Date((Long) value);
+											}
 										}
 									}
 								}

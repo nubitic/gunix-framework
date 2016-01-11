@@ -75,10 +75,14 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 
 		rol.getModulos().forEach(
 				modulo -> {
-					Modulo modRolOrg = acomodaFuncionesModulos(aplicacion, modulo.getFunciones()).get(0);
-					List<Funcion> funcionesPadre = new ArrayList<Funcion>();
-					insertaFuncionesRol(rol.getIdRol(), modRolOrg.getFunciones(), toListFuncionesPadre(funcionesPadre, aplicacion.getModulos().get(aplicacion.getModulos().indexOf(modRolOrg)).getFunciones()), true);
+					doInsertModuloRol(aplicacion, modulo, rol);
 				});
+	}
+
+	private void doInsertModuloRol(Aplicacion aplicacion, Modulo modulo, Rol rol) {
+		Modulo modRolOrg = acomodaFuncionesModulos(aplicacion, modulo.getFunciones()).get(0);
+		List<Funcion> funcionesPadre = new ArrayList<Funcion>();
+		insertaFuncionesRol(rol.getIdRol(), modRolOrg.getFunciones(), toListFuncionesPadre(funcionesPadre, aplicacion.getModulos().get(aplicacion.getModulos().indexOf(modRolOrg)).getFunciones()), true);
 	}
 
 	private void doInsert(Modulo modulo) {
@@ -318,6 +322,26 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 										}
 									}
 								});
+							}
+							
+							Rol idRol = new Rol();
+							idRol.setAplicacion((Aplicacion) dcRol.getIdMap().get("aplicacion"));
+							idRol.setIdRol((String) dcRol.getIdMap().get("idRol"));
+							if (dcRol.getInserciones() != null) {
+								// Agregando los nuevos modulos
+								if (dcRol.getInserciones().containsKey("modulos")) {
+									dcRol.getInserciones().get("modulos").forEach(modulo -> {
+										doInsertModuloRol(idRol.getAplicacion(), (Modulo) modulo, idRol);
+									});
+								}
+							}
+
+							if (dcRol.getEliminaciones() != null) {
+								// Eliminando modulos
+								if (dcRol.getEliminaciones().containsKey("modulos")) {
+									List hijas = dcRol.getEliminaciones().get("modulos");
+									eliminaFuncionesRol(idRol.getIdRol(), (List<Funcion>) hijas);
+								}
 							}
 						}
 					});
