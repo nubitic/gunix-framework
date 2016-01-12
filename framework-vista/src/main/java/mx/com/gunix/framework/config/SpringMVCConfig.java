@@ -5,6 +5,7 @@ import mx.com.gunix.framework.ui.springmvc.tiles3.AjaxTilesView;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.js.ajax.AjaxUrlBasedViewResolver;
 import org.springframework.ui.context.ThemeSource;
 import org.springframework.ui.context.support.ResourceBundleThemeSource;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMap
 import org.springframework.web.servlet.theme.FixedThemeResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.tiles3.TilesConfigurer;
+import org.springframework.context.MessageSource;
 
 @EnableWebMvc
 @Configuration
@@ -89,4 +91,13 @@ public class SpringMVCConfig extends WebMvcConfigurerAdapter {
 		LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         return validator;
 	}
+	
+	
+	@Bean
+	public MessageSource messageSource(){
+		ResourceBundleMessageSource messageSource =  new ResourceBundleMessageSource();
+		messageSource.setBasename("messages");
+		return messageSource;
+	}
+	
 }
