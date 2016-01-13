@@ -7,15 +7,15 @@
     <subProcess id="alta" name="Alta de Usuarios">
       <startEvent id="starteventAlta" name="StartAlta"></startEvent>
       <userTask id="usertaskAlta" name="Formulario" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.usuario.UsuarioView"></userTask>
-      <serviceTask id="servicetask1" name="Validación" activiti:expression="${usuarioService.isValid(usuario)}" activiti:resultVariableName="esValido"></serviceTask>
+      <serviceTask id="servicetask1" name="Validación" activiti:expression="${usuarioAdminService.isValid(usuario)}" activiti:resultVariableName="esValido"></serviceTask>
       <sequenceFlow id="flow1" sourceRef="usertaskAlta" targetRef="servicetask1"></sequenceFlow>
-      <sequenceFlow id="flow2" sourceRef="starteventAlta" targetRef="usertaskAlta"></sequenceFlow>
+      <sequenceFlow id="flow2" sourceRef="starteventAlta" targetRef="servicetask7"></sequenceFlow>
       <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
       <sequenceFlow id="flow3" sourceRef="servicetask1" targetRef="exclusivegateway2"></sequenceFlow>
       <sequenceFlow id="flow4" name="!esValido" sourceRef="exclusivegateway2" targetRef="usertaskAlta">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!esValido}]]></conditionExpression>
       </sequenceFlow>
-      <serviceTask id="servicetask2" name="Guarda" activiti:expression="${usuarioService.insert(usuario)}"></serviceTask>
+      <serviceTask id="servicetask2" name="Guarda" activiti:expression="$usuarioAdminService.insert(usuario)}"></serviceTask>
       <sequenceFlow id="flow5" name="esValido" sourceRef="exclusivegateway2" targetRef="servicetask2">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${esValido}]]></conditionExpression>
       </sequenceFlow>
@@ -26,11 +26,13 @@
       <endEvent id="terminateendevent1" name="TerminateEndEvent">
         <terminateEventDefinition></terminateEventDefinition>
       </endEvent>
+      <serviceTask id="servicetask7" name="Busca Aplicaciones" activiti:expression="${usuarioAdminService.getAppRoles()}" activiti:resultVariableName="aplicaciones"></serviceTask>
+      <sequenceFlow id="flow30" sourceRef="servicetask7" targetRef="usertaskAlta"></sequenceFlow>
     </subProcess>
     <subProcess id="consulta" name="Consulta de Usuarios">
       <startEvent id="starteventConsulsta" name="StartConsulta"></startEvent>
       <userTask id="usertask2" name="Formulario de Búsqueda" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.usuario.UsuarioSearchView"></userTask>
-      <serviceTask id="servicetask3" name="Consulta" activiti:expression="${usuarioService.getByExample(esMaestro,usuario)}" activiti:resultVariableName="resultado"></serviceTask>
+      <serviceTask id="servicetask3" name="Consulta" activiti:expression="${usuarioAdminService.getByExample(esMaestro,usuario)}" activiti:resultVariableName="resultado"></serviceTask>
       <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway"></exclusiveGateway>
       <userTask id="usertask3" name="Formulario de Detalle" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.usuario.UsuarioView"></userTask>
       <sequenceFlow id="flow11" sourceRef="starteventConsulsta" targetRef="usertask2"></sequenceFlow>
@@ -47,11 +49,11 @@
     <subProcess id="modificación" name="Modificación de Usuarios">
       <startEvent id="starteventModificación" name="StartModificación"></startEvent>
       <userTask id="usertask4" name="Formulario Búsqueda" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.usuario.UsuarioSearchView"></userTask>
-      <serviceTask id="servicetask4" name="Consulta" activiti:expression="${usuarioService.getByExample(esMaestro,usuario)}" activiti:resultVariableName="resultado"></serviceTask>
+      <serviceTask id="servicetask4" name="Consulta" activiti:expression="${usuarioAdminService.getByExample(esMaestro,usuario)}" activiti:resultVariableName="resultado"></serviceTask>
       <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway"></exclusiveGateway>
       <userTask id="usertask5" name="Formulario Detalle" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.usuario.UsuarioView"></userTask>
       <exclusiveGateway id="exclusivegateway5" name="Exclusive Gateway"></exclusiveGateway>
-      <serviceTask id="servicetask5" name="Guarda" activiti:expression="${usuarioService.update(usuario, usuarioActualizado)}"></serviceTask>
+      <serviceTask id="servicetask5" name="Guarda" activiti:expression="${usuarioAdminService.update(usuario, usuarioActualizado)}"></serviceTask>
       <userTask id="usertask6" name="Modificación Exitosa" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.OperacionExitosaView"></userTask>
       <endEvent id="endevent2" name="End"></endEvent>
       <sequenceFlow id="flow17" sourceRef="starteventModificación" targetRef="usertask4"></sequenceFlow>
@@ -67,7 +69,7 @@
       <sequenceFlow id="flow23" name="cancelar" sourceRef="exclusivegateway5" targetRef="starteventModificación">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${acción=="Cancelar"}]]></conditionExpression>
       </sequenceFlow>
-      <serviceTask id="servicetask6" name="Validación" activiti:expression="${usuarioService.isValid(usuario)}" activiti:resultVariableName="esValido"></serviceTask>
+      <serviceTask id="servicetask6" name="Validación" activiti:expression="${usuarioAdminService.isValid(usuario)}" activiti:resultVariableName="esValido"></serviceTask>
       <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway"></exclusiveGateway>
       <sequenceFlow id="flow24" name="guardar" sourceRef="exclusivegateway5" targetRef="servicetask6">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${acción=="Guardar"}]]></conditionExpression>
@@ -110,10 +112,10 @@
         <omgdc:Bounds height="301.0" width="711.0" x="360.0" y="10.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="starteventAlta" id="BPMNShape_starteventAlta">
-        <omgdc:Bounds height="35.0" width="35.0" x="390.0" y="100.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="390.0" y="30.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertaskAlta" id="BPMNShape_usertaskAlta">
-        <omgdc:Bounds height="55.0" width="105.0" x="470.0" y="90.0"></omgdc:Bounds>
+        <omgdc:Bounds height="55.0" width="105.0" x="470.0" y="109.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
         <omgdc:Bounds height="55.0" width="105.0" x="470.0" y="200.0"></omgdc:Bounds>
@@ -132,6 +134,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="terminateendevent1" id="BPMNShape_terminateendevent1">
         <omgdc:Bounds height="35.0" width="35.0" x="1213.0" y="454.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask7" id="BPMNShape_servicetask7">
+        <omgdc:Bounds height="55.0" width="105.0" x="470.0" y="20.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="consulta" id="BPMNShape_consulta">
         <omgdc:Bounds height="291.0" width="511.0" x="360.0" y="340.0"></omgdc:Bounds>
@@ -195,12 +200,12 @@
         <omgdi:waypoint x="210.0" y="470.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
-        <omgdi:waypoint x="522.0" y="145.0"></omgdi:waypoint>
+        <omgdi:waypoint x="522.0" y="164.0"></omgdi:waypoint>
         <omgdi:waypoint x="522.0" y="200.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
-        <omgdi:waypoint x="425.0" y="117.0"></omgdi:waypoint>
-        <omgdi:waypoint x="470.0" y="117.0"></omgdi:waypoint>
+        <omgdi:waypoint x="425.0" y="47.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="47.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
         <omgdi:waypoint x="575.0" y="227.0"></omgdi:waypoint>
@@ -208,8 +213,8 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
         <omgdi:waypoint x="630.0" y="207.0"></omgdi:waypoint>
-        <omgdi:waypoint x="629.0" y="117.0"></omgdi:waypoint>
-        <omgdi:waypoint x="575.0" y="117.0"></omgdi:waypoint>
+        <omgdi:waypoint x="629.0" y="136.0"></omgdi:waypoint>
+        <omgdi:waypoint x="575.0" y="136.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
           <omgdc:Bounds height="14.0" width="44.0" x="580.0" y="86.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
@@ -228,6 +233,10 @@
       <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
         <omgdi:waypoint x="955.0" y="227.0"></omgdi:waypoint>
         <omgdi:waypoint x="1000.0" y="227.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
+        <omgdi:waypoint x="522.0" y="75.0"></omgdi:waypoint>
+        <omgdi:waypoint x="522.0" y="109.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
         <omgdi:waypoint x="425.0" y="407.0"></omgdi:waypoint>
