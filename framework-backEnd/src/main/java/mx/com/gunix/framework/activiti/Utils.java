@@ -23,7 +23,10 @@ public class Utils {
 
 	private static final String EMPTY_COLLECTION_NESTED_REFERENCE = NESTED_REFERENCE + Iterable.class + "|1";
 	private static final String EMPTY_MAP_NESTED_REFERENCE = NESTED_REFERENCE + Map.class + "|0";
-
+	
+	private static Boolean isGroovyPresent;
+	private static Class<?> groovyMetaClass;
+	
 	@SuppressWarnings({ "rawtypes" })
 	public static Object fromMap(String varName, TreeMap<String, Object> stringifiedObject, ClassLoader classLoader) {
 		final Object ans;
@@ -211,6 +214,22 @@ public class Utils {
 	private static void doAppend(Object nestedObject, Map<String, Object> stringifiedObject, CharSequence currFieldStrBldr, List<String> processedObjectsHashes) {
 		if (nestedObject != null) {
 			Class<?> clazz = nestedObject.getClass();
+			
+			if (isGroovyPresent == null && clazz != null) {
+				try {
+					groovyMetaClass = clazz.getClassLoader().loadClass("groovy.lang.MetaClass");
+					isGroovyPresent = Boolean.TRUE;
+				} catch (ClassNotFoundException ignorar) {
+					isGroovyPresent = Boolean.FALSE;
+				}
+			}
+
+			if (groovyMetaClass != null) {
+				if (groovyMetaClass.isAssignableFrom(clazz)) {
+					return;
+				}
+			}
+			
 			if (BeanUtils.isSimpleProperty(clazz)) {
 				doPut(stringifiedObject, currFieldStrBldr, clazz, nestedObject);
 			} else {
