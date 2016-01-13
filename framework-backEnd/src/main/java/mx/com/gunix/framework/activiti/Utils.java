@@ -217,7 +217,7 @@ public class Utils {
 			
 			if (isGroovyPresent == null && clazz != null) {
 				try {
-					groovyMetaClass = clazz.getClassLoader().loadClass("groovy.lang.MetaClass");
+					groovyMetaClass = Class.forName("groovy.lang.MetaClass");
 					isGroovyPresent = Boolean.TRUE;
 				} catch (ClassNotFoundException ignorar) {
 					isGroovyPresent = Boolean.FALSE;
