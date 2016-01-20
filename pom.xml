@@ -21,7 +21,7 @@
 		<javac.path>${JAVA_1_8_HOME}/bin/javac</javac.path>
 		<slf4j.version>1.7.12</slf4j.version>
 		<aspectj.version>1.8.5</aspectj.version>
-		<josso.version>1.8.9</josso.version>
+		<josso.version>1.8.10</josso.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 

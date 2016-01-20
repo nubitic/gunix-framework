@@ -54,7 +54,7 @@
 
         <def-pwdmgr:processes>
 
-            <lostpassword-process name="josso-simple-lostpassword" xmlns="urn:org:josso:simple:lostpasswordprocess">
+            <lostpassword-process maxTimeToLive="3600000" challeng-id="ID_USUARIO" name="josso-simple-lostpassword" xmlns="urn:org:josso:simple:lostpasswordprocess">
 
                 <idGenerator>
                     <id-generator xmlns="urn:org:josso:core"/>
@@ -93,9 +93,9 @@
     <!-- EMail Password Distributor : will distribute passwords using email. -->
     <!-- The 'mail-to-userproperty' is the SSOUser property name that contains the user email! -->
     <email-password-distributor id="josso-password-distributor"
-            mail-from="josso@josso.org"
+            mail-from="${JOSSO_MAIL_FROM}"
             mail-to-userproperty="email"
-            mail-subject="JOSSO Password Reset verification e-mail"
+            mail-subject="Verificación para Restablecimiento de Contraseña"
             template="/passwordVerificationEmail.vm"
             xmlns="urn:org:josso:email:passworddistributor">
 

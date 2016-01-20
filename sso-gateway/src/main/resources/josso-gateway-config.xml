@@ -292,7 +292,17 @@
     <s:bean id="josso-spring-mailsender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
         <!-- Spring JavaMaileSender properties :
             protocol, host, port, username, password -->
-        <s:property name="host" value="mail.mycompany.com"/>
+        <s:property name="host" value="${JOSSO_MAIL_SERVER}"/>
+        <s:property name="username" value="${JOSSO_MAIL_USERNAME}"/>
+        <s:property name="password" value="${JOSSO_MAIL_PASSWORD}"/>
+        <s:property name="port" value="${JOSSO_MAIL_PORT}" />
+        <s:property name="javaMailProperties">
+	   		<s:props>
+       	      <s:prop key="mail.smtp.auth">${JOSSO_MAIL_SMTP_AUTH}</s:prop>
+       	      <s:prop key="mail.smtp.starttls.enable">${JOSSO_MAIL_SMTP_TLS}</s:prop>
+       	      <s:prop key="mail.smtp.localhost">${JOSSO_MAIL_SMTP_HELO}</s:prop>
+       	   </s:props>
+		</s:property>
     </s:bean>
 
 </s:beans>
