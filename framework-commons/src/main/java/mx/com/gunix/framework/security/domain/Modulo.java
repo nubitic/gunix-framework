@@ -27,7 +27,7 @@ public class Modulo extends HashCodeByTimeStampAware implements Serializable {
 	private String icono;
 
 	@NotNull(groups = BeanValidations.class)
-	@Size(min = 1, groups = BeanValidations.class)
+	@Size(min = 1, groups = BeanValidations.class, message="Debe definiar al menos una Función")
 	private List<Funcion> funciones;
 
 	@NotNull(groups = BeanValidations.class)

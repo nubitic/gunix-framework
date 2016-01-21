@@ -3,8 +3,12 @@ package mx.com.gunix.framework.ui.vaadin.view;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -28,11 +32,51 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.Responsive;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 public abstract class AbstractGunixView<S extends Serializable> extends VerticalLayout implements View {
+	private static final ThreadLocal<Map<Notification.Type, Set<String>>> notificacionesMap = new ThreadLocal<Map<Notification.Type, Set<String>>>();
 
+	public static void appendNotification(Notification.Type type, String notificacion) {
+		Map<Notification.Type, Set<String>> notificaciones = notificacionesMap.get();
+		if (notificaciones == null) {
+			notificaciones = new HashMap<Notification.Type, Set<String>>();
+			notificacionesMap.set(notificaciones);
+		}
+		
+		Set<String> notificacionesPuntuales = notificaciones.get(type);
+		if(notificacionesPuntuales == null) {
+			notificacionesPuntuales = new LinkedHashSet<String>();
+			notificaciones.put(type, notificacionesPuntuales);
+		}
+		
+		notificacionesPuntuales.add(notificacion);
+		UI.getCurrent().markAsDirty();
+	}
+	
+	public static void doNotification() {
+		Map<Notification.Type, Set<String>> notificaciones = notificacionesMap.get();
+		if (notificaciones != null && !notificaciones.isEmpty()) {
+			notificaciones.keySet().forEach(type -> {
+				Set<String> notificacionesPuntuales = notificaciones.get(type);
+				if (notificacionesPuntuales != null && !notificacionesPuntuales.isEmpty()) {
+					StringBuilder notificationMessage = new StringBuilder();
+					notificacionesPuntuales.forEach(notificacion -> {
+						notificationMessage.append(notificacion).append("\n\r");
+					});
+					try {
+						Notification.show(notificationMessage.toString(), type);
+					} catch (IllegalStateException ignorar) {
+
+					}
+				}
+			});
+		}
+		notificacionesMap.set(null);
+	}
+	
 	protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private GunixBeanFieldGroup<S> fieldGroup;
 
@@ -134,7 +178,7 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		fieldGroup.commit();
 	}
 	
-	protected final void commit(OnBeanValidationErrorCallback onBVECallback) throws CommitException {
+	protected final void commit(OnBeanValidationErrorCallback<S> onBVECallback) throws CommitException {
 		validaFieldGroup();
 		fieldGroup.commit(onBVECallback);
 	}

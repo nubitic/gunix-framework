@@ -33,7 +33,6 @@ import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
@@ -92,7 +91,7 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 	protected void doEnter(ViewChangeEvent event) {
 		List<String> errores = (List<String>) $("errores");
 		if (errores != null && !errores.isEmpty()) {
-			Notification.show("Existen errores en el formulario: " + errores, Type.ERROR_MESSAGE);
+			appendNotification(Type.ERROR_MESSAGE, "Existen errores en el formulario: " + errores);
 		}
 		guardarButton.setEnabled(true);
 		guardarButton.setDisableOnClick(true);
@@ -184,8 +183,20 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 					commitModulos();
 					commitRoles();
 					updateRoles();
-					commit(ibve -> {
-						flyt.setComponentError(new UserError(ibve.getMessage()));
+					modulosRolesAcc.getTab(0).setComponentError(null);
+					modulosRolesAcc.getTab(1).setComponentError(null);
+					modulosRolesAcc.setComponentError(null);
+					commit(cv -> {
+						UserError ue = new UserError(cv.getMessage());
+						if ("modulos".equals(cv.getPropertyPath().toString())) {
+							modulosRolesAcc.getTab(0).setComponentError(ue);
+							modulosRolesAcc.setComponentError(ue);
+						} else {
+							if ("roles".equals(cv.getPropertyPath().toString()) || cv.getPropertyPath().toString().matches("roles\\[\\d+\\]\\.modulos")) {
+								modulosRolesAcc.getTab(1).setComponentError(ue);
+								modulosRolesAcc.setComponentError(ue);
+							}
+						}
 					});
 					GunixFile iconoF = (GunixFile) iconoFile.getValue();
 					if ((esModificacion && iconoF != null && iconoF.getFile() != null) || !esModificacion) {
@@ -195,7 +206,7 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 				}
 				completaTarea();
 			} catch (CommitException ce) {
-				Notification.show("Existen errores en el formulario", Type.ERROR_MESSAGE);
+				appendNotification(Type.ERROR_MESSAGE, "Existen errores en el formulario");
 				guardarButton.setEnabled(true);
 				guardarButton.setDisableOnClick(true);
 			} catch (IOException e) {
@@ -271,7 +282,6 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 					fnesTabComp.commit();
 				} catch (CommitException e) {
 					sinError = false;
-					Notification.show("Existen errores en el formulario:" + e.getMessage(), Type.ERROR_MESSAGE);
 					modulosRolesAcc.setSelectedTab(modulosPanel);
 					modulosTabS.setSelectedTab(fnesTabComp);
 				}
@@ -448,7 +458,7 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 			if ((m = ((ModuloForm) window.getContent()).getModulo()) != null) {
 				if (moduloExiste(m)) {
 					showModuloPopup(m, false);
-					Notification.show("Ya existe un módulo con el id " + m.getIdModulo(), Type.ERROR_MESSAGE);
+					appendNotification(Type.ERROR_MESSAGE, "Ya existe un módulo con el id " + m.getIdModulo());
 				} else {
 					addModuloTab(m);
 				}
@@ -521,7 +531,7 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 
 				if (rolExiste(r)) {
 					showRolPopup(r);
-					Notification.show("Ya existe un rol con el id " + r.getIdRol(), Type.ERROR_MESSAGE);
+					appendNotification(Type.ERROR_MESSAGE, "Ya existe un rol con el id " + r.getIdRol());
 				} else {
 					r.setAplicacion(aplicacion);
 					aplicacion.getRoles().add(r);

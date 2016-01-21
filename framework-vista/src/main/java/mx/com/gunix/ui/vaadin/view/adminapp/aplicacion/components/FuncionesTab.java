@@ -410,7 +410,12 @@ public class FuncionesTab extends CustomComponent {
 		if (!validaFunciones(container, modulo.getFunciones())) {
 			throw new CommitException("El módulo " + modulo.getIdModulo() + " tiene errores");
 		} else {
-			moduloBFG.commit(ibve -> {
+			funcionesTreeTable.setComponentError(null);
+			moduloBFG.commit(cv -> {
+				UserError ue = new UserError(cv.getMessage());
+				if ("funciones".equals(cv.getPropertyPath().toString())) {
+					funcionesTreeTable.setComponentError(ue);
+				}
 			});
 		}
 	}

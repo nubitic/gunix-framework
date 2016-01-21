@@ -181,60 +181,68 @@ public class Header extends CustomComponent {
 			Optional<Rol> rolSelOpt = aplicacion.getRoles().stream().filter(rol -> rol.getIdRol().equals(rolCBox.getValue())).findFirst();
 
 			rolSelOpt.ifPresent(rolSel -> {
-				int filasModulos = ((filasModulos = rolSel.getModulos().size()) % MODULOS_POR_FILA == 0) ? filasModulos / MODULOS_POR_FILA : (filasModulos / MODULOS_POR_FILA) + 1;
 				boolean isOneModulo = rolSel.getModulos().size() == 1;
-				if (filasModulos > 1) {
-					modulosLayout.setRows(1 + (filasModulos * 2));
-				}
-
-				int modulosProcesados = 0;
-				int rowIncr = 1;
-				for (int row = 0; row < filasModulos; row++) {
-					if (row % 2 != 0) {
-						modulosLayout.setRowExpandRatio(row, 1);
-					} else {
-						modulosLayout.setRowExpandRatio(row, 2);
+				if(isOneModulo) {
+					seleccionaModulo(rolSel.getModulos().get(0));
+				} else {
+					int filasModulos = ((filasModulos = rolSel.getModulos().size()) % MODULOS_POR_FILA == 0) ? filasModulos / MODULOS_POR_FILA : (filasModulos / MODULOS_POR_FILA) + 1;
+					if (filasModulos > 1) {
+						modulosLayout.setRows(1 + (filasModulos * 2));
 					}
-					int colIncr = isOneModulo ? 3 : 1;
-					for (int col = 0; col < MODULOS_POR_FILA; col++) {
-						Modulo modulo = rolSel.getModulos().get(modulosProcesados);
-						Image button = new Image(modulo.getDescripcion(), new ThemeResource("img/" + modulo.getIcono()));
-						button.addStyleName("moduleImageButton");
-						button.addClickListener(clickEvnt -> {
-							menuBar.removeItems();
-							menuBar.setCaption("");
-							menuBar.setEnabled(true);
-							modulosLayout.setVisible(false);
-							modulo.getFunciones().stream().forEach(funcion -> {
-								Optional<List<Funcion>> optHijas = Optional.ofNullable(funcion.getHijas());
-								MenuItem padre = null;
-								if (optHijas.isPresent()) {
-									padre = menuBar.addItem(funcion.getTitulo(), null);
-								} else {
-									padre = menuBar.addItem(funcion.getTitulo(), selectedItem -> {
-										Notification.show(funcion.getDescripcion());
-									});
-								}
 
-								padre.setEnabled(true);
-								recorreFuncionesHijas(padre, optHijas);
-							});
-							menuBar.setCaption(modulo.getDescripcion());
-						});
-						modulosLayout.addComponent(button, col + colIncr, row + rowIncr);
-
-						modulosLayout.setComponentAlignment(button, Alignment.TOP_CENTER);
-						modulosProcesados++;
-						colIncr++;
-						if (modulosProcesados == rolSel.getModulos().size()) {
-							break;
+					int modulosProcesados = 0;
+					int rowIncr = 1;
+					for (int row = 0; row < filasModulos; row++) {
+						if (row % 2 != 0) {
+							modulosLayout.setRowExpandRatio(row, 1);
+						} else {
+							modulosLayout.setRowExpandRatio(row, 2);
 						}
+						int colIncr = isOneModulo ? 3 : 1;
+						for (int col = 0; col < MODULOS_POR_FILA; col++) {
+							Modulo modulo = rolSel.getModulos().get(modulosProcesados);
+							Image button = new Image(modulo.getDescripcion(), new ThemeResource("img/" + modulo.getIcono()));
+							button.addStyleName("moduleImageButton");
+							button.addClickListener(clickEvnt -> {
+								seleccionaModulo(modulo);
+							});
+							modulosLayout.addComponent(button, col + colIncr, row + rowIncr);
+
+							modulosLayout.setComponentAlignment(button, Alignment.TOP_CENTER);
+							modulosProcesados++;
+							colIncr++;
+							if (modulosProcesados == rolSel.getModulos().size()) {
+								break;
+							}
+						}
+						rowIncr++;
 					}
-					rowIncr++;
 				}
 			});
 		});
 
+	}
+
+	private void seleccionaModulo(Modulo modulo) {
+		menuBar.removeItems();
+		menuBar.setCaption("");
+		menuBar.setEnabled(true);
+		modulosLayout.setVisible(false);
+		modulo.getFunciones().stream().forEach(funcion -> {
+			Optional<List<Funcion>> optHijas = Optional.ofNullable(funcion.getHijas());
+			MenuItem padre = null;
+			if (optHijas.isPresent()) {
+				padre = menuBar.addItem(funcion.getTitulo(), null);
+			} else {
+				padre = menuBar.addItem(funcion.getTitulo(), selectedItem -> {
+					Notification.show(funcion.getDescripcion());
+				});
+			}
+
+			padre.setEnabled(true);
+			recorreFuncionesHijas(padre, optHijas);
+		});
+		menuBar.setCaption(modulo.getDescripcion());
 	}
 
 	private void recorreFuncionesHijas(MenuItem padre, Optional<List<Funcion>> optHijas) {

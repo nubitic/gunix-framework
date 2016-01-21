@@ -12,7 +12,6 @@ import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.RowHeaderMode;
@@ -46,7 +45,7 @@ public class AplicacionSearchView extends AbstractGunixView<Aplicacion> {
 		} else {
 			if (esMaestro != null) {
 				resultadosTable.setVisible(false);
-				Notification.show("No se encontraron aplicaciones con los filtros indicados", Type.HUMANIZED_MESSAGE);
+				appendNotification(Type.HUMANIZED_MESSAGE, "No se encontraron aplicaciones con los filtros indicados");
 			}
 		}
 	}

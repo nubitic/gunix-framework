@@ -27,7 +27,7 @@ public class Rol extends HashCodeByTimeStampAware implements Serializable {
 	private Aplicacion aplicacion;
 
 	@NotNull(groups = BeanValidations.class)
-	@Size(min = 1, groups = BeanValidations.class)
+	@Size(min = 1, groups = BeanValidations.class, message="Debe indicar al menos una Función de algún Módulo")
 	private List<Modulo> modulos;
 
 	private boolean habilitado;

@@ -12951,6 +12951,10 @@ div.v-layout.v-horizontal.v-widget {
 	overflow: hidden;
 }
 
+.gunix .v-table.v-table-error {
+	background-color: rgba(255, 0, 0, 0.1);
+}
+
 .gunix .v-button-link.v-disabled.xbreadcrumbbutton {
 	opacity: 1;
 	filter: alpha(opacity=100);

@@ -3,11 +3,15 @@ package mx.com.gunix.framework.ui.vaadin.component;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 
 import org.vaadin.easyuploads.GunixFileBuffer;
 import org.vaadin.easyuploads.UploadField;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.Validator.EmptyValueException;
+import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.server.UserError;
 import com.vaadin.ui.Upload;
 
 public class GunixUploadField extends UploadField {
@@ -17,6 +21,27 @@ public class GunixUploadField extends UploadField {
 	public GunixUploadField() {
 		super();
 		init();
+	}
+
+	@Override
+	public void validate() throws InvalidValueException {
+		try {
+			setComponentError(null);
+			super.validate();
+		} catch (InvalidValueException reThrow) {
+			if (reThrow instanceof EmptyValueException) {
+				setComponentError(new UserError((null == getRequiredError() || "".equals(getRequiredError())) ? "no puede ser null" : getRequiredError()));
+			} else {
+				if (reThrow.getCauses() != null) {
+					StringBuilder errorString = new StringBuilder();
+					Arrays.stream(reThrow.getCauses()).forEach(ive -> {
+						errorString.append(ive.getMessage()).append("\n");
+					});
+					setComponentError(new UserError(errorString.toString()));
+				}
+			}
+			throw reThrow;
+		}
 	}
 
 	public GunixUploadField(StorageMode mode) {

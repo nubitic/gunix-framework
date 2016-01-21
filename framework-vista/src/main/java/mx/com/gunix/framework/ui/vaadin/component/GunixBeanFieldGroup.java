@@ -10,21 +10,26 @@ import javax.validation.ValidatorFactory;
 
 import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
 
+import com.vaadin.data.Item;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
+import com.vaadin.data.util.NestingBeanItem;
 import com.vaadin.ui.Field;
 
 public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
-	public interface OnBeanValidationErrorCallback {
-		void callback(InvalidValueException ive);
+
+	public interface OnBeanValidationErrorCallback<BT> {
+		void callback(ConstraintViolation<BT> cv);
 	}
 
 	private static final long serialVersionUID = 1L;
 	private static ValidatorFactory factory;
 	private transient javax.validation.Validator javaxBeanValidator;
+	private Class<BT> beanType;
 
 	public GunixBeanFieldGroup(Class<BT> beanType) {
 		super(beanType);
+		this.beanType = beanType;
 		if (!isBeanValidationImplementationAvailable()) {
 			throw new IllegalStateException("No se encontró una implementación de JSR-303 bean validation");
 		}
@@ -49,7 +54,7 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 		commit(null);
 	}
 
-	public void commit(OnBeanValidationErrorCallback onBVECallback) throws CommitException {
+	public void commit(OnBeanValidationErrorCallback<BT> onBVECallback) throws CommitException {
 		super.commit();
 		Set<ConstraintViolation<BT>> errores = getJavaxBeanValidator().validate(getItemDataSource().getBean(), BeanValidations.class);
 		if (errores != null && !errores.isEmpty()) {
@@ -67,14 +72,10 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 				}
 			} else {
 				if (onBVECallback != null) {
-					StringBuilder erroresStrBldr = new StringBuilder();
 					for (ConstraintViolation<BT> cv : errores) {
-						erroresStrBldr.append(cv.getPropertyPath() != null ? cv.getPropertyPath().toString() : cv.getRootBeanClass().getSimpleName()).append(" ").append(cv.getMessage()).append("\n");
+						onBVECallback.callback(cv);
 					}
-					String erroresString = erroresStrBldr.toString();
-					InvalidValueException ive = new InvalidValueException(erroresString);
-					onBVECallback.callback(ive);
-					throw new CommitException(erroresString, this, new FieldGroupInvalidValueException(invalidValueExceptions));
+					throw new CommitException();
 				} else {
 					throw new IllegalStateException("No se asoció (bind) ningún campo al grupo ni tampoco se indicó un callback para atender los errores en la validación");
 				}
@@ -82,4 +83,12 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 		}
 	}
 
+	@Override
+	public void setItemDataSource(BT bean) {
+		if (bean == null) {
+			setItemDataSource((Item) null);
+		} else {
+			setItemDataSource(new NestingBeanItem<BT>(bean, beanType));
+		}
+	}
 }

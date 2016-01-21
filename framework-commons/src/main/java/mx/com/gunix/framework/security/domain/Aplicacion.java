@@ -2,6 +2,7 @@ package mx.com.gunix.framework.security.domain;
 
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -33,11 +34,13 @@ public class Aplicacion extends HashCodeByTimeStampAware implements ACLType {
 	private String icono;
 
 	@NotNull(groups = BeanValidations.class)
-	@Size(min = 1, groups = BeanValidations.class)
+	@Size(min = 1, groups = BeanValidations.class, message="Debe definir al menos un Rol")
+	@Valid
 	private List<Rol> roles;
 
 	@NotNull(groups = BeanValidations.class)
-	@Size(min = 1, groups = BeanValidations.class)
+	@Size(min = 1, groups = BeanValidations.class, message="Debe definir al menos un Módulo")
+	@Valid
 	private List<Modulo> modulos;
 
 	public Long getId() {
