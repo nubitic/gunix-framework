@@ -3,6 +3,7 @@ package mx.com.gunix.framework.security.domain;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -10,6 +11,9 @@ public class Usuario implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private List<Aplicacion> aplicaciones;
+	
+	@Valid
+	private DatosUsuario datosUsuario;
 	
 	@NotNull
 	@Size(min=1,max=254)
@@ -93,6 +97,12 @@ public class Usuario implements Serializable {
 	@Override
 	public String toString() {
 		return "Usuario [idUsuario=" + idUsuario + ", eliminado=" + eliminado + ", bloqueado=" + bloqueado + ", activo=" + activo + "]";
+	}
+	public DatosUsuario getDatosUsuario() {
+		return datosUsuario;
+	}
+	public void setDatosUsuario(DatosUsuario datosUsuario) {
+		this.datosUsuario = datosUsuario;
 	}
 	
 }

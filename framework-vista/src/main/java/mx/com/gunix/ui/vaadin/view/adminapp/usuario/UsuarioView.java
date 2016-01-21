@@ -1,88 +1,124 @@
 package mx.com.gunix.ui.vaadin.view.adminapp.usuario;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
+
+import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Notification.Type;
+
 
 import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.security.domain.Aplicacion;
+import mx.com.gunix.framework.security.domain.DatosUsuario;
+import mx.com.gunix.framework.security.domain.Rol;
 import mx.com.gunix.framework.security.domain.Usuario;
-import mx.com.gunix.framework.ui.vaadin.component.GunixUploadField;
 import mx.com.gunix.framework.ui.vaadin.spring.GunixVaadinView;
 import mx.com.gunix.framework.ui.vaadin.view.AbstractGunixView;
 import mx.com.gunix.framework.ui.vaadin.view.SecuredView;
-import mx.com.gunix.ui.vaadin.view.adminapp.aplicacion.AplicacionView.AplicacionViewBean;
 
 
 @GunixVaadinView
 public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> implements SecuredView {
-	/**
-	 * 
-	 */
+
+	public static class UsuarioViewBean extends Usuario {
+		private static final long serialVersionUID = 1L;
+	}
+	
 	private static final long serialVersionUID = 1L;
+	
 	private TextField idUsuario;
 	private ComboBox estatus;
 	private Button guardarButton;
-	private Accordion datosRolesAcc;
 	private Accordion appRolesAcc;
 	private Panel datosPanel;
-	private Panel rolesPanel;
+	private Panel appRolesPanel;
 	private GridLayout datosGridL;
 	private List<Aplicacion> aplicaciones;
 
 	
 	//datos personales
+	@PropertyId("datosUsuario.curp")
 	private TextField curp;
+	@PropertyId("datosUsuario.rfc")
 	private TextField rfc;
+	@PropertyId("datosUsuario.nombre")
 	private TextField nombre;
+	@PropertyId("datosUsuario.apPaterno")
 	private TextField apPaterno;
+	@PropertyId("datosUsuario.apMaterno")
 	private TextField apMaterno;
-	private TextField correoE;
+	@PropertyId("datosUsuario.correoElectronico")
+	private TextField correoElectronico;
+	@PropertyId("datosUsuario.telefono")
 	private TextField telefono;
-
-	public static class UsuarioViewBean extends Usuario {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-		
-	}
 	
-	
-	@Override
-	protected void doEnter(ViewChangeEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
+	private Usuario usuario;
+
+	private DatosUsuario datosUsuario;
 
 	@Override
-	protected void doConstruct() {
-		//esConsulta = "Consulta".equals($("operación"));
-		//esModificacion = "Modificación".equals($("operación"));
-		
+	protected void doConstruct() {	
 		flyt.setIcon(new ThemeResource("img/1440816106_window.png"));
-		flyt.setCaption(new StringBuilder($("operación").toString()).append(" de Usuarios").toString());
-		
+		flyt.setCaption(new StringBuilder($("operación").toString()).append(" de Usuarios").toString());		
 		buildMainLayout();
-		datosRolesAcc.getTab(0).setIcon(new ThemeResource("img/1452591654_marty-mcfly.png"));
-		datosRolesAcc.getTab(1).setIcon(new ThemeResource("img/1440815816_To_do_list.png"));
+		
+		// guardarButton
+		guardarButton = new Button();
+		guardarButton.setImmediate(true);
+		guardarButton.setWidth("-1px");
+		guardarButton.setHeight("-1px");
+		guardarButton.setCaption("Guardar");
+		guardarButton.setDisableOnClick(true);		
+		flyt.addComponent(guardarButton);	
+		
+		guardarButton.addClickListener(event ->{
+			    commitUsuario();
+			    completaTarea();
+				estatus.setEnabled(false);
+				guardarButton.setEnabled(false);
+				guardarButton.setDisableOnClick(true);
+			//}
+			
+		});
+				
+		setSizeFull();
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	protected void doEnter(ViewChangeEvent event) {
+		List<String> errores = (List<String>) $("errores");
+		if (errores != null && !errores.isEmpty()) {
+			Notification.show("Existen errores en el formulario: " + errores, Type.ERROR_MESSAGE);
+		}
+		guardarButton.setEnabled(true);
+		guardarButton.setDisableOnClick(true);
 		
 	}
 
 	@Override
 	protected List<Variable<?>> getVariablesTarea() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Variable<?>> vars = new ArrayList<Variable<?>>();
+		Variable<Usuario> usuarioVar = new Variable<Usuario>();
+		
+		usuarioVar.setValor(usuario);
+		usuarioVar.setNombre("usuario");
+		vars.add(usuarioVar);
+		return vars;
 	}
 
 	@Override
@@ -108,53 +144,37 @@ public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> 
 		idUsuario.setHeight("-1px");
 		flyt.addComponent(idUsuario);
 		
+		//estatus
 		estatus = new ComboBox();
-		estatus.setCaption("Estatus");
-		
+		estatus.setNullSelectionAllowed(false);
+		estatus.setCaption("Estatus");	
+		estatus.addItem(0);
+		estatus.setItemCaption(0, "Inactivo");
 		estatus.addItem(1);
 		estatus.setItemCaption(1,"Activo");
-		estatus.addItem(0);
-		estatus.setItemCaption(0,"Inactivo");
-
-		estatus.select(1);
-		estatus.setEnabled(false);
 		estatus.setWidth("-1px");
 		estatus.setHeight("-1px");
+		estatus.setValue(1);
+		estatus.setEnabled(false);
 		flyt.addComponent(estatus);
 		
-		// datosRolesAcc
-		datosRolesAcc = buildDatosRolesAcc();
-		flyt.addComponent(datosRolesAcc);
-
-		// guardarButton
-		guardarButton = new Button();
-		guardarButton.setImmediate(true);
-		guardarButton.setWidth("-1px");
-		guardarButton.setHeight("-1px");
-		flyt.addComponent(guardarButton);
-		
-		guardarButton.setCaption("Guardar");
-	}
-	
-	private Accordion buildDatosRolesAcc() {
-		// common part: create layout
-		datosRolesAcc = new Accordion();
-		datosRolesAcc.setImmediate(true);
-		datosRolesAcc.setSizeFull();
-		datosRolesAcc.setHeight("-1px");
-		// datosPanel
+		// datos personales
 		datosPanel = buildDatosPanel();
-		datosRolesAcc.addTab(datosPanel, "Datos Personales", null);
-
-		// rolesPanel
-		rolesPanel = buildRolesPanel();
-		datosRolesAcc.addTab(rolesPanel, "Roles", null);
-
-		return datosRolesAcc;
+		flyt.addComponent(datosPanel);
+		
+		appRolesPanel = buildAppRolesPanel();
+		flyt.addComponent(appRolesPanel);
 	}
 	
-	@SuppressWarnings("unchecked")
-	private Accordion buildAppRolesAcc(){
+	
+	@SuppressWarnings({ "unchecked" })
+	private Panel buildAppRolesPanel(){
+		appRolesPanel = new Panel("Roles");
+		appRolesPanel.setIcon(new ThemeResource("img/1440815816_To_do_list.png"));
+		appRolesPanel.setImmediate(false);
+		appRolesPanel.setSizeFull();
+		appRolesPanel.setHeight("-1px");
+		
 		appRolesAcc = new Accordion();
 		appRolesAcc.setImmediate(true);
 		appRolesAcc.setSizeFull();
@@ -163,13 +183,51 @@ public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> 
 		aplicaciones = (List<Aplicacion>) $("aplicaciones");
 		
 		for(Aplicacion app : aplicaciones){
-			appRolesAcc.addTab(new Panel(), app.getDescripcion(), null);
+			appRolesAcc.addTab(buildRolesPanel(app), app.getDescripcion(), null);
+			appRolesAcc.setId(app.getIdAplicacion());
+			
+			appRolesAcc.addTab(buildRolesPanel(app), "APP2-Ejemplo", null);
+			appRolesAcc.addTab(buildRolesPanel(app),"APP3-Ejemplo", null);
 		}
-		return appRolesAcc;
+		appRolesAcc.addTab(new Panel(), "APP2", null);
+		appRolesAcc.addTab(new Panel(),"APP3", null);
+		
+		appRolesPanel.setContent(appRolesAcc);
+		
+		return appRolesPanel;
 	}
+
+	private Panel buildRolesPanel(Aplicacion app){
+		Panel rolesPanel = new Panel();
+		rolesPanel.setImmediate(false);
+		rolesPanel.setSizeFull();
+		rolesPanel.setHeight("-1px");
+
+		OptionGroup roles = new OptionGroup(app.getIdAplicacion());
+		roles.addStyleName("horizontal");
+		roles.setMultiSelect(true);
+		
+		app.getRoles().forEach(rol -> {
+			roles.addItem(rol.getIdRol());
+			roles.setItemCaption(rol.getIdRol(), rol.getDescripcion());
+		});
+		
+		/*roles.addValueChangeListener(new ValueChangeListener(){
+			@Override
+			public void valueChange(com.vaadin.data.Property.ValueChangeEvent event) {
+				// TODO Auto-generated method stub
+				
+			}
+		});*/
+				
+		rolesPanel.setContent(roles);
+		return rolesPanel;
+	}
+	
 	private Panel buildDatosPanel() {
 		// common part: create layout
-		datosPanel = new Panel();
+		datosPanel = new Panel("Datos Personales");
+		datosPanel.setIcon(new ThemeResource("img/1452591654_marty-mcfly.png"));
 		datosPanel.setImmediate(false);
 		datosPanel.setSizeFull();
 		datosPanel.setHeight("-1px");
@@ -228,13 +286,13 @@ public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> 
 		apMaterno.setWidth("-1px");
 		apMaterno.setHeight("-1px");
 		
-		correoE = new TextField();
-		correoE.setCaption("CORREO ELECTRÓNICO");
-		correoE.setImmediate(false);
-		correoE.setNullRepresentation("");
-		correoE.setInvalidCommitted(false);
-		correoE.setWidth("-1px");
-		correoE.setHeight("-1px");
+		correoElectronico = new TextField();
+		correoElectronico.setCaption("CORREO ELECTRÓNICO");
+		correoElectronico.setImmediate(false);
+		correoElectronico.setNullRepresentation("");
+		correoElectronico.setInvalidCommitted(false);
+		correoElectronico.setWidth("-1px");
+		correoElectronico.setHeight("-1px");
 		
 		telefono = new TextField();
 		telefono.setCaption("TELEFONO");
@@ -249,22 +307,63 @@ public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> 
 		datosGridL.addComponent(nombre,0,1);
 		datosGridL.addComponent(apPaterno,1,1);
 		datosGridL.addComponent(apMaterno,2,1);
-		datosGridL.addComponent(correoE,0,2);
+		datosGridL.addComponent(correoElectronico,0,2);
 		datosGridL.addComponent(telefono,1,2);
 		
 		return datosGridL;
 	}
+	
 
-	private Panel buildRolesPanel() {
-		rolesPanel = new Panel();
-		rolesPanel.setImmediate(false);
-		rolesPanel.setSizeFull();
-		rolesPanel.setHeight("-1px");
+	private void commitUsuario() {
+		usuario = new Usuario();
+		datosUsuario = new DatosUsuario();
+		
+		usuario.setIdUsuario(idUsuario.getValue());
+		usuario.setActivo(true);
+		
+		datosUsuario.setCurp(curp.getValue());
+		datosUsuario.setRfc(rfc.getValue());
+		datosUsuario.setNombre(nombre.getValue());
+		datosUsuario.setApPaterno(apPaterno.getValue());
+		datosUsuario.setApMaterno(apMaterno.getValue());
+		datosUsuario.setCorreoElectronico(correoElectronico.getValue());
+		datosUsuario.setTelefono(telefono.getValue());
+		usuario.setDatosUsuario(datosUsuario);
+		
+		usuario.setAplicaciones(getAplicacionesRoles());
+	
+	}
+	
+	private List<Aplicacion> getAplicacionesRoles(){
+		Iterator<Component> i = appRolesAcc.iterator();
+		List<Aplicacion> appSelect = new ArrayList<Aplicacion>();
+		List<Rol> rolesSelec = new ArrayList<Rol>();
+		while (i.hasNext()) {
+		    Panel panel = (Panel) i.next();
+		    OptionGroup roles = (OptionGroup)panel.getContent();
+		    			
+		    if(roles != null){
+				@SuppressWarnings("unchecked")
+				Collection<String> rSelect = (Collection<String>) roles.getValue();
+		    	
+			    if(rSelect!=null && !rSelect.isEmpty()){
+			    	Aplicacion app = new Aplicacion();
+			    	app.setIdAplicacion(roles.getCaption());	
+	  
+	                for (String r : rSelect) {
+	                	Rol rolSelect = new Rol();
+	                	rolSelect.setIdRol(r);
+	                	rolSelect.setDescripcion(roles.getItemCaption(r));
+	                	rolesSelec.add(rolSelect);
+	                }
+	                app.setRoles(rolesSelec);	    	
+			    	appSelect.add(app);
+			    }
+		    }
+		}
+		
+		return appSelect;
 
-		appRolesAcc = buildAppRolesAcc();
-		rolesPanel.setContent(appRolesAcc);
-
-		return rolesPanel;
 	}
 
 }
