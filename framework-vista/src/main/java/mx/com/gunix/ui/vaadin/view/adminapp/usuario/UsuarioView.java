@@ -1,11 +1,16 @@
 package mx.com.gunix.ui.vaadin.view.adminapp.usuario;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 
+
+
+
+import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ThemeResource;
@@ -19,6 +24,9 @@ import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Notification.Type;
+
+
+
 
 
 import mx.com.gunix.framework.processes.domain.Variable;
@@ -86,12 +94,17 @@ public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> 
 		flyt.addComponent(guardarButton);	
 		
 		guardarButton.addClickListener(event ->{
-			    commitUsuario();
-			    completaTarea();
-				estatus.setEnabled(false);
 				guardarButton.setEnabled(false);
-				guardarButton.setDisableOnClick(true);
-			//}
+				try {
+					commit();
+				    commitUsuario();
+				    completaTarea();
+				} catch (CommitException ce) {			
+					appendNotification(Type.ERROR_MESSAGE, "Existen errores en el formulario");
+					guardarButton.setEnabled(true);
+					guardarButton.setDisableOnClick(true);				
+					ce.printStackTrace();
+				}
 			
 		});
 				
@@ -317,6 +330,7 @@ public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> 
 	private void commitUsuario() {
 		usuario = new Usuario();
 		datosUsuario = new DatosUsuario();
+		usuario.setPassword("passwordTemp");
 		
 		usuario.setIdUsuario(idUsuario.getValue());
 		usuario.setActivo(true);

@@ -47,7 +47,6 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 
 	public boolean isValid(Usuario usuario){
 		boolean esValido = false;
-		
 		Set<ConstraintViolation<Usuario>> result = valida(usuario, Default.class, BeanValidations.class);
 		
 		Usuario u = null;

@@ -12,43 +12,31 @@ public class DatosUsuario implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	@NotNull
-	@Size(min=1,max=254)
-	@Identificador
-	private String idUsuario;
-	
-	@NotNull
+	@NotNull(message = "El curp es obligatorio")
 	@Pattern(regexp = "[A-Z]{4}[0-9]{6}[HM][A-Z]{2}[B-DF-HJ-NP-TV-Z]{3}[A-Z0-9][0-9]")
 	private String curp;
 	
-	@NotNull
+	@NotNull(message = "El rfc es obligatorio")
 	@Pattern(regexp = "[&A-Z\u00d1]{3,4}[0-9]{6}[1-9A-Z]{2}[0-9A]{1}")
 	private String rfc;
 	
-	@NotNull
+	@NotNull(message = "El Apellido Paterno es obligatorio")
 	@Size(min=1,max=50)
 	private String apPaterno;
 	
 	@Size(min=0,max=50)
 	private String apMaterno;
 	
-	@NotNull
+	@NotNull(message = "El nombre es obligatorio")
 	@Size(min=1,max=100)
 	private String nombre;
 	
-	@NotNull
+	@NotNull(message = "El correo electrónico es obligatorio")
 	private String correoElectronico;
 	
 	@Size(min=0,max=30)
 	private String telefono;
 
-	public String getIdUsuario() {
-		return idUsuario;
-	}
-
-	public void setIdUsuario(String idUsuario) {
-		this.idUsuario = idUsuario;
-	}
 
 	public String getCurp() {
 		return curp;

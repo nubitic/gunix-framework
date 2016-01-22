@@ -7,6 +7,6 @@ import org.apache.ibatis.annotations.Select;
 
 public interface UsuarioAdminMapper {
 	@Select("Select ID_USUARIO,PASSWORD,ESTATUS from SEGURIDAD.USUARIO where ID_USUARIO=#{idUsuario}")
-	@ResultMap("usuarioMap")
+	@ResultMap("usuarioAdminMap")
 	public Usuario getByidUsuario(String idUsuario);
 }
