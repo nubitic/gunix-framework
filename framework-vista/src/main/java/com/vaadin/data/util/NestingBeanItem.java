@@ -35,11 +35,14 @@ public class NestingBeanItem<BT> extends BeanItem<BT> {
 					String qualifiedPropertyId = propertyId + "." + key;
 					nestedProperties.add(qualifiedPropertyId);
 				});
+				removedProperties.add((String) propertyId);
 				try {
+					propertyType.getConstructor((Class<?>[]) null);
 					p.setValue(propertyType.newInstance());
-					removedProperties.add((String) propertyId);
-				} catch (ReadOnlyException | InstantiationException | IllegalAccessException e) {
+				} catch (ReadOnlyException | InstantiationException | IllegalAccessException | SecurityException e) {
 					throw new RuntimeException(e);
+				} catch (NoSuchMethodException ignorar) {
+
 				}
 			}
 		}
