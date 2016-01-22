@@ -41,9 +41,8 @@ public class GunixFileBuffer extends FileBuffer {
 	public Object getValue() {
 		File fileValue = null;
 		if ((value == null && (fileValue = (File) super.getValue()) != null) || (fileValue != null && fileValue != value.getFile() && !value.getFile().equals(fileValue))) {
-			value = new GunixFile();
+			value = new GunixFile(this.fileName);
 			value.setFile(fileValue);
-			value.setFileName(this.fileName);
 			value.setMimeType(this.mimeType);
 		}
 		return value;
@@ -70,6 +69,6 @@ public class GunixFileBuffer extends FileBuffer {
 
 	@Override
 	public void setFieldType(FieldType fieldType) {
-		
+
 	}
 }

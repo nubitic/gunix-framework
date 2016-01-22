@@ -29,19 +29,21 @@ public class NestingBeanItem<BT> extends BeanItem<BT> {
 			Property p = getItemProperty(propertyId);
 			Class<?> propertyType = p.getType();
 			if (!BeanUtils.isSimpleProperty(propertyType) && !Iterable.class.isAssignableFrom(propertyType) && !Map.class.isAssignableFrom(propertyType)) {
-				// Enumerate all sub-properties
-				Map<String, ?> pds = getPropertyDescriptors(propertyType);
-				pds.keySet().forEach(key -> {
-					String qualifiedPropertyId = propertyId + "." + key;
-					nestedProperties.add(qualifiedPropertyId);
-				});
-				removedProperties.add((String) propertyId);
 				try {
-					propertyType.getConstructor((Class<?>[]) null);
-					p.setValue(propertyType.newInstance());
+					if (p.getValue() == null) {
+						propertyType.getConstructor((Class<?>[]) null);
+						p.setValue(propertyType.newInstance());
+					}
+					// Enumerate all sub-properties
+					Map<String, ?> pds = getPropertyDescriptors(propertyType);
+					pds.keySet().forEach(key -> {
+						String qualifiedPropertyId = propertyId + "." + key;
+						nestedProperties.add(qualifiedPropertyId);
+					});
+					removedProperties.add((String) propertyId);
 				} catch (ReadOnlyException | InstantiationException | IllegalAccessException | SecurityException e) {
 					throw new RuntimeException(e);
-				} catch (NoSuchMethodException ignorar) {
+				} catch (NoSuchMethodException noProcesar) {
 
 				}
 			}

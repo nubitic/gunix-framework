@@ -9,6 +9,10 @@ public class GunixFile implements Serializable {
 	private String fileName;
 	private String mimeType;
 
+	public GunixFile(String fileName) {
+		this.fileName = fileName;
+	}
+
 	public File getFile() {
 		return file;
 	}

@@ -343,8 +343,7 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 			if (aplicacion instanceof AplicacionViewBean) {
 				((AplicacionViewBean) appBean).setIconoFile(((AplicacionViewBean) aplicacion).getIconoFile());
 			} else {
-				GunixFile gf = new GunixFile();
-				gf.setFileName(aplicacion.getIcono());
+				GunixFile gf = new GunixFile(aplicacion.getIcono());
 				((AplicacionViewBean) appBean).setIconoFile(gf);
 			}
 		}
