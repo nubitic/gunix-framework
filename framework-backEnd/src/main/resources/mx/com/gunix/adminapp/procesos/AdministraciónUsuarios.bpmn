@@ -15,11 +15,11 @@
       <sequenceFlow id="flow4" name="!esValido" sourceRef="exclusivegateway2" targetRef="usertaskAlta">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!esValido}]]></conditionExpression>
       </sequenceFlow>
-      <serviceTask id="servicetask2" name="Guarda" activiti:expression="$usuarioAdminService.insert(usuario)}"></serviceTask>
+      <serviceTask id="servicetask2" name="Guarda" activiti:expression="$usuarioAdminService.doInsert(usuario)}"></serviceTask>
       <sequenceFlow id="flow5" name="esValido" sourceRef="exclusivegateway2" targetRef="servicetask2">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${esValido}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="usertask1" name="Alta Exitosa" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.OperacionExitosaView"></userTask>
+      <userTask id="usertask1" name="Alta Exitosa" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.usuario.OpUsuarioExitosaView"></userTask>
       <sequenceFlow id="flow6" sourceRef="servicetask2" targetRef="usertask1"></sequenceFlow>
       <endEvent id="endevent1" name="End"></endEvent>
       <sequenceFlow id="flow7" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>

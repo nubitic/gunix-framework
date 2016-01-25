@@ -20,6 +20,8 @@ import mx.com.gunix.framework.service.UsuarioService;
 
 import org.josso.gateway.GatewayServiceLocator;
 import org.josso.gateway.WebserviceGatewayServiceLocator;
+import org.josso.selfservices.password.PasswordGenerator;
+import org.josso.selfservices.password.generator.PasswordGeneratorImpl;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -73,6 +75,34 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 	@Bean
 	public UserDetailsService userDetailsService(){
 		return new UserDetailsServiceImpl();
+	}
+	
+	@Bean
+	public PasswordGenerator passwordGenerator(){
+		PasswordGeneratorImpl pg = new PasswordGeneratorImpl();
+		pg.setPasswordLength(8);
+		pg.setUseSimpleRandom(false);
+		pg.setSecureRandomAlgorithm("SHA1PRNG");
+		pg.setSecureRandomProvider("SUN");
+		pg.setGenerateNumerals(false);
+		pg.setGenerateCapitalLetters(true);
+		pg.setIncludeAmbigousChars(false);
+		pg.setIncludeSpecialSymbols(true);
+		pg.setRegexStartsNoSmallLetter(false);
+		pg.setRegexEndsNoSmallLetter(false);
+		pg.setRegexStartsNoUpperLetter(false);
+		pg.setRegexEndsNosUpperLetter(false);
+		pg.setRegexStartsNoDigit(false);
+		pg.setRegexEndsNoDigit(false);
+		pg.setRegexStartsNoSymbol(false);
+		pg.setRegexEndsNoSymbol(false);
+		pg.setRegexOnlyOneCapital(false);
+		pg.setRegexOnlyOneSymbol(false);
+		pg.setRegexAtLeastTwoSymbols(false);
+		pg.setRegexOnlyOneDigit(false);
+		pg.setRegexAtLeastTwoDigits(false);
+		pg.setMaxAttempts(10000);
+		return pg;
 	}
 	
 	protected AccessDecisionManager buildAccessDesicionManager() {

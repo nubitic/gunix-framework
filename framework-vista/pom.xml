@@ -230,6 +230,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.josso</groupId>
+			<artifactId>josso-default-passwordgenerator</artifactId>
+			<version>1.8.10</version>
+		</dependency>
 	</dependencies>
 
 	<distributionManagement>

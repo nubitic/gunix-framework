@@ -11,6 +11,8 @@ import javax.validation.groups.Default;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.vote.AuthenticatedVoter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,8 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 	
 	@Autowired
 	RolMapper rm;
+	
+	private PasswordEncoder pe;
 	
 	public List<Aplicacion> getAppRoles() {
 		List<Aplicacion> appRoles =  am.getAll();
@@ -70,5 +74,19 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 		}
 		
 		return esValido;		
+	}
+	
+	public void doInsert(Usuario usuario){
+		pe = new BCryptPasswordEncoder();
+		String encodedPassword = pe.encode(usuario.getPassword());
+		usuario.setEncodePassword(encodedPassword);
+		um.inserta(usuario);
+		um.insertaDatos(usuario.getIdUsuario(), usuario.getDatosUsuario());
+		usuario.getAplicaciones().forEach(aplicacion->{doInsertAppRoles(usuario.getIdUsuario(),aplicacion);});
+	}
+	
+	public void doInsertAppRoles(String idUsuario,Aplicacion aplicacion){
+		um.insertaUsuarioApp(idUsuario,aplicacion.getIdAplicacion());
+		aplicacion.getRoles().forEach(rol->{um.insertaUsuarioRol(idUsuario, aplicacion.getIdAplicacion(), rol.getIdRol());});
 	}
 }

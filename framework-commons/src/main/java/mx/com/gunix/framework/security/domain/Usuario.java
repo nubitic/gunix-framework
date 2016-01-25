@@ -32,6 +32,8 @@ public class Usuario implements Serializable {
 	@NotNull
 	private boolean activo;
 	
+	private String encodePassword;
+	
 	public List<Aplicacion> getAplicaciones() {
 		return aplicaciones;
 	}
@@ -103,6 +105,12 @@ public class Usuario implements Serializable {
 	}
 	public void setDatosUsuario(DatosUsuario datosUsuario) {
 		this.datosUsuario = datosUsuario;
+	}
+	public String getEncodePassword() {
+		return encodePassword;
+	}
+	public void setEncodePassword(String encodePassword) {
+		this.encodePassword = encodePassword;
 	}
 	
 }

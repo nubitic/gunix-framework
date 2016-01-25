@@ -1,6 +1,6 @@
 package mx.com.gunix.ui.vaadin.view.adminapp.usuario;
 
-import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -9,6 +9,8 @@ import java.util.List;
 
 
 
+import org.josso.selfservices.password.PasswordGenerator;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.PropertyId;
@@ -24,10 +26,6 @@ import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Notification.Type;
-
-
-
-
 
 import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.security.domain.Aplicacion;
@@ -45,6 +43,9 @@ public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> 
 	public static class UsuarioViewBean extends Usuario {
 		private static final long serialVersionUID = 1L;
 	}
+	
+	@Autowired
+	private PasswordGenerator pg;
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -330,8 +331,7 @@ public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> 
 	private void commitUsuario() {
 		usuario = new Usuario();
 		datosUsuario = new DatosUsuario();
-		usuario.setPassword("passwordTemp");
-		
+		usuario.setPassword(pg.generateClearPassword());
 		usuario.setIdUsuario(idUsuario.getValue());
 		usuario.setActivo(true);
 		
