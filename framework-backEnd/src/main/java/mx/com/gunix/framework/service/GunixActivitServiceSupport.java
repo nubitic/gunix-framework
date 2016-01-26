@@ -18,6 +18,7 @@ import javax.validation.Validator;
 
 import mx.com.gunix.framework.domain.Identificador;
 import mx.com.gunix.framework.persistence.DescriptorCambios;
+import mx.com.gunix.framework.processes.domain.ProgressUpdate;
 
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
@@ -34,8 +35,8 @@ public class GunixActivitServiceSupport<T extends Serializable> {
 	}
 
 	private static final ThreadLocal<List<Integer>> objetosProcesados = ThreadLocal.<List<Integer>>withInitial(() -> {return new ArrayList<Integer>();});
-	private static final Map<Class<?>, Set<Field>> identificadoresCache = new Hashtable<Class<?>, Set<Field>>(); 
-	
+	private static final Map<Class<?>, Set<Field>> identificadoresCache = new Hashtable<Class<?>, Set<Field>>();
+		
 	@Autowired
 	private Validator validator;
 
@@ -342,5 +343,16 @@ public class GunixActivitServiceSupport<T extends Serializable> {
 			}
 		}
 		return set;
+	}
+	
+	protected void addProgressUpdate(String mensaje, float avance, boolean isCancelado) {
+		System.out.println(mensaje);
+		ProgressUpdate pu = new ProgressUpdate();
+		pu.setMensaje(mensaje);
+		pu.setProgreso(avance);
+		pu.setCancelado(isCancelado);
+		pu.setTimeStamp(System.currentTimeMillis());
+		pu.setProcessId(Context.getExecutionContext().getExecution().getProcessInstanceId());
+		ActivitiServiceImp.addProgressUpdate(pu.getProcessId(), pu);
 	}
 }

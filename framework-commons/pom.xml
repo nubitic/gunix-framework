@@ -7,6 +7,8 @@
 	</parent>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<super-csv.version>2.4.0</super-csv.version>
+		<dozer.version>5.5.1</dozer.version>
 	</properties>
 	<artifactId>framework-commons</artifactId>
 	<repositories>
@@ -45,6 +47,32 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.supercsv</groupId>
+			<artifactId>super-csv</artifactId>
+			<version>${super-csv.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.supercsv</groupId>
+			<artifactId>super-csv-dozer</artifactId>
+			<version>${super-csv.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>net.sf.dozer</groupId>
+					<artifactId>dozer</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.supercsv</groupId>
+			<artifactId>super-csv-java8</artifactId>
+			<version>${super-csv.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.dozer</groupId>
+			<artifactId>dozer</artifactId>
+			<version>${dozer.version}</version>
 		</dependency>
 	</dependencies>
 	<distributionManagement>
@@ -103,21 +131,21 @@
 					</execution>
 				</executions>
 			</plugin>
-	 <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-eclipse-plugin</artifactId>
-        <version>2.10</version>
-        <configuration>
-          <additionalConfig>
-            <file>
-              <name>.settings/org.eclipse.core.resources.prefs</name>
-              <content>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.10</version>
+				<configuration>
+					<additionalConfig>
+						<file>
+							<name>.settings/org.eclipse.core.resources.prefs</name>
+							<content>
                 <![CDATA[eclipse.preferences.version=1${line.separator}encoding/<project>=${project.build.sourceEncoding}${line.separator}]]>
-              </content>
-            </file>
-          </additionalConfig>
-        </configuration>
-      </plugin>
+							</content>
+						</file>
+					</additionalConfig>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>

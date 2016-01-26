@@ -5,14 +5,14 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 
-import javax.enterprise.concurrent.ManagedThreadFactory;
 import javax.sql.DataSource;
 
+import mx.com.gunix.framework.activiti.ExecuteAsyncSecuredRunnable;
 import mx.com.gunix.framework.activiti.FloatType;
 import mx.com.gunix.framework.activiti.GunixObjectVariableType;
 import mx.com.gunix.framework.activiti.persistence.entity.VariableInstanceEntityManager;
-import mx.com.gunix.framework.scheduling.concurrent.ManagedAwareThreadFactory;
 
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
@@ -24,7 +24,6 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.VariableScope;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
-import org.activiti.engine.impl.asyncexecutor.ManagedAsyncJobExecutor;
 import org.activiti.engine.impl.bpmn.data.ItemInstance;
 import org.activiti.engine.impl.cfg.IdGenerator;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -41,22 +40,31 @@ import org.activiti.engine.impl.javax.el.ListELResolver;
 import org.activiti.engine.impl.javax.el.MapELResolver;
 import org.activiti.engine.impl.javax.el.MethodNotFoundException;
 import org.activiti.engine.impl.persistence.StrongUuidGenerator;
+import org.activiti.engine.impl.persistence.entity.JobEntity;
 import org.activiti.engine.impl.variable.VariableType;
 import org.activiti.spring.ApplicationContextElResolver;
 import org.activiti.spring.ProcessEngineFactoryBean;
+import org.activiti.spring.SpringAsyncExecutor;
 import org.activiti.spring.SpringExpressionManager;
 import org.activiti.spring.SpringProcessEngineConfiguration;
+import org.activiti.spring.SpringRejectedJobsHandler;
 import org.activiti.spring.autodeployment.AutoDeploymentStrategy;
 import org.activiti.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.openl.rules.activiti.spring.OpenLResourcesHandleListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ReflectionUtils;
@@ -165,24 +173,23 @@ public class ActivitiConfig {
 
 	@Bean
 	public AsyncExecutor asyncExecutor() {
-		ManagedAsyncJobExecutor majex = new ManagedAsyncJobExecutor();
-		majex.setCorePoolSize(5);
-		majex.setMaxPoolSize(100);
-		majex.setKeepAliveTime(5000);
-		majex.setQueueSize(2);
-		majex.setMaxTimerJobsPerAcquisition(75);
-		majex.setMaxAsyncJobsDuePerAcquisition(75);
-		majex.setDefaultTimerJobAcquireWaitTimeInMillis(60000);
-		majex.setDefaultAsyncJobAcquireWaitTimeInMillis(2000);
-		majex.setTimerLockTimeInMillis(2147483647);
-		majex.setAsyncJobLockTimeInMillis(2147483647);
-		majex.setThreadFactory(threadFactory());
-		return majex;
+		SpringAsyncExecutor sajex = new SpringAsyncSecuredExecutor(taskExecutor());
+		sajex.setCorePoolSize(5);
+		sajex.setMaxPoolSize(100);
+		sajex.setKeepAliveTime(5000);
+		sajex.setQueueSize(2);
+		sajex.setMaxTimerJobsPerAcquisition(75);
+		sajex.setMaxAsyncJobsDuePerAcquisition(75);
+		sajex.setDefaultTimerJobAcquireWaitTimeInMillis(60000);
+		sajex.setDefaultAsyncJobAcquireWaitTimeInMillis(2000);
+		sajex.setTimerLockTimeInMillis(2147483647);
+		sajex.setAsyncJobLockTimeInMillis(2147483647);
+		return sajex;
 	}
 
 	@Bean
-	public ManagedThreadFactory threadFactory() {
-		return new ManagedAwareThreadFactory();
+	public TaskExecutor taskExecutor() {
+		return new SimpleAsyncTaskExecutor();
 	}
 
 	@Bean
@@ -301,5 +308,37 @@ public class ActivitiConfig {
 	@Bean
 	public TaskService taskService(ProcessEngineFactoryBean pefb) throws Exception {
 		return pefb.getObject().getTaskService();
+	}
+	
+	static final class SpringAsyncSecuredExecutor extends SpringAsyncExecutor implements SpringRejectedJobsHandler {
+		private static Logger log = LoggerFactory.getLogger(SpringAsyncSecuredExecutor.class);
+
+		@Autowired
+		@Lazy
+		RuntimeService rs;
+		
+		public SpringAsyncSecuredExecutor(TaskExecutor taskExecutor) {
+			super(taskExecutor, null);
+			setRejectedJobsHandler(this);
+		}
+
+		@Override
+		public void executeAsyncJob(JobEntity job) {
+			try {
+				taskExecutor.execute(new ExecuteAsyncSecuredRunnable(job, commandExecutor, rs));
+			} catch (RejectedExecutionException e) {
+				rejectedJobsHandler.jobRejected(this, job);
+			}
+		}
+
+		@Override
+		public void jobRejected(AsyncExecutor asyncExecutor, JobEntity job) {
+			try {
+				// execute rejected work in caller thread (potentially blocking job acquisition)
+				new ExecuteAsyncSecuredRunnable(job, asyncExecutor.getCommandExecutor(), rs).run();
+			} catch (Exception e) {
+				log.error("Failed to execute rejected job " + job.getId(), e);
+			}
+		}
 	}
 }

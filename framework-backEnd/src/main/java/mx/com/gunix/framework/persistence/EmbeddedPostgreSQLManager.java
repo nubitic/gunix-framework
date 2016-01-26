@@ -18,10 +18,14 @@ import java.util.zip.ZipInputStream;
 
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.log4j.Logger;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 
 public final class EmbeddedPostgreSQLManager {
 	private static Logger log = Logger.getLogger(EmbeddedPostgreSQLManager.class);
-
+	private static ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+	
 	public static void start(String pgsqlHome, String usuario, String password, String database, ClassLoader classLoader) {
 		log.warn("Iniciando servidor local PostgreSQL (no se recomienda el uso de este servidor para un ambiente diferente a DESARROLLO)");
 		// Validando si en el home indicado ya existe una instalación de postgreSQL
@@ -106,6 +110,8 @@ public final class EmbeddedPostgreSQLManager {
 			log.info("Creando Tablas, Secuencias...");
 			initDB(pgsqlHomeFile, usuario, passwordFile.getAbsolutePath(), database, classLoader);
 		}
+		
+		ejecutaAppScripts(pgsqlHomeFile, usuario, passwordFile.getAbsolutePath(), database);
 
 		passwordFile.delete();
 
@@ -115,6 +121,19 @@ public final class EmbeddedPostgreSQLManager {
 		log.info("usuario: " + usuario);
 		log.info("contraseña: " + password);
 		log.info("base de datos: " + database);
+	}
+
+	private static void ejecutaAppScripts(File pgsqlHomeFile, String usuario, String password, String database) {
+		try {
+			Resource[] appScriptsResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/domain/persistence/scripts/**/*.sql");
+			if (appScriptsResources != null) {
+				for (Resource appScriptResource : appScriptsResources) {
+					ejecutaScript(appScriptResource.getInputStream(), pgsqlHomeFile, usuario, password, database);
+				}
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private static void initDB(File pgsqlHomeFile, String usuario, String password, String database, ClassLoader classLoader) {

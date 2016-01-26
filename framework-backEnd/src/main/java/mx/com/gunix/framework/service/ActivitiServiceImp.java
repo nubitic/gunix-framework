@@ -10,9 +10,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import mx.com.gunix.framework.activiti.GunixObjectVariableType;
 import mx.com.gunix.framework.processes.domain.Instancia;
+import mx.com.gunix.framework.processes.domain.ProgressUpdate;
 import mx.com.gunix.framework.processes.domain.Tarea;
 import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.processes.domain.Variable.Scope;
@@ -39,6 +43,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +68,11 @@ public class ActivitiServiceImp implements ActivitiService {
 
 	@Autowired
 	RepositoryService repos;
+	
+	private static final Map<String, Queue<ProgressUpdate>> progressUpdateMap = new ConcurrentHashMap<String, Queue<ProgressUpdate>>();
+	public static final String CURRENT_AUTHENTICATION_USUARIO_VAR = "CURRENT_AUTHENTICATION_USUARIO_VAR";
+	public static final String CURRENT_AUTHENTICATION_ROLES_VAR = "CURRENT_AUTHENTICATION_ROLES_VAR";
+	private final int MAX_UPDATES_PER_FETCH = 100;
 
 	@Override
 	public Instancia completaTarea(Tarea tarea) {
@@ -132,10 +142,21 @@ public class ActivitiServiceImp implements ActivitiService {
 	public Instancia iniciaProceso(String processKey, List<Variable<?>> variables, String comentario) {
 		Instancia instancia = null;
 		try {
-			String usuario = ((Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getIdUsuario();
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			String usuario = ((Usuario) auth.getPrincipal()).getIdUsuario();
 			is.setAuthenticatedUserId(usuario);
+			
 			ProcessInstance pi = rs.startProcessInstanceByKey(processKey, toMap(variables)[Variable.Scope.PROCESO.ordinal()]);
-
+			rs.setVariable(pi.getProcessInstanceId(), CURRENT_AUTHENTICATION_USUARIO_VAR, usuario);
+			if (auth.getAuthorities() != null && !auth.getAuthorities().isEmpty()) {
+				StringBuilder roles = new StringBuilder();
+				auth.getAuthorities().forEach(ga -> {
+					roles.append(ga.toString()).append(",");
+				});
+				roles.deleteCharAt(roles.length() - 1);
+				rs.setVariable(pi.getProcessInstanceId(), CURRENT_AUTHENTICATION_ROLES_VAR, roles.toString());
+			}
+			
 			instancia = new Instancia();
 			instancia.setId(pi.getId());
 			instancia.setComentario(comentario);
@@ -234,5 +255,29 @@ public class ActivitiServiceImp implements ActivitiService {
 				});
 			});
 		}
+	}
+
+	@Override
+	public List<ProgressUpdate> getRecentProgressUpdates(String processId) {
+		Queue<ProgressUpdate> qpu = progressUpdateMap.get(processId);
+		List<ProgressUpdate> pu = new ArrayList<ProgressUpdate>();
+		if (qpu != null) {
+			ProgressUpdate cpud = null;
+			int updatesFetched = 0;
+			while ((cpud = qpu.poll()) != null && updatesFetched < MAX_UPDATES_PER_FETCH) {
+				pu.add(cpud);
+				updatesFetched++;
+			}
+		}
+		return pu;
+	}
+
+	static void addProgressUpdate(String processId, ProgressUpdate pu) {
+		Queue<ProgressUpdate> qpu = progressUpdateMap.get(processId);
+		if (qpu == null) {
+			qpu = new ConcurrentLinkedQueue<ProgressUpdate>();
+			progressUpdateMap.put(processId, qpu);
+		}
+		qpu.add(pu);
 	}
 }

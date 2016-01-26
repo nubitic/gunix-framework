@@ -23,6 +23,7 @@
 		<aspectj.version>1.8.5</aspectj.version>
 		<josso.version>1.8.10</josso.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<rxjava.version>1.1.0</rxjava.version>
 	</properties>
 
 	<dependencyManagement>
@@ -151,6 +152,11 @@
 				<groupId>org.openl</groupId>
 				<artifactId>org.openl.conf.ant</artifactId>
 				<version>${openl.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.reactivex</groupId>
+				<artifactId>rxjava</artifactId>
+				<version>${rxjava.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

@@ -173,6 +173,7 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration impl
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
 		auth
 		.authenticationProvider(new AuthenticationProvider(){
 

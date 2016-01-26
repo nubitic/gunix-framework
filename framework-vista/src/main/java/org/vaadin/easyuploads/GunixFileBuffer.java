@@ -21,10 +21,12 @@ public class GunixFileBuffer extends FileBuffer {
 
 	public GunixFileBuffer(UploadField uf) {
 		super(FieldType.FILE);
+		super.setFieldType(FieldType.FILE);
 		if (uf == null) {
 			throw new IllegalArgumentException("UploadField no puede ser null");
 		}
 		this.uf = uf;
+		this.uf.setFieldType(FieldType.FILE);
 	}
 
 	@Override
@@ -69,6 +71,6 @@ public class GunixFileBuffer extends FileBuffer {
 
 	@Override
 	public void setFieldType(FieldType fieldType) {
-
+		
 	}
 }

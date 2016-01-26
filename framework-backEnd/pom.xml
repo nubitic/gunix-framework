@@ -7,7 +7,6 @@
 	</parent>
 	<artifactId>framework-backEnd</artifactId>
 	<properties>
-		<dozer.version>5.5.1</dozer.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<repositories>
@@ -60,11 +59,6 @@
 			<version>1.8.2.RELEASE</version>
 		</dependency>
 		<dependency>
-			<groupId>javax.enterprise.concurrent</groupId>
-			<artifactId>javax.enterprise.concurrent-api</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
 			<groupId>mx.com.gunix</groupId>
 			<artifactId>framework-commons</artifactId>
 		</dependency>
@@ -84,9 +78,9 @@
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis</artifactId>
 			<version>3.2.8</version>
-			<!-- 3.3.0 no juega bien con activiti dado que el mÃ©todo 
+			<!-- 3.3.0 no juega bien con activiti dado que el método 
 			private void applyIncludes(Node source, final Properties variablesContext) de org.apache.ibatis.builder.xml.XMLIncludeTransformer 
-				hace un reemplazo de variables que antes no hacÃ­a:
+				hace un reemplazo de variables que antes no hacia:
 				 
 				if (source.getNodeType() == Node.TEXT_NODE && !variablesContext.isEmpty()) { // replace variables ins all text nodes 
 					source.setNodeValue(PropertyParser.parse(source.getNodeValue(),variablesContext)); 
@@ -192,11 +186,6 @@
 			<groupId>com.fasterxml.uuid</groupId>
 			<artifactId>java-uuid-generator</artifactId>
 			<version>3.1.4</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.dozer</groupId>
-			<artifactId>dozer</artifactId>
-			<version>${dozer.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.aspectj</groupId>

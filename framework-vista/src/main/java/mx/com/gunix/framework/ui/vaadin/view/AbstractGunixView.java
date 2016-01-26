@@ -121,12 +121,14 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		if (genSuperType instanceof ParameterizedType) {
 			Type[] typeArguments = ((ParameterizedType) genSuperType).getActualTypeArguments();
 			if (typeArguments.length == 1) {
-				Class<S> clazz = ((Class<S>) typeArguments[0]);
-				fieldGroup = new GunixBeanFieldGroup<S>(clazz);
-				try {
-					fieldGroup.setItemDataSource(clazz.newInstance());
-				} catch (InstantiationException | IllegalAccessException e) {
-					throw new IllegalArgumentException("No fue posible inicializar el ItemDataSource para el fieldGroup con una nueva instancia de " + clazz.getName(), e);
+				if(typeArguments[0] instanceof Class) {
+					Class<S> clazz = ((Class<S>) typeArguments[0]);
+					fieldGroup = new GunixBeanFieldGroup<S>(clazz);
+					try {
+						fieldGroup.setItemDataSource(clazz.newInstance());
+					} catch (InstantiationException | IllegalAccessException e) {
+						throw new IllegalArgumentException("No fue posible inicializar el ItemDataSource para el fieldGroup con una nueva instancia de " + clazz.getName(), e);
+					}	
 				}
 			}
 		}
@@ -194,6 +196,10 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		tarea = taNav.getTareaActual();
 		doEnter(event);
 		Responsive.makeResponsive(this);
+	}
+	
+	Tarea getTarea() {
+		return tarea;
 	}
 
 	protected abstract void doEnter(ViewChangeEvent event);
