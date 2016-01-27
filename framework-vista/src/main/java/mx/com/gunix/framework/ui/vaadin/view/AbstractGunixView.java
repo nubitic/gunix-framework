@@ -3,6 +3,7 @@ package mx.com.gunix.framework.ui.vaadin.view;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -26,19 +27,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
 
+import com.vaadin.data.Property;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
+import com.vaadin.data.util.BeanContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.Responsive;
+import com.vaadin.server.UserError;
+import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 public abstract class AbstractGunixView<S extends Serializable> extends VerticalLayout implements View {
 	private static final ThreadLocal<Map<Notification.Type, Set<String>>> notificacionesMap = new ThreadLocal<Map<Notification.Type, Set<String>>>();
-
+	private Class<S> clazz;
 	public static void appendNotification(Notification.Type type, String notificacion) {
 		Map<Notification.Type, Set<String>> notificaciones = notificacionesMap.get();
 		if (notificaciones == null) {
@@ -122,7 +129,7 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 			Type[] typeArguments = ((ParameterizedType) genSuperType).getActualTypeArguments();
 			if (typeArguments.length == 1) {
 				if(typeArguments[0] instanceof Class) {
-					Class<S> clazz = ((Class<S>) typeArguments[0]);
+					clazz = ((Class<S>) typeArguments[0]);
 					fieldGroup = new GunixBeanFieldGroup<S>(clazz);
 					try {
 						fieldGroup.setItemDataSource(clazz.newInstance());
@@ -200,6 +207,68 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	
 	Tarea getTarea() {
 		return tarea;
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected List<S> getBeans(Table tabla) {
+		List<S> beans = new ArrayList<S>();
+		if (tabla.getContainerDataSource() == null || !(tabla.getContainerDataSource() instanceof BeanContainer)) {
+			throw new IllegalArgumentException("Se requiere que el ContainerDataSource de la tabla sea de tipo BeanContainer");
+		}
+		BeanContainer<Object, S> beanContainer = (BeanContainer<Object, S>) tabla.getContainerDataSource();
+		beanContainer.getItemIds().forEach(beanId -> {
+			beans.add(beanContainer.getItem(beanId).getBean());
+		});
+		return beans;
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	protected boolean valida(Table tabla) {
+		Map<String, Boolean> hayErroresHolder = new HashMap<String, Boolean>();
+		if (tabla.getContainerDataSource() == null || !(tabla.getContainerDataSource() instanceof BeanContainer)) {
+			throw new IllegalArgumentException("Se requiere que el ContainerDataSource de la tabla sea de tipo BeanContainer");
+		}
+		tabla.setComponentError(null);
+		BeanContainer<Object, S> beanContainer = (BeanContainer<Object, S>) tabla.getContainerDataSource();
+		Map<Field, Property> prevPropDS = new HashMap<Field, Property>();
+		GunixBeanFieldGroup bfgf = new GunixBeanFieldGroup<S>(clazz);
+
+		beanContainer.getItemIds().forEach(beanId -> {
+			bfgf.setItemDataSource(beanContainer.getItem(beanId).getBean());
+			beanContainer.getContainerPropertyIds().forEach(propertyId -> {
+				Property property = beanContainer.getContainerProperty(beanId, propertyId);
+				tabla.iterator().forEachRemaining(component -> {
+					if (component instanceof Field) {
+						Field field = (Field) component;
+						if (field.getPropertyDataSource().equals(property)) {
+							prevPropDS.put(field, field.getPropertyDataSource());
+							((AbstractComponent) field).setComponentError(null);
+							bfgf.bind(field, propertyId);
+							//field.setValue(property.getValue());
+						}
+					}
+				});
+			});
+			try {
+				bfgf.commit(ibve -> {
+					tabla.setComponentError(new UserError(ibve.getMessage()));
+				});
+				hayErroresHolder.put("hayErrores", false);
+			} catch (CommitException e) {
+				hayErroresHolder.put("hayErrores", true);
+				for (Field<?> f : e.getInvalidFields().keySet()) {
+					((AbstractComponent) f).setComponentError(new UserError(e.getInvalidFields().get(f).getCauses()[0].getMessage()));
+				}
+			} finally {
+				for (Field<?> f : prevPropDS.keySet()) {
+					bfgf.unbind(f);
+					f.setPropertyDataSource(prevPropDS.get(f));
+					f.setBuffered(false);
+				}
+				prevPropDS.clear();
+			}
+		});
+		return hayErroresHolder.get("hayErrores");
 	}
 
 	protected abstract void doEnter(ViewChangeEvent event);
