@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 public final class SingleEntryZipWorker {
 
@@ -25,6 +26,10 @@ public final class SingleEntryZipWorker {
 				outZF.close();
 			}
 		}
+	}
+	
+	public static void process(InputStream is, EntryWorker ew) {
+		ew.work(new ZipInputStream(is));
 	}
 
 	public interface EntryWorker {

@@ -17,9 +17,12 @@ import mx.com.gunix.framework.processes.domain.Instancia;
 import mx.com.gunix.framework.processes.domain.Tarea;
 import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.service.ActivitiService;
+import mx.com.gunix.framework.ui.GunixFile;
 import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup;
 import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup.OnBeanValidationErrorCallback;
+import mx.com.gunix.framework.ui.vaadin.component.GunixUploadField;
 import mx.com.gunix.framework.ui.vaadin.component.Header.TareaActualNavigator;
+import mx.com.gunix.framework.util.ActivitiGunixFile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -269,6 +272,14 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 			}
 		});
 		return hayErroresHolder.get("hayErrores");
+	}
+	
+	protected Variable<ActivitiGunixFile> buildGunixFileVariable(String nombreVariable, GunixUploadField uploadField) {
+		Variable<ActivitiGunixFile> fileVar = new Variable<ActivitiGunixFile>();
+		fileVar.setNombre(nombreVariable);
+		GunixFile gf = (GunixFile) uploadField.getValue();
+		fileVar.setValor(new ActivitiGunixFile(nombreVariable, gf.getFileName(), gf.getMimeType(), gf.getFile()));
+		return fileVar;
 	}
 
 	protected abstract void doEnter(ViewChangeEvent event);

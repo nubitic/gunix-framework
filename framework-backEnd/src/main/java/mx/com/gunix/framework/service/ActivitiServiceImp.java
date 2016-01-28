@@ -137,7 +137,7 @@ public class ActivitiServiceImp implements ActivitiService {
 		variablesMaps[Variable.Scope.TAREA.ordinal()] = variablesTareaMap;
 		return variablesMaps;
 	}
-
+	
 	@Override
 	public Instancia iniciaProceso(String processKey, List<Variable<?>> variables, String comentario) {
 		Instancia instancia = null;
@@ -264,9 +264,16 @@ public class ActivitiServiceImp implements ActivitiService {
 		if (qpu != null) {
 			ProgressUpdate cpud = null;
 			int updatesFetched = 0;
+			boolean isLast = false;
 			while ((cpud = qpu.poll()) != null && updatesFetched < MAX_UPDATES_PER_FETCH) {
+				if (cpud.isCancelado() || cpud.getProgreso() == 1f) {
+					isLast = true;
+				}
 				pu.add(cpud);
 				updatesFetched++;
+			}
+			if (isLast) {
+				progressUpdateMap.remove(processId);
 			}
 		}
 		return pu;

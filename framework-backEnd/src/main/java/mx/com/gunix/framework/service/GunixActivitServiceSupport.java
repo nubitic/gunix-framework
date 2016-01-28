@@ -346,7 +346,6 @@ public class GunixActivitServiceSupport<T extends Serializable> {
 	}
 	
 	protected void addProgressUpdate(String mensaje, float avance, boolean isCancelado) {
-		System.out.println(mensaje);
 		ProgressUpdate pu = new ProgressUpdate();
 		pu.setMensaje(mensaje);
 		pu.setProgreso(avance);
