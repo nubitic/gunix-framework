@@ -12964,3 +12964,7 @@ div.v-layout.v-horizontal.v-widget {
 	top: 0 !important;
 	left: 26% !important;
 }
+
+.gunix .invisibleDownloadButton {
+	display: none;
+}
