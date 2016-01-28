@@ -9,6 +9,7 @@ import java.util.List;
 
 
 
+
 import org.josso.selfservices.password.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -38,12 +39,8 @@ import mx.com.gunix.framework.ui.vaadin.view.SecuredView;
 
 
 @GunixVaadinView
-public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> implements SecuredView {
+public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredView {
 
-	public static class UsuarioViewBean extends Usuario {
-		private static final long serialVersionUID = 1L;
-	}
-	
 	@Autowired
 	private PasswordGenerator pg;
 	
@@ -52,6 +49,7 @@ public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> 
 	private TextField idUsuario;
 	private ComboBox estatus;
 	private Button guardarButton;
+	private Button cancelarButton;
 	private Accordion appRolesAcc;
 	private Panel datosPanel;
 	private Panel appRolesPanel;
@@ -76,11 +74,17 @@ public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> 
 	private TextField telefono;
 	
 	private Usuario usuario;
+	
+	private Boolean esConsulta;
+	private Boolean esModificacion;
+	private Boolean cancelar = Boolean.FALSE;
 
-	private DatosUsuario datosUsuario;
-
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void doConstruct() {	
+		esConsulta = "Consulta".equals($("operación"));
+		esModificacion = "Modificación".equals($("operación"));
+		
 		flyt.setIcon(new ThemeResource("img/1440816106_window.png"));
 		flyt.setCaption(new StringBuilder($("operación").toString()).append(" de Usuarios").toString());		
 		buildMainLayout();
@@ -90,14 +94,34 @@ public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> 
 		guardarButton.setImmediate(true);
 		guardarButton.setWidth("-1px");
 		guardarButton.setHeight("-1px");
-		guardarButton.setCaption("Guardar");
+		guardarButton.setCaption(esConsulta == true?"Regresar":"Guardar");
 		guardarButton.setDisableOnClick(true);		
-		flyt.addComponent(guardarButton);	
+		flyt.addComponent(guardarButton);
+		
+		if (esModificacion) {
+			cancelarButton = new Button();
+			cancelarButton.setImmediate(true);
+			cancelarButton.setWidth("-1px");
+			cancelarButton.setHeight("-1px");
+			cancelarButton.setCaption("Cancelar");
+			
+			cancelarButton.addClickListener(evnt->{
+				cancelar=Boolean.TRUE;
+				completaTarea();
+			});
+			
+			flyt.addComponent(cancelarButton);
+			
+			if (esConsulta || esModificacion) {
+				deepCopy(((List<Usuario>) $("usuario")).get(0), usuario);
+			}
+		}
 		
 		guardarButton.addClickListener(event ->{
 				guardarButton.setEnabled(false);
 				try {
 					commit();
+					usuario = getBean();
 				    commitUsuario();
 				    completaTarea();
 				} catch (CommitException ce) {			
@@ -121,6 +145,15 @@ public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> 
 		}
 		guardarButton.setEnabled(true);
 		guardarButton.setDisableOnClick(true);
+
+		if (cancelarButton != null) {
+			cancelarButton.setEnabled(false);
+			cancelarButton.setVisible(false);
+		}
+		
+		if (esConsulta) {
+		 flyt.setReadOnly(true);
+		}
 		
 	}
 
@@ -199,12 +232,7 @@ public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> 
 		for(Aplicacion app : aplicaciones){
 			appRolesAcc.addTab(buildRolesPanel(app), app.getDescripcion(), null);
 			appRolesAcc.setId(app.getIdAplicacion());
-			
-			appRolesAcc.addTab(buildRolesPanel(app), "APP2-Ejemplo", null);
-			appRolesAcc.addTab(buildRolesPanel(app),"APP3-Ejemplo", null);
 		}
-		appRolesAcc.addTab(new Panel(), "APP2", null);
-		appRolesAcc.addTab(new Panel(),"APP3", null);
 		
 		appRolesPanel.setContent(appRolesAcc);
 		
@@ -225,14 +253,6 @@ public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> 
 			roles.addItem(rol.getIdRol());
 			roles.setItemCaption(rol.getIdRol(), rol.getDescripcion());
 		});
-		
-		/*roles.addValueChangeListener(new ValueChangeListener(){
-			@Override
-			public void valueChange(com.vaadin.data.Property.ValueChangeEvent event) {
-				// TODO Auto-generated method stub
-				
-			}
-		});*/
 				
 		rolesPanel.setContent(roles);
 		return rolesPanel;
@@ -329,21 +349,8 @@ public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> 
 	
 
 	private void commitUsuario() {
-		usuario = new Usuario();
-		datosUsuario = new DatosUsuario();
 		usuario.setPassword(pg.generateClearPassword());
-		usuario.setIdUsuario(idUsuario.getValue());
-		usuario.setActivo(true);
-		
-		datosUsuario.setCurp(curp.getValue());
-		datosUsuario.setRfc(rfc.getValue());
-		datosUsuario.setNombre(nombre.getValue());
-		datosUsuario.setApPaterno(apPaterno.getValue());
-		datosUsuario.setApMaterno(apMaterno.getValue());
-		datosUsuario.setCorreoElectronico(correoElectronico.getValue());
-		datosUsuario.setTelefono(telefono.getValue());
-		usuario.setDatosUsuario(datosUsuario);
-		
+		usuario.setActivo(true);		
 		usuario.setAplicaciones(getAplicacionesRoles());
 	
 	}
@@ -378,6 +385,17 @@ public class UsuarioView extends AbstractGunixView<UsuarioView.UsuarioViewBean> 
 		
 		return appSelect;
 
+	}
+	
+	private Usuario deepCopy(Usuario usuario, Usuario usuarioBean) {
+		usuarioBean.setIdUsuario(usuario.getIdUsuario());
+		usuarioBean.setDatosUsuario(usuario.getDatosUsuario());
+		//usuarioBean.setPassword(usuario.getPassword());
+		usuarioBean.setActivo(usuario.isActivo());
+		usuarioBean.setBloqueado(usuario.isBloqueado());
+		usuarioBean.setEliminado(usuario.isEliminado());
+		usuarioBean.setAplicaciones(usuario.getAplicaciones());
+		return usuarioBean;
 	}
 
 }

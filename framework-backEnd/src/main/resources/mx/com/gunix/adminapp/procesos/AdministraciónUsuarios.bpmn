@@ -15,7 +15,7 @@
       <sequenceFlow id="flow4" name="!esValido" sourceRef="exclusivegateway2" targetRef="usertaskAlta">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!esValido}]]></conditionExpression>
       </sequenceFlow>
-      <serviceTask id="servicetask2" name="Guarda" activiti:expression="$usuarioAdminService.doInsert(usuario)}"></serviceTask>
+      <serviceTask id="servicetask2" name="Guarda" activiti:expression="${usuarioAdminService.doInsert(usuario)}"></serviceTask>
       <sequenceFlow id="flow5" name="esValido" sourceRef="exclusivegateway2" targetRef="servicetask2">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${esValido}]]></conditionExpression>
       </sequenceFlow>

@@ -2,10 +2,72 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="mx.com.gunix.adminapp.domain.persistence.UsuarioAdminMapper">
+	<insert id="insertaUsuario">
+		INSERT INTO SEGURIDAD.USUARIO (ID_USUARIO,PASSWORD,ESTATUS) 
+		VALUES(#{idUsuario},#{encodePassword},				
+				<choose>
+					<when test="bloqueado == true">
+						'BLOQUEADO'
+					</when>
+					<when test="eliminado == true">
+						'ELIMINADO'
+					</when>
+					<when test="activo == true">
+						'ACTIVO'
+					</when>
+				</choose>)
+	</insert>
+	<select id="getDetalleUById" resultMap="usuarioAdminMap">
+		SELECT U.ID_USUARIO AS ID_USUARIO ,PASSWORD,NOMBRE,AP_PATERNO,AP_MATERNO, 
+		       CASE WHEN ESTATUS = 'ACTIVO' THEN true ELSE false END AS ACTIVO, 
+		       CASE WHEN ESTATUS = 'BLOQUEADO' THEN true ELSE false END AS BLOQUEADO, 
+		       CASE WHEN ESTATUS = 'ELIMINADO' THEN true ELSE false END AS ELIMINADO,
+		       CURP,RFC,CORREO_ELECTRONICO,TELEFONO
+		from SEGURIDAD.USUARIO U LEFT JOIN SEGURIDAD.DATOS_USUARIO DU ON (U.ID_USUARIO = DU.ID_USUARIO) 
+		WHERE U.ID_USUARIO = #{idUsuario}
+	</select>	
+	<select id="getByExample" resultMap="usuarioAdminMap">
+		SELECT U.ID_USUARIO AS ID_USUARIO ,PASSWORD,NOMBRE,AP_PATERNO,AP_MATERNO, 
+		       CASE WHEN ESTATUS = 'ACTIVO' THEN true ELSE false END AS ACTIVO, 
+		       CASE WHEN ESTATUS = 'BLOQUEADO' THEN true ELSE false END AS BLOQUEADO, 
+		       CASE WHEN ESTATUS = 'ELIMINADO' THEN true ELSE false END AS ELIMINADO,
+		       CURP,RFC,CORREO_ELECTRONICO,TELEFONO
+		from SEGURIDAD.USUARIO U LEFT JOIN SEGURIDAD.DATOS_USUARIO DU ON (U.ID_USUARIO = DU.ID_USUARIO) 
+		<where>
+			<if test="idUsuario != null">
+				<bind name="idUsuarioLike" value="'%' + _parameter.getIdUsuario() + '%'" />
+				AND U.ID_USUARIO LIKE #{idUsuarioLike}
+			</if>
+		</where>
+	</select>
 	<resultMap id="usuarioAdminMap" type="mx.com.gunix.framework.security.domain.Usuario">
 		<id property="idUsuario" column="ID_USUARIO" />
-		<result column="PASSWORD" property="password" />
-		<result column="ESTATUS" property="activo" />
+		<result column="PASSWORD" property="password" />		
+		<result column="ACTIVO" property="activo" />
+		<result column="BLOQUEADO" property="bloqueado" />
+		<result column="ELIMINADO" property="eliminado" />
+		<association property="datosUsuario" javaType="mx.com.gunix.framework.security.domain.DatosUsuario">
+			<id property="nombre" column="NOMBRE" />
+			<id property="apPaterno" column="AP_PATERNO" />
+			<id property="apMaterno" column="AP_MATERNO" />
+			<id property="curp" column="CURP" />
+			<id property="rfc" column="RFC" />
+			<id property="correoElectronico" column="CORREO_ELECTRONICO" />
+			<id property="telefono" column="TELEFONO" />
+		</association>
+	</resultMap>
+	<resultMap id="usuarioIDMap" type="mx.com.gunix.framework.security.domain.Usuario">
+		<id property="idUsuario" column="ID_USUARIO" />
+	</resultMap>
+	<resultMap id="appUsuarioMap" type="mx.com.gunix.framework.security.domain.Aplicacion">
+		<result column="ID_APLICACION" property="idAplicacion" />
+		<result column="DESCRIPCION" property="descripcion" />
+		<result column="ICONO" property="icono" />
+	</resultMap>
+	
+	<resultMap id="rolAppUsuarioMap" type="mx.com.gunix.framework.security.domain.Rol">
+		<result column="ID_ROL" property="idRol" />
+		<result column="DESCRIPCION" property="descripcion" />
 	</resultMap>
 </mapper>	
 	

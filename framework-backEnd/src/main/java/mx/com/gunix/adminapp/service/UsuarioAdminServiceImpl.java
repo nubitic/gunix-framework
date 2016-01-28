@@ -37,7 +37,7 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 	@Autowired
 	RolMapper rm;
 	
-	private PasswordEncoder pe;
+	private PasswordEncoder pe = new BCryptPasswordEncoder();
 	
 	public List<Aplicacion> getAppRoles() {
 		List<Aplicacion> appRoles =  am.getAll();
@@ -77,10 +77,9 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 	}
 	
 	public void doInsert(Usuario usuario){
-		pe = new BCryptPasswordEncoder();
 		String encodedPassword = pe.encode(usuario.getPassword());
 		usuario.setEncodePassword(encodedPassword);
-		um.inserta(usuario);
+		um.insertaUsuario(usuario);
 		um.insertaDatos(usuario.getIdUsuario(), usuario.getDatosUsuario());
 		usuario.getAplicaciones().forEach(aplicacion->{doInsertAppRoles(usuario.getIdUsuario(),aplicacion);});
 	}
@@ -88,5 +87,40 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 	public void doInsertAppRoles(String idUsuario,Aplicacion aplicacion){
 		um.insertaUsuarioApp(idUsuario,aplicacion.getIdAplicacion());
 		aplicacion.getRoles().forEach(rol->{um.insertaUsuarioRol(idUsuario, aplicacion.getIdAplicacion(), rol.getIdRol());});
+	}
+	
+	
+	@SuppressWarnings("null")
+	public List<Usuario> getByExample(Boolean esMaestro, Usuario usuario) {
+		List<Usuario> usuarios = null;
+		if (esMaestro) {
+			usuarios = um.getByExample(usuario);
+
+			
+		}else{
+			List<Aplicacion> appRoles = getAppRoles();
+			this.agregaVariable("aplicaciones", appRoles);
+			usuarios = new ArrayList<Usuario>();
+			usuarios.add(um.getDetalleUById(usuario.getIdUsuario()));		
+
+			if (!usuarios.isEmpty()) {
+				Usuario u = usuarios.get(0);
+				if(u==null) {
+					throw new IllegalArgumentException("No se encontró el detalle del usuario con id: "+u.getIdUsuario());
+				}
+				
+				List<Aplicacion> appRolesUS =  um.getAppUsuario(u.getIdUsuario());
+						
+				if(appRolesUS.isEmpty()){
+					throw new IllegalArgumentException("No se encontrarion Aplicaciónes asociadas al usuario con id: "+u.getIdUsuario()); 
+				}
+				
+				appRolesUS.forEach(app->{
+					app.setRoles(um.getRolAppUsuario(u.getIdUsuario(), app.getIdAplicacion()));
+				});
+				u.setAplicaciones(appRolesUS);
+			}
+		}
+		return usuarios;	
 	}
 }
