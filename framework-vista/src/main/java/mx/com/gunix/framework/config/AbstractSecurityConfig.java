@@ -10,6 +10,7 @@ import mx.com.gunix.framework.security.PersistentTokenBasedRememberMeServices;
 import mx.com.gunix.framework.security.RolAccessDecisionVoter;
 import mx.com.gunix.framework.security.UserDetails;
 import mx.com.gunix.framework.security.UserDetailsServiceImpl;
+import mx.com.gunix.framework.security.domain.Usuario;
 import mx.com.gunix.framework.security.josso.JOSSOAuthenticationProcessingFilter;
 import mx.com.gunix.framework.security.josso.JOSSOAuthenticationProvider;
 import mx.com.gunix.framework.security.josso.JOSSOLogoutSuccessHandler;
@@ -181,11 +182,14 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http
-			.anonymous()
-				.principal(new UserDetails(usuarioService.getAnonymous()))
-			.and()
-			.sessionManagement()
+		Usuario anonymous = usuarioService.getAnonymous();
+		
+		if(anonymous!=null) {
+			http.anonymous()
+				.principal(new UserDetails(anonymous));
+		}
+		
+		http.sessionManagement()
 				.sessionFixation()
 				.migrateSession()
 			.and()
