@@ -1,57 +1,51 @@
-<%--
-  ~ JOSSO: Java Open Single Sign-On
-  ~
-  ~ Copyright 2004-2009, Atricore, Inc.
-  ~
-  ~ This is free software; you can redistribute it and/or modify it
-  ~ under the terms of the GNU Lesser General Public License as
-  ~ published by the Free Software Foundation; either version 2.1 of
-  ~ the License, or (at your option) any later version.
-  ~
-  ~ This software is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  ~ Lesser General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU Lesser General Public
-  ~ License along with this software; if not, write to the Free
-  ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-  ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
-  ~
-  --%>
+<%@ page contentType="text/html; charset=UTF-8" language="java"%>
+<%@ taglib uri="/WEB-INF/tlds/struts-html.tld" prefix="html"%>
+<%@ taglib uri="/WEB-INF/tlds/struts-bean.tld" prefix="bean"%>
+<html:errors />
 
-<%@ page contentType="text/html; charset=UTF-8" language="java" %>
-<%@ taglib uri="/WEB-INF/tlds/struts-html.tld" prefix="html" %>
-<%@ taglib uri="/WEB-INF/tlds/struts-bean.tld" prefix="bean" %>
-
-
-    <html:errors/>
-
-    <div id="lost-password">
-
-        <div id="subwrapper">
-
-            <div class="main">
-                <h2><bean:message key="sso.title.lostPassword"/></h2>
-
-                <p><bean:message key="sso.text.lostPassword"/></p>
-
-                <html:form action="/selfservices/lostpassword/processChallenges" focus="ID_USUARIO" >
-                    <div><label for="ID_USUARIO"><bean:message key="sso.label.email"/></label> <html:text styleClass="text" property="ID_USUARIO" /></div>
-                    <div><input class="button medium" type="submit" value="Reset password"/></div>
-                </html:form>
-
-                <p class="note"><bean:message key="sso.text.buttonOnlyOnce"/></p>
-
-                <div class="highlight">
-                    <h3 class="help"><bean:message key="sso.title.help"/></h3>
-                    <p><bean:message key="sso.text.lostPassword.help"/></p>
-                    <div class="footer"></div>
-                </div><!-- /highlight -->
-
-            </div><!-- /main -->
-
-        </div><!-- /subwrapper -->
-
-
-    </div>
+<div class="v-caption" id="gwt-uid-19" for="gwt-uid-20">
+	<img class="v-icon" src="<%=request.getContextPath()%>/resources/img/1454464590_change_password.png"><span class="v-captiontext"><strong><bean:message key="sso.title.lostPassword" /></strong></span>
+</div>
+<div class="v-captiontext" id="gwt-uid-19" for="gwt-uid-20">
+	<span class="v-text">
+		<p>
+			<bean:message key="sso.text.lostPassword" />
+		</p>
+	</span>
+</div>
+<html:form action="/selfservices/lostpassword/processChallenges" focus="ID_USUARIO">
+	<div class="v-formlayout v-layout v-widget v-has-width" id="gwt-uid-20" aria-labelledby="gwt-uid-19" style="width: 100%;">
+		<table cellpadding="0" cellspacing="0" role="presentation" class="v-formlayout-spacing">
+			<colgroup>
+				<col>
+			</colgroup>
+			<tbody>
+				<tr class="v-formlayout-row v-formlayout-firstrow">
+					<td class="v-formlayout-captioncell">
+						<div class="v-caption v-caption-hasdescription">
+							<span id="gwt-uid-21" for="gwt-uid-22"><bean:message key="sso.label.email" /></span>
+						</div>
+					</td>
+					<td class="v-formlayout-errorcell"><div class="v-formlayout-error-indicator"></div></td>
+					<td class="v-formlayout-contentcell"><html:text styleClass="v-textfield v-widget" property="ID_USUARIO" /></td>
+				</tr>
+				<tr class="v-formlayout-row">
+					<td class="v-formlayout-captioncell"><div class="gwt-HTML"></div></td>
+					<td class="v-formlayout-errorcell"><div class="v-formlayout-error-indicator"></div></td>
+					<td class="v-formlayout-contentcell">
+						<div tabindex="0" role="button" class="v-button v-widget" onclick="document.forms[0].submit();">
+							<span class="v-button-wrap"><span class="v-button-caption"><bean:message key="sso.button.resetPassword" /></span></span>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</html:form>
+<div class="v-captiontext" id="gwt-uid-19" for="gwt-uid-20">
+	<span class="v-text">
+		<p>
+			<bean:message key="sso.text.buttonOnlyOnce" />
+		</p>
+	</span>
+</div>

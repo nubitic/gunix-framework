@@ -1,70 +1,64 @@
-<%--
-  ~ JOSSO: Java Open Single Sign-On
-  ~
-  ~ Copyright 2004-2009, Atricore, Inc.
-  ~
-  ~ This is free software; you can redistribute it and/or modify it
-  ~ under the terms of the GNU Lesser General Public License as
-  ~ published by the Free Software Foundation; either version 2.1 of
-  ~ the License, or (at your option) any later version.
-  ~
-  ~ This software is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  ~ Lesser General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU Lesser General Public
-  ~ License along with this software; if not, write to the Free
-  ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-  ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
-  ~
-  --%>
-
-<%@ page contentType="text/html; charset=UTF-8" language="java" %>
-<%@ taglib uri="/WEB-INF/tlds/struts-html.tld" prefix="html" %>
-<%@ taglib uri="/WEB-INF/tlds/struts-bean.tld" prefix="bean" %>
-
-        <div id="authentication">
-
-                <html:errors/>
-
-                <div id="subwrapper">
-
-                    <div class="main">
-                        <h2><bean:message key="sso.title.userLogin"/></h2>
-
-                        <p><bean:message key="sso.text.userLogin"/></p>
+<%@ page contentType="text/html; charset=UTF-8" language="java"%>
+<%@ taglib uri="/WEB-INF/tlds/struts-html.tld" prefix="html"%>
+<%@ taglib uri="/WEB-INF/tlds/struts-bean.tld" prefix="bean"%>
 
 
-                        <html:form action="/signon/usernamePasswordLogin" focus="josso_username" >
-
-                            <fieldset>
-                                <html:hidden property="josso_cmd" value="login"/>
-                                <html:hidden property="josso_back_to"/>
-
-                                <div><label for="username"><bean:message key="sso.label.username"/> </label> <html:text styleClass="text" property="josso_username" />
-                                </div>
-                                <div><label for="password"><bean:message key="sso.label.password"/> </label> <html:password styleClass="text error" property="josso_password" /></div>
-                                <div class="indent"><html:checkbox property="josso_rememberme" styleClass="checkbox"/><bean:message key="sso.label.rememberme"/></div>
-                            </fieldset>
-
-                            <div><input class="button indent" type="submit" value="Login"/></div>
-                        </html:form>
-                        <p class="indent"><a href="<%=request.getContextPath()%>/selfservices/lostpassword/lostPassword.do?josso_cmd=lostPwd"><bean:message key="sso.label.forgotPassword"/></a></p>
-
-                        <div class="highlight">
-                            <h3 class="help"><bean:message key="sso.title.help"/></h3>
-
-                            <p><bean:message key="sso.text.login.help"/>.</p>
-
-                            <div class="footer"></div>
-
-                        </div>
-                        <!-- /highlight -->
-
-                    </div>
-                    <!-- /main -->
-                </div>
-
-            </div> <!-- /authentication -->
-        
+<div class="v-caption" id="gwt-uid-19" for="gwt-uid-20">
+	<img class="v-icon" src="<%=request.getContextPath()%>/resources/img/1440816106_window.png"><span class="v-captiontext"><strong><bean:message key="sso.title.userLogin" /></strong></span>
+</div>
+<div class="v-captiontext" id="gwt-uid-19" for="gwt-uid-20">
+	<span class="v-text">
+		<p>
+			<bean:message key="sso.text.userLogin" />
+		</p>
+	</span>
+</div>
+<html:form action="/signon/usernamePasswordLogin" focus="josso_username">
+	<html:hidden property="josso_cmd" value="login" />
+	<html:hidden property="josso_back_to" />
+	<div class="v-formlayout v-layout v-widget v-has-width" id="gwt-uid-20" aria-labelledby="gwt-uid-19" style="width: 100%;">
+		<table cellpadding="0" cellspacing="0" role="presentation" class="v-formlayout-spacing">
+			<colgroup>
+				<col>
+			</colgroup>
+			<tbody>
+				<tr class="v-formlayout-row v-formlayout-firstrow">
+					<td class="v-formlayout-captioncell"><div class="v-caption v-caption-hasdescription">
+							<span id="gwt-uid-21" for="gwt-uid-22"><bean:message key="sso.label.username" /></span>
+						</div></td>
+					<td class="v-formlayout-errorcell"><div class="v-formlayout-error-indicator"></div></td>
+					<td class="v-formlayout-contentcell"><html:text styleClass="v-textfield v-widget" property="josso_username" /></td>
+				</tr>
+				<tr class="v-formlayout-row">
+					<td class="v-formlayout-captioncell"><div class="v-caption v-caption-hasdescription">
+							<span id="gwt-uid-23" for="gwt-uid-24"><bean:message key="sso.label.password" /></span>
+						</div></td>
+					<td class="v-formlayout-errorcell"><div class="v-formlayout-error-indicator"></div></td>
+					<td class="v-formlayout-contentcell"><html:password styleClass="v-textfield v-widget" property="josso_password" /></td>
+				</tr>
+				<tr class="v-formlayout-row v-formlayout-firstrow">
+					<td class="v-formlayout-captioncell"><div class="v-caption v-caption-hasdescription">
+							<span id="gwt-uid-21" for="gwt-uid-22"><bean:message key="sso.label.rememberme" /></span>
+						</div></td>
+					<td class="v-formlayout-errorcell"><div class="v-formlayout-error-indicator"></div></td>
+					<td class="v-formlayout-contentcell"><html:checkbox property="josso_rememberme" styleClass="v-checkbox v-widget" /></td>
+				</tr>
+				<tr class="v-formlayout-row">
+					<td class="v-formlayout-captioncell"><div class="gwt-HTML"></div></td>
+					<td class="v-formlayout-errorcell"><div class="v-formlayout-error-indicator"></div></td>
+					<td class="v-formlayout-contentcell">
+						<div tabindex="0" role="button" class="v-button v-widget" onclick="document.forms[0].submit();">
+							<span class="v-button-wrap"><span class="v-button-caption"><bean:message key="sso.button.login" /></span></span>
+						</div>
+					</td>
+				</tr>
+				<tr class="v-formlayout-row">
+					<td class="v-formlayout-captioncell"><div class="gwt-HTML"></div></td>
+					<td class="v-formlayout-errorcell"><div class="v-formlayout-error-indicator"></div></td>
+					<td class="v-formlayout-contentcell">
+					<span class="v-href-caption"><a href="<%=request.getContextPath()%>/selfservices/lostpassword/lostPassword.do?josso_cmd=lostPwd"><bean:message key="sso.label.forgotPassword" /></a></span></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</html:form>
