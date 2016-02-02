@@ -14,7 +14,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import mx.com.gunix.framework.activiti.GunixObjectVariableType;
 import mx.com.gunix.framework.processes.domain.Instancia;
 import mx.com.gunix.framework.processes.domain.ProgressUpdate;
 import mx.com.gunix.framework.processes.domain.Tarea;
@@ -84,8 +83,6 @@ public class ActivitiServiceImp implements ActivitiService {
 		Map<String, Object>[] variablesMaps = toMap(tarea.getVariables());
 		Map<String, Object> variablesProcesoMap = variablesMaps[Variable.Scope.PROCESO.ordinal()];
 		Map<String, Object> variablesTareaMap = variablesMaps[Variable.Scope.TAREA.ordinal()];
-
-		GunixObjectVariableType.setCurrentTarea(tarea);
 
 		if (!variablesProcesoMap.isEmpty()) {
 			rs.setVariables(tarea.getInstancia().getId(), variablesProcesoMap);

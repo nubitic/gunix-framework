@@ -8,15 +8,8 @@ import mx.com.gunix.framework.persistence.EmbeddedPostgreSQLManager;
 import mx.com.gunix.framework.security.domain.UsuarioMapperInterceptor;
 import mx.com.gunix.framework.security.domain.persistence.GunixPersistentTokenRepository;
 
-import org.activiti.engine.impl.persistence.ByteArrayRefTypeHandler;
-import org.activiti.engine.impl.variable.VariableType;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
-import org.apache.ibatis.type.Alias;
-import org.apache.ibatis.type.JdbcType;
-import org.apache.ibatis.type.MappedJdbcTypes;
-import org.apache.ibatis.type.MappedTypes;
-import org.apache.ibatis.type.TypeHandler;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
@@ -34,7 +27,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @EnableTransactionManagement
-@MapperScan({ "mx.com.gunix.domain.persistence", "mx.com.gunix.framework.security.domain.persistence", "mx.com.gunix.framework.activiti.persistence.entity" })
+@MapperScan({ "mx.com.gunix.domain.persistence", "mx.com.gunix.framework.security.domain.persistence" })
 public class PersistenceConfig {
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
@@ -87,17 +80,13 @@ public class PersistenceConfig {
 		sessionFactory.setPlugins(new Interceptor[] { new UsuarioMapperInterceptor() });
 
 		Resource[] appResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/domain/persistence/**/*Mapper.xml");
-		Resource[] activitiAppResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/framework/activiti/persistence/entity/*Mapper.xml");
-		Resource[] resources = null;
+		Resource[] resources = appResources != null ? appResources : new Resource[] {};
 
 		if (appResources != null && appResources.length > 0) {
-			resources = new Resource[appResources.length + activitiAppResources.length];
-			System.arraycopy(activitiAppResources, 0, resources, 0, activitiAppResources.length);
-			System.arraycopy(appResources, 0, resources, appResources.length, appResources.length);
-		} else {
-			resources = activitiAppResources;
+			resources = new Resource[appResources.length];
+			System.arraycopy(appResources, 0, resources, 0, appResources.length);
 		}
-
+		
 		if (Boolean.valueOf(System.getenv("STANDALONE_APP"))) {
 			Resource[] adminAppResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/adminapp/domain/persistence/*Mapper.xml");
 			Resource[] securityAppResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/framework/security/domain/*Mapper.xml");
@@ -112,8 +101,6 @@ public class PersistenceConfig {
 			sessionFactory.setMapperLocations(resources);
 		}
 
-		sessionFactory.setTypeAliases(new Class<?>[] { ByteArrayRefTypeHandlerAlias.class });
-		sessionFactory.setTypeHandlers(new TypeHandler[] { new ByteArrayRefTypeHandlerAlias(), new IbatisVariableTypeHandler() });
 		return sessionFactory;
 	}
 
@@ -124,14 +111,4 @@ public class PersistenceConfig {
 		return ptr;
 	}
 
-	@Alias("ByteArrayRefTypeHandler")
-	public static class ByteArrayRefTypeHandlerAlias extends ByteArrayRefTypeHandler {
-
-	}
-
-	@MappedTypes(VariableType.class)
-	@MappedJdbcTypes(JdbcType.VARCHAR)
-	public static class IbatisVariableTypeHandler extends org.activiti.engine.impl.db.IbatisVariableTypeHandler {
-
-	}
 }
