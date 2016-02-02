@@ -7,6 +7,7 @@ import mx.com.gunix.framework.security.domain.DatosUsuario;
 import mx.com.gunix.framework.security.domain.Rol;
 import mx.com.gunix.framework.security.domain.Usuario;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.ResultMap;
@@ -34,10 +35,18 @@ public interface UsuarioAdminMapper {
 	@ResultMap("appUsuarioMap")
 	public List<Aplicacion> getAppUsuario(String idUsuario);
 	
-	@Select("SELECT UR.ID_USUARIO AS ID_USUARIO, UR.ID_APLICACION AS ID_APLICACION, UR.ID_ROL AS ID_ROL, R.DESCRIPCION AS DESCRIPCION FROM SEGURIDAD.USUARIO_ROL UR INNER JOIN SEGURIDAD.ROL R ON (UR.ID_ROL = R.ID_ROL AND UR.ID_APLICACION = R.ID_APLICACION) WHERE UR.ID_USUARIO = =#{idUsuario} AND UR.ID_APLICACION =#{idAplicacion}")
-	@ResultMap("rolAppUsuarioMap")
-	public List<Rol> getRolAppUsuario(String idUsuario,String idAplicacion);
+	public List<Rol> getRolAppUsuario(@Param("idUsuario") String idUsuario,@Param("idAplicacion") String idAplicacion);
 	
-	public Usuario getDetalleUById(String idUsuario);
+	public Usuario getDetalleUById(@Param("idUsuario") String idUsuario);
+	
+	public void updateUsuario(Usuario usuario);
+	
+	public void updateDatosUsuario(@Param("idUsuario") String idUsuario,@Param("datosUsuario") DatosUsuario datosUsuario);
+	
+	@Delete("DELETE FROM SEGURIDAD.USUARIO_ROL WHERE ID_USUARIO = #{idUsuario}")
+    public void deleteRolesUsuario(@Param("idUsuario") String idUsuario);
+	
+	@Delete("DELETE FROM SEGURIDAD.USUARIO_APLICACION WHERE ID_USUARIO = #{idUsuario}")
+	public void deleteAppUsuario(@Param("idUsuario") String idUsuario);
 	
 }

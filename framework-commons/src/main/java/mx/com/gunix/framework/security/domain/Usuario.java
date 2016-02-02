@@ -10,6 +10,8 @@ import javax.validation.constraints.Size;
 public class Usuario implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
+	@NotNull(message = "Debe asignar al usuario al menos a un Rol")
+	@Size(min=1)
 	private List<Aplicacion> aplicaciones;
 	
 	@Valid

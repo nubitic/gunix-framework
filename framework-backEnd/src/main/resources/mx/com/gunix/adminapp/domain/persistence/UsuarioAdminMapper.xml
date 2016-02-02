@@ -40,6 +40,13 @@
 			</if>
 		</where>
 	</select>
+	<select id="getRolAppUsuario" resultMap="rolAppUsuarioMap">
+		SELECT UR.ID_USUARIO AS ID_USUARIO, UR.ID_APLICACION AS ID_APLICACION,
+			   UR.ID_ROL AS ID_ROL, R.DESCRIPCION AS DESCRIPCION 
+	    FROM SEGURIDAD.USUARIO_ROL UR INNER JOIN SEGURIDAD.ROL R ON (UR.ID_ROL = R.ID_ROL AND UR.ID_APLICACION = R.ID_APLICACION) 
+	    WHERE UR.ID_USUARIO=#{idUsuario} AND UR.ID_APLICACION =#{idAplicacion}
+	</select>		
+	
 	<resultMap id="usuarioAdminMap" type="mx.com.gunix.framework.security.domain.Usuario">
 		<id property="idUsuario" column="ID_USUARIO" />
 		<result column="PASSWORD" property="password" />		
@@ -69,5 +76,46 @@
 		<result column="ID_ROL" property="idRol" />
 		<result column="DESCRIPCION" property="descripcion" />
 	</resultMap>
+	
+	<update id="updateUsuario">
+		UPDATE SEGURIDAD.USUARIO SET ESTATUS = 
+		<choose>
+			<when test="activo == true">
+						'ACTIVO'
+			</when>
+			<when test="eliminado == true">
+						'ELIMINADO'
+			</when>
+			<when test="bloqueado == true">
+						'BLOQUEADO'
+			</when>
+		</choose>
+		<where>
+				ID_USUARIO = #{idUsuario}
+		</where>
+	</update>
+	<update id="updateDatosUsuario">
+		UPDATE SEGURIDAD.DATOS_USUARIO SET
+			CURP = #{datosUsuario.curp},
+			RFC = #{datosUsuario.rfc} ,
+			AP_PATERNO = #{datosUsuario.apPaterno} ,
+			<if test="datosUsuario.apMaterno != null">
+				AP_MATERNO = #{datosUsuario.apMaterno},
+			</if>
+			<if test="datosUsuario.apMaterno == null">
+				AP_MATERNO = NULL,
+			</if>
+			NOMBRE = #{datosUsuario.nombre},
+			CORREO_ELECTRONICO = #{datosUsuario.correoElectronico},
+			<if test="datosUsuario.telefono != null">
+				TELEFONO =  #{datosUsuario.telefono}
+			</if>
+			<if test="datosUsuario.telefono == null">
+				TELEFONO = NULL
+			</if>
+		<where>
+				ID_USUARIO = #{idUsuario}
+		</where>
+	</update>
 </mapper>	
 	

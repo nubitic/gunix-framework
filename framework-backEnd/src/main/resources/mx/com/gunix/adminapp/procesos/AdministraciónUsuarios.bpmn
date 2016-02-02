@@ -53,7 +53,7 @@
       <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway"></exclusiveGateway>
       <userTask id="usertask5" name="Formulario Detalle" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.usuario.UsuarioView"></userTask>
       <exclusiveGateway id="exclusivegateway5" name="Exclusive Gateway"></exclusiveGateway>
-      <serviceTask id="servicetask5" name="Guarda" activiti:expression="${usuarioAdminService.update(usuario, usuarioActualizado)}"></serviceTask>
+      <serviceTask id="servicetask5" name="Guarda" activiti:expression="${usuarioAdminService.doUpdate(usuario)}"></serviceTask>
       <userTask id="usertask6" name="Modificación Exitosa" activiti:formKey="mx.com.gunix.ui.vaadin.view.adminapp.OperacionExitosaView"></userTask>
       <endEvent id="endevent2" name="End"></endEvent>
       <sequenceFlow id="flow17" sourceRef="starteventModificación" targetRef="usertask4"></sequenceFlow>

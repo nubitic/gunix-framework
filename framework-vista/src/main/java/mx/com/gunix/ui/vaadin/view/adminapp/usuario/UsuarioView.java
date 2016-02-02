@@ -30,7 +30,6 @@ import com.vaadin.ui.Notification.Type;
 
 import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.security.domain.Aplicacion;
-import mx.com.gunix.framework.security.domain.DatosUsuario;
 import mx.com.gunix.framework.security.domain.Rol;
 import mx.com.gunix.framework.security.domain.Usuario;
 import mx.com.gunix.framework.ui.vaadin.spring.GunixVaadinView;
@@ -50,11 +49,12 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 	private ComboBox estatus;
 	private Button guardarButton;
 	private Button cancelarButton;
-	private Accordion appRolesAcc;
+	private Accordion appRolesAcc;	
 	private Panel datosPanel;
 	private Panel appRolesPanel;
 	private GridLayout datosGridL;
 	private List<Aplicacion> aplicaciones;
+	private List<Aplicacion> appSelect;
 
 	
 	//datos personales
@@ -85,6 +85,14 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		esConsulta = "Consulta".equals($("operación"));
 		esModificacion = "Modificación".equals($("operación"));
 		
+		if ((esConsulta || esModificacion) ) {
+			if(((List<Usuario>) $("resultado")) != null){
+				deepCopy( ((List<Usuario>) $("resultado")).get(0));
+			}else if(esModificacion){
+				deepCopy((Usuario) $("usuario"));
+			}
+		}
+		
 		flyt.setIcon(new ThemeResource("img/1440816106_window.png"));
 		flyt.setCaption(new StringBuilder($("operación").toString()).append(" de Usuarios").toString());		
 		buildMainLayout();
@@ -111,18 +119,18 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 			});
 			
 			flyt.addComponent(cancelarButton);
-			
-			if (esConsulta || esModificacion) {
-				deepCopy(((List<Usuario>) $("usuario")).get(0), usuario);
-			}
+
 		}
+		
 		
 		guardarButton.addClickListener(event ->{
 				guardarButton.setEnabled(false);
 				try {
-					commit();
-					usuario = getBean();
-				    commitUsuario();
+					if(!esConsulta){
+						commit();
+						usuario = getBean();
+					    commitUsuario();
+					}
 				    completaTarea();
 				} catch (CommitException ce) {			
 					appendNotification(Type.ERROR_MESSAGE, "Existen errores en el formulario");
@@ -143,17 +151,28 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		if (errores != null && !errores.isEmpty()) {
 			Notification.show("Existen errores en el formulario: " + errores, Type.ERROR_MESSAGE);
 		}
+		
+		if (esConsulta || esModificacion) {
+			idUsuario.setEnabled(false);
+			estatus.setValue(getEstatus());
+			if (esModificacion) {
+				cancelarButton.setEnabled(true);
+				cancelarButton.setVisible(true);
+				cancelarButton.setDisableOnClick(true);
+				estatus.setEnabled(true);
+			}else{
+				datosPanel.setEnabled(false);
+				//appRolesPanel.setEnabled(false);
+				estatus.setEnabled(false);
+			}
+		}else{
+			estatus.setValue(1);
+			estatus.setEnabled(false);
+		}
+		
 		guardarButton.setEnabled(true);
 		guardarButton.setDisableOnClick(true);
 
-		if (cancelarButton != null) {
-			cancelarButton.setEnabled(false);
-			cancelarButton.setVisible(false);
-		}
-		
-		if (esConsulta) {
-		 flyt.setReadOnly(true);
-		}
 		
 	}
 
@@ -162,6 +181,19 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		List<Variable<?>> vars = new ArrayList<Variable<?>>();
 		Variable<Usuario> usuarioVar = new Variable<Usuario>();
 		
+		if(esConsulta||esModificacion){
+			Variable<ArrayList<Usuario>> resultadoVar = new Variable<ArrayList<Usuario>>();
+			resultadoVar.setNombre("resultado");
+			resultadoVar.setValor(null);
+			vars.add(resultadoVar);
+			
+			if (esModificacion) {
+				Variable<String> accionVar = new Variable<String>();
+				accionVar.setNombre("acción");
+				accionVar.setValor(cancelar ? "Cancelar" : "Guardar");
+				vars.add(accionVar);
+			}
+		}
 		usuarioVar.setValor(usuario);
 		usuarioVar.setNombre("usuario");
 		vars.add(usuarioVar);
@@ -196,13 +228,13 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		estatus.setNullSelectionAllowed(false);
 		estatus.setCaption("Estatus");	
 		estatus.addItem(0);
-		estatus.setItemCaption(0, "Inactivo");
+		estatus.setItemCaption(0, "Eliminado");
 		estatus.addItem(1);
 		estatus.setItemCaption(1,"Activo");
+		estatus.addItem(2);
+		estatus.setItemCaption(2,"Bloqueado");
 		estatus.setWidth("-1px");
 		estatus.setHeight("-1px");
-		estatus.setValue(1);
-		estatus.setEnabled(false);
 		flyt.addComponent(estatus);
 		
 		// datos personales
@@ -216,6 +248,7 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 	
 	@SuppressWarnings({ "unchecked" })
 	private Panel buildAppRolesPanel(){
+		List<Rol> rolSelect =null;
 		appRolesPanel = new Panel("Roles");
 		appRolesPanel.setIcon(new ThemeResource("img/1440815816_To_do_list.png"));
 		appRolesPanel.setImmediate(false);
@@ -228,9 +261,15 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		appRolesAcc.setHeight("-1px");
 		
 		aplicaciones = (List<Aplicacion>) $("aplicaciones");
+		if (esConsulta || esModificacion) {
+			appSelect = usuario.getAplicaciones();
+		}
 		
 		for(Aplicacion app : aplicaciones){
-			appRolesAcc.addTab(buildRolesPanel(app), app.getDescripcion(), null);
+			if(appSelect!=null){
+				rolSelect = buscaApp(app.getIdAplicacion());
+			} 
+			appRolesAcc.addTab(buildRolesPanel(app,rolSelect), app.getDescripcion(), null);
 			appRolesAcc.setId(app.getIdAplicacion());
 		}
 		
@@ -239,7 +278,7 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		return appRolesPanel;
 	}
 
-	private Panel buildRolesPanel(Aplicacion app){
+	private Panel buildRolesPanel(Aplicacion app,List<Rol> rolSelect){
 		Panel rolesPanel = new Panel();
 		rolesPanel.setImmediate(false);
 		rolesPanel.setSizeFull();
@@ -252,7 +291,18 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		app.getRoles().forEach(rol -> {
 			roles.addItem(rol.getIdRol());
 			roles.setItemCaption(rol.getIdRol(), rol.getDescripcion());
+			if(rolSelect != null){
+				if(buscaRol(rolSelect,rol.getIdRol())){
+					roles.select(rol.getIdRol());
+				}
+			}
+
+
 		});
+		
+		if(esConsulta){
+			rolesPanel.setEnabled(false);
+		}
 				
 		rolesPanel.setContent(roles);
 		return rolesPanel;
@@ -349,8 +399,21 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 	
 
 	private void commitUsuario() {
-		usuario.setPassword(pg.generateClearPassword());
-		usuario.setActivo(true);		
+		usuario.setActivo(false);
+		usuario.setEliminado(false);
+		usuario.setBloqueado(false);
+		if(!esModificacion){
+			usuario.setPassword(pg.generateClearPassword());
+			usuario.setActivo(true);
+		}else{
+			if(estatus.getValue().equals(1)){
+				usuario.setActivo(true);
+			}else if(estatus.getValue().equals(2)){
+				usuario.setBloqueado(true);
+			}else {
+				usuario.setEliminado(true);	
+			}			
+		}	
 		usuario.setAplicaciones(getAplicacionesRoles());
 	
 	}
@@ -358,7 +421,6 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 	private List<Aplicacion> getAplicacionesRoles(){
 		Iterator<Component> i = appRolesAcc.iterator();
 		List<Aplicacion> appSelect = new ArrayList<Aplicacion>();
-		List<Rol> rolesSelec = new ArrayList<Rol>();
 		while (i.hasNext()) {
 		    Panel panel = (Panel) i.next();
 		    OptionGroup roles = (OptionGroup)panel.getContent();
@@ -369,6 +431,7 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		    	
 			    if(rSelect!=null && !rSelect.isEmpty()){
 			    	Aplicacion app = new Aplicacion();
+			    	List<Rol> rolesSelec = new ArrayList<Rol>();
 			    	app.setIdAplicacion(roles.getCaption());	
 	  
 	                for (String r : rSelect) {
@@ -387,15 +450,45 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 
 	}
 	
-	private Usuario deepCopy(Usuario usuario, Usuario usuarioBean) {
-		usuarioBean.setIdUsuario(usuario.getIdUsuario());
-		usuarioBean.setDatosUsuario(usuario.getDatosUsuario());
-		//usuarioBean.setPassword(usuario.getPassword());
-		usuarioBean.setActivo(usuario.isActivo());
-		usuarioBean.setBloqueado(usuario.isBloqueado());
-		usuarioBean.setEliminado(usuario.isEliminado());
-		usuarioBean.setAplicaciones(usuario.getAplicaciones());
-		return usuarioBean;
+	private void deepCopy(Usuario usuarioVar) {
+		usuario =  getBean();
+		usuario.setIdUsuario(usuarioVar.getIdUsuario());
+		if(usuarioVar.getDatosUsuario()!=null){
+			usuario.setDatosUsuario(usuarioVar.getDatosUsuario());
+		}	
+		usuario.setPassword(usuarioVar.getPassword());
+		usuario.setActivo(usuarioVar.isActivo());
+		usuario.setBloqueado(usuarioVar.isBloqueado());
+		usuario.setEliminado(usuarioVar.isEliminado());
+		usuario.setAplicaciones(usuarioVar.getAplicaciones());
+	}
+	
+	private List<Rol> buscaApp(String idAplicacion){
+		for(Aplicacion app:appSelect){
+			if(app.getIdAplicacion().equals(idAplicacion)){
+				return app.getRoles();
+			}
+		}		
+		return null;
+	}
+	
+	private Boolean buscaRol(List<Rol> rolSelect,String idRol){
+		for(Rol rol:rolSelect){
+			if(rol.getIdRol().equals(idRol)){
+				return Boolean.TRUE;
+			}
+		}
+		return Boolean.FALSE;
+	}
+	
+	private Object getEstatus(){
+		if(usuario.isActivo()){
+			return 1;
+		}else if(usuario.isBloqueado()){
+			return 2;
+		}else {
+			return 0;	
+		}
 	}
 
 }

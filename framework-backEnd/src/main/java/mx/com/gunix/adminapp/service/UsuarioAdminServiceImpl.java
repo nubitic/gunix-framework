@@ -67,6 +67,8 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 					agregaVariable("errores", errores);
 				}
 				
+			}else{
+				esValido = true;
 			}
 			
 		}else{
@@ -89,6 +91,14 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 		aplicacion.getRoles().forEach(rol->{um.insertaUsuarioRol(idUsuario, aplicacion.getIdAplicacion(), rol.getIdRol());});
 	}
 	
+	public void doUpdate(Usuario usuario){
+		String idUsuario = usuario.getIdUsuario();
+		um.updateUsuario(usuario);
+		um.updateDatosUsuario(idUsuario, usuario.getDatosUsuario());
+		um.deleteRolesUsuario(idUsuario);
+		um.deleteAppUsuario(idUsuario);
+		usuario.getAplicaciones().forEach(aplicacion->{doInsertAppRoles(idUsuario,aplicacion);});
+	}
 	
 	@SuppressWarnings("null")
 	public List<Usuario> getByExample(Boolean esMaestro, Usuario usuario) {
