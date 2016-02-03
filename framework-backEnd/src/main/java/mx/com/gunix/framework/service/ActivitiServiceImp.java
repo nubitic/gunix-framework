@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 import mx.com.gunix.framework.processes.domain.Instancia;
 import mx.com.gunix.framework.processes.domain.ProgressUpdate;
@@ -72,6 +73,8 @@ public class ActivitiServiceImp implements ActivitiService {
 	public static final String CURRENT_AUTHENTICATION_USUARIO_VAR = "CURRENT_AUTHENTICATION_USUARIO_VAR";
 	public static final String CURRENT_AUTHENTICATION_ROLES_VAR = "CURRENT_AUTHENTICATION_ROLES_VAR";
 	private final int MAX_UPDATES_PER_FETCH = 100;
+	private static final String ID_APLICACION_VAR = "ID_APLICACION";
+	private final String ID_APLICACION = System.getenv(ID_APLICACION_VAR);
 
 	@Override
 	public Instancia completaTarea(Tarea tarea) {
@@ -153,7 +156,9 @@ public class ActivitiServiceImp implements ActivitiService {
 				roles.deleteCharAt(roles.length() - 1);
 				rs.setVariable(pi.getProcessInstanceId(), CURRENT_AUTHENTICATION_ROLES_VAR, roles.toString());
 			}
-			
+			if (ID_APLICACION != null) {
+				rs.setVariable(pi.getProcessInstanceId(), ID_APLICACION_VAR, ID_APLICACION);
+			}
 			instancia = new Instancia();
 			instancia.setId(pi.getId());
 			instancia.setComentario(comentario);
@@ -240,17 +245,30 @@ public class ActivitiServiceImp implements ActivitiService {
 			List<ProcessDefinition> pDefsVolatiles = repos.createProcessDefinitionQuery().processDefinitionCategory("VOLATIL").latestVersion().list();
 			Date hace35Minutos = Date.from(Instant.now().minus(35, ChronoUnit.MINUTES));
 			pDefsVolatiles.parallelStream().forEach(
-					pd -> {				
+					pd -> {
 						List<HistoricProcessInstance> hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).startedBefore(hace35Minutos).list();
-						hpis.parallelStream().forEach(hpi -> {
-							rs.deleteProcessInstance(hpi.getId(), "");
-						});
 						
-						hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).finished().list();
+						if (ID_APLICACION != null) {
+							rs.createProcessInstanceQuery().processInstanceIds(hpis
+																				.stream()
+																				.map(hpi -> hpi.getId())
+																				.collect(Collectors.toSet()))
+														   .variableValueEquals(ID_APLICACION_VAR, ID_APLICACION)
+														   .list()
+														   .forEach(pi -> {
+															   rs.deleteProcessInstance(pi.getId(), "");
+														   });
+							hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).finished().variableValueEquals(ID_APLICACION_VAR, ID_APLICACION).list();
+						} else {
+							hpis.forEach(hpi -> {
+								rs.deleteProcessInstance(hpi.getId(), "");
+							});
+							hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).finished().list();
+						}
 						hpis.parallelStream().forEach(hpi -> {
 							hs.deleteHistoricProcessInstance(hpi.getId());
-				});
-			});
+						});
+					});
 		}
 	}
 
