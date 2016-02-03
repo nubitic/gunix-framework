@@ -15,16 +15,14 @@ import org.springframework.util.StringUtils;
 public class JOSSOUtils {
 	private static final String TIMESTAMP_PREFIX = "omx.com.gunix.framework.security.josso.";
 	private static final Logger logger = Logger.getLogger(JOSSOUtils.class);
+	private static final String BACKTO_HOST = System.getenv("VIEW_SSO_BACKTO_HOST");
 
 	/**
 	 * This method builds the back_to URL value pointing to the given URI.
 	 * <p/>
-	 * The determines the host used to build the back_to URL in the following
-	 * order :
+	 * The determines the host used to build the back_to URL in the following order :
 	 * <p/>
-	 * First, checks the singlePointOfAccess agent's configuration property.
-	 * Then checks the reverse-proxy-host HTTP header value from the request.
-	 * Finally uses current host name.
+	 * First, checks the singlePointOfAccess agent's configuration property. Then checks the reverse-proxy-host HTTP header value from the request. Finally uses current host name.
 	 */
 	public static String buildBackToQueryString(HttpServletRequest request, String uri) {
 		// Build the back to url.
@@ -39,9 +37,15 @@ public class JOSSOUtils {
 		StringBuffer mySelf = request.getRequestURL();
 
 		try {
-			URL url = new URL(mySelf.toString());
-			StringBuilder rv = new StringBuilder(url.getProtocol()).append("://").append(url.getHost()).append(((url.getPort() > 0) ? ":" + url.getPort() : ""));
-			rv.append((contextPath.endsWith("/") ? contextPath.substring(0, contextPath.length() - 1) : contextPath)).append(uri);
+			StringBuilder rv = null;
+			if (BACKTO_HOST != null) {
+				rv = new StringBuilder(BACKTO_HOST);
+			} else {
+				URL url = new URL(mySelf.toString());
+				rv = new StringBuilder(url.getProtocol()).append("://").append(url.getHost()).append(((url.getPort() > 0) ? ":" + url.getPort() : ""));
+				rv.append((contextPath.endsWith("/") ? contextPath.substring(0, contextPath.length() - 1) : contextPath));
+			}
+			rv.append(uri);
 
 			rv = new StringBuilder("?").append(Constants.PARAM_JOSSO_BACK_TO).append('=').append(rv);
 			rv.append("&").append(Constants.PARAM_JOSSO_PARTNERAPP_CONTEXT).append("=").append(contextPath);
@@ -79,8 +83,7 @@ public class JOSSOUtils {
 	}
 
 	/**
-	 * Sets a "cancel cookie" (with maxAge = 0) on the response to disable
-	 * persistent logins.
+	 * Sets a "cancel cookie" (with maxAge = 0) on the response to disable persistent logins.
 	 * 
 	 * @param request
 	 * @param response
@@ -97,8 +100,7 @@ public class JOSSOUtils {
 	 * Sets a new JOSSO Cookie for the given value.
 	 * 
 	 * @param path
-	 *            the path associated with the cookie, normaly the partner
-	 *            application context.
+	 *            the path associated with the cookie, normaly the partner application context.
 	 * @param value
 	 *            the SSO Session ID
 	 * @return
