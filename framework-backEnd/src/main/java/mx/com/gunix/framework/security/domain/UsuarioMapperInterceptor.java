@@ -15,7 +15,6 @@ import org.apache.ibatis.plugin.Signature;
 
 @Intercepts({ @Signature(type = ResultSetHandler.class, method = "handleResultSets", args = { Statement.class }) })
 public class UsuarioMapperInterceptor implements Interceptor {
-	private final Boolean IS_STANDALONE_APP = Boolean.valueOf(System.getenv("STANDALONE_APP"));
 	private final String ID_APLICACION = System.getenv("ID_APLICACION");
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -43,7 +42,7 @@ public class UsuarioMapperInterceptor implements Interceptor {
 			Objects.requireNonNull(usuario);
 			Objects.requireNonNull(usuario.getAplicaciones());
 			
-			if (!IS_STANDALONE_APP) {
+			if (ID_APLICACION != null) {
 				usuario.getAplicaciones().removeIf(app -> !(ID_APLICACION.equals(app.getIdAplicacion())));
 			}
 			
