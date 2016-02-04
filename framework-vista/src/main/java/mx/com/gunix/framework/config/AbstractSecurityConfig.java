@@ -175,7 +175,7 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 		if (Boolean.parseBoolean(System.getenv("VIEW_ENABLE_SSO"))) {
 			GatewayServiceLocator gsl = gatewayServiceLocator();
 			jpfep = new JOSSOProcessingFilterEntryPoint();
-			jpfep.setGatewayLoginUrl(new StringBuilder(gsl.getEndpointBase()).append(gsl.getServicesWebContext()).append("/signon/login.do").toString());
+			jpfep.setGatewayLoginUrl(new StringBuilder(gsl.getEndpointBase()).append(gsl.getServicesWebContext()).append((gsl.getServicesWebContext() == null || "".equals(gsl.getServicesWebContext())) ? "" : "/").append("signon/login.do").toString());
 		}
 		return jpfep;
 	}
@@ -217,7 +217,7 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 				.addFilterBefore(jossoSessionPingFilter(), AbstractPreAuthenticatedProcessingFilter.class)
 				.logout()
 					.addLogoutHandler(new SecurityContextLogoutHandler())
-					.logoutSuccessHandler(new JOSSOLogoutSuccessHandler(new StringBuilder(gsl.getEndpointBase()).append(gsl.getServicesWebContext()).append("/signon/logout.do").toString(),"/"))
+					.logoutSuccessHandler(new JOSSOLogoutSuccessHandler(new StringBuilder(gsl.getEndpointBase()).append(gsl.getServicesWebContext()).append((gsl.getServicesWebContext() == null || "".equals(gsl.getServicesWebContext())) ? "" : "/").append("signon/logout.do").toString(), "/"))
 				.and()
 				.exceptionHandling()
 					.authenticationEntryPoint(jossoProcessingFilterEntryPoint());

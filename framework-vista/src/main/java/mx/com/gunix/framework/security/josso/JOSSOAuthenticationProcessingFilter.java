@@ -18,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -25,6 +26,9 @@ public class JOSSOAuthenticationProcessingFilter extends AbstractAuthenticationP
 
 	private static final Logger logger = Logger.getLogger(JOSSOAuthenticationProcessingFilter.class);
 	public static final String JOSSO_SECURITY_CHECK_URI = "/josso_security_check";
+	private static final String BACKTO_HOST = System.getenv("VIEW_SSO_BACKTO_HOST");
+	private static final String BACKTO_CONTEXT = System.getenv("VIEW_SSO_BACKTO_CONTEXT");
+
 
 	private SSOIdentityProviderService ip;
 	private String partnerId;
@@ -33,6 +37,10 @@ public class JOSSOAuthenticationProcessingFilter extends AbstractAuthenticationP
 		super(JOSSO_SECURITY_CHECK_URI);
 		Assert.notNull(partnerId);
 		this.partnerId = partnerId;
+		if(BACKTO_HOST!=null) {
+			((SavedRequestAwareAuthenticationSuccessHandler) getSuccessHandler()).setAlwaysUseDefaultTargetUrl(true);
+			((SavedRequestAwareAuthenticationSuccessHandler) getSuccessHandler()).setDefaultTargetUrl(BACKTO_HOST + (BACKTO_CONTEXT != null ? BACKTO_CONTEXT : ""));	
+		}
 	}
 
 	@Required

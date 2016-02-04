@@ -16,6 +16,7 @@ public class JOSSOUtils {
 	private static final String TIMESTAMP_PREFIX = "omx.com.gunix.framework.security.josso.";
 	private static final Logger logger = Logger.getLogger(JOSSOUtils.class);
 	private static final String BACKTO_HOST = System.getenv("VIEW_SSO_BACKTO_HOST");
+	private static final String BACKTO_CONTEXT = System.getenv("VIEW_SSO_BACKTO_CONTEXT");
 
 	/**
 	 * This method builds the back_to URL value pointing to the given URI.
@@ -25,22 +26,23 @@ public class JOSSOUtils {
 	 * First, checks the singlePointOfAccess agent's configuration property. Then checks the reverse-proxy-host HTTP header value from the request. Finally uses current host name.
 	 */
 	public static String buildBackToQueryString(HttpServletRequest request, String uri) {
-		// Build the back to url.
-		String contextPath = request.getContextPath();
-
-		// This is the root context
-		if (!StringUtils.hasText(contextPath)) {
-			contextPath = "/";
-		}
-
+		String contextPath = null;
 		// Using default host
 		StringBuffer mySelf = request.getRequestURL();
 
 		try {
 			StringBuilder rv = null;
 			if (BACKTO_HOST != null) {
-				rv = new StringBuilder(BACKTO_HOST);
+				rv = new StringBuilder(BACKTO_HOST).append(BACKTO_CONTEXT == null ? "" : BACKTO_CONTEXT);
+				contextPath = BACKTO_CONTEXT;
 			} else {
+				// Build the back to url.
+				contextPath = request.getContextPath();
+
+				// This is the root context
+				if (!StringUtils.hasText(contextPath)) {
+					contextPath = "/";
+				}
 				URL url = new URL(mySelf.toString());
 				rv = new StringBuilder(url.getProtocol()).append("://").append(url.getHost()).append(((url.getPort() > 0) ? ":" + url.getPort() : ""));
 				rv.append((contextPath.endsWith("/") ? contextPath.substring(0, contextPath.length() - 1) : contextPath));
