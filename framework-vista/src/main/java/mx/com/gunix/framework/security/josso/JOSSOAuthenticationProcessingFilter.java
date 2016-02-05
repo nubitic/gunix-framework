@@ -39,7 +39,7 @@ public class JOSSOAuthenticationProcessingFilter extends AbstractAuthenticationP
 		this.partnerId = partnerId;
 		if(BACKTO_HOST!=null) {
 			((SavedRequestAwareAuthenticationSuccessHandler) getSuccessHandler()).setAlwaysUseDefaultTargetUrl(true);
-			((SavedRequestAwareAuthenticationSuccessHandler) getSuccessHandler()).setDefaultTargetUrl(BACKTO_HOST + (BACKTO_CONTEXT != null ? BACKTO_CONTEXT : ""));	
+			((SavedRequestAwareAuthenticationSuccessHandler) getSuccessHandler()).setDefaultTargetUrl(BACKTO_HOST + (BACKTO_CONTEXT != null ? BACKTO_CONTEXT : "") + "/");	
 		}
 	}
 
