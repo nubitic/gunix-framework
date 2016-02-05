@@ -33,8 +33,8 @@ public class JOSSOUtils {
 		try {
 			StringBuilder rv = null;
 			if (BACKTO_HOST != null) {
-				rv = new StringBuilder(BACKTO_HOST).append(BACKTO_CONTEXT == null ? "" : BACKTO_CONTEXT);
-				contextPath = BACKTO_CONTEXT;
+				contextPath = (BACKTO_CONTEXT == null || "".equals(BACKTO_CONTEXT)) ? "/" : BACKTO_CONTEXT;
+				rv = new StringBuilder(BACKTO_HOST);
 			} else {
 				// Build the back to url.
 				contextPath = request.getContextPath();
@@ -45,8 +45,8 @@ public class JOSSOUtils {
 				}
 				URL url = new URL(mySelf.toString());
 				rv = new StringBuilder(url.getProtocol()).append("://").append(url.getHost()).append(((url.getPort() > 0) ? ":" + url.getPort() : ""));
-				rv.append((contextPath.endsWith("/") ? contextPath.substring(0, contextPath.length() - 1) : contextPath));
 			}
+			rv.append((contextPath.endsWith("/") ? contextPath.substring(0, contextPath.length() - 1) : contextPath));
 			rv.append(uri);
 
 			rv = new StringBuilder("?").append(Constants.PARAM_JOSSO_BACK_TO).append('=').append(rv);
