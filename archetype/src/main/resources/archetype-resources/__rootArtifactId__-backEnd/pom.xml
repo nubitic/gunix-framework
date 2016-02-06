@@ -29,7 +29,7 @@
 				<version>2.6</version>
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
-					<packagingExcludes>WEB-INF/lib/activiti-engine-${activiti.version}.jar,WEB-INF/classes/mx/com/gunix/procesos/README.txt</packagingExcludes>
+					<packagingExcludes>WEB-INF/classes/mx/com/gunix/procesos/README.txt</packagingExcludes>
 				</configuration>
 			</plugin>
 	 <plugin>

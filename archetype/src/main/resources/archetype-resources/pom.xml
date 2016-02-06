@@ -12,7 +12,6 @@
 	</modules>
 	<properties>
 		<javac.path>${JAVA_1_8_HOME}/bin/javac</javac.path>
-		<activiti.version>${activitiVersion}</activiti.version>
 		<openL.version>${openLVersion}</openL.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
