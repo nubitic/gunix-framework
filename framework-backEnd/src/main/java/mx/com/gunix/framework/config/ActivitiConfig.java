@@ -296,12 +296,14 @@ public class ActivitiConfig {
 		}
 
 		@Override
-		public void executeAsyncJob(JobEntity job) {
+		public boolean executeAsyncJob(JobEntity job) {
 			try {
 				taskExecutor.execute(new ExecuteAsyncSecuredRunnable(job, commandExecutor, rs));
 			} catch (RejectedExecutionException e) {
 				rejectedJobsHandler.jobRejected(this, job);
+				return false;
 			}
+			return true;
 		}
 
 		@Override

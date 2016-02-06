@@ -3,20 +3,19 @@ package mx.com.gunix.ui.vaadin.view.adminapp.usuario;
 import java.util.ArrayList;
 import java.util.List;
 
+import mx.com.gunix.framework.processes.domain.Variable;
+import mx.com.gunix.framework.security.domain.Usuario;
+import mx.com.gunix.framework.ui.vaadin.spring.GunixVaadinView;
+import mx.com.gunix.framework.ui.vaadin.view.AbstractGunixView;
+
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.RowHeaderMode;
-
-import mx.com.gunix.framework.processes.domain.Variable;
-import mx.com.gunix.framework.security.domain.Aplicacion;
-import mx.com.gunix.framework.security.domain.Usuario;
-import mx.com.gunix.framework.ui.vaadin.spring.GunixVaadinView;
-import mx.com.gunix.framework.ui.vaadin.view.AbstractGunixView;
+import com.vaadin.ui.TextField;
 
 @GunixVaadinView
 public class UsuarioSearchView extends AbstractGunixView<Usuario> {

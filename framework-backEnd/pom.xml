@@ -36,14 +36,6 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>activiti-engine-job-prefix-fix-mvn-repo</id>
-			<url>https://raw.github.com/loloq123/activiti-engine-job-prefix-fix/mvn-repo/</url>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-			</snapshots>
-		</repository>
-		<repository>
 			<id>org.openl.rules.activiti-repo</id>
 			<url>https://raw.github.com/loloq123/org.openl.rules.activiti/mvn-repo/</url>
 			<snapshots>
@@ -67,8 +59,8 @@
 			<artifactId>activiti-spring</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>mx.com.gunix</groupId>
-			<artifactId>activiti-engine-job-prefix-fix</artifactId>
+			<groupId>org.activiti</groupId>
+			<artifactId>activiti-engine</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>mx.com.gunix</groupId>
@@ -77,15 +69,7 @@
 		<dependency>
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis</artifactId>
-			<version>3.2.8</version>
-			<!-- 3.3.0 no juega bien con activiti dado que el método 
-			private void applyIncludes(Node source, final Properties variablesContext) de org.apache.ibatis.builder.xml.XMLIncludeTransformer 
-				hace un reemplazo de variables que antes no hacia:
-				 
-				if (source.getNodeType() == Node.TEXT_NODE && !variablesContext.isEmpty()) { // replace variables ins all text nodes 
-					source.setNodeValue(PropertyParser.parse(source.getNodeValue(),variablesContext)); 
-				} 
-			-->
+			<version>3.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mybatis.caches</groupId>

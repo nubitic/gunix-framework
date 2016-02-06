@@ -15,14 +15,6 @@
 	</properties>
 	<repositories>
 		<repository>
-			<id>activiti-engine-job-prefix-fix-mvn-repo</id>
-			<url>https://raw.github.com/loloq123/activiti-engine-job-prefix-fix/mvn-repo/</url>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-			</snapshots>
-		</repository>
-		<repository>
 			<id>gunix-mvn-repo</id>
 			<url>https://raw.github.com/loloq123/gunix/mvn-repo/</url>
 			<snapshots>
@@ -33,8 +25,8 @@
 	</repositories>
 	<dependencies>
 		<dependency>
-			<groupId>mx.com.gunix</groupId>
-			<artifactId>activiti-engine-job-prefix-fix</artifactId>
+			<groupId>org.activiti</groupId>
+			<artifactId>activiti-engine</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.activiti</groupId>

@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class HessianServiceAdvice {
-	@Around("execution(* net.bytebuddy.generated.*.*(..))")
+	@Around("execution(* net.bytebuddy.renamed..*.*(..))")
 	public Object aroundAnyMethodInsideAClassGeneratedByByteBuddy(ProceedingJoinPoint pjp){
 		try {
 			Object[] orgArgs = pjp.getArgs();
@@ -52,7 +52,7 @@ public class HessianServiceAdvice {
 			Class<?>[] interfaces = ((Advised)pjp.getThis()).getProxiedInterfaces();
 			Class<?> generatedInterface = null;
 			for(Class<?> interCara:interfaces){
-				if(interCara.getName().startsWith("net.bytebuddy.generated")){
+				if(interCara.getName().startsWith("net.bytebuddy.renamed")){
 					generatedInterface=interCara;
 					break;
 				}
