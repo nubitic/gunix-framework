@@ -117,6 +117,8 @@ public class Header extends CustomComponent {
 	TareaActualNavigator navigator;
 
 	final private int MODULOS_POR_FILA = 3;
+
+	private Aplicacion aplicacion;
 	private static final long serialVersionUID = 1L;
 
 	public static final String DESCARGA_ARCHIVO = "da:";
@@ -165,6 +167,7 @@ public class Header extends CustomComponent {
 	}
 
 	public void renderHeader(Aplicacion aplicacion) {
+		this.aplicacion = aplicacion;
 		setId(new StringBuilder(getClass().getName()).append(":").append(aplicacion.getIdAplicacion()).toString());
 		navigator.addProvider(svp);
 
@@ -474,5 +477,9 @@ public class Header extends CustomComponent {
 		panelContenido.setContent(verticalLayout_2);
 
 		return panelContenido;
+	}
+
+	public Aplicacion getAplicacion() {
+		return aplicacion;
 	}
 }

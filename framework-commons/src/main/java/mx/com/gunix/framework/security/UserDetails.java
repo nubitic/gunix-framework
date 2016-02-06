@@ -32,6 +32,7 @@ public class UserDetails extends Usuario implements org.springframework.security
 		setEliminado(usuario.isEliminado());
 		setBloqueado(usuario.isBloqueado());
 		setActivo(usuario.isActivo());
+		setDatosUsuario(usuario.getDatosUsuario());
 	}
 	
 	@Override

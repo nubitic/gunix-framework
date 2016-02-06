@@ -12965,3 +12965,13 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .invisibleDownloadButton {
 	display: none;
 }
+
+.gunix .app-title {
+	font-size: 32px;
+	font-weight: bold;
+	margin-left: 15px;
+}
+
+.gunix .user-id-label {
+	text-align: right;
+}

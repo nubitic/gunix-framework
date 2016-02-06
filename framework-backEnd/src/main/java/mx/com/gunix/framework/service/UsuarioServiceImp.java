@@ -2,6 +2,7 @@ package mx.com.gunix.framework.service;
 
 import java.util.Date;
 
+import mx.com.gunix.adminapp.domain.persistence.UsuarioAdminMapper;
 import mx.com.gunix.framework.security.PersistentRememberMeToken;
 import mx.com.gunix.framework.security.domain.Usuario;
 import mx.com.gunix.framework.security.domain.persistence.UsuarioMapper;
@@ -16,13 +17,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class UsuarioServiceImp implements UsuarioService {
 	@Autowired
 	UsuarioMapper um;
+	
+	@Autowired
+	UsuarioAdminMapper uam;
 
 	@Autowired
 	PersistentTokenRepository persistentTokenRepository;
 
 	@Override
 	public Usuario getUsuario(String idUsuario) {
-		return um.getUsuario(idUsuario);
+		Usuario usuarioSeg = um.getUsuario(idUsuario);
+		usuarioSeg.setDatosUsuario(uam.getDetalleUById(idUsuario).getDatosUsuario());
+		return usuarioSeg;
 	}
 
 	@Override

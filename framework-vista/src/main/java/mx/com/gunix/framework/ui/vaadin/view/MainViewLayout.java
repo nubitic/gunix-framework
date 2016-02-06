@@ -16,9 +16,12 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.Page;
 import com.vaadin.server.Responsive;
 import com.vaadin.ui.Alignment;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Image;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.UI;
@@ -46,19 +49,42 @@ public class MainViewLayout extends VerticalLayout implements PopupView.Content{
 		setMargin(true);
 		addStyleName("MainViewLayout");
 		Usuario u = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		userId = u.getIdUsuario();
+		StringBuilder userIdStrBldr = new StringBuilder(u.getIdUsuario());
+		if (u.getDatosUsuario() != null) {
+			userIdStrBldr.append("<br/>")
+				.append(u.getDatosUsuario().getApPaterno()).append(" ")
+				.append(u.getDatosUsuario().getApMaterno())
+				.append(u.getDatosUsuario().getApMaterno() != null && !"".equals(u.getDatosUsuario().getApMaterno().trim()) ? " " : "")
+				.append(u.getDatosUsuario().getNombre());
+		}
+		userId = userIdStrBldr.toString();
 		
 		HorizontalLayout hl = new HorizontalLayout();
 		hl.setMargin(false);
 		hl.setSpacing(true);
-		hl.setWidth("-1px");
+		hl.setWidth("100%");
+		
+		Image logoInstitucional = new Image(null, new ThemeResource("img/logo-institucional.png"));
+		hl.addComponent(logoInstitucional);
+		hl.setComponentAlignment(logoInstitucional, Alignment.MIDDLE_LEFT);
+		hl.setExpandRatio(logoInstitucional, 0.25f);
+		
+		HorizontalLayout appInfo = new HorizontalLayout();
+		appInfo.setMargin(false);
+		appInfo.setSpacing(false);
+		appInfo.setSizeUndefined();
+		hl.addComponent(appInfo);
+		hl.setComponentAlignment(appInfo, Alignment.MIDDLE_CENTER);
+		hl.setExpandRatio(appInfo, 0.50f);
 		
 		userIdLabel = new PopupView(this);
+		userIdLabel.addStyleName("user-id-label");
 		hl.addComponent(userIdLabel);
 		hl.setComponentAlignment(userIdLabel, Alignment.MIDDLE_RIGHT);
-
+		hl.setExpandRatio(userIdLabel, 0.25f);
+		
 		addComponent(hl);
-		setComponentAlignment(hl, Alignment.TOP_RIGHT);
+		//setComponentAlignment(hl, Alignment.TOP_RIGHT);
 		setExpandRatio(hl, 0.0f);
 		
 		if (u.getAplicaciones().size() > 1) {
@@ -71,12 +97,17 @@ public class MainViewLayout extends VerticalLayout implements PopupView.Content{
 				h.renderHeader(aplicacion);
 				aplicacionesTab.addTab(h, aplicacion.getDescripcion());
 				aplicacionesTab.addSelectedTabChangeListener(selectedTab -> {
-					UI.getCurrent().setNavigator(((Header) selectedTab.getTabSheet().getSelectedTab()).getNavigator());
+					Header iH = (Header) selectedTab.getTabSheet().getSelectedTab();
+					updateAppInfo(iH, appInfo);
+					UI.getCurrent().setNavigator(iH.getNavigator());
 				});
 			});
 
 			addComponent(aplicacionesTab);
-			UI.getCurrent().setNavigator(((Header) aplicacionesTab.getSelectedTab()).getNavigator());
+			
+			Header iH = (Header) aplicacionesTab.getSelectedTab();
+			updateAppInfo(iH, appInfo);
+			UI.getCurrent().setNavigator(iH.getNavigator());
 			setExpandRatio(aplicacionesTab, 1.0f);
 		} else {
 			if (!u.getAplicaciones().isEmpty()) {
@@ -86,8 +117,8 @@ public class MainViewLayout extends VerticalLayout implements PopupView.Content{
 				addComponent(h);
 				UI.getCurrent().setNavigator(h.getNavigator());
 				setExpandRatio(h, 1.0f);
-				Page.getCurrent().setTitle(app.getDescripcion());
 				setSpacing(true);
+				updateAppInfo(h,appInfo);
 			}
 		}
 		
@@ -99,6 +130,16 @@ public class MainViewLayout extends VerticalLayout implements PopupView.Content{
 		userDetailsLayout.addComponent(logoutButton);
 	}
 	
+	private void updateAppInfo(Header iH, HorizontalLayout appInfo) {
+		Page.getCurrent().setTitle(iH.getAplicacion().getDescripcion());
+		appInfo.removeAllComponents();
+		appInfo.addComponent(new Image(null, new ThemeResource("img/" + iH.getAplicacion().getIcono())));
+		Label appTitle = new Label(iH.getAplicacion().getDescripcion());
+		appTitle.addStyleName("app-title");
+		appInfo.addComponent(appTitle);
+		appInfo.setComponentAlignment(appTitle, Alignment.MIDDLE_LEFT);
+	}
+
 	public void enter(ViewChangeEvent event) {
 		Responsive.makeResponsive(this);
 	}
