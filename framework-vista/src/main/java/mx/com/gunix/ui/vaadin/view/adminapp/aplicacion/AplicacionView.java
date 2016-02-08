@@ -13,6 +13,7 @@ import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.security.domain.Aplicacion;
 import mx.com.gunix.framework.security.domain.Funcion;
 import mx.com.gunix.framework.security.domain.Modulo;
+import mx.com.gunix.framework.security.domain.Parametro;
 import mx.com.gunix.framework.security.domain.Rol;
 import mx.com.gunix.framework.ui.GunixFile;
 import mx.com.gunix.framework.ui.vaadin.component.GunixUploadField;
@@ -388,7 +389,6 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 			funcionC.setIdFuncion(funcion.getIdFuncion());
 			funcionC.setModulo(modulo);
 			funcionC.setOrden(funcion.getOrden());
-			funcionC.setParametros(funcion.getParametros());
 			funcionC.setProcessKey(funcion.getProcessKey());
 			funcionC.setTitulo(funcion.getTitulo());
 			if (funcion.getHijas() != null) {
@@ -398,8 +398,22 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 					funcionCHija.setPadre(funcionC);
 				});
 			}
+			funcionC.setParametros(copyParametros(funcion.getParametros()));
 			funcionesDest.add(funcionC);
 		});
+	}
+
+	private List<Parametro> copyParametros(List<Parametro> parametros) {
+		List<Parametro> clonedParametros = new ArrayList<Parametro>();
+		if (parametros != null) {
+			parametros.forEach(parametro -> {
+				Parametro param = new Parametro();
+				param.setNombre(parametro.getNombre());
+				param.setValor(parametro.getValor());
+				clonedParametros.add(param);
+			});
+		}
+		return clonedParametros;
 	}
 
 	@Override

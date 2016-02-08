@@ -84,7 +84,7 @@
 			</if>
 		</foreach>
 		<where>
-			<foreach collection="idMapFuncion" index="key" item="value" open="" separator=" AND " close="">
+			<foreach collection="idMapFuncion" index="key" item="value" open="" separator=" AND " close=" AND ">
 				<choose>
 					<when test="key == 'modulo'">
 						<bind name="idAplicacion" value="value.aplicacion.idAplicacion" />
