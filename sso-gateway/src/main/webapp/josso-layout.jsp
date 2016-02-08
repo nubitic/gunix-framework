@@ -20,70 +20,81 @@
   ~
   --%>
 
-<%@ page contentType="text/html; charset=UTF-8" language="java"%>
-<%@ taglib prefix="tiles" uri="http://jakarta.apache.org/struts/tags-tiles"%>
-<%@ taglib prefix="html" uri="http://jakarta.apache.org/struts/tags-html"%>
-<%@ taglib prefix="bean" uri="http://jakarta.apache.org/struts/tags-bean"%>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<%@ taglib prefix="tiles" uri="http://jakarta.apache.org/struts/tags-tiles" %>
+<%@ taglib prefix="html" uri="http://jakarta.apache.org/struts/tags-html" %>
+<%@ taglib prefix="bean" uri="http://jakarta.apache.org/struts/tags-bean" %>
 
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="es" lang="es">
+
+<!-- Copyright (c) 2009, Novascope -->
 
 <head>
 
-<title><bean:message key="sso.title" /> - <tiles:getAsString name="josso.page.title" ignore="true" /></title>
-<meta name="Title" content="Gunix" />
-<meta name="Keywords" content="GUNIX, Single Sign On" />
-<meta name="Description" content="GUNIX Java Open Single Sing-On." />
+    <title><bean:message key="sso.title"/> - <tiles:getAsString name="josso.page.title" ignore="true" /></title><!-- Edit -->
 
-<meta name="Robots" content="index,follow" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="Title" content="Atricore, Inc"/>
+    <meta name="Author" content="Nicolas Calabrese"/>
+    <meta name="Author" content="Sebastian Gonzalez Oyuela"/>
+    <meta name="Keywords" content="JOSSO, Single Sign On"/>
+    <meta name="Description" content="Java Open Single Sing-On."/>
 
-<meta http-equiv="X-UA-Compatible" content="IE=11;chrome=1" />
-<style type="text/css">
-html, body {
-	height: 100%;
-	margin: 0;
-}
-</style>
-<link rel="shortcut icon" type="image/vnd.microsoft.icon" href="<%=request.getContextPath()%>/resources/img/favicon.ico" />
-<link rel="icon" type="image/vnd.microsoft.icon" href="<%=request.getContextPath()%>/resources/img/favicon.ico" />
-<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/resources/css/styles.css" />
+    <meta name="Robots" content="index,follow"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <link href="<%=request.getContextPath()%>/resources/css/screen.css" rel="stylesheet" type="text/css" media="screen, projector"/>
+
+    <!--[if IE 6]><link href="<%=request.getContextPath()%>/resources/css/ie6.css" rel="stylesheet" type="text/css" media="screen, projector" /><![endif]-->
+    <!--[if IE 7]><link href="<%=request.getContextPath()%>/resources/css/ie7.css" rel="stylesheet" type="text/css" media="screen, projector" /><![endif]-->
+
 </head>
 
-<body scroll="auto" class="v-generated-body v-sa v-ch v-webkit v-win v-touch" style="text-align: center;">
-	<div id="ROOT-2521314" class="v-app gunix mainui">
-		<div tabindex="1" class="v-ui v-scrollable" style="width: 100%; height: 100%;">
-			<div class="v-verticallayout v-layout v-vertical v-widget MainViewLayout v-verticallayout-MainViewLayout v-has-width v-margin-top v-margin-right v-margin-bottom v-margin-left"
-				style="width: 792px; margin: 0 auto !important;">
-				<div class="v-slot">
-					<div class="v-customcomponent v-widget v-has-width" id="mx.com.gunix.framework.ui.vaadin.component.Header:ADMIN_APP" style="width: 100%;">
-						<div class="v-verticallayout v-layout v-vertical v-widget v-has-width" style="width: 100%;">
-							<div class="v-slot v-align-center v-align-middle">
-								<div class="v-panel v-widget v-has-width"
-									style="overflow: hidden; width: 100%; padding-top: 0px; padding-bottom: 0px; background: url('<%=request.getContextPath()%>/resources/img/rect4238-op.png'); background-repeat: no-repeat; background-position: right center;">
-									<div class="v-panel-captionwrap" style="margin-top: 0px;">
-										<div class="v-panel-nocaption">
-											<span></span>
-										</div>
-									</div>
-									<div class="v-panel-content v-scrollable" tabindex="-1" style="position: relative;">
-										<div class="v-verticallayout v-layout v-vertical v-widget v-has-width v-margin-top v-margin-right v-margin-bottom v-margin-left"
-											id="mx.com.gunix.ui.vaadin.view.adminapp.aplicacion.AplicacionView:75101439" style="width: 100%;">
-											<div class="v-slot">
-												<div class="v-widget v-has-caption v-caption-on-top v-has-width" style="width: 100%;">
-													<tiles:insert attribute="josso.body" flush="false" />
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="v-panel-deco" style="margin-bottom: 0px;"></div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+<body>
+<div><p class="alert browser-support">Using a modern browser that supports web standards ensures that the site's full
+    visual experience is available. Consider <a href="http://www.opera.com/products/desktop/">upgrading your browser</a>
+    if you are using an older technology.</p></div>
+
+
+<div id="wrapper">
+
+    <!-- PAGE HEADER  -->
+
+    <div id="header">
+
+        <h1> <!-- Logo JOSSO-->
+            <a href="http://www.josso.org" title="Click here to go to the homepage">
+                <img src="<%=request.getContextPath()%>/resources/img/content/josso-logo.png" alt="Java Open Single SignOn" width="372" height="48"/>
+            </a>
+        </h1> <!-- /Logo JOSSO -->
+
+
+        <h2> <!-- Logo Atricore -->
+            <a href="http://www.atricore.com">
+                <img src="<%=request.getContextPath()%>/resources/img/content/atricore-logo.gif" alt="Atricore, the company behind JOSSO" width="254"
+                     height="66"/>
+            </a>
+        </h2> <!-- /Logo Atricore -->
+
+
+    </div>
+
+
+    <!-- PAGE CONTENT  -->
+    <div id="content" class="clearfix">
+        <tiles:insert attribute="josso.body" flush="false" />
+    </div> <!-- /content -->    
+    <!-- /content -->
+
+    <!-- PAGE FOOTER  -->
+
+    <div id="footer">
+        <p>Copyright &copy; 2004-2013. Atricore, Inc.</p>
+    </div>
+
+
+</div>
+
 </body>
 </html>
