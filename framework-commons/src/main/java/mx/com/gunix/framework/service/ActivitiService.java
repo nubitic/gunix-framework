@@ -18,4 +18,6 @@ public interface ActivitiService {
 	public void eliminaTodasLasInstanciasVolatilesTerminadasOIniciadasHaceMasDe35Minutos();
 	
 	public List<ProgressUpdate> getRecentProgressUpdates(String processId);
+
+	public void addProgressUpdate(String processId, ProgressUpdate pu);
 }

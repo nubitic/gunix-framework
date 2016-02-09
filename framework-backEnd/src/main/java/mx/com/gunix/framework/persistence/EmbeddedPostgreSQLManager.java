@@ -300,7 +300,7 @@ public final class EmbeddedPostgreSQLManager {
 		}
 	}
 
-	private static void log(Process process) throws IOException {
+	public static void log(Process process) throws IOException {
 		if (log.isInfoEnabled()) {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			String linea = null;
@@ -310,10 +310,11 @@ public final class EmbeddedPostgreSQLManager {
 		}
 	}
 
-	private static File descargaArchivo(String fileURL, String tempFilePrefix, String tempFileSufix) throws IOException {
+	public static File descargaArchivo(String fileURL, String tempFilePrefix, String tempFileSufix) throws IOException {
 
 		URL url = new URL(fileURL);
 		HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+		httpConn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
 		int responseCode = httpConn.getResponseCode();
 		File downloadedFile = File.createTempFile(tempFilePrefix, tempFileSufix);
 
@@ -406,7 +407,7 @@ public final class EmbeddedPostgreSQLManager {
 		}
 	}
 
-	private static void extractZip(File downloadedFile, String postgreSQLAbsPath) throws IOException {
+	public static void extractZip(File downloadedFile, String postgreSQLAbsPath) throws IOException {
 		log.info("Extrayendo: " + downloadedFile.getName());
 		// get the zip file content
 		ZipInputStream zis = new ZipInputStream(new FileInputStream(downloadedFile));
@@ -441,7 +442,7 @@ public final class EmbeddedPostgreSQLManager {
 		log.info("extracción completada con éxito!!");
 	}
 
-	private static void extractTar(File downloadedFile, String postgreSQLAbsPath) throws IOException {
+	public static void extractTar(File downloadedFile, String postgreSQLAbsPath) throws IOException {
 		log.info("Extrayendo: " + downloadedFile.getName());
 		
 		new File(postgreSQLAbsPath).mkdirs();

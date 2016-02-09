@@ -29,7 +29,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class GunixActivitServiceSupport<T extends Serializable> {
-	
 	private interface FoundAction {
 		boolean doFoundAction(Serializable itProp1Obj, Serializable itProp2Obj);
 	}
@@ -39,6 +38,9 @@ public class GunixActivitServiceSupport<T extends Serializable> {
 		
 	@Autowired
 	private Validator validator;
+	
+	@Autowired
+	private ActivitiService activitiService;
 
 	protected final void actualizaVariable(Object var) {
 		ExecutionEntity ee = Context.getExecutionContext().getExecution();
@@ -352,6 +354,6 @@ public class GunixActivitServiceSupport<T extends Serializable> {
 		pu.setCancelado(isCancelado);
 		pu.setTimeStamp(System.currentTimeMillis());
 		pu.setProcessId(Context.getExecutionContext().getExecution().getProcessInstanceId());
-		ActivitiServiceImp.addProgressUpdate(pu.getProcessId(), pu);
+		activitiService.addProgressUpdate(pu.getProcessId(), pu);
 	}
 }

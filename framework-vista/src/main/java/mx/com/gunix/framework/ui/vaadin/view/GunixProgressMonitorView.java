@@ -6,14 +6,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import mx.com.gunix.framework.processes.domain.ProgressUpdate;
 import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.ui.vaadin.spring.GunixVaadinView;
 
 import org.springframework.util.StringUtils;
 
 import rx.Observable;
-import rx.Scheduler;
 import rx.schedulers.Schedulers;
 
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -36,8 +34,6 @@ public final class GunixProgressMonitorView<S extends Serializable> extends Abst
 	private TextArea log;
 	private Button continuarButton;
 	private Window window;
-	private Observable<ProgressUpdate> messagePoller;
-	private Scheduler scheduler;
 	
 	protected void doEnter(ViewChangeEvent event) {
 
@@ -78,21 +74,20 @@ public final class GunixProgressMonitorView<S extends Serializable> extends Abst
 		window.setContent(layout);
 		UI.getCurrent().addWindow(window);
 		
-		(messagePoller = Observable.interval(4, TimeUnit.SECONDS, scheduler = Schedulers.io())
+		Observable.interval(4, TimeUnit.SECONDS, Schedulers.io())
 			      .map(tick -> as.getRecentProgressUpdates(getTarea().getInstancia().getId()))
 				  .doOnError(err -> UI.getCurrent().access(() -> {
 							  Notification.show("Hubo un error al obtener el estado del proceso:\n" + err, Type.ERROR_MESSAGE);
 							  window.close();
-							  finishObservable();
 						  }))
 			      .flatMap(Observable::from)
-			      .distinct())
+			      .distinct()
+			      .takeUntil(pu -> (pu.isCancelado() || pu.getProgreso() == 1f))
 			      .subscribe(pu -> UI.getCurrent().access(() -> {
 			    	  if(pu.isCancelado()) {
 			    		  UI.getCurrent().access(() -> {
 							  Notification.show("El proceso terminó abruptamente con el siguiente mensaje:\n" + pu.getMensaje(), Type.ERROR_MESSAGE);
 							  window.close();
-							  finishObservable();
 						  });
 			    	  } else {
 				    	  if(!StringUtils.isEmpty(pu.getMensaje())) {
@@ -103,15 +98,9 @@ public final class GunixProgressMonitorView<S extends Serializable> extends Abst
 				    	  bar.setValue(pu.getProgreso());
 				    	  if(pu.getProgreso()==1f) {
 				    		  continuarButton.setVisible(true);
-				    		  finishObservable();
 				    	  }
 			    	  }
 				  }));
-	}
-
-	private void finishObservable() {
-		messagePoller.takeUntil(obj -> (true));
-		messagePoller.unsubscribeOn(scheduler);
 	}
 
 	private void addLog(String mensaje) {

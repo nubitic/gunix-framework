@@ -1,7 +1,6 @@
 package mx.com.gunix.framework.config;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
@@ -26,19 +25,19 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 	private Class<?>[] doConfigureClasses() {
 		List<Class<?>> configClasses = new ArrayList<Class<?>>();
 
-		if (Boolean.valueOf(System.getenv("STANDALONE_APP")) && Boolean.valueOf(System.getenv("MONGO_DB_NAME"))) {
-			configClasses.addAll(Arrays.asList(new Class<?>[] { MethodSecurityConfig.class, ServerServiceConfig.class, ActivitiConfig.class, AspectJConfig.class, AdminAppServicesConfig.class, MongoDBConfig.class }));
-		} else {
-			if (Boolean.valueOf(System.getenv("STANDALONE_APP"))) {
-				configClasses.addAll(Arrays.asList(new Class<?>[] { MethodSecurityConfig.class, ServerServiceConfig.class, ActivitiConfig.class, AspectJConfig.class, AdminAppServicesConfig.class }));
-			} else {
-				if (Boolean.valueOf(System.getenv("MONGO_DB_NAME"))) {
-					configClasses.addAll(Arrays.asList(new Class<?>[] { MethodSecurityConfig.class, ServerServiceConfig.class, ActivitiConfig.class, AspectJConfig.class, MongoDBConfig.class }));
-				} else {
-					configClasses.addAll(Arrays.asList(new Class<?>[] { MethodSecurityConfig.class, ServerServiceConfig.class, ActivitiConfig.class, AspectJConfig.class }));
-				}
-			}
+		configClasses.add(MethodSecurityConfig.class);
+		configClasses.add(ServerServiceConfig.class);
+		configClasses.add(ActivitiConfig.class);
+		configClasses.add(AspectJConfig.class);
+		configClasses.add(REDISConfig.class);
+
+		if (Boolean.valueOf(System.getenv("STANDALONE_APP"))) {
+			configClasses.add(AdminAppServicesConfig.class);
 		}
+		if (Boolean.valueOf(System.getenv("MONGO_DB_NAME"))) {
+			configClasses.add(MongoDBConfig.class);
+		}
+
 		try {
 			configClasses.add(AppInitializer.class.getClassLoader().loadClass("mx.com.gunix.config.AppSpringConfig"));
 		} catch (ClassNotFoundException ignorar) {

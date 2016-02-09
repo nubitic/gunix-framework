@@ -10,9 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 import mx.com.gunix.framework.processes.domain.Instancia;
@@ -42,6 +39,7 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -69,7 +67,9 @@ public class ActivitiServiceImp implements ActivitiService {
 	@Autowired
 	RepositoryService repos;
 	
-	private static final Map<String, Queue<ProgressUpdate>> progressUpdateMap = new ConcurrentHashMap<String, Queue<ProgressUpdate>>();
+	@Autowired
+	RedisTemplate<String, ProgressUpdate> redisProgressUpdateTemplate;
+	
 	public static final String CURRENT_AUTHENTICATION_USUARIO_VAR = "CURRENT_AUTHENTICATION_USUARIO_VAR";
 	public static final String CURRENT_AUTHENTICATION_ROLES_VAR = "CURRENT_AUTHENTICATION_ROLES_VAR";
 	private final int MAX_UPDATES_PER_FETCH = 100;
@@ -274,32 +274,18 @@ public class ActivitiServiceImp implements ActivitiService {
 
 	@Override
 	public List<ProgressUpdate> getRecentProgressUpdates(String processId) {
-		Queue<ProgressUpdate> qpu = progressUpdateMap.get(processId);
 		List<ProgressUpdate> pu = new ArrayList<ProgressUpdate>();
-		if (qpu != null) {
-			ProgressUpdate cpud = null;
-			int updatesFetched = 0;
-			boolean isLast = false;
-			while ((cpud = qpu.poll()) != null && updatesFetched < MAX_UPDATES_PER_FETCH) {
-				if (cpud.isCancelado() || cpud.getProgreso() == 1f) {
-					isLast = true;
-				}
-				pu.add(cpud);
-				updatesFetched++;
-			}
-			if (isLast) {
-				progressUpdateMap.remove(processId);
-			}
+
+		ProgressUpdate cpud = null;
+		int updatesFetched = 0;
+		while ((cpud = redisProgressUpdateTemplate.boundListOps(processId).rightPop()) != null && updatesFetched < MAX_UPDATES_PER_FETCH) {
+			pu.add(cpud);
+			updatesFetched++;
 		}
 		return pu;
 	}
 
-	static void addProgressUpdate(String processId, ProgressUpdate pu) {
-		Queue<ProgressUpdate> qpu = progressUpdateMap.get(processId);
-		if (qpu == null) {
-			qpu = new ConcurrentLinkedQueue<ProgressUpdate>();
-			progressUpdateMap.put(processId, qpu);
-		}
-		qpu.add(pu);
+	public void addProgressUpdate(String processId, ProgressUpdate pu) {
+		redisProgressUpdateTemplate.boundListOps(processId).leftPush(pu);
 	}
 }
