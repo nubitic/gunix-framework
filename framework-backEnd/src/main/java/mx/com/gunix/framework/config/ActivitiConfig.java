@@ -4,12 +4,16 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
 import javax.sql.DataSource;
 
 import mx.com.gunix.framework.activiti.ExecuteAsyncSecuredRunnable;
+import mx.com.gunix.framework.processes.domain.ProgressUpdate;
+import mx.com.gunix.framework.service.ActivitiService;
 
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
@@ -19,7 +23,11 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.VariableScope;
+import org.activiti.engine.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
+import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiExceptionEvent;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.bpmn.data.ItemInstance;
 import org.activiti.engine.impl.cfg.IdGenerator;
@@ -67,7 +75,6 @@ import org.springframework.util.ReflectionUtils;
 @Configuration
 @EnableScheduling
 public class ActivitiConfig {
-
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
 	@Bean
@@ -146,12 +153,25 @@ public class ActivitiConfig {
 		}
 		
 		speConf.setDeploymentResources(resources);
-
-		List<ActivitiEventListener> evntListners =  new ArrayList<ActivitiEventListener>();
-		evntListners.add(new OpenLResourcesHandleListener());
-		speConf.setEventListeners(evntListners);
+		
+		Map<String, List<ActivitiEventListener>> eventListeners = new HashMap<String, List<ActivitiEventListener>>();
+		
+		List<ActivitiEventListener> openLEvntListners = new ArrayList<ActivitiEventListener>();
+		openLEvntListners.add(new OpenLResourcesHandleListener());
+		eventListeners.put(ActivitiEventType.ENTITY_UPDATED + "," + ActivitiEventType.ENTITY_DELETED, openLEvntListners);
+		
+		List<ActivitiEventListener> jobFailureEvntListners = new ArrayList<ActivitiEventListener>();
+		jobFailureEvntListners.add(jobExecutionFailureEvntListener());		
+		eventListeners.put(ActivitiEventType.JOB_EXECUTION_FAILURE.toString(), jobFailureEvntListners);
+		
+		speConf.setTypedEventListeners(eventListeners);
 
 		return speConf;
+	}
+	
+	@Bean
+	public JobExecutionFailureEvntListener jobExecutionFailureEvntListener() {
+		return new JobExecutionFailureEvntListener();
 	}
 
 	@Bean
@@ -315,5 +335,38 @@ public class ActivitiConfig {
 				log.error("Failed to execute rejected job " + job.getId(), e);
 			}
 		}
+	}
+	
+	static final class JobExecutionFailureEvntListener implements ActivitiEventListener {
+		@Autowired
+		@Lazy
+		private ActivitiService activitiService;
+		
+		@Autowired
+		@Lazy
+		private ManagementService ms;
+		
+		@Override
+		public void onEvent(ActivitiEvent event) {
+			if (event instanceof ActivitiExceptionEvent) {
+				JobEntity job = (JobEntity) ((ActivitiEntityEvent) event).getEntity();
+				ProgressUpdate pu = new ProgressUpdate();
+				pu.setCancelado(true);
+				pu.setMensaje("El proceso ha sido cancelado debido a un error inesperado. " + (((ActivitiExceptionEvent) event).getCause() != null ? ((ActivitiExceptionEvent) event).getCause().getMessage() : ""));
+				pu.setProcessId(job.getProcessInstanceId());
+				pu.setProgreso(0f);
+				pu.setTimeStamp(System.currentTimeMillis());
+				activitiService.addProgressUpdate(job.getProcessInstanceId(), pu);
+				job.setRetries(0);
+				ms.setJobRetries(job.getId(), 0);
+			}
+		}
+
+		@Override
+		public boolean isFailOnException() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
 	}
 }

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import mx.com.gunix.framework.processes.domain.Instancia;
@@ -39,6 +40,7 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
@@ -286,6 +288,8 @@ public class ActivitiServiceImp implements ActivitiService {
 	}
 
 	public void addProgressUpdate(String processId, ProgressUpdate pu) {
-		redisProgressUpdateTemplate.boundListOps(processId).leftPush(pu);
+		BoundListOperations<String, ProgressUpdate> blops = redisProgressUpdateTemplate.boundListOps(processId);
+		blops.expire(2, TimeUnit.MINUTES);
+		blops.leftPush(pu);
 	}
 }

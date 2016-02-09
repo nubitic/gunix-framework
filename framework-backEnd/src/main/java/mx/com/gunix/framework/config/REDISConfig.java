@@ -30,6 +30,11 @@ public class REDISConfig {
 		if (redisPort != null && !redisPort.equals("")) {
 			jcf.setPort(Integer.parseInt(redisPort));
 		}
+		String redisPassword = System.getenv("REDIS_PASSWORD");
+		if (redisPassword != null && !redisPassword.equals("")) {
+			jcf.setPassword(redisPassword);
+		}
+
 		return jcf;
 	}
 
