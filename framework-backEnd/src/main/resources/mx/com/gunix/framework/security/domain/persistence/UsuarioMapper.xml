@@ -8,6 +8,15 @@
     <result property="eliminado" column="ELIMINADO" />
     <result property="bloqueado" column="BLOQUEADO" />
     <result property="activo" column="ACTIVO" />
+	<association property="datosUsuario" javaType="mx.com.gunix.framework.security.domain.DatosUsuario">
+		<id property="nombre" column="NOMBRE" />
+		<id property="apPaterno" column="AP_PATERNO" />
+		<id property="apMaterno" column="AP_MATERNO" />
+		<id property="curp" column="CURP" />
+		<id property="rfc" column="RFC" />
+		<id property="correoElectronico" column="CORREO_ELECTRONICO" />
+		<id property="telefono" column="TELEFONO" />
+	</association>
     <collection property="aplicaciones" ofType="mx.com.gunix.framework.security.domain.Aplicacion">
     	<id property="idAplicacion" column="ID_APLICACION"/>
     	<result property="descripcion" column="DESCRIPCION_APLICACION" />

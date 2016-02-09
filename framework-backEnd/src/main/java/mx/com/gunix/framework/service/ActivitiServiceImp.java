@@ -251,15 +251,15 @@ public class ActivitiServiceImp implements ActivitiService {
 						List<HistoricProcessInstance> hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).startedBefore(hace35Minutos).list();
 						
 						if (ID_APLICACION != null) {
-							rs.createProcessInstanceQuery().processInstanceIds(hpis
-																				.stream()
-																				.map(hpi -> hpi.getId())
-																				.collect(Collectors.toSet()))
-														   .variableValueEquals(ID_APLICACION_VAR, ID_APLICACION)
-														   .list()
-														   .forEach(pi -> {
-															   rs.deleteProcessInstance(pi.getId(), "");
-														   });
+							if (hpis != null && !hpis.isEmpty()) {
+								rs.createProcessInstanceQuery()
+										.processInstanceIds(hpis.stream().map(hpi -> hpi.getId()).collect(Collectors.toSet()))
+										.variableValueEquals(ID_APLICACION_VAR, ID_APLICACION)
+										.list()
+										.forEach(pi -> {
+											rs.deleteProcessInstance(pi.getId(), "");
+										});
+							}
 							hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).finished().variableValueEquals(ID_APLICACION_VAR, ID_APLICACION).list();
 						} else {
 							hpis.forEach(hpi -> {
