@@ -66,14 +66,14 @@
 
         <!-- This will require basic challenges like e-mail address -->
         <action path="/selfservices/lostpassword/lostPassword"
-                type="org.josso.selfservices.password.LostPasswordAction">
+                type="mx.com.gunix.framework.josso.selfservices.password.LostPasswordAction">
             <forward name="requestChallenges" path="josso.selfservices.requestChallenges"/>
         </action>
 
         <!-- This is where challenges form (email, etc) submites results -->
         <action path="/selfservices/lostpassword/processChallenges"
                 validate="false"
-                type="org.josso.selfservices.password.LostPasswordAction"
+                type="mx.com.gunix.framework.josso.selfservices.password.LostPasswordAction"
                 name="requestChallengesForm">
 
             <!-- We may need to require challenges again -->
@@ -93,7 +93,7 @@
         <!-- Used in more complex scenarios -->
         <action path="/selfservices/lostpassword/requestAdditionalChallenges"
                 validate="false"
-                type="org.josso.selfservices.password.LostPasswordAction"
+                type="mx.com.gunix.framework.josso.selfservices.password.LostPasswordAction"
                 name="requestAdditionalChallengesForm">
 
             <forward name="requestAdditionalChallenges" path="josso.selfservices.requestAdditionalChallenges"/>
@@ -105,7 +105,7 @@
         <!-- This handles password confirmation -->
         <action path="/selfservices/lostpassword/confirmPassword"
                 validate="false"
-                type="org.josso.selfservices.password.LostPasswordAction"
+                type="mx.com.gunix.framework.josso.selfservices.password.LostPasswordAction"
                 name="confirmPasswordForm">
 
             <!-- We may require more chalenges than the ones recieved with the confirmation URL (assertion ,etc). -->
@@ -118,7 +118,7 @@
         <!-- Used in more complex scenarios -->
         <action path="/selfservices/lostpassword/requestAdditionalConfirmationChallenges"
                 validate="false"
-                type="org.josso.selfservices.password.LostPasswordAction"
+                type="mx.com.gunix.framework.josso.selfservices.password.LostPasswordAction"
                 name="requestAdditionalChallengesForm">
             <forward name="requestAdditionalConfirmationChallenges" path="josso.selfservices.requestAdditionaConfirmationChallenges"/>
             <forward name="passwordReseted" path="josso.selfservices.passwordResetted"/>
