@@ -77,8 +77,8 @@
                       userQueryString="SELECT ID_USUARIO AS NAME FROM USUARIO WHERE ID_USUARIO = ?"
                       credentialsQueryString="SELECT ID_USUARIO AS USERNAME, PASSWORD FROM USUARIO WHERE ID_USUARIO = ?"
                       resetCredentialDml="UPDATE USUARIO SET PASSWORD = crypt(?, gen_salt('bf', 16)) WHERE ID_USUARIO = ?"
-                      relayCredentialQueryString="SELECT ID_USUARIO FROM USUARIO WHERE #?# = ?" 
-                      userPropertiesQueryString="SELECT 'email' as NAME, ? as VALUE"
+                      relayCredentialQueryString="SELECT ID_USUARIO FROM DATOS_USUARIO WHERE #?# = ?" 
+                      userPropertiesQueryString="SELECT 'email' as NAME, CORREO_ELECTRONICO as VALUE FROM DATOS_USUARIO WHERE ID_USUARIO = ?"
                       rolesQueryString="SELECT 'AUTENTICADO' AS ROLE, ? AS USERNAME"
                       certificateCredentialsQueryString=""
 					  uidQueryString=""/>

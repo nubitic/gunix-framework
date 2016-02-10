@@ -36,7 +36,7 @@
         Modify this depending on the challenges you are using !
         -->
         <form-bean name="requestChallengesForm" type="org.apache.struts.validator.DynaValidatorForm">
-            <form-property name="ID_USUARIO" type="java.lang.String"/>
+            <form-property name="CORREO_ELECTRONICO" type="java.lang.String"/>
         </form-bean>
 
         <form-bean name="requestAdditionalChallengesForm" type="org.apache.struts.validator.DynaValidatorForm">

@@ -36,8 +36,8 @@
 
                 <p><bean:message key="sso.text.lostPassword"/></p>
 
-                <html:form action="/selfservices/lostpassword/processChallenges" focus="ID_USUARIO" >
-                    <div><label for="ID_USUARIO"><bean:message key="sso.label.email"/></label> <html:text styleClass="text" property="ID_USUARIO" /></div>
+                <html:form action="/selfservices/lostpassword/processChallenges" focus="CORREO_ELECTRONICO" >
+                    <div><label for="CORREO_ELECTRONICO"><bean:message key="sso.label.email"/></label> <html:text styleClass="text" property="CORREO_ELECTRONICO" /></div>
                     <div><input class="button medium" type="submit" value="Reset password"/></div>
                 </html:form>
 

@@ -54,7 +54,7 @@
 
         <def-pwdmgr:processes>
 
-            <lostpassword-process maxTimeToLive="3600000" challeng-id="ID_USUARIO" name="josso-simple-lostpassword" xmlns="urn:org:josso:simple:lostpasswordprocess">
+            <lostpassword-process maxTimeToLive="3600000" challeng-id="CORREO_ELECTRONICO" name="josso-simple-lostpassword" xmlns="urn:org:josso:simple:lostpasswordprocess">
 
                 <idGenerator>
                     <id-generator xmlns="urn:org:josso:core"/>
