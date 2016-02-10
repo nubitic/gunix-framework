@@ -12975,3 +12975,7 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .user-id-label {
 	text-align: right;
 }
+
+.gunix .padding-top-header {
+	margin-top: 5px;
+}

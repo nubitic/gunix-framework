@@ -1,10 +1,5 @@
 package mx.com.gunix.ui.vaadin.view.adminapp.aplicacion;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -15,8 +10,6 @@ import mx.com.gunix.framework.security.domain.Funcion;
 import mx.com.gunix.framework.security.domain.Modulo;
 import mx.com.gunix.framework.security.domain.Parametro;
 import mx.com.gunix.framework.security.domain.Rol;
-import mx.com.gunix.framework.ui.GunixFile;
-import mx.com.gunix.framework.ui.vaadin.component.GunixUploadField;
 import mx.com.gunix.framework.ui.vaadin.spring.GunixVaadinView;
 import mx.com.gunix.framework.ui.vaadin.view.AbstractGunixView;
 import mx.com.gunix.framework.ui.vaadin.view.SecuredView;
@@ -30,10 +23,12 @@ import com.vaadin.event.FieldEvents.FocusListener;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.UserError;
-import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
@@ -44,31 +39,12 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 @GunixVaadinView
-public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionViewBean> implements SecuredView {
-	public static class AplicacionViewBean extends Aplicacion {
-
-		@Override
-		protected int doHashCode() {
-			return 31;
-		}
-
-		private static final long serialVersionUID = 1L;
-		private GunixFile iconoFile;
-
-		public GunixFile getIconoFile() {
-			return iconoFile;
-		}
-
-		public void setIconoFile(GunixFile iconoFile) {
-			setIcono(iconoFile.getFileName());
-			this.iconoFile = iconoFile;
-		}
-	}
-
+public class AplicacionView extends AbstractGunixView<Aplicacion> implements SecuredView {
 	private static final long serialVersionUID = 1L;
 	
 	private Button guardarButton;
 	private Button cancelarButton;
+	private HorizontalLayout botonera;
 	private Accordion modulosRolesAcc;
 	private Panel rolesPanel;
 	private VerticalLayout verticalLayout_3;
@@ -76,12 +52,12 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 	private Panel modulosPanel;
 	private VerticalLayout verticalLayout_2;
 	private TabSheet modulosTabS;
-	private GunixUploadField iconoFile;
+	private TextField icono;
 	private TextField descripcion;
 	private TextField idAplicacion;
 	private Tab modulosAddTab;
 	private Tab rolesAddTab;
-	private AplicacionViewBean aplicacion;
+	private Aplicacion aplicacion;
 	private Boolean cancelar = Boolean.FALSE;
 
 	private Boolean esConsulta;
@@ -118,7 +94,7 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 				cancelarButton.setDisableOnClick(true);
 			} else {
 				descripcion.setReadOnly(true);
-				iconoFile.setReadOnly(true);
+				icono.setReadOnly(true);
 			}
 		}
 	}
@@ -170,8 +146,9 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 					cancelar=Boolean.TRUE;
 					completaTarea();
 				});
-				
-				flyt.addComponent(cancelarButton);
+				botonera.addComponent(cancelarButton);
+				botonera.setComponentAlignment(cancelarButton, Alignment.MIDDLE_RIGHT);
+				botonera.setExpandRatio(cancelarButton, 0.0f);
 			}
 		} else {
 			guardarButton.setCaption("Regresar");
@@ -199,19 +176,12 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 							}
 						}
 					});
-					GunixFile iconoF = (GunixFile) iconoFile.getValue();
-					if ((esModificacion && iconoF != null && iconoF.getFile() != null) || !esModificacion) {
-						Files.copy(iconoF.getFile().toPath(), new File(VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/VAADIN/themes/gunix/img/" + aplicacion.getIcono()).toPath(),
-								REPLACE_EXISTING);
-					}
 				}
 				completaTarea();
 			} catch (CommitException ce) {
 				appendNotification(Type.ERROR_MESSAGE, "Existen errores en el formulario");
 				guardarButton.setEnabled(true);
 				guardarButton.setDisableOnClick(true);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
 			}
 		});
 
@@ -339,15 +309,7 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 		appBean.setIcono(aplicacion.getIcono());
 		appBean.setIdAplicacion(aplicacion.getIdAplicacion());
 		appBean.setId(aplicacion.getId());
-
-		if (appBean instanceof AplicacionViewBean) {
-			if (aplicacion instanceof AplicacionViewBean) {
-				((AplicacionViewBean) appBean).setIconoFile(((AplicacionViewBean) aplicacion).getIconoFile());
-			} else {
-				GunixFile gf = new GunixFile(aplicacion.getIcono());
-				((AplicacionViewBean) appBean).setIconoFile(gf);
-			}
-		}
+		appBean.setIcono(aplicacion.getIcono());
 
 		List<Modulo> modulos = new ArrayList<Modulo>();
 		appBean.setModulos(modulos);
@@ -626,25 +588,38 @@ public class AplicacionView extends AbstractGunixView<AplicacionView.AplicacionV
 		flyt.addComponent(descripcion);
 
 		// icono
-		iconoFile = new GunixUploadField();
-		iconoFile.setCaption("Icono");
-		iconoFile.setImmediate(false);
-		iconoFile.setWidth("-1px");
-		iconoFile.setHeight("-1px");
-		iconoFile.setAcceptFilter(".jpe,.jpg,.jpeg,.gif,.png");
-		iconoFile.setRequired(true);
-		flyt.addComponent(iconoFile);
+		icono = new TextField();
+		icono.setCaption("Icono");
+		icono.setImmediate(false);
+		icono.setWidth("-1px");
+		icono.setHeight("-1px");
+		icono.setNullRepresentation("");
+		icono.setInvalidCommitted(false);
+		flyt.addComponent(icono);
 
 		// modulosRolesAcc
 		modulosRolesAcc = buildModulosRolesAcc();
 		flyt.addComponent(modulosRolesAcc);
 
-		// guardarButton
+		// botones
+		botonera = new HorizontalLayout();
+		botonera.setWidth("100%");
+		botonera.setSpacing(true);
+		botonera.setMargin(false);
+		flyt.addComponent(botonera);
+		
+		Label fill = new Label();
+		botonera.addComponent(fill);
+		botonera.setComponentAlignment(fill, Alignment.MIDDLE_LEFT);
+		botonera.setExpandRatio(fill, 1.0f);
+		
 		guardarButton = new Button();
 		guardarButton.setImmediate(true);
 		guardarButton.setWidth("-1px");
 		guardarButton.setHeight("-1px");
-		flyt.addComponent(guardarButton);
+		botonera.addComponent(guardarButton);
+		botonera.setComponentAlignment(guardarButton, Alignment.MIDDLE_RIGHT);
+		botonera.setExpandRatio(guardarButton, 0.0f);
 	}
 
 	private Accordion buildModulosRolesAcc() {

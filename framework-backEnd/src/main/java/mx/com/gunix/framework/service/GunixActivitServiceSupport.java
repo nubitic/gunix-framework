@@ -323,7 +323,7 @@ public class GunixActivitServiceSupport<T extends Serializable> {
 			cambios.setInserciones(new HashMap<String, List<Serializable>>());
 			cambios.getInserciones().put(propertyName, new ArrayList<Serializable>());
 		} else {
-			if (cambios.getEliminaciones().get(propertyName) == null) {
+			if (cambios.getInserciones().get(propertyName) == null) {
 				cambios.getInserciones().put(propertyName, new ArrayList<Serializable>());
 			}
 		}

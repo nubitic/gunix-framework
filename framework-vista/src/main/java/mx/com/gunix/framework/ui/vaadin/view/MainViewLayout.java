@@ -60,6 +60,7 @@ public class MainViewLayout extends VerticalLayout implements PopupView.Content{
 		userId = userIdStrBldr.toString();
 		
 		HorizontalLayout hl = new HorizontalLayout();
+		hl.addStyleName("padding-top-header");
 		hl.setMargin(false);
 		hl.setSpacing(true);
 		hl.setWidth("100%");

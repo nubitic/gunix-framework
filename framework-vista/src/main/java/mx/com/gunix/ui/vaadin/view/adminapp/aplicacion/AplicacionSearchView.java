@@ -14,7 +14,6 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.Table.RowHeaderMode;
 import com.vaadin.ui.TextField;
 
 @GunixVaadinView
@@ -40,7 +39,6 @@ public class AplicacionSearchView extends AbstractGunixView<Aplicacion> {
 			resultadosTable.setVisible(true);
 			aplicaciones.forEach(aplicacion -> {
 				resultadosTable.addItem(new Object[] { aplicacion.getIdAplicacion(), aplicacion.getDescripcion() }, aplicacion);
-				resultadosTable.setItemIcon(aplicacion, new ThemeResource("img/" + aplicacion.getIcono()));
 			});
 		} else {
 			if (esMaestro != null) {
@@ -106,7 +104,6 @@ public class AplicacionSearchView extends AbstractGunixView<Aplicacion> {
 
 		resultadosTable.setColumnExpandRatio("idAplicacion", 0.5f);
 		resultadosTable.setColumnExpandRatio("descripcion", 1f);
-		resultadosTable.setRowHeaderMode(RowHeaderMode.ICON_ONLY);
 		resultadosTable.setPageLength(5);
 
 		resultadosTable.addItemClickListener(itemClickEvnt -> {
