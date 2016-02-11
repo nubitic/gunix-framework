@@ -38,10 +38,7 @@
         urn:org:josso:db:assertionstore http://www.josso.org/schema/josso-db-assertionstore.xsd
         urn:org:josso:memory:assertionstore http://www.josso.org/schema/josso-memory-assertionstore.xsd
         "
-        >
-        
-    <s:bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    
+        >    
     <s:bean class="mx.com.gunix.framework.josso.spring.DataSourceStoreBeansPostProcessor" />
     
 	<s:bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">

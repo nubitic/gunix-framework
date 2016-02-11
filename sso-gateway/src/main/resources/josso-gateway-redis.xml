@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<s:beans xmlns:s="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<s:bean class="mx.com.gunix.framework.josso.redis.clients.jedis.JedisPool" id="jedisConnectionFactory">
+		<s:constructor-arg>
+			<s:bean class="redis.clients.jedis.JedisPoolConfig" />
+		</s:constructor-arg>
+		<s:constructor-arg value="${REDIS_HOST}" />
+		<s:constructor-arg value="${REDIS_PORT}" />
+		<s:constructor-arg value="2000" />
+		<s:constructor-arg value="${REDIS_PASSWORD}" />
+	</s:bean>
+
+	<s:bean class="mx.com.gunix.framework.RedisTemplate" id="redisPasswordManagementProcessTemplate">
+		<s:property name="connectionFactory" ref="jedisConnectionFactory" />
+	</s:bean>
+
+</s:beans>

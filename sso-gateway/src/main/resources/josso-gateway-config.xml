@@ -45,7 +45,6 @@
        xmlns:def-auditmgr="urn:org:josso:default:auditmgr"
        xmlns:logger-atrailhandler="urn:org:josso:logger:audittrailhandler"
        xmlns:def-eventmgr="urn:org:josso:default:eventmgr"
-       xmlns:def-pwdmgr="urn:org:josso:default:passwordmgr"
        xmlns:def-pwdgen="urn:org:josso:default:passwordgenerator"
        xmlns:email-pwddist="urn:org:josso:email:passworddistributor"
        xmlns:simple-lostpwd="urn:org:josso:simple:lostpasswordprocess"
@@ -75,7 +74,6 @@
         urn:org:josso:default:auditmgr http://www.josso.org/schema/josso-default-auditmgr.xsd
         urn:org:josso:logger:audittrailhandler http://www.josso.org/schema/josso-logger-audittrailhandler.xsd
         urn:org:josso:default:eventmgr http://www.josso.org/schema/josso-default-eventmgr.xsd
-        urn:org:josso:default:passwordmgr http://www.josso.org/schema/josso-default-passwordmanager.xsd
         urn:org:josso:default:passwordgenerator http://www.josso.org/schema/josso-default-passwordgenerator.xsd
         urn:org:josso:email:passworddistributor http://www.josso.org/schema/josso-email-passworddistributor.xsd
         urn:org:josso:simple:lostpasswordprocess http://www.josso.org/schema/josso-simple-lostpasswordprocess.xsd">
@@ -108,6 +106,9 @@
 
     <!-- JMX, used internally -->
     <s:import resource="josso-gateway-jmx.xml" />
+    
+    <!-- REDIS, used internally -->
+    <s:import resource="josso-gateway-redis.xml" />
 
     <!-- ================================================================== -->
     <!-- Here we define gateway core structure                              -->
@@ -304,5 +305,12 @@
        	   </s:props>
 		</s:property>
     </s:bean>
+
+	<s:bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<s:property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<s:property name="location">
+			<s:value>josso-redis.properties</s:value>
+		</s:property>
+	</s:bean>
 
 </s:beans>

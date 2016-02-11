@@ -23,7 +23,7 @@
 
 <s:beans xmlns:s="http://www.springframework.org/schema/beans"
        xmlns="urn:org:josso:core"
-       xmlns:def-pwdmgr="urn:org:josso:default:passwordmgr"
+       xmlns:redis-pwdmgr="urn:mx:com:gunix:redis:passwordmgr"
        xmlns:def-pwdgen="urn:org:josso:default:passwordgenerator"
        xmlns:email-pwddist="urn:org:josso:email:passworddistributor"
        xmlns:simple-lostpwd="urn:org:josso:simple:lostpasswordprocess"
@@ -31,7 +31,7 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
         urn:org:josso:core http://www.josso.org/schema/josso-core.xsd
-        urn:org:josso:default:passwordmgr http://www.josso.org/schema/josso-default-passwordmanager.xsd
+        urn:mx:com:gunix:redis:passwordmgr http://gunix.mx/schema/mx-com-gunix-redis-passwordmgr.xsd
         urn:org:josso:default:passwordgenerator http://www.josso.org/schema/josso-default-passwordgenerator.xsd
         urn:org:josso:email:passworddistributor http://www.josso.org/schema/josso-email-passworddistributor.xsd
         urn:org:josso:simple:lostpasswordprocess http://www.josso.org/schema/josso-simple-lostpasswordprocess.xsd
@@ -50,41 +50,45 @@
     <!-- ===================================================================== -->
     <!-- SSO Password Manager                                                  -->
     <!-- ===================================================================== -->
-    <def-pwdmgr:password-manager id="josso-password-manager">
+	<redis-pwdmgr:password-manager id="josso-password-manager">
 
-        <def-pwdmgr:processes>
+		<redis-pwdmgr:password-management-running-processes>
+			<s:ref bean="redisPasswordManagementProcessTemplate" />
+		</redis-pwdmgr:password-management-running-processes>
+		
+		<redis-pwdmgr:processes>
 
-            <lostpassword-process maxTimeToLive="3600000" challeng-id="CORREO_ELECTRONICO" name="josso-simple-lostpassword" xmlns="urn:org:josso:simple:lostpasswordprocess">
+			<redis-pwdmgr:lostpassword-process maxTimeToLive="3600000" challengeId="CORREO_ELECTRONICO" name="josso-simple-lostpassword">
 
-                <idGenerator>
-                    <id-generator xmlns="urn:org:josso:core"/>
-                </idGenerator>
+				<idGenerator>
+					<id-generator xmlns="urn:org:josso:core" />
+				</idGenerator>
 
-                <passwordGenerator>
-                    <s:ref bean="josso-password-generator"/>
-                </passwordGenerator>
+				<passwordGenerator>
+					<s:ref bean="josso-password-generator" />
+				</passwordGenerator>
 
-                <passwordDistributor>
-                    <s:ref bean="josso-password-distributor"/>
-                </passwordDistributor>
+				<passwordDistributor>
+					<s:ref bean="josso-password-distributor" />
+				</passwordDistributor>
 
-                <credentialProvider>
-                    <s:ref bean="josso-basic-authentication"/>
-                </credentialProvider>
+				<credentialProvider>
+					<s:ref bean="josso-basic-authentication" />
+				</credentialProvider>
 
-                <identityManager>
-                    <s:ref bean="josso-identity-manager"/>
-                </identityManager>
+				<identityManager>
+					<s:ref bean="josso-identity-manager" />
+				</identityManager>
 
-            </lostpassword-process>
+			</redis-pwdmgr:lostpassword-process>
 
-        </def-pwdmgr:processes>
+		</redis-pwdmgr:processes>
 
-        <def-pwdmgr:process-id-generator>
-            <id-generator/>
-        </def-pwdmgr:process-id-generator>
+		<redis-pwdmgr:process-id-generator>
+			<id-generator />
+		</redis-pwdmgr:process-id-generator>
 
-    </def-pwdmgr:password-manager>
+	</redis-pwdmgr:password-manager>
 
 
     <!-- ===================================================================== -->
