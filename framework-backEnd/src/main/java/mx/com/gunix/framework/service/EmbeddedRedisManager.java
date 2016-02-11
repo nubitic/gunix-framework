@@ -71,6 +71,8 @@ public final class EmbeddedRedisManager {
 		try {
 			List<String> cmd = new ArrayList<String>();
 			cmd.add(getCommandPath(redisHomeFile, "redis-server"));
+			cmd.add("--timeout");
+			cmd.add("120");
 
 			ProcessBuilder processBuilder = new ProcessBuilder(cmd);
 			processBuilder.redirectErrorStream(true);
