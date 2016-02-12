@@ -27,6 +27,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.form.TaskFormData;
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
@@ -107,7 +108,6 @@ public class ActivitiServiceImp implements ActivitiService {
 
 		if (tarea.getInstancia().getTareaActual().isTerminal()) {
 			ts.complete(tarea.getInstancia().getTareaActual().getId());
-			hs.deleteHistoricProcessInstance(tarea.getInstancia().getId());
 		}
 
 		return tarea.getInstancia();
@@ -183,8 +183,31 @@ public class ActivitiServiceImp implements ActivitiService {
 	
 	@Override
 	public Serializable getVar(Instancia instancia, String varName) {
-		Serializable ser = rs.getVariable(instancia.getId(), varName, Serializable.class);
-		return ser == null && instancia.getTareaActual() != null ? getVar(instancia.getTareaActual(), varName) : ser;
+		if (instancia.getTareaActual() == null) {
+			throw new IllegalArgumentException("La tarea actual no debe ser null");
+		}
+		Serializable ser = null;
+		if (!instancia.getTareaActual().isTerminal()) {
+			ser = rs.getVariable(instancia.getId(), varName, Serializable.class);
+			ser = (ser == null ? getVar(instancia.getTareaActual(), varName) : ser);
+		} else {
+			List<HistoricVariableInstance> hvis = hs.createHistoricVariableInstanceQuery().processInstanceId(instancia.getId()).excludeTaskVariables().variableName(varName).list();
+			if (hvis != null && !hvis.isEmpty()) {
+				ser = (Serializable) hvis.get(0).getValue();
+			} else {
+				ser = (ser == null ? getHistVar(instancia.getTareaActual(), varName) : ser);
+			}
+		}
+		return ser;
+	}
+
+	private Serializable getHistVar(Tarea tarea, String varName) {
+		Serializable ser = null;
+		List<HistoricVariableInstance> hvis = hs.createHistoricVariableInstanceQuery().processInstanceId(tarea.getInstancia().getId()).taskId(tarea.getId()).variableName(varName).list();
+		if (hvis != null && !hvis.isEmpty()) {
+			ser = (Serializable) hvis.get(0).getValue();
+		}
+		return ser;
 	}
 
 	private Serializable getVar(Tarea tarea, String varName) {
