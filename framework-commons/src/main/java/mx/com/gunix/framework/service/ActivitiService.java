@@ -1,5 +1,6 @@
 package mx.com.gunix.framework.service;
 
+import java.io.Serializable;
 import java.util.List;
 
 import mx.com.gunix.framework.processes.domain.Instancia;
@@ -20,4 +21,6 @@ public interface ActivitiService {
 	public List<ProgressUpdate> getRecentProgressUpdates(String processId);
 
 	public void addProgressUpdate(String processId, ProgressUpdate pu);
+
+	public Serializable getVar(Instancia instancia, String varName);
 }

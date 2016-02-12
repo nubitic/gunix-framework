@@ -17,7 +17,6 @@ import mx.com.gunix.framework.processes.domain.Instancia;
 import mx.com.gunix.framework.processes.domain.ProgressUpdate;
 import mx.com.gunix.framework.processes.domain.Tarea;
 import mx.com.gunix.framework.processes.domain.Variable;
-import mx.com.gunix.framework.processes.domain.Variable.Scope;
 import mx.com.gunix.framework.security.domain.Usuario;
 
 import org.activiti.engine.FormService;
@@ -104,8 +103,6 @@ public class ActivitiServiceImp implements ActivitiService {
 			tarea.getInstancia().setTareaActual(Tarea.DEFAULT_END_TASK);
 		} else {
 			tarea.getInstancia().getTareaActual().setInstancia(tarea.getInstancia());
-			refreshVars(tarea.getInstancia().getTareaActual());
-			refreshVars(tarea.getInstancia());
 		}
 
 		if (tarea.getInstancia().getTareaActual().isTerminal()) {
@@ -175,7 +172,6 @@ public class ActivitiServiceImp implements ActivitiService {
 				Tarea currTask = getCurrentTask(pi.getId());
 				currTask.setInstancia(instancia);
 				instancia.setTareaActual(currTask);
-				refreshVars(instancia);
 			} else {
 				instancia.setTareaActual(Tarea.DEFAULT_END_TASK);
 			}
@@ -184,30 +180,15 @@ public class ActivitiServiceImp implements ActivitiService {
 		}
 		return instancia;
 	}
-
-	private void refreshVars(Instancia instancia) {
-		instancia.setVariables(new ArrayList<Variable<?>>());
-		Map<String, Object> vars = rs.getVariables(instancia.getId());
-		doStoreVariables(vars, instancia.getVariables(), Scope.PROCESO);
+	
+	@Override
+	public Serializable getVar(Instancia instancia, String varName) {
+		Serializable ser = rs.getVariable(instancia.getId(), varName, Serializable.class);
+		return ser == null && instancia.getTareaActual() != null ? getVar(instancia.getTareaActual(), varName) : ser;
 	}
 
-	private void doStoreVariables(Map<String, Object> vars, List<Variable<?>> variables, Scope scope) {
-		vars.keySet().stream().forEach(key -> {
-			Object valor = vars.get(key);
-			Variable<Serializable> var = new Variable<Serializable>();
-			var.setNombre(key);
-			if (valor != null) {
-				var.setValor((Serializable) valor);
-			}
-			var.setScope(scope);
-			variables.add(var);
-		});
-	}
-
-	private void refreshVars(Tarea tarea) {
-		tarea.setVariables(new ArrayList<Variable<?>>());
-		Map<String, Object> vars = ts.getVariablesLocal(tarea.getId());
-		doStoreVariables(vars, tarea.getVariables(), Scope.TAREA);
+	private Serializable getVar(Tarea tarea, String varName) {
+		return ts.getVariableLocal(tarea.getId(), varName, Serializable.class);
 	}
 
 	private Tarea getCurrentTask(String piid) {

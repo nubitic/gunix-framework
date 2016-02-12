@@ -10,6 +10,8 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCsvCellProcessorException;
@@ -19,15 +21,20 @@ import org.supercsv.prefs.CsvPreference;
 import org.supercsv.util.CsvContext;
 
 public abstract class CSVBeanImporter<T extends Serializable> {
+	private final String[] requiredHeader;
 	private final String[] fieldMappings;
 	private final CellProcessor[] processors;
+	private final String requiredHeadersString;
 	private final Class<T> clazz;
 
 	@SuppressWarnings("unchecked")
-	public CSVBeanImporter(String[] fieldMappings, CellProcessor[] processors) {
-		this.fieldMappings = fieldMappings;
+	public CSVBeanImporter(LinkedHashMap<String, String> fieldMappings, CellProcessor[] processors) {
 		this.processors = processors;
 
+		requiredHeader = fieldMappings.keySet().toArray(new String[] {});
+		this.fieldMappings = fieldMappings.values().toArray(new String[] {});
+		requiredHeadersString = Arrays.deepToString(requiredHeader);
+		
 		Type genSuperType = getClass().getGenericSuperclass();
 		if (genSuperType instanceof ParameterizedType) {
 			Type[] typeArguments = ((ParameterizedType) genSuperType).getActualTypeArguments();
@@ -59,22 +66,27 @@ public abstract class CSVBeanImporter<T extends Serializable> {
 		try {		    
 			beanReader = new CsvDozerBeanReader(csvSource, CsvPreference.STANDARD_PREFERENCE);
 
-			String[] header = beanReader.getHeader(true); // ignore the header
-			beanReader.configureBeanMapping(clazz, fieldMappings);
-			
-			T t = null;
-			do {
-				try {
-					t = beanReader.read(clazz, processors);
-					if (t != null) {
-						processor.process(t,beanReader.getLineNumber());
-					} else {
-						break;
+			String[] header = beanReader.getHeader(true); 
+			 
+			if (Arrays.equals(header, requiredHeader)) {
+				beanReader.configureBeanMapping(clazz, fieldMappings);
+				
+				T t = null;
+				do {
+					try {
+						t = beanReader.read(clazz, processors);
+						if (t != null) {
+							processor.process(t,beanReader.getLineNumber());
+						} else {
+							break;
+						}
+					} catch (SuperCsvCellProcessorException errorInfo) {
+						errorProcessor.error(header, errorInfo.getCsvContext(), errorInfo.getMessage());
 					}
-				} catch (SuperCsvCellProcessorException errorInfo) {
-					errorProcessor.error(header, errorInfo.getCsvContext(), errorInfo.getMessage());
-				}
-			} while (true);
+				} while (true);				
+			}else {
+				errorProcessor.error(header, new CsvContext(1, 0, 1), String.format("El encabezado del archivo es incorrecto, debe ser: %s", requiredHeadersString));
+			}
 		} catch (IOException exc) {
 		} finally {
 			if (beanReader != null) {

@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -49,6 +48,22 @@ import com.vaadin.ui.VerticalLayout;
 public abstract class AbstractGunixView<S extends Serializable> extends VerticalLayout implements View {
 	private static final ThreadLocal<Map<Notification.Type, Set<String>>> notificacionesMap = new ThreadLocal<Map<Notification.Type, Set<String>>>();
 	private Class<S> clazz;
+	private Map<String, Serializable> varCache = new HashMap<String, Serializable>();
+	private static final long serialVersionUID = 1L;
+	
+	private static final Serializable NULL_OBJECT = new Serializable() {private static final long serialVersionUID = 1L;};
+	
+	TareaActualNavigator taNav;
+	private Tarea tarea;
+	
+	@Autowired
+	@Lazy
+	ApplicationContext applicationContext;
+
+	@Autowired
+	@Lazy
+	ActivitiService as;
+	
 	public static void appendNotification(Notification.Type type, String notificacion) {
 		Map<Notification.Type, Set<String>> notificaciones = notificacionesMap.get();
 		if (notificaciones == null) {
@@ -97,18 +112,6 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 			fieldGroup.bindMemberFields(this);
 		}
 	}
-
-	private static final long serialVersionUID = 1L;
-	@Autowired
-	@Lazy
-	ApplicationContext applicationContext;
-
-	@Autowired
-	@Lazy
-	ActivitiService as;
-
-	TareaActualNavigator taNav;
-	private Tarea tarea;
 
 	@PostConstruct
 	private void postConstruct() {
@@ -174,8 +177,20 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	}
 
 	protected final Serializable $(String nombreVariable) {
-		Optional<Variable<?>> valor = tarea.getInstancia().getVariables().stream().filter(var -> var.getNombre().equals(nombreVariable)).findFirst();
-		return valor.isPresent() ? valor.get().getValor() : null;
+		Serializable s = varCache.get(nombreVariable);
+		if (s == null) {
+			s = as.getVar(tarea.getInstancia(), nombreVariable);
+			if (s == null) {
+				varCache.put(nombreVariable, NULL_OBJECT);
+			} else {
+				varCache.put(nombreVariable, s);
+			}
+		} else {
+			if (s == NULL_OBJECT) {
+				s = null;
+			}
+		}
+		return s;
 	}
 
 	protected final S getBean() {
@@ -226,13 +241,17 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected boolean valida(Table tabla) {
+	protected boolean valida(Table tabla, boolean vacioEsError) {
 		Map<String, Boolean> hayErroresHolder = new HashMap<String, Boolean>();
 		if (tabla.getContainerDataSource() == null || !(tabla.getContainerDataSource() instanceof BeanContainer)) {
 			throw new IllegalArgumentException("Se requiere que el ContainerDataSource de la tabla sea de tipo BeanContainer");
 		}
 		tabla.setComponentError(null);
 		BeanContainer<Object, S> beanContainer = (BeanContainer<Object, S>) tabla.getContainerDataSource();
+		if (vacioEsError && beanContainer.size() == 0) {
+			hayErroresHolder.put("hayErrores", true);
+			tabla.setComponentError(new UserError("La tabla debe contener al menos un registro"));
+		}
 		Map<Field, Property> prevPropDS = new HashMap<Field, Property>();
 		GunixBeanFieldGroup bfgf = new GunixBeanFieldGroup<S>(clazz);
 

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.vaadin.data.Container;
+import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
@@ -27,6 +28,9 @@ public class GunixTableFieldFactory extends DefaultFieldFactory {
 		if(field==null) {
 			field = super.createField(container, itemId, propertyId, uiContext);
 			previouslyCreatedFieldsMap.put(fieldId, field);
+		}
+		if (field instanceof AbstractTextField) {
+			((AbstractTextField) field).setNullRepresentation("");
 		}
 		return field;
 	}
