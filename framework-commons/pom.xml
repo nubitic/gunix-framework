@@ -29,6 +29,14 @@
 				<updatePolicy>always</updatePolicy>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>xelem-mvn-repo</id>
+			<url>https://raw.github.com/loloq123/xelem/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
@@ -81,8 +89,13 @@
 				<exclusion>
 					<groupId>org.apache.commons</groupId>
 					<artifactId>commons-lang3</artifactId>
-				</exclusion>				
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>nl.fountain.xelem</groupId>
+			<artifactId>xelem</artifactId>
+			<version>3.1</version>
 		</dependency>
 	</dependencies>
 	<distributionManagement>
