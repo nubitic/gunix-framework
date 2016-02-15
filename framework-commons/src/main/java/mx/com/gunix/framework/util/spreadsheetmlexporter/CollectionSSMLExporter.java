@@ -9,6 +9,7 @@ import java.util.List;
 
 import mx.com.gunix.framework.util.SpreadsheetMLExporter;
 
+import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.InvalidPropertyException;
 
@@ -20,9 +21,8 @@ public class CollectionSSMLExporter<T extends List<S>, S extends Serializable> i
 	private String[] columnPaths;
 	private int[] columnTypes;
 	private int columnCount;
-	private BeanWrapperImpl bwi;
+	private PropertyUtilsBean pub;
 	private static final List<Class<?>> primitiveNumbers = Arrays.asList(new Class<?>[] { int.class, float.class, double.class, short.class, byte.class, long.class });
-	private static final Object[] emptyArgs = new Object[] {};
 
 	public CollectionSSMLExporter(T datos, Class<S> clase, LinkedHashMap<String, String> columnMapping) {
 		if (datos == null || datos.isEmpty()) {
@@ -35,7 +35,8 @@ public class CollectionSSMLExporter<T extends List<S>, S extends Serializable> i
 		columnCount = columnNames.length;
 		columnTypes = new int[columnCount];
 
-		bwi = new BeanWrapperImpl(clase);
+		BeanWrapperImpl bwi = new BeanWrapperImpl(clase);
+		bwi.setAutoGrowNestedPaths(true);
 		for (int i = 0; i < columnPaths.length; i++) {
 			Class<?> fieldType = bwi.getPropertyDescriptor(columnPaths[i]).getPropertyType();
 			if (Number.class.isAssignableFrom(fieldType) || primitiveNumbers.contains(fieldType)) {
@@ -44,6 +45,7 @@ public class CollectionSSMLExporter<T extends List<S>, S extends Serializable> i
 				columnTypes[i] = MetaDatos.TEXTO;
 			}
 		}
+		pub = new PropertyUtilsBean();
 	}
 
 	@Override
@@ -60,9 +62,9 @@ public class CollectionSSMLExporter<T extends List<S>, S extends Serializable> i
 	public Double getDouble(int indiceColumna) {
 		try {
 			indiceColumna--;
-			Number n = (Number) bwi.getPropertyDescriptor(columnPaths[indiceColumna]).getReadMethod().invoke(datos.get(processedIndex), emptyArgs);
+			Number n = (Number) pub.getProperty(datos.get(processedIndex), columnPaths[indiceColumna]);
 			return n != null ? n.doubleValue() : null;
-		} catch (InvalidPropertyException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+		} catch (NoSuchMethodException | InvalidPropertyException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new RuntimeException("No fue posible leer la propiedad " + columnPaths[indiceColumna], e);
 		}
 	}
@@ -71,9 +73,9 @@ public class CollectionSSMLExporter<T extends List<S>, S extends Serializable> i
 	public String getString(int indiceColumna) {
 		try {
 			indiceColumna--;
-			Object o = bwi.getPropertyDescriptor(columnPaths[indiceColumna]).getReadMethod().invoke(datos.get(processedIndex), emptyArgs);
+			Object o = pub.getProperty(datos.get(processedIndex), columnPaths[indiceColumna]);
 			return o != null ? o.toString() : null;
-		} catch (InvalidPropertyException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+		} catch (NoSuchMethodException | InvalidPropertyException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new RuntimeException("No fue posible leer la propiedad " + columnPaths[indiceColumna], e);
 		}
 	}
