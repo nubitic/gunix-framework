@@ -3,8 +3,6 @@ package mx.com.gunix.framework.util.spreadsheetmlexporter;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,8 +24,7 @@ public class CollectionSSMLExporter<T extends List<S>, S extends Serializable> i
 	private static final List<Class<?>> primitiveNumbers = Arrays.asList(new Class<?>[] { int.class, float.class, double.class, short.class, byte.class, long.class });
 	private static final Object[] emptyArgs = new Object[] {};
 
-	@SuppressWarnings("unchecked")
-	public CollectionSSMLExporter(T datos, LinkedHashMap<String, String> columnMapping) {
+	public CollectionSSMLExporter(T datos, Class<S> clase, LinkedHashMap<String, String> columnMapping) {
 		if (datos == null || datos.isEmpty()) {
 			throw new IllegalArgumentException("Debe haber datos para exportar...");
 		}
@@ -38,20 +35,13 @@ public class CollectionSSMLExporter<T extends List<S>, S extends Serializable> i
 		columnCount = columnNames.length;
 		columnTypes = new int[columnCount];
 
-		Type genSuperType = getClass().getGenericSuperclass();
-		if (genSuperType instanceof ParameterizedType) {
-			Type[] typeArguments = ((ParameterizedType) genSuperType).getActualTypeArguments();
-			if (typeArguments.length == 2) {
-				Class<S> modelClass = ((Class<S>) typeArguments[1]);
-				bwi = new BeanWrapperImpl(modelClass);
-				for (int i = 0; i < columnPaths.length; i++) {
-					Class<?> fieldType = bwi.getPropertyDescriptor(columnPaths[i]).getPropertyType();
-					if (Number.class.isAssignableFrom(fieldType) || primitiveNumbers.contains(fieldType)) {
-						columnTypes[i] = MetaDatos.NUMERICO;
-					} else {
-						columnTypes[i] = MetaDatos.TEXTO;
-					}
-				}
+		bwi = new BeanWrapperImpl(clase);
+		for (int i = 0; i < columnPaths.length; i++) {
+			Class<?> fieldType = bwi.getPropertyDescriptor(columnPaths[i]).getPropertyType();
+			if (Number.class.isAssignableFrom(fieldType) || primitiveNumbers.contains(fieldType)) {
+				columnTypes[i] = MetaDatos.NUMERICO;
+			} else {
+				columnTypes[i] = MetaDatos.TEXTO;
 			}
 		}
 	}
