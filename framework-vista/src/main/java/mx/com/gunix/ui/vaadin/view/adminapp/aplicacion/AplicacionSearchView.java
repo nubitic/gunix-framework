@@ -31,7 +31,7 @@ public class AplicacionSearchView extends AbstractGunixView<Aplicacion> {
 	@Override
 	protected void doEnter(ViewChangeEvent event) {
 		buscaButton.setEnabled(true);
-
+		
 		List<Aplicacion> aplicaciones = (List<Aplicacion>) $("resultado");
 		resultadosTable.removeAllItems();
 
@@ -113,6 +113,9 @@ public class AplicacionSearchView extends AbstractGunixView<Aplicacion> {
 		});
 
 		flyt.addComponent(resultadosTable);
+		
+		camposVaciosSonValidos();
+		initBean((Aplicacion)$("aplicacion"));
 	}
 
 	@Override

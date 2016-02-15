@@ -110,6 +110,8 @@ public class UsuarioSearchView extends AbstractGunixView<Usuario> {
 		});
 
 		flyt.addComponent(resultadosTable);
+		camposVaciosSonValidos();
+		initBean((Usuario)$("usuario"));
 	}
 
 	@Override

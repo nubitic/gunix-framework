@@ -25,6 +25,7 @@ import mx.com.gunix.framework.util.ActivitiGunixFile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
@@ -146,7 +147,19 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 			}
 		}
 	}
-
+	
+	protected final void camposVaciosSonValidos() {
+		if (fieldGroup != null) {
+			fieldGroup.setRequiredEnabled(false);
+		}
+	}
+	
+	protected void initBean(S fuente) {
+		if (fuente != null) {
+			BeanUtils.copyProperties(fuente, getBean());
+		}
+	}
+	
 	protected final void completaTarea() {
 		tarea.setVariables(getVariablesTarea());
 		tarea.setComentario(getComentarioTarea());

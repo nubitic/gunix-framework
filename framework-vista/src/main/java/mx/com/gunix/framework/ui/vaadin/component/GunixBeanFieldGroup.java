@@ -1,12 +1,18 @@
 package mx.com.gunix.framework.ui.vaadin.component;
 
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
 
@@ -14,10 +20,10 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.util.NestingBeanItem;
+import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.ui.Field;
 
 public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
-
 	public interface OnBeanValidationErrorCallback<BT> {
 		void callback(ConstraintViolation<BT> cv);
 	}
@@ -26,10 +32,13 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 	private static ValidatorFactory factory;
 	private transient javax.validation.Validator javaxBeanValidator;
 	private Class<BT> beanType;
+	private final Map<Field<?>, BeanValidator> defaultValidators;
+	private boolean requiredEnabled = true;
 
 	public GunixBeanFieldGroup(Class<BT> beanType) {
 		super(beanType);
 		this.beanType = beanType;
+		this.defaultValidators = new HashMap<Field<?>, BeanValidator>();
 		if (!isBeanValidationImplementationAvailable()) {
 			throw new IllegalStateException("No se encontró una implementación de JSR-303 bean validation");
 		}
@@ -84,11 +93,84 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 	}
 
 	@Override
+	public void unbind(Field<?> field) throws BindException {
+		super.unbind(field);
+
+		BeanValidator removed = defaultValidators.remove(field);
+		if (removed != null) {
+			field.removeValidator(removed);
+		}
+	}
+
+	@Override
+	protected void configureField(Field<?> field) {
+		field.setBuffered(isBuffered());
+
+		field.setEnabled(isEnabled());
+
+		if (field.getPropertyDataSource().isReadOnly()) {
+			field.setReadOnly(true);
+		} else {
+			field.setReadOnly(isReadOnly());
+		}
+		// Add Bean validators if there are annotations
+		if (isBeanValidationImplementationAvailable() && !defaultValidators.containsKey(field)) {
+			GunixBeanValidator validator = new GunixBeanValidator(beanType, getPropertyId(field).toString());
+			field.addValidator(validator);
+			if (field.getLocale() != null) {
+				validator.setLocale(field.getLocale());
+			}
+			defaultValidators.put(field, validator);
+		}
+	}
+
+	@Override
 	public void setItemDataSource(BT bean) {
 		if (bean == null) {
 			setItemDataSource((Item) null);
 		} else {
 			setItemDataSource(new NestingBeanItem<BT>(bean, beanType));
+		}
+	}
+	public boolean isRequiredEnabled() {
+		return requiredEnabled;
+	}
+
+	public void setRequiredEnabled(boolean requiredEnabled) {
+		this.requiredEnabled = requiredEnabled;
+	}
+	private class GunixBeanValidator extends BeanValidator {
+		private static final long serialVersionUID = 1L;
+		private String propertyName;
+		private Locale locale;
+
+		public GunixBeanValidator(Class<BT> beanClass, String propertyName) {
+			super(beanType, propertyName);
+			this.propertyName = propertyName;
+			locale = Locale.getDefault();
+		}
+
+		@Override
+		public void validate(Object value) throws InvalidValueException {
+			Set<ConstraintViolation<BT>> violations = getJavaxBeanValidator().validateValue(beanType, propertyName, value);
+			if (violations.size() > 0) {
+				List<InvalidValueException> causes = new ArrayList<InvalidValueException>();
+				for (ConstraintViolation<BT> v : violations) {
+					if (!requiredEnabled && v.getConstraintDescriptor().getAnnotation() != null) {
+						Annotation annotation = v.getConstraintDescriptor().getAnnotation();
+						if (annotation.annotationType() == NotNull.class || annotation.annotationType() == Size.class) {
+							continue;
+						}
+					}
+
+					final ConstraintViolation<?> violation = (ConstraintViolation<?>) v;
+					String msg = getJavaxBeanValidatorFactory().getMessageInterpolator().interpolate(violation.getMessageTemplate(), new SimpleContext(value, violation.getConstraintDescriptor()), locale);
+					causes.add(new InvalidValueException(msg));
+				}
+				if (!causes.isEmpty()) {
+					throw new InvalidValueException(null, causes.toArray(new InvalidValueException[] {}));
+				}
+			}
 		}
 	}
 }
