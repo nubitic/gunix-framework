@@ -256,6 +256,7 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected boolean valida(Table tabla, boolean vacioEsError) {
 		Map<String, Boolean> hayErroresHolder = new HashMap<String, Boolean>();
+		hayErroresHolder.put("hayErrores", false);
 		if (tabla.getContainerDataSource() == null || !(tabla.getContainerDataSource() instanceof BeanContainer)) {
 			throw new IllegalArgumentException("Se requiere que el ContainerDataSource de la tabla sea de tipo BeanContainer");
 		}
@@ -288,7 +289,6 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 				bfgf.commit(ibve -> {
 					tabla.setComponentError(new UserError(ibve.getMessage()));
 				});
-				hayErroresHolder.put("hayErrores", false);
 			} catch (CommitException e) {
 				hayErroresHolder.put("hayErrores", true);
 				for (Field<?> f : e.getInvalidFields().keySet()) {
@@ -303,6 +303,9 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 				prevPropDS.clear();
 			}
 		});
+		if(hayErroresHolder.get("hayErrores")) {
+			tabla.setComponentError(new UserError("La tabla tiene errores"));
+		}
 		return hayErroresHolder.get("hayErrores");
 	}
 	
