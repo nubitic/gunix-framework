@@ -93,9 +93,9 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>nl.fountain.xelem</groupId>
+			<groupId>mx.com.gunix</groupId>
 			<artifactId>xelem</artifactId>
-			<version>3.1</version>
+			<version>1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-beanutils</groupId>

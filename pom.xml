@@ -12,6 +12,7 @@
 		<module>framework-backEnd</module>
 		<module>archetype</module>
 		<module>sso-gateway</module>
+		<module>xelem</module>
 	</modules>
 
 	<properties>
