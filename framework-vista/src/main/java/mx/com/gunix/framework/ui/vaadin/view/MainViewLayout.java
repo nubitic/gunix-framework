@@ -186,9 +186,9 @@ public class MainViewLayout extends VerticalLayout{
 					break;
 				}
 			}
-		}, "Generando Archivo...")).setExpandRatio(0);
+		}, "Generando Archivo..."));
 		downloadsManager.setHeightMode(HeightMode.ROW);
-		downloadsManager.setWidth("800px");
+		downloadsManager.setWidth("750px");
 		downloadsManager.setHeightByRows(5.0);
 		
 		userDetailsLayout = new VerticalLayout();
@@ -222,7 +222,7 @@ public class MainViewLayout extends VerticalLayout{
 		downloadProps.downloadButton = botonDescarga;
 		mvl.registeredDownloads.put(botonDescarga.getId(), downloadProps);
 		mvl.downloads.setVisible(true);
-		Notification.show("Exportación de archivo " + nombreArchivo + " EN PROGRESO", Notification.Type.TRAY_NOTIFICATION);
+		mvl.showDownloads();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -233,7 +233,7 @@ public class MainViewLayout extends VerticalLayout{
 		if (downloadProps != null) {
 			Double progreso = procesados.doubleValue() / downloadProps.size.doubleValue();
 			downloadProps.progreso = progreso;
-			if (progreso >= 1.0 || procesados % 1000 == 0) {
+			if (progreso >= 1.0 || procesados % 5000 == 0) {
 				UI.getCurrent().access(() -> {
 					Indexed descargas = mvl.downloadsManager.getContainerDataSource();
 					if (descargas.getItem(downloadProps.id) != null) {
@@ -241,7 +241,6 @@ public class MainViewLayout extends VerticalLayout{
 							String fileName = (String) descargas.getItem(downloadProps.id).getItemProperty("Archivo").getValue();
 							mvl.downloadsManager.getContainerDataSource().getItem(downloadProps.id).getItemProperty("").setValue("Descargar");
 							mvl.downloadsManager.getContainerDataSource().getItem(downloadProps.id).getItemProperty("Progreso").setValue(progreso);
-							mvl.showDownloads();
 							Notification.show("Exportación de archivo " + fileName + " TERMINADA", Notification.Type.TRAY_NOTIFICATION);
 					} else {
 						mvl.downloadsManager.getContainerDataSource().getItem(downloadProps.id).getItemProperty("Progreso").setValue(progreso);
