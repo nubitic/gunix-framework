@@ -29,14 +29,6 @@
 				<updatePolicy>always</updatePolicy>
 			</snapshots>
 		</repository>
-		<repository>
-			<id>xelem-mvn-repo</id>
-			<url>https://raw.github.com/loloq123/xelem/mvn-repo/</url>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-			</snapshots>
-		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
@@ -91,11 +83,6 @@
 					<artifactId>commons-lang3</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>mx.com.gunix</groupId>
-			<artifactId>xelem</artifactId>
-			<version>1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-beanutils</groupId>

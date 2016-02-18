@@ -10,12 +10,13 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import mx.com.gunix.framework.ui.vaadin.view.MainViewLayout;
 import mx.com.gunix.framework.util.spreadsheetmlexporter.CollectionSSMLExporter;
+import mx.com.gunix.framework.util.spreadsheetmlexporter.Progreso;
 
 import com.vaadin.server.Extension;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
-import com.vaadin.server.Page;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CustomComponent;
@@ -48,34 +49,22 @@ public class GunixData2ExcelFileDownloader<T extends List<S>, S extends Serializ
 		this.clase = clase;
 
 		downloadVisibleButton = new Button(caption);
-		root.addComponent(downloadVisibleButton);
-		downloadInvisibleButtonId = new StringBuilder(fileName).append(System.currentTimeMillis()).toString();
-		downloadInvisibleButton = new Button();
-		downloadInvisibleButton.setId(downloadInvisibleButtonId);
-		downloadInvisibleButton.addStyleName("invisibleDownloadButton");
-		root.addComponent(downloadInvisibleButton);
-
 		if (datos != null && mapping != null) {
 			downloadVisibleButton.addClickListener(clickEvent -> {
 				doDownload(datos, mapping);
 			});
 		}
+		root.addComponent(downloadVisibleButton);
 	}
 
 	public void doDownload(T datos, LinkedHashMap<String, String> mapping) {
 		try {
+			String finalFileName = new StringBuilder(timeStampFormatter.format(new Date())).append(fileName).append(".zip").toString();
+			downloadInvisibleButtonId = new StringBuilder(fileName).append(System.currentTimeMillis()).toString();
+			downloadInvisibleButton = new Button();
+			downloadInvisibleButton.setId(downloadInvisibleButtonId);
+			downloadInvisibleButton.addStyleName("invisibleDownloadButton");
 			File tempExportFile = File.createTempFile("exportaExcel", "tmp");
-			CollectionSSMLExporter<T, S> cssmle = new CollectionSSMLExporter<T, S>(datos, clase, mapping);
-			cssmle.exporta(fileName, new FileOutputStream(tempExportFile));
-			FileDownloader fileDownloader = new FileDownloader(new FileResource(tempExportFile) {
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public String getFilename() {
-					return new StringBuilder(timeStampFormatter.format(new Date())).append(fileName).append(".zip").toString();
-				}
-
-			});
 			if (downloadInvisibleButton.getExtensions() != null) {
 				Extension ext = null;
 				Iterator<Extension> extIt = downloadInvisibleButton.getExtensions().iterator();
@@ -87,8 +76,44 @@ public class GunixData2ExcelFileDownloader<T extends List<S>, S extends Serializ
 					downloadInvisibleButton.removeExtension(ext);
 				}
 			}
+			FileDownloader fileDownloader = new FileDownloader(new FileResource(tempExportFile) {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public String getFilename() {
+					return finalFileName;
+				}
+
+			});
 			fileDownloader.extend(downloadInvisibleButton);
-			Page.getCurrent().getJavaScript().execute(new StringBuilder("document.getElementById('").append(downloadInvisibleButtonId).append("').click();").toString());
+			MainViewLayout.registraExportacion(downloadInvisibleButton, finalFileName, datos.size());
+			new Thread(() -> {
+				CollectionSSMLExporter<T, S> cssmle = new CollectionSSMLExporter<T, S>(datos, clase, mapping);
+				final Integer datosSize = datos.size();
+				try {
+					cssmle.exporta(fileName, new FileOutputStream(tempExportFile), new Progreso() {
+
+						@Override
+						public void despliegaMensaje(String string) {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void registrosProcesados(int conTotal) {
+							MainViewLayout.actualizaProgresoExportacion(downloadInvisibleButtonId, (int) (conTotal*0.9));	
+						}
+
+						@Override
+						public void terminarProceso(Estatus error) {
+							MainViewLayout.actualizaProgresoExportacion(downloadInvisibleButtonId, datosSize);
+						}
+						
+					});
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}).start();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

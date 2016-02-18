@@ -12979,3 +12979,8 @@ div.v-layout.v-horizontal.v-widget {
 .gunix .padding-top-header {
 	margin-top: 5px;
 }
+
+.gunix .descargas-button {
+	padding: 0px;
+	font-weight: bold;
+}

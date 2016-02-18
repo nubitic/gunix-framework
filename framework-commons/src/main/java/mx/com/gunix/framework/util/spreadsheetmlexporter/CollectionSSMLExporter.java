@@ -125,4 +125,8 @@ public class CollectionSSMLExporter<T extends List<S>, S extends Serializable> i
 			}
 		});
 	}
+	
+	public void exporta(String nombreArcchivoExcel, OutputStream salida, Progreso progreso) {
+		SpreadsheetMLExporter.exportaArchivo(nombreArcchivoExcel, salida, this, progreso);
+	}
 }
