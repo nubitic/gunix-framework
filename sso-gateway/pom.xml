@@ -12,7 +12,8 @@
 	Franklin St, Fifth Floor, Boston, MA ~ 02110-1301 USA, or see the FSF site: 
 	http://www.fsf.org. ~ -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<groupId>mx.com.gunix</groupId>
 		<artifactId>gunix</artifactId>
@@ -280,6 +281,12 @@
 			<groupId>org.josso</groupId>
 			<artifactId>josso-email-passworddistributor</artifactId>
 			<version>${josso.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-collections</groupId>
+					<artifactId>commons-collections</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.josso</groupId>
@@ -287,8 +294,12 @@
 			<version>${josso.version}</version>
 		</dependency>
 
-
 		<!-- 3rd party dependencies -->
+
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>commons-discovery</groupId>
@@ -354,7 +365,6 @@
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
-			<version>2.8.0</version>
 		</dependency>
 	</dependencies>
 
@@ -486,7 +496,8 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
