@@ -16,6 +16,7 @@ import mx.com.gunix.framework.processes.domain.Instancia;
 import mx.com.gunix.framework.processes.domain.Tarea;
 import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.service.ActivitiService;
+import mx.com.gunix.framework.service.GetterService;
 import mx.com.gunix.framework.ui.GunixFile;
 import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup;
 import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup.OnBeanValidationErrorCallback;
@@ -64,6 +65,10 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	@Autowired
 	@Lazy
 	ActivitiService as;
+	
+	@Autowired
+	@Lazy
+	GetterService gs;
 	
 	public static void appendNotification(Notification.Type type, String notificacion) {
 		Map<Notification.Type, Set<String>> notificaciones = notificacionesMap.get();
@@ -315,6 +320,10 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		GunixFile gf = (GunixFile) uploadField.getValue();
 		fileVar.setValor(new ActivitiGunixFile(nombreVariable, gf.getFileName(), gf.getMimeType(), gf.getFile()));
 		return fileVar;
+	}
+	
+	protected Serializable get(String uri, Object... args) {
+		return gs.get(uri, args);
 	}
 
 	protected abstract void doEnter(ViewChangeEvent event);
