@@ -1,5 +1,6 @@
 package mx.com.gunix.framework.util;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -16,5 +17,10 @@ public abstract class Utils {
 			return Stream.empty();
 		int fullChunks = (size - 1) / length;
 		return IntStream.range(0, fullChunks + 1).mapToObj(n -> source.subList(n * length, n == fullChunks ? size : (n + 1) * length));
+	}
+
+	private static final List<Class<?>> primitiveNumbers = Arrays.asList(new Class<?>[] { int.class, float.class, double.class, short.class, byte.class, long.class });
+	public static boolean isNumber(Class<?> fieldType) {
+		return Number.class.isAssignableFrom(fieldType) || primitiveNumbers.contains(fieldType);
 	}
 }

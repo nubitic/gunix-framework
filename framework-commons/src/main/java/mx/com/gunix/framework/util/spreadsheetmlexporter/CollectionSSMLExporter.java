@@ -3,11 +3,11 @@ package mx.com.gunix.framework.util.spreadsheetmlexporter;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import mx.com.gunix.framework.util.SpreadsheetMLExporter;
+import mx.com.gunix.framework.util.Utils;
 
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.springframework.beans.BeanWrapperImpl;
@@ -22,7 +22,6 @@ public class CollectionSSMLExporter<T extends List<S>, S extends Serializable> i
 	private int[] columnTypes;
 	private int columnCount;
 	private PropertyUtilsBean pub;
-	private static final List<Class<?>> primitiveNumbers = Arrays.asList(new Class<?>[] { int.class, float.class, double.class, short.class, byte.class, long.class });
 
 	public CollectionSSMLExporter(T datos, Class<S> clase, LinkedHashMap<String, String> columnMapping) {
 		if (datos == null || datos.isEmpty()) {
@@ -39,7 +38,7 @@ public class CollectionSSMLExporter<T extends List<S>, S extends Serializable> i
 		bwi.setAutoGrowNestedPaths(true);
 		for (int i = 0; i < columnPaths.length; i++) {
 			Class<?> fieldType = bwi.getPropertyDescriptor(columnPaths[i]).getPropertyType();
-			if (Number.class.isAssignableFrom(fieldType) || primitiveNumbers.contains(fieldType)) {
+			if (Utils.isNumber(fieldType)) {
 				columnTypes[i] = MetaDatos.NUMERICO;
 			} else {
 				columnTypes[i] = MetaDatos.TEXTO;

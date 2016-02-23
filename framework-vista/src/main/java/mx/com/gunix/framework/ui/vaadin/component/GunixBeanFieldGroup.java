@@ -15,12 +15,16 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
+import mx.com.gunix.framework.ui.vaadin.VaadinUtils;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.util.NestingBeanItem;
 import com.vaadin.data.validator.BeanValidator;
+import com.vaadin.server.ErrorEvent;
+import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Field;
 
 public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
@@ -39,6 +43,7 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 		super(beanType);
 		this.beanType = beanType;
 		this.defaultValidators = new HashMap<Field<?>, BeanValidator>();
+		setBuffered(false);
 		if (!isBeanValidationImplementationAvailable()) {
 			throw new IllegalStateException("No se encontró una implementación de JSR-303 bean validation");
 		}
@@ -64,10 +69,25 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 	}
 
 	public void commit(OnBeanValidationErrorCallback<BT> onBVECallback) throws CommitException {
-		super.commit();
+		Map<Field<?>, InvalidValueException> invalidValueExceptions = new HashMap<Field<?>, InvalidValueException>();
+		defaultValidators.keySet().forEach(field -> {
+			GunixViewErrorHandler errorHandler = (GunixViewErrorHandler) ErrorEvent.findErrorHandler(field);
+			if (errorHandler.isInvalidValueComponent(field)) {
+				InvalidValueException ive = new InvalidValueException(((AbstractComponent) field).getComponentError().getFormattedHtmlMessage());
+				invalidValueExceptions.put(field, new InvalidValueException(ive.getMessage(), new InvalidValueException[] { ive }));
+			} else {
+				try {
+					field.commit();
+				} catch (InvalidValueException e) {
+					invalidValueExceptions.put(field, e);
+				}
+			}
+		});
+		if (!invalidValueExceptions.isEmpty()) {
+			throw new CommitException("Commit Failed!", this, new FieldGroupInvalidValueException(invalidValueExceptions));
+		}
 		Set<ConstraintViolation<BT>> errores = getJavaxBeanValidator().validate(getItemDataSource().getBean(), BeanValidations.class);
 		if (errores != null && !errores.isEmpty()) {
-			Map<Field<?>, InvalidValueException> invalidValueExceptions = new HashMap<Field<?>, InvalidValueException>();
 			if (onBVECallback == null && getFields().iterator().hasNext()) {
 				for (ConstraintViolation<BT> cv : errores) {
 					Field<?> field = getField(cv.getPropertyPath().toString());
@@ -105,13 +125,15 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 	@Override
 	protected void configureField(Field<?> field) {
 		field.setBuffered(isBuffered());
-
 		field.setEnabled(isEnabled());
 
 		if (field.getPropertyDataSource().isReadOnly()) {
 			field.setReadOnly(true);
 		} else {
 			field.setReadOnly(isReadOnly());
+		}
+		if (field instanceof AbstractField) {
+			((AbstractField<?>) field).setConversionError(VaadinUtils.getConversionError(field.getPropertyDataSource().getType()));
 		}
 		// Add Bean validators if there are annotations
 		if (isBeanValidationImplementationAvailable() && !defaultValidators.containsKey(field)) {

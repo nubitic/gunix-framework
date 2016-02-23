@@ -1,9 +1,11 @@
 package mx.com.gunix.framework.service;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -12,8 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.Valid;
 import javax.validation.Validator;
 
 import mx.com.gunix.framework.domain.Identificador;
@@ -28,13 +32,15 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class GunixActivitServiceSupport<T extends Serializable> {
+public abstract class GunixActivitServiceSupport<T extends Serializable> {
 	private interface FoundAction {
 		boolean doFoundAction(Serializable itProp1Obj, Serializable itProp2Obj);
 	}
 
 	private static final ThreadLocal<List<Integer>> objetosProcesados = ThreadLocal.<List<Integer>>withInitial(() -> {return new ArrayList<Integer>();});
 	private static final Map<Class<?>, Set<Field>> identificadoresCache = new Hashtable<Class<?>, Set<Field>>();
+	private static final Map<Class<?>, Set<Field>> validCache = new Hashtable<Class<?>, Set<Field>>();
+	private static final Set<Field> EMPTY_FIELD_SET = Collections.unmodifiableSet(new HashSet<Field>());
 		
 	@Autowired
 	private Validator validator;
@@ -73,7 +79,36 @@ public class GunixActivitServiceSupport<T extends Serializable> {
 	}
 
 	protected final Set<ConstraintViolation<T>> valida(T serializable, Class<?>... groups) {
-		return validator.validate(serializable, groups);
+		Set<ConstraintViolation<T>> violaciones = validator.validate(serializable, groups);
+		findValidAnnotatedFields(serializable.getClass()).forEach(field -> {
+			filtraFieldsNoIdentificadores(violaciones, field, "");
+		});
+		return violaciones;
+	}
+
+	private void filtraFieldsNoIdentificadores(Set<ConstraintViolation<T>> violaciones, Field field, String nestedPath) {
+		String actualNestedPath = new StringBuilder(nestedPath).append("".equals(nestedPath)?"":".").append(field.getName()).toString();
+		List<ConstraintViolation<T>> subFieldsViolations = violaciones
+																	.stream()
+																	.filter(consViol -> consViol.getPropertyPath().toString().startsWith(actualNestedPath))
+																	.collect(Collectors.toCollection(() -> {return new ArrayList<ConstraintViolation<T>>();}));
+		findIdentificadorFields(field.getType())
+												.forEach(idField -> {
+													String currentFieldPath = new StringBuilder(actualNestedPath).append(".").append(idField.getName()).toString();
+													ConstraintViolation<T> foundConsViol=null;
+													for (ConstraintViolation<T> consViol : subFieldsViolations) {
+														if (consViol.getPropertyPath().toString().equals(currentFieldPath)) {
+															foundConsViol=consViol;
+															break;
+														}
+													}
+													if (foundConsViol!=null) {
+														subFieldsViolations.remove(foundConsViol);
+													}
+												});
+		subFieldsViolations.forEach(consViol->{
+			violaciones.remove(consViol);
+		});
 	}
 
 	protected final List<String> toStringList(Set<ConstraintViolation<T>> errores) {
@@ -328,23 +363,37 @@ public class GunixActivitServiceSupport<T extends Serializable> {
 			}
 		}
 	}
-
+	
+	private Set<Field> findValidAnnotatedFields(Class<?> classs) {
+		Set<Field> set = validCache.get(classs);
+		if (set == null) {
+			set = new HashSet<>(findAnnotatedFields(classs, Valid.class));
+			validCache.put(classs, set);
+		}
+		return set;
+	}
+	
 	private Set<Field> findIdentificadorFields(Class<?> classs) {
 		Set<Field> set = identificadoresCache.get(classs);
 		if (set == null) {
-			set = new HashSet<>();
+			set = new HashSet<>(findAnnotatedFields(classs, Identificador.class));
 			identificadoresCache.put(classs, set);
-			Class<?> c = classs;
-			while (c != null) {
-				for (Field field : c.getDeclaredFields()) {
-					if (field.isAnnotationPresent(Identificador.class)) {
-						set.add(field);
-					}
-				}
-				c = c.getSuperclass();
-			}
 		}
 		return set;
+	}
+
+	private Set<Field> findAnnotatedFields(Class<?> classs, Class<? extends Annotation> annotationClass) {
+		Set<Field> set = new HashSet<>();
+		Class<?> c = classs;
+		while (c != null) {
+			for (Field field : c.getDeclaredFields()) {
+				if (field.isAnnotationPresent(annotationClass)) {
+					set.add(field);
+				}
+			}
+			c = c.getSuperclass();
+		}
+		return set.isEmpty() ? EMPTY_FIELD_SET : set;
 	}
 	
 	protected void addProgressUpdate(String mensaje, float avance, boolean isCancelado) {

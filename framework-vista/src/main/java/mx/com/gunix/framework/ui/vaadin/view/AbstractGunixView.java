@@ -20,7 +20,10 @@ import mx.com.gunix.framework.service.GetterService;
 import mx.com.gunix.framework.ui.GunixFile;
 import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup;
 import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup.OnBeanValidationErrorCallback;
+import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory;
+import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory.GunixFieldPropertyRel;
 import mx.com.gunix.framework.ui.vaadin.component.GunixUploadField;
+import mx.com.gunix.framework.ui.vaadin.component.GunixViewErrorHandler;
 import mx.com.gunix.framework.ui.vaadin.component.Header.TareaActualNavigator;
 import mx.com.gunix.framework.util.ActivitiGunixFile;
 
@@ -31,9 +34,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
 
+import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
-import com.vaadin.data.util.BeanContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.Responsive;
@@ -125,6 +128,7 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		setHeight("100%");
 		setSpacing(false);
 		setMargin(true);
+		setErrorHandler(new GunixViewErrorHandler());
 		setId(new StringBuilder(getClass().getName()).append(":").append(hashCode()).toString());
 		taNav = (TareaActualNavigator) UI.getCurrent().getNavigator();
 		tarea = taNav.getTareaActual();
@@ -248,70 +252,82 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	@SuppressWarnings("unchecked")
 	protected List<S> getBeans(Table tabla) {
 		List<S> beans = new ArrayList<S>();
-		if (tabla.getContainerDataSource() == null || !(tabla.getContainerDataSource() instanceof BeanContainer)) {
-			throw new IllegalArgumentException("Se requiere que el ContainerDataSource de la tabla sea de tipo BeanContainer");
+		if (tabla.getContainerDataSource() == null) {
+			throw new IllegalArgumentException("Se requiere que el ContainerDataSource sea diferente a null");
 		}
-		BeanContainer<Object, S> beanContainer = (BeanContainer<Object, S>) tabla.getContainerDataSource();
-		beanContainer.getItemIds().forEach(beanId -> {
-			beans.add(beanContainer.getItem(beanId).getBean());
+		tabla.getContainerDataSource().getItemIds().forEach(beanId -> {
+			beans.add((S) beanId);
 		});
 		return beans;
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected boolean valida(Table tabla, boolean vacioEsError) {
+	protected boolean isValido(Table tabla, S bean) {
+		return isValid(tabla, false, bean);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private boolean isValid(Table tabla, boolean vacioEsError, S bean){
 		Map<String, Boolean> hayErroresHolder = new HashMap<String, Boolean>();
 		hayErroresHolder.put("hayErrores", false);
-		if (tabla.getContainerDataSource() == null || !(tabla.getContainerDataSource() instanceof BeanContainer)) {
-			throw new IllegalArgumentException("Se requiere que el ContainerDataSource de la tabla sea de tipo BeanContainer");
-		}
-		tabla.setComponentError(null);
-		BeanContainer<Object, S> beanContainer = (BeanContainer<Object, S>) tabla.getContainerDataSource();
-		if (vacioEsError && beanContainer.size() == 0) {
+		Container container = tabla.getContainerDataSource();
+		if (bean == null && vacioEsError && container.size() == 0) {
 			hayErroresHolder.put("hayErrores", true);
 			tabla.setComponentError(new UserError("La tabla debe contener al menos un registro"));
 		}
-		Map<Field, Property> prevPropDS = new HashMap<Field, Property>();
-		GunixBeanFieldGroup bfgf = new GunixBeanFieldGroup<S>(clazz);
-
-		beanContainer.getItemIds().forEach(beanId -> {
-			bfgf.setItemDataSource(beanContainer.getItem(beanId).getBean());
-			beanContainer.getContainerPropertyIds().forEach(propertyId -> {
-				Property property = beanContainer.getContainerProperty(beanId, propertyId);
-				tabla.iterator().forEachRemaining(component -> {
-					if (component instanceof Field) {
-						Field field = (Field) component;
-						if (field.getPropertyDataSource().equals(property)) {
-							prevPropDS.put(field, field.getPropertyDataSource());
-							((AbstractComponent) field).setComponentError(null);
-							bfgf.bind(field, propertyId);
-							//field.setValue(property.getValue());
-						}
-					}
-				});
+		if (bean != null && !container.getItemIds().contains(bean)) {
+			throw new IllegalArgumentException("El bean especificado no se encuentra en la tabla");
+		}
+		tabla.setComponentError(null);
+		Map<Field<?>, Property<?>> prevPropDS = new HashMap<Field<?>, Property<?>>();
+		GunixBeanFieldGroup<S> bfgf = new GunixBeanFieldGroup<S>(clazz);
+		GunixTableFieldFactory grff = (GunixTableFieldFactory) tabla.getTableFieldFactory();
+		if (bean == null) {
+			container.getItemIds().forEach(beanId -> {
+				validaBean(bfgf, (S) beanId, grff, tabla, container, prevPropDS, hayErroresHolder);
 			});
-			try {
-				bfgf.commit(ibve -> {
-					tabla.setComponentError(new UserError(ibve.getMessage()));
-				});
-			} catch (CommitException e) {
-				hayErroresHolder.put("hayErrores", true);
-				for (Field<?> f : e.getInvalidFields().keySet()) {
-					((AbstractComponent) f).setComponentError(new UserError(e.getInvalidFields().get(f).getCauses()[0].getMessage()));
-				}
-			} finally {
-				for (Field<?> f : prevPropDS.keySet()) {
-					bfgf.unbind(f);
-					f.setPropertyDataSource(prevPropDS.get(f));
-					f.setBuffered(false);
-				}
-				prevPropDS.clear();
-			}
-		});
+		} else {
+			validaBean(bfgf, bean, grff, tabla, container, prevPropDS, hayErroresHolder);
+		}
 		if(hayErroresHolder.get("hayErrores")) {
 			tabla.setComponentError(new UserError("La tabla tiene errores"));
 		}
-		return hayErroresHolder.get("hayErrores");
+		return !hayErroresHolder.get("hayErrores");
+	}
+	
+	private void validaBean(GunixBeanFieldGroup<S> bfgf, S beanId, GunixTableFieldFactory grff, Table tabla, Container container, Map<Field<?>, Property<?>> prevPropDS, Map<String, Boolean> hayErroresHolder) {
+		bfgf.setItemDataSource(beanId);
+		List<GunixFieldPropertyRel> fieldProps = grff.getFieldsBy(tabla, container, beanId);
+		fieldProps.forEach(fieldProp -> {
+			if (!((GunixViewErrorHandler) getErrorHandler()).isInvalidValueComponent(fieldProp.getField())) {
+				prevPropDS.put(fieldProp.getField(), fieldProp.getField().getPropertyDataSource());
+				((AbstractComponent) fieldProp.getField()).setComponentError(null);
+				bfgf.bind(fieldProp.getField(), fieldProp.getPropertyId());
+			} else {
+				hayErroresHolder.put("hayErrores", true);
+			}
+		});
+		try {
+			bfgf.commit(ibve -> {
+				tabla.setComponentError(new UserError(ibve.getMessage()));
+			});
+		} catch (CommitException e) {
+			hayErroresHolder.put("hayErrores", true);
+			for (Field<?> f : e.getInvalidFields().keySet()) {
+				((AbstractComponent) f).setComponentError(new UserError(e.getInvalidFields().get(f).getCauses()[0].getMessage()));
+			}
+		} finally {
+			for (Field<?> f : prevPropDS.keySet()) {
+				bfgf.unbind(f);
+				f.setPropertyDataSource(prevPropDS.get(f));
+				f.setBuffered(false);
+				f.setInvalidAllowed(false);
+			}
+			prevPropDS.clear();
+		}
+	}
+
+	protected boolean isValida(Table tabla, boolean vacioEsError) {
+		return isValid(tabla, vacioEsError, null);
 	}
 	
 	protected Variable<ActivitiGunixFile> buildGunixFileVariable(String nombreVariable, GunixUploadField uploadField) {
