@@ -55,8 +55,10 @@ public final class ProgressUpdate implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + (cancelado ? 1231 : 1237);
+		result = prime * result + ((mensaje == null) ? 0 : mensaje.hashCode());
 		result = prime * result + ((processInstanceId == null) ? 0 : processInstanceId.hashCode());
-		result = prime * result + (int) (timeStamp ^ (timeStamp >>> 32));
+		result = prime * result + Float.floatToIntBits(progreso);
 		return result;
 	}
 
@@ -69,12 +71,19 @@ public final class ProgressUpdate implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ProgressUpdate other = (ProgressUpdate) obj;
+		if (cancelado != other.cancelado)
+			return false;
+		if (mensaje == null) {
+			if (other.mensaje != null)
+				return false;
+		} else if (!mensaje.equals(other.mensaje))
+			return false;
 		if (processInstanceId == null) {
 			if (other.processInstanceId != null)
 				return false;
 		} else if (!processInstanceId.equals(other.processInstanceId))
 			return false;
-		if (timeStamp != other.timeStamp)
+		if (Float.floatToIntBits(progreso) != Float.floatToIntBits(other.progreso))
 			return false;
 		return true;
 	}

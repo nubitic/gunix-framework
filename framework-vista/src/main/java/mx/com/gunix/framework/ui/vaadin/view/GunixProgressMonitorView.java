@@ -83,24 +83,24 @@ public final class GunixProgressMonitorView<S extends Serializable> extends Abst
 			      .flatMap(Observable::from)
 			      .distinct()
 			      .takeUntil(pu -> (pu.isCancelado() || pu.getProgreso() == 1f))
-			      .subscribe(pu -> UI.getCurrent().access(() -> {
-			    	  if(pu.isCancelado()) {
-			    		  UI.getCurrent().access(() -> {
+			      .subscribe(pu -> {
+			    	  UI.getCurrent().accessSynchronously(() -> {
+				    	  if(pu.isCancelado()) {
 							  Notification.show("El proceso terminó abruptamente con el siguiente mensaje:\n" + pu.getMensaje(), Type.ERROR_MESSAGE);
 							  window.close();
-						  });
-			    	  } else {
-				    	  if(!StringUtils.isEmpty(pu.getMensaje())) {
-				    		  StringBuilder nMss = new StringBuilder(sdf.format(new Date(pu.getTimeStamp())));
-					    	  nMss.append(pu.getMensaje());
-					    	  addLog(nMss.toString());
+				    	  } else {
+					    	  if(!StringUtils.isEmpty(pu.getMensaje())) {
+					    		  StringBuilder nMss = new StringBuilder(sdf.format(new Date(pu.getTimeStamp())));
+						    	  nMss.append(pu.getMensaje());
+						    	  addLog(nMss.toString());
+					    	  }
+					    	  bar.setValue(pu.getProgreso());
+					    	  if(pu.getProgreso()==1f) {
+					    		  continuarButton.setVisible(true);
+					    	  }
 				    	  }
-				    	  bar.setValue(pu.getProgreso());
-				    	  if(pu.getProgreso()==1f) {
-				    		  continuarButton.setVisible(true);
-				    	  }
-			    	  }
-				  }));
+			    	  });
+			    	 });
 	}
 
 	private void addLog(String mensaje) {
