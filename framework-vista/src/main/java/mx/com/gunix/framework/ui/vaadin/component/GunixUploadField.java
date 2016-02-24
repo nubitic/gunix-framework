@@ -17,6 +17,26 @@ import com.vaadin.ui.Upload;
 public class GunixUploadField extends UploadField {
 	private static final long serialVersionUID = 1L;
 	private boolean readOnly;
+	private GunixFileBuffer receiver;
+	private String acceptFiler;
+	private int maxFileSize;
+	private static Field uploadField;
+	private static Field html5FileInputSettingsField;
+	private static Field receiverField;
+	static {
+		try {
+			uploadField = UploadField.class.getDeclaredField("upload");
+			uploadField.setAccessible(true);
+
+			html5FileInputSettingsField = UploadField.class.getDeclaredField("html5FileInputSettings");
+			html5FileInputSettingsField.setAccessible(true);
+
+			receiverField = UploadField.class.getDeclaredField("receiver");
+			receiverField.setAccessible(true);
+		} catch (NoSuchFieldException | SecurityException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	public GunixUploadField() {
 		super();
@@ -44,6 +64,43 @@ public class GunixUploadField extends UploadField {
 		}
 	}
 
+	@Override
+	public void clear() {
+		Upload upload = new Upload(null, receiver);
+        upload.setImmediate(true);
+        upload.addStartedListener(this);
+        upload.addFinishedListener(this);
+        upload.addProgressListener(this);
+        upload.setButtonCaption(getButtonCaption());
+        
+        try {
+        	Upload currUpload = (Upload) uploadField.get(this);
+        	getRootLayout().replaceComponent(currUpload, upload);
+			uploadField.set(this, upload);
+			html5FileInputSettingsField.set(this, null);
+			setAcceptFilter(acceptFiler);
+			if (maxFileSize > 0) {
+				setMaxFileSize(maxFileSize);
+			}
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+        
+		markAsDirty();
+	}
+
+	@Override
+	public void setAcceptFilter(String acceptString) {
+		super.setAcceptFilter(acceptString);
+		this.acceptFiler=acceptString;
+	}
+
+	@Override
+	public void setMaxFileSize(int maxFileSize) {
+		super.setMaxFileSize(maxFileSize);
+		this.maxFileSize=maxFileSize;
+	}
+
 	public GunixUploadField(StorageMode mode) {
 		super(mode);
 		init();
@@ -51,24 +108,17 @@ public class GunixUploadField extends UploadField {
 
 	private void init() {
 		try {
-			Field receiverField = UploadField.class.getDeclaredField("receiver");
-			receiverField.setAccessible(true);
-			GunixFileBuffer receiver = new GunixFileBuffer(this);
+			receiver = new GunixFileBuffer(this);
 			receiverField.set(this, receiver);
-			Field uploadField = UploadField.class.getDeclaredField("upload");
-			uploadField.setAccessible(true);
+
 			Upload upload = (Upload) uploadField.get(this);
 			upload.setReceiver(receiver);
-		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+		} catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 		setButtonCaption("Cargar");
 		setValidationVisible(true);
-	}
-
-	@Override
-	protected String getDeleteCaption() {
-		return "Eliminar";
+		setFileDeletesAllowed(false);
 	}
 
 	@SuppressWarnings("rawtypes")
