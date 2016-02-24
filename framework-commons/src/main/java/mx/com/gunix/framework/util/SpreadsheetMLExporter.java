@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class SpreadsheetMLExporter {
 	private static final int MAX_REG_EXCEL_DEFAULT = 1048576;
-	private static final String EXTENSION = ".xml";
+	private static final String EXTENSION = ".xls";
 
 	public static void exportaArchivo(String nombreArchivo, OutputStream out, DatosExportar resultados, Progreso progreso) {
 		// Bloque de consulta y construcción de excel.
