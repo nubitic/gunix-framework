@@ -22,9 +22,9 @@ import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.util.NestingBeanItem;
 import com.vaadin.data.validator.BeanValidator;
-import com.vaadin.server.ErrorEvent;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractField;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.Field;
 
 public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
@@ -71,7 +71,7 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 	public void commit(OnBeanValidationErrorCallback<BT> onBVECallback) throws CommitException {
 		Map<Field<?>, InvalidValueException> invalidValueExceptions = new HashMap<Field<?>, InvalidValueException>();
 		defaultValidators.keySet().forEach(field -> {
-			GunixViewErrorHandler errorHandler = (GunixViewErrorHandler) ErrorEvent.findErrorHandler(field);
+			GunixViewErrorHandler errorHandler = GunixViewErrorHandler.getCurrent();
 			if (errorHandler.isInvalidValueComponent(field)) {
 				InvalidValueException ive = new InvalidValueException(((AbstractComponent) field).getComponentError().getFormattedHtmlMessage());
 				invalidValueExceptions.put(field, new InvalidValueException(ive.getMessage(), new InvalidValueException[] { ive }));
@@ -126,6 +126,7 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 	protected void configureField(Field<?> field) {
 		field.setBuffered(isBuffered());
 		field.setEnabled(isEnabled());
+		field.setErrorHandler(GunixViewErrorHandler.getCurrent());
 
 		if (field.getPropertyDataSource().isReadOnly()) {
 			field.setReadOnly(true);
@@ -134,6 +135,9 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 		}
 		if (field instanceof AbstractField) {
 			((AbstractField<?>) field).setConversionError(VaadinUtils.getConversionError(field.getPropertyDataSource().getType()));
+		}
+		if (field instanceof DateField && "Date format not recognized".equals(((DateField) field).getParseErrorMessage())) {
+			((DateField) field).setParseErrorMessage("Fecha Inválida");
 		}
 		// Add Bean validators if there are annotations
 		if (isBeanValidationImplementationAvailable() && !defaultValidators.containsKey(field)) {

@@ -13,6 +13,7 @@ import com.vaadin.server.ErrorEvent;
 import com.vaadin.server.ErrorMessage;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Component;
+import com.vaadin.util.CurrentInstance;
 
 public class GunixViewErrorHandler extends DefaultErrorHandler {
 	private static final long serialVersionUID = 1L;
@@ -49,5 +50,14 @@ public class GunixViewErrorHandler extends DefaultErrorHandler {
 
 	public boolean isInvalidValueComponent(Component component) {
 		return invalidValueComponents.get().contains(component);
+	}
+
+	public static GunixViewErrorHandler getCurrent() {
+		GunixViewErrorHandler currentErrorHandler = CurrentInstance.get(GunixViewErrorHandler.class);
+		if (currentErrorHandler == null) {
+			currentErrorHandler = new GunixViewErrorHandler();
+			CurrentInstance.set(GunixViewErrorHandler.class, currentErrorHandler);
+		}
+		return currentErrorHandler;
 	}
 }

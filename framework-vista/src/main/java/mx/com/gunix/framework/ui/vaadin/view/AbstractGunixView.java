@@ -22,6 +22,7 @@ import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup;
 import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup.OnBeanValidationErrorCallback;
 import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory;
 import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory.GunixFieldPropertyRel;
+import mx.com.gunix.framework.ui.vaadin.component.GunixTableBeanErrorGenerator;
 import mx.com.gunix.framework.ui.vaadin.component.GunixUploadField;
 import mx.com.gunix.framework.ui.vaadin.component.GunixViewErrorHandler;
 import mx.com.gunix.framework.ui.vaadin.component.Header.TareaActualNavigator;
@@ -128,7 +129,7 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		setHeight("100%");
 		setSpacing(false);
 		setMargin(true);
-		setErrorHandler(new GunixViewErrorHandler());
+		setErrorHandler(GunixViewErrorHandler.getCurrent());
 		setId(new StringBuilder(getClass().getName()).append(":").append(hashCode()).toString());
 		taNav = (TareaActualNavigator) UI.getCurrent().getNavigator();
 		tarea = taNav.getTareaActual();
@@ -294,11 +295,12 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		return !hayErroresHolder.get("hayErrores");
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void validaBean(GunixBeanFieldGroup<S> bfgf, S beanId, GunixTableFieldFactory grff, Table tabla, Container container, Map<Field<?>, Property<?>> prevPropDS, Map<String, Boolean> hayErroresHolder) {
 		bfgf.setItemDataSource(beanId);
 		List<GunixFieldPropertyRel> fieldProps = grff.getFieldsBy(tabla, container, beanId);
 		fieldProps.forEach(fieldProp -> {
-			if (!((GunixViewErrorHandler) getErrorHandler()).isInvalidValueComponent(fieldProp.getField())) {
+			if (!(GunixViewErrorHandler.getCurrent().isInvalidValueComponent(fieldProp.getField()))) {
 				prevPropDS.put(fieldProp.getField(), fieldProp.getField().getPropertyDataSource());
 				((AbstractComponent) fieldProp.getField()).setComponentError(null);
 				bfgf.bind(fieldProp.getField(), fieldProp.getPropertyId());
@@ -308,7 +310,12 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		});
 		try {
 			bfgf.commit(ibve -> {
-				tabla.setComponentError(new UserError(ibve.getMessage()));
+				if ("".equals(ibve.getPropertyPath().toString())) {
+					GunixTableBeanErrorGenerator<S> bErrGen = initTableBeanErrorGenerator(tabla);
+					bErrGen.addBeanError((S) ibve.getLeafBean(), ibve.getMessage());
+				} else {
+					tabla.setComponentError(new UserError(ibve.getMessage()));
+				}
 			});
 		} catch (CommitException e) {
 			hayErroresHolder.put("hayErrores", true);
@@ -324,6 +331,21 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 			}
 			prevPropDS.clear();
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private GunixTableBeanErrorGenerator<S> initTableBeanErrorGenerator(Table tabla) {
+		GunixTableBeanErrorGenerator<S> gtbeg = null;
+		if (tabla.getItemDescriptionGenerator() == null && tabla.getCellStyleGenerator() == null) {
+			gtbeg = new GunixTableBeanErrorGenerator<S>();
+			tabla.setItemDescriptionGenerator(gtbeg);
+			tabla.setCellStyleGenerator(gtbeg);
+		} else {
+			if (tabla.getItemDescriptionGenerator() instanceof GunixTableBeanErrorGenerator) {
+				gtbeg = (GunixTableBeanErrorGenerator<S>) tabla.getItemDescriptionGenerator();
+			}
+		}
+		return gtbeg;
 	}
 
 	protected boolean isValida(Table tabla, boolean vacioEsError) {

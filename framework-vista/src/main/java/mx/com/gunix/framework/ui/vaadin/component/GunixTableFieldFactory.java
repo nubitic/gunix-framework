@@ -2,14 +2,21 @@ package mx.com.gunix.framework.ui.vaadin.component;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.vaadin.data.Container;
+import com.vaadin.data.Validator;
+import com.vaadin.data.util.converter.Converter;
+import com.vaadin.data.util.converter.Converter.ConversionException;
+import com.vaadin.server.ErrorMessage;
+import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
 
@@ -22,11 +29,42 @@ public class GunixTableFieldFactory extends DefaultFieldFactory {
 		GunixFieldPropertyRel gfpr = previouslyCreatedFieldsMap.get(fieldId);
 		if (gfpr == null) {
 			Field<?> field = null;
-			field = super.createField(container, itemId, propertyId, uiContext);
+			
+			if (Date.class.isAssignableFrom(container.getContainerProperty(itemId, propertyId).getType())) {
+				final DateField df = new DateField() {
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					protected Date handleUnparsableDateString(String dateString) throws ConversionException {
+						try {
+							return super.handleUnparsableDateString(dateString);
+						} catch (Converter.ConversionException reThrow) {
+							getErrorHandler().error(new ConnectorErrorEvent(this ,new Validator.InvalidValueException(reThrow.getMessage())));
+							throw reThrow;
+						}
+					}
+
+					@Override
+					public ErrorMessage getErrorMessage() {
+						if (!(GunixViewErrorHandler.getCurrent().isInvalidValueComponent(this))) {
+							return super.getErrorMessage();
+						} else {
+							return getComponentError();
+						}
+					}
+				};
+				df.setResolution(Resolution.DAY);
+				df.setParseErrorMessage("Fecha inválida");
+				field = df;
+			} else {
+				field = super.createField(container, itemId, propertyId, uiContext);
+			}
+
 			field.setInvalidAllowed(false);
 			if (field instanceof AbstractTextField) {
 				((AbstractTextField) field).setNullRepresentation("");
 			}
+			field.setErrorHandler(GunixViewErrorHandler.getCurrent());
 			gfpr = new GunixFieldPropertyRel();
 			gfpr.setField(field);
 			gfpr.setPropertyId(propertyId);

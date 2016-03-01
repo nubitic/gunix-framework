@@ -5,6 +5,10 @@
 		background-color: rgba(255,0,0,0.1);
 	}
 
+	.v-table-row-bean-error{
+	    background-color: rgba(255, 0, 0, 0.33);
+	}	
+
   .v-button-link.v-disabled.xbreadcrumbbutton{
   	opacity: 1;
 	filter: alpha(opacity=100);

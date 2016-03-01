@@ -12952,6 +12952,10 @@ div.v-layout.v-horizontal.v-widget {
 	background-color: rgba(255, 0, 0, 0.1);
 }
 
+.gunix .v-table-row-bean-error {
+	background-color: rgba(255, 0, 0, 0.33);
+}
+
 .gunix .v-button-link.v-disabled.xbreadcrumbbutton {
 	opacity: 1;
 	filter: alpha(opacity=100);
