@@ -1,5 +1,7 @@
 package mx.com.gunix.framework.ui.vaadin;
 
+import java.util.Locale;
+
 import mx.com.gunix.framework.ui.vaadin.spring.SpringViewProvider;
 import mx.com.gunix.framework.ui.vaadin.view.AbstractGunixView;
 
@@ -14,6 +16,7 @@ import com.vaadin.server.SystemMessagesInfo;
 import com.vaadin.server.SystemMessagesProvider;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 
 public abstract class AbstractGunixUI extends UI {
@@ -47,6 +50,7 @@ public abstract class AbstractGunixUI extends UI {
 				return messages;
 			}
 		});
+		VaadinSession.getCurrent().setLocale(Locale.getDefault());
 	}
 
 	@Override

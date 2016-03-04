@@ -46,7 +46,7 @@ public class Funcion extends HashCodeByTimeStampAware implements Serializable {
 	private Modulo modulo;
 
 	@NotNull
-	@Size(min = 1, max = 20)
+	@Size(min = 1, max = 50)
 	private String titulo;
 
 	@NotNull
