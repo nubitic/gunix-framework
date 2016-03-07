@@ -2,21 +2,22 @@ package mx.com.gunix.framework.security.domain;
 
 import java.io.Serializable;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import mx.com.gunix.framework.domain.HashCodeByTimeStampAware;
 import mx.com.gunix.framework.domain.Identificador;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 public class Parametro extends HashCodeByTimeStampAware implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
-	@NotNull
+	@NotBlank
 	@Size(min=1,max=15)
 	@Identificador
 	private String nombre;
 	
-	@NotNull
+	@NotBlank
 	@Size(min=1,max=500)
 	private String valor;
 	

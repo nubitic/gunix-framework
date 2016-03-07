@@ -14,6 +14,8 @@ import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
 import mx.com.gunix.framework.ui.vaadin.VaadinUtils;
 
@@ -184,7 +186,7 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 				for (ConstraintViolation<BT> v : violations) {
 					if (!requiredEnabled && v.getConstraintDescriptor().getAnnotation() != null) {
 						Annotation annotation = v.getConstraintDescriptor().getAnnotation();
-						if (annotation.annotationType() == NotNull.class || annotation.annotationType() == Size.class) {
+						if (annotation.annotationType() == NotNull.class || annotation.annotationType() == Size.class || annotation.annotationType() == NotBlank.class) {
 							continue;
 						}
 					}

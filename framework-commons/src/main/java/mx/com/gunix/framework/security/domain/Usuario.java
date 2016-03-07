@@ -7,6 +7,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 public class Usuario implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -17,11 +19,11 @@ public class Usuario implements Serializable {
 	@Valid
 	private DatosUsuario datosUsuario;
 	
-	@NotNull
+	@NotBlank
 	@Size(min=1,max=254)
 	private String idUsuario;
 	
-	@NotNull
+	@NotBlank
 	@Size(min=1,max=60)
 	private String password;
 	

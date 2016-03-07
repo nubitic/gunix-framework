@@ -82,6 +82,7 @@ public class GunixUploadField extends UploadField {
 			if (maxFileSize > 0) {
 				setMaxFileSize(maxFileSize);
 			}
+			super.clear();
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}

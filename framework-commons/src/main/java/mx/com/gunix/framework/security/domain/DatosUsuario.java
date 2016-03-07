@@ -6,6 +6,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 public class DatosUsuario implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -18,14 +20,14 @@ public class DatosUsuario implements Serializable {
 	@Pattern(regexp = "[&A-Z\u00d1]{3,4}[0-9]{6}[1-9A-Z]{2}[0-9A]{1}")
 	private String rfc;
 	
-	@NotNull(message = "El Apellido Paterno es obligatorio")
+	@NotBlank(message = "El Apellido Paterno es obligatorio")
 	@Size(min=1,max=50)
 	private String apPaterno;
 	
 	@Size(min=0,max=50)
 	private String apMaterno;
 	
-	@NotNull(message = "El nombre es obligatorio")
+	@NotBlank(message = "El nombre es obligatorio")
 	@Size(min=1,max=100)
 	private String nombre;
 	

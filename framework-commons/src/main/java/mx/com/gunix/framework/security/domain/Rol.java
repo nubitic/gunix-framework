@@ -6,6 +6,8 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 import mx.com.gunix.framework.domain.HashCodeByTimeStampAware;
 import mx.com.gunix.framework.domain.Identificador;
 import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
@@ -13,12 +15,12 @@ import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValida
 public class Rol extends HashCodeByTimeStampAware implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@NotNull
+	@NotBlank
 	@Size(min = 1, max = 30)
 	@Identificador
 	private String idRol;
 
-	@NotNull
+	@NotBlank
 	@Size(min = 1, max = 100)
 	private String descripcion;
 

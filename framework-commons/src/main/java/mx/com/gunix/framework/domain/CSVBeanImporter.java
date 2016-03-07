@@ -62,7 +62,7 @@ public abstract class CSVBeanImporter<T extends Serializable> {
 
 	public void importBeans(Reader csvSource, ImportedBeanProcessor<T> processor, BeanErrorProcessor errorProcessor) {
 		ICsvDozerBeanReader beanReader = null;
-
+		Boolean sinRegistros = true;
 		try {		    
 			beanReader = new CsvDozerBeanReader(csvSource, CsvPreference.STANDARD_PREFERENCE);
 
@@ -77,13 +77,17 @@ public abstract class CSVBeanImporter<T extends Serializable> {
 						t = beanReader.read(clazz, processors);
 						if (t != null) {
 							processor.process(t,beanReader.getLineNumber());
+							sinRegistros = false;
 						} else {
 							break;
 						}
 					} catch (SuperCsvCellProcessorException errorInfo) {
 						errorProcessor.error(header, errorInfo.getCsvContext(), traduce(errorInfo.getMessage()));
 					}
-				} while (true);				
+				} while (true);
+				if(sinRegistros){
+					errorProcessor.error(header, new CsvContext(1, 0, 1), "El archivo esta vacío");
+				}
 			}else {
 				errorProcessor.error(header, new CsvContext(1, 0, 1), String.format("El encabezado del archivo es incorrecto, debe ser: %s", requiredHeadersString));
 			}

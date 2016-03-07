@@ -7,6 +7,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 import mx.com.gunix.framework.domain.HashCodeByTimeStampAware;
 import mx.com.gunix.framework.domain.Identificador;
 import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
@@ -20,16 +22,16 @@ public class Aplicacion extends HashCodeByTimeStampAware implements ACLType {
 	@Identificador
 	private Long id;
 
-	@NotNull
+	@NotBlank
 	@Size(min = 1, max = 30)
 	@Identificador
 	private String idAplicacion;
 
-	@NotNull
+	@NotBlank
 	@Size(min = 1, max = 100)
 	private String descripcion;
 
-	@NotNull
+	@NotBlank
 	@Size(min = 1, max = 25)
 	private String icono;
 

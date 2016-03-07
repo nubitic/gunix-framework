@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 import mx.com.gunix.framework.domain.HashCodeByTimeStampAware;
 import mx.com.gunix.framework.domain.Identificador;
 import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
@@ -36,7 +38,7 @@ public class Funcion extends HashCodeByTimeStampAware implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@NotNull
+	@NotBlank
 	@Size(min = 1, max = 30)
 	@Identificador
 	private String idFuncion;
@@ -45,18 +47,18 @@ public class Funcion extends HashCodeByTimeStampAware implements Serializable {
 	@Identificador
 	private Modulo modulo;
 
-	@NotNull
+	@NotBlank
 	@Size(min = 1, max = 50)
 	private String titulo;
 
-	@NotNull
+	@NotBlank
 	@Size(min = 1, max = 100)
 	private String descripcion;
 
 	@Size(min = 0, max = 255)
 	private String processKey;
 
-	@NotNull
+	@NotBlank
 	private float orden;
 
 	@NotNull
