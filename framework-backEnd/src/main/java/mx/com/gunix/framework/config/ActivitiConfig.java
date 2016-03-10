@@ -12,6 +12,10 @@ import java.util.concurrent.RejectedExecutionException;
 import javax.sql.DataSource;
 
 import mx.com.gunix.framework.activiti.ExecuteAsyncSecuredRunnable;
+import mx.com.gunix.framework.activiti.FloatType;
+import mx.com.gunix.framework.activiti.GunixObjectVariableType;
+import mx.com.gunix.framework.activiti.ProcessInstanceCreatedEvntListener;
+import mx.com.gunix.framework.activiti.persistence.entity.VariableInstanceEntityManager;
 import mx.com.gunix.framework.processes.domain.ProgressUpdate;
 import mx.com.gunix.framework.service.ActivitiService;
 
@@ -34,6 +38,7 @@ import org.activiti.engine.impl.cfg.IdGenerator;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.el.ReadOnlyMapELResolver;
 import org.activiti.engine.impl.el.VariableScopeElResolver;
+import org.activiti.engine.impl.interceptor.SessionFactory;
 import org.activiti.engine.impl.javax.el.ArrayELResolver;
 import org.activiti.engine.impl.javax.el.BeanELResolver;
 import org.activiti.engine.impl.javax.el.CompositeELResolver;
@@ -45,6 +50,7 @@ import org.activiti.engine.impl.javax.el.MapELResolver;
 import org.activiti.engine.impl.javax.el.MethodNotFoundException;
 import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
+import org.activiti.engine.impl.variable.VariableType;
 import org.activiti.spring.ApplicationContextElResolver;
 import org.activiti.spring.ProcessEngineFactoryBean;
 import org.activiti.spring.SpringAsyncExecutor;
@@ -154,6 +160,19 @@ public class ActivitiConfig {
 		
 		speConf.setDeploymentResources(resources);
 		
+		VariableInstanceEntityManager vim = variableInstanceEntityManager();
+
+		List<SessionFactory> vimList = new ArrayList<SessionFactory>();
+		vimList.add(vim);
+		speConf.setCustomSessionFactories(vimList);
+
+		List<VariableType> varTypes = new ArrayList<VariableType>();
+		varTypes.add(gunixObjectVariableType());
+		varTypes.add(new FloatType());
+		speConf.setCustomPreVariableTypes(varTypes);// Se establece primero en la lista que se usa para el guardado
+		speConf.setCustomPostVariableTypes(varTypes);// Se establece como el último en asignarse en el Mapa que se usa para la recuperación
+		
+		
 		Map<String, List<ActivitiEventListener>> eventListeners = new HashMap<String, List<ActivitiEventListener>>();
 		
 		List<ActivitiEventListener> openLEvntListners = new ArrayList<ActivitiEventListener>();
@@ -163,6 +182,10 @@ public class ActivitiConfig {
 		List<ActivitiEventListener> jobFailureEvntListners = new ArrayList<ActivitiEventListener>();
 		jobFailureEvntListners.add(jobExecutionFailureEvntListener());		
 		eventListeners.put(ActivitiEventType.JOB_EXECUTION_FAILURE.toString(), jobFailureEvntListners);
+		
+		List<ActivitiEventListener> entityCreatedEvntListners = new ArrayList<ActivitiEventListener>();
+		entityCreatedEvntListners.add(new ProcessInstanceCreatedEvntListener());		
+		eventListeners.put(ActivitiEventType.ENTITY_CREATED.toString(), entityCreatedEvntListners);
 		
 		speConf.setTypedEventListeners(eventListeners);
 
@@ -195,6 +218,11 @@ public class ActivitiConfig {
 		return new SimpleAsyncTaskExecutor();
 	}
 
+	@Bean
+	public GunixObjectVariableType gunixObjectVariableType() {
+		return new GunixObjectVariableType();
+	}
+	
 	@Bean
 	public ProcessEngineFactoryBean processEngineFactoryBean(SpringProcessEngineConfiguration speConf) throws Exception {
 		ProcessEngineFactoryBean pefbean = new ProcessEngineFactoryBean() {
@@ -267,7 +295,12 @@ public class ActivitiConfig {
 		pefbean.setProcessEngineConfiguration(speConf);
 		return pefbean;
 	}
-
+	
+	@Bean
+	public VariableInstanceEntityManager variableInstanceEntityManager() {
+		return new VariableInstanceEntityManager();
+	}
+	
 	@Bean
 	public RepositoryService repositoryService(ProcessEngineFactoryBean pefb) throws Exception {
 		return pefb.getObject().getRepositoryService();

@@ -174,12 +174,6 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		tarea.setVariables(getVariablesTarea());
 		tarea.setComentario(getComentarioTarea());
 
-		if (LOGGER.isDebugEnabled() && tarea.getInstancia() != null && tarea.getInstancia().getVariables() != null) {
-			for (Variable<?> var : tarea.getInstancia().getVariables()) {
-				LOGGER.debug(var.toString());
-			}
-		}
-
 		Instancia instancia = as.completaTarea(tarea);
 		String taskView = null;
 		Tarea tareaAct = instancia.getTareaActual();

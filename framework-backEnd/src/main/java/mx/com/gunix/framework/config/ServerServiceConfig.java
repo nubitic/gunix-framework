@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Primary;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
@@ -28,6 +29,7 @@ public class ServerServiceConfig extends WebMvcConfigurerAdapter {
 	}
 
 	@Bean
+	@Primary
 	public ActivitiService activitiService() {
 		return new ActivitiServiceImp();
 	}

@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import mx.com.gunix.framework.activiti.GunixObjectVariableType;
+import mx.com.gunix.framework.activiti.ProcessInstanceCreatedEvntListener;
 import mx.com.gunix.framework.processes.domain.Instancia;
 import mx.com.gunix.framework.processes.domain.ProgressUpdate;
 import mx.com.gunix.framework.processes.domain.Tarea;
@@ -27,17 +29,20 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.form.TaskFormData;
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.TerminateEndEventActivityBehavior;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundListOperations;
@@ -50,7 +55,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class ActivitiServiceImp implements ActivitiService {
+public class ActivitiServiceImp implements ActivitiService, BusinessProcessManager {
 	@Autowired
 	TaskService ts;
 
@@ -76,6 +81,10 @@ public class ActivitiServiceImp implements ActivitiService {
 	public static final String CURRENT_AUTHENTICATION_ROLES_VAR = "CURRENT_AUTHENTICATION_ROLES_VAR";
 	private final int MAX_UPDATES_PER_FETCH = 100;
 	private static final String ID_APLICACION_VAR = "ID_APLICACION";
+
+	private static final String PROCESS_CREATION_COMMENT = "PROCESS_CREATION_COMMENT";
+	private static final String TASK_COMMENT = "TASK_COMMENT";
+	
 	private final String ID_APLICACION = System.getenv(ID_APLICACION_VAR);
 
 	@Override
@@ -83,12 +92,14 @@ public class ActivitiServiceImp implements ActivitiService {
 		String taskId = tarea.getId();
 		ts.claim(taskId, ((Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getIdUsuario());
 		Optional.ofNullable(tarea.getComentario()).ifPresent(comment -> {
-			ts.addComment(taskId, tarea.getInstancia().getId(), comment);
+			ts.addComment(taskId, tarea.getInstancia().getId(), TASK_COMMENT, comment);
 		});
 		Map<String, Object>[] variablesMaps = toMap(tarea.getVariables());
 		Map<String, Object> variablesProcesoMap = variablesMaps[Variable.Scope.PROCESO.ordinal()];
 		Map<String, Object> variablesTareaMap = variablesMaps[Variable.Scope.TAREA.ordinal()];
 
+		GunixObjectVariableType.setCurrentTarea(tarea);
+		
 		if (!variablesProcesoMap.isEmpty()) {
 			rs.setVariables(tarea.getInstancia().getId(), variablesProcesoMap);
 		}
@@ -98,7 +109,7 @@ public class ActivitiServiceImp implements ActivitiService {
 		}
 
 		ts.complete(taskId, variablesMaps[Variable.Scope.TAREA.ordinal()]);
-		tarea.getInstancia().setTareaActual(getCurrentTask(tarea.getInstancia().getId()));
+		tarea.getInstancia().setTareaActual(getCurrentTask(tarea.getInstancia().getId(), null));
 
 		if (tarea.getInstancia().getTareaActual() == null) {
 			tarea.getInstancia().setTareaActual(Tarea.DEFAULT_END_TASK);
@@ -164,17 +175,19 @@ public class ActivitiServiceImp implements ActivitiService {
 			instancia.setProcessKey(pi.getBusinessKey());
 			instancia.setUsuario(usuario);
 			instancia.setVariables(Collections.unmodifiableList(variables));
+			instancia.setVolatil(VOLATIL.equals(repos.getProcessDefinition(pi.getProcessDefinitionId()).getCategory()));
 			
 			if (!pi.isEnded()) {
 				Optional.ofNullable(comentario).ifPresent(comment -> {
-					ts.addComment(null, pi.getProcessInstanceId(), comment);
+					ts.addComment(null, pi.getProcessInstanceId(), PROCESS_CREATION_COMMENT, comment);
 				});
-				Tarea currTask = getCurrentTask(pi.getId());
+				Tarea currTask = getCurrentTask(pi.getProcessInstanceId(), pi);
 				currTask.setInstancia(instancia);
 				instancia.setTareaActual(currTask);
 			} else {
 				instancia.setTareaActual(Tarea.DEFAULT_END_TASK);
 			}
+			ProcessInstanceCreatedEvntListener.consumeLastCreated();
 		} finally {
 			is.setAuthenticatedUserId(null);
 		}
@@ -187,7 +200,7 @@ public class ActivitiServiceImp implements ActivitiService {
 			throw new IllegalArgumentException("La tarea actual no debe ser null");
 		}
 		Serializable ser = null;
-		if (!instancia.getTareaActual().isTerminal()) {
+		if (!instancia.getTareaActual().isTerminal() && instancia.getTermino() == null) {
 			ser = rs.getVariable(instancia.getId(), varName, Serializable.class);
 			ser = (ser == null ? getVar(instancia.getTareaActual(), varName) : ser);
 		} else {
@@ -214,9 +227,16 @@ public class ActivitiServiceImp implements ActivitiService {
 		return ts.getVariableLocal(tarea.getId(), varName, Serializable.class);
 	}
 
-	private Tarea getCurrentTask(String piid) {
+	private Tarea getCurrentTask(String piid, ProcessInstance pi) {
 		Tarea tarea = null;
-		Task task = ts.createTaskQuery().active().processInstanceId(piid).singleResult();
+		Task task =null;
+		
+		if (pi != null && ((ExecutionEntity) pi).getTasks() != null) {
+			task = ((ExecutionEntity) pi).getTasks().get(0);
+		} else {
+			task = ts.createTaskQuery().active().processInstanceId(piid).singleResult();
+		}
+		
 		if (task != null) {
 			tarea = new Tarea();
 			tarea.setId(task.getId());
@@ -229,26 +249,40 @@ public class ActivitiServiceImp implements ActivitiService {
 			TaskEntity te = (TaskEntity) task;
 			ProcessDefinitionImpl pdfimp = (ProcessDefinitionImpl) repos.getProcessDefinition(te.getProcessDefinitionId());
 			List<PvmTransition> oTrans = pdfimp.findActivity(te.getTaskDefinitionKey()).getOutgoingTransitions();
-			if (oTrans.size() >= 1) {
+			if (oTrans != null) {
 				if (oTrans.isEmpty()) {
 					tarea.setTerminal(true);
 				} else {
-					ActivityImpl pva = (ActivityImpl) oTrans.get(0).getDestination();
-					if ((pva.getActivityBehavior() instanceof TerminateEndEventActivityBehavior) || (pva.getActivityBehavior() instanceof ErrorEndEventActivityBehavior)
-							|| (pva.getActivityBehavior() instanceof NoneEndEventActivityBehavior) || (pva.getActivityBehavior() instanceof CancelEndEventActivityBehavior)) {
-						tarea.setTerminal(true);
+					if (oTrans.size() == 1) {
+						ActivityImpl pva = (ActivityImpl) oTrans.get(0).getDestination();
+						if ((pva.getActivityBehavior() instanceof TerminateEndEventActivityBehavior) || (pva.getActivityBehavior() instanceof ErrorEndEventActivityBehavior) || (pva.getActivityBehavior() instanceof NoneEndEventActivityBehavior) || (pva.getActivityBehavior() instanceof CancelEndEventActivityBehavior)) {
+							tarea.setTerminal(true);
+						} else {
+							addTransitions(tarea, oTrans);
+						}
+					} else {
+						addTransitions(tarea, oTrans);
 					}
 				}
+			} else {
+				tarea.setTerminal(true);
 			}
 		}
 		return tarea;
+	}
+
+	private void addTransitions(Tarea tarea, List<PvmTransition> oTrans) {
+		tarea.setTransiciones(new ArrayList<String>());
+		oTrans.forEach(trans -> {
+			tarea.getTransiciones().add(new StringBuilder(trans.getId() != null ? trans.getId().trim() : "").append(" ").append(trans.getDestination().getId() != null ? trans.getDestination().getId().trim() : "").toString());
+		});
 	}
 
 	// A las 00:00 todos los días
 	@Scheduled(cron = "0 0 0 * * *")
 	public void eliminaTodasLasInstanciasVolatilesTerminadasOIniciadasHaceMasDe35Minutos() {
 		if(Boolean.valueOf(System.getenv("ACTIVITI_MASTER"))) {
-			List<ProcessDefinition> pDefsVolatiles = repos.createProcessDefinitionQuery().processDefinitionCategory("VOLATIL").latestVersion().list();
+			List<ProcessDefinition> pDefsVolatiles = repos.createProcessDefinitionQuery().processDefinitionCategory(VOLATIL).latestVersion().list();
 			Date hace35Minutos = Date.from(Instant.now().minus(35, ChronoUnit.MINUTES));
 			pDefsVolatiles.parallelStream().forEach(
 					pd -> {
@@ -295,5 +329,54 @@ public class ActivitiServiceImp implements ActivitiService {
 		BoundListOperations<String, ProgressUpdate> blops = redisProgressUpdateTemplate.boundListOps(processId);
 		blops.expire(2, TimeUnit.MINUTES);
 		blops.leftPush(pu);
+	}
+
+	@Override
+	public Instancia getInstancia(String processInstanceId) {
+		boolean isHistoric = false;
+
+		HistoricProcessInstance hpi = hs.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+		isHistoric = hpi.getEndTime() != null;
+		
+		
+		Instancia instancia = new Instancia();
+		instancia.setId(processInstanceId);
+		instancia.setInicio(hpi.getStartTime());
+		instancia.setTermino(hpi.getEndTime());
+		
+		List<Comment> processCreationComments = ts.getProcessInstanceComments(processInstanceId, PROCESS_CREATION_COMMENT);
+		if (processCreationComments != null && !processCreationComments.isEmpty()) {
+			instancia.setComentario(processCreationComments.get(0).getFullMessage());
+		}
+		
+		instancia.setProcessKey(hpi.getBusinessKey());
+		
+		if (isHistoric) {
+			instancia.setUsuario((String) hs.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).variableName(CURRENT_AUTHENTICATION_USUARIO_VAR).singleResult().getValue());
+		} else {
+			instancia.setUsuario((String) rs.getVariable(processInstanceId, CURRENT_AUTHENTICATION_USUARIO_VAR));
+		}
+		
+		instancia.setVolatil(VOLATIL.equals(repos.getProcessDefinition(hpi.getProcessDefinitionId()).getCategory()));
+		
+		List<HistoricTaskInstance> tareasCompletadas = hs.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).finished().list();
+		if (tareasCompletadas != null) {
+			instancia.setTareas(new ArrayList<Tarea>());
+			tareasCompletadas.forEach(hti -> {
+				Tarea hT = new Tarea();
+				hT.setInicio(hti.getCreateTime());
+				hT.setTermino(hti.getEndTime());
+				hT.setInstancia(instancia);
+				hT.setUsuario(hti.getOwner() == null ? hti.getAssignee() : hti.getOwner());
+				List<Comment> taskComments = ts.getTaskComments(hti.getId(), TASK_COMMENT);
+				if (taskComments != null && !taskComments.isEmpty()) {
+					hT.setComentario(taskComments.get(0).getFullMessage());
+				}
+				instancia.getTareas().add(hT);
+			});
+		}
+		
+		instancia.setTareaActual(getCurrentTask(processInstanceId, null));
+		return instancia;
 	}
 }

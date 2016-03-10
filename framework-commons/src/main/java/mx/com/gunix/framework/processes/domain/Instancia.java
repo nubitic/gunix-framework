@@ -16,7 +16,7 @@ public class Instancia implements Serializable {
 	private Date termino;
 	private List<Tarea> tareas;
 	private Tarea tareaActual;
-	private List<String> rolesCandidatos;
+	private boolean volatil = true;
 
 	public String getProcessKey() {
 		return processKey;
@@ -82,20 +82,20 @@ public class Instancia implements Serializable {
 		this.tareas = tareas;
 	}
 
-	public List<String> getRolesCandidatos() {
-		return rolesCandidatos;
-	}
-
-	public void setRolesCandidatos(List<String> rolesCandidatos) {
-		this.rolesCandidatos = rolesCandidatos;
-	}
-
 	public Tarea getTareaActual() {
 		return tareaActual;
 	}
 
 	public void setTareaActual(Tarea tareaActual) {
 		this.tareaActual = tareaActual;
+	}
+
+	public boolean isVolatil() {
+		return volatil;
+	}
+
+	public void setVolatil(boolean volatil) {
+		this.volatil = volatil;
 	}
 
 	@Override

@@ -9,12 +9,11 @@ public class Tarea implements Serializable {
 
 	public static final Tarea DEFAULT_END_TASK = new Tarea();
 	public static final String DEFAULT_END_TASK_VIEW = "DEFAULT_END_TASK_VIEW";
-	
-	
-	static{
+
+	static {
 		DEFAULT_END_TASK.setVista(DEFAULT_END_TASK_VIEW);
 	}
-	
+
 	private String id;
 	private String executionId;
 	private List<String> rolesCandidatos;
@@ -26,52 +25,68 @@ public class Tarea implements Serializable {
 	private String vista;
 	private Instancia instancia;
 	private boolean terminal;
-	
+	private List<String> transiciones;
+
 	public boolean isTerminal() {
 		return terminal;
 	}
+
 	public void setTerminal(boolean terminal) {
 		this.terminal = terminal;
 	}
+
 	public String getId() {
 		return id;
 	}
+
 	public void setId(String id) {
 		this.id = id;
 	}
+
 	public List<String> getRolesCandidatos() {
 		return rolesCandidatos;
 	}
+
 	public void setRolesCandidatos(List<String> rolesCandidatos) {
 		this.rolesCandidatos = rolesCandidatos;
 	}
+
 	public List<Variable<?>> getVariables() {
 		return variables;
 	}
+
 	public void setVariables(List<Variable<?>> variables) {
 		this.variables = variables;
 	}
+
 	public String getComentario() {
 		return comentario;
 	}
+
 	public void setComentario(String comentario) {
 		this.comentario = comentario;
 	}
+
 	public String getUsuario() {
 		return usuario;
 	}
+
 	public void setUsuario(String usuario) {
 		this.usuario = usuario;
 	}
+
 	public Date getInicio() {
 		return inicio;
 	}
+
 	public void setInicio(Date inicio) {
 		this.inicio = inicio;
 	}
+
 	public Date getTermino() {
 		return termino;
 	}
+
 	public void setTermino(Date termino) {
 		this.termino = termino;
 	}
@@ -79,22 +94,35 @@ public class Tarea implements Serializable {
 	public String getVista() {
 		return vista;
 	}
+
 	public void setVista(String vista) {
 		this.vista = vista;
 	}
+
 	public Instancia getInstancia() {
 		return instancia;
 	}
+
 	public void setInstancia(Instancia instancia) {
 		this.instancia = instancia;
 	}
-	
+
 	public String getExecutionId() {
 		return executionId;
 	}
+
 	public void setExecutionId(String executionId) {
 		this.executionId = executionId;
 	}
+
+	public List<String> getTransiciones() {
+		return transiciones;
+	}
+
+	public void setTransiciones(List<String> transiciones) {
+		this.transiciones = transiciones;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -104,6 +132,7 @@ public class Tarea implements Serializable {
 		result = prime * result + ((instancia == null) ? 0 : instancia.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -130,9 +159,9 @@ public class Tarea implements Serializable {
 			return false;
 		return true;
 	}
+
 	@Override
 	public String toString() {
 		return "Tarea [id=" + id + ", usuario=" + usuario + ", inicio=" + inicio + ", vista=" + vista + ", instancia=" + instancia + "]";
 	}
-	
 }

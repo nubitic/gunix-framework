@@ -13,7 +13,7 @@ public class UserDetails extends Usuario implements org.springframework.security
 	private static final long serialVersionUID = 1L;
 	
 	private List<SimpleGrantedAuthority> autorities = new ArrayList<SimpleGrantedAuthority>();
-
+	
 	public UserDetails(Usuario usuario) {
 		if(usuario.getAplicaciones()!=null){
 			usuario.getAplicaciones()
