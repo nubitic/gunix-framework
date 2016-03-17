@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import mx.com.gunix.framework.util.SpreadsheetMLExporter;
 import mx.com.gunix.framework.util.Utils;
@@ -19,11 +20,13 @@ public class CollectionSSMLExporter<T extends List<S>, S extends Serializable> i
 	private int size;
 	private String[] columnNames;
 	private String[] columnPaths;
+	private boolean[] haveStringConverters;
 	private int[] columnTypes;
 	private int columnCount;
 	private PropertyUtilsBean pub;
+	private Map<String, Converter<?>> value2StringConverters;
 
-	public CollectionSSMLExporter(T datos, Class<S> clase, LinkedHashMap<String, String> columnMapping) {
+	public CollectionSSMLExporter(T datos, Class<S> clase, LinkedHashMap<String, String> columnMapping, Map<String, Converter<?>> value2StringConverters) {
 		if (datos == null || datos.isEmpty()) {
 			throw new IllegalArgumentException("Debe haber datos para exportar...");
 		}
@@ -33,6 +36,7 @@ public class CollectionSSMLExporter<T extends List<S>, S extends Serializable> i
 		columnPaths = columnMapping.values().toArray(new String[] {});
 		columnCount = columnNames.length;
 		columnTypes = new int[columnCount];
+		haveStringConverters = new boolean[columnPaths.length];
 
 		BeanWrapperImpl bwi = new BeanWrapperImpl(clase);
 		bwi.setAutoGrowNestedPaths(true);
@@ -43,8 +47,12 @@ public class CollectionSSMLExporter<T extends List<S>, S extends Serializable> i
 			} else {
 				columnTypes[i] = MetaDatos.TEXTO;
 			}
+			if (value2StringConverters != null && value2StringConverters.get(columnPaths[i]) != null) {
+				haveStringConverters[i] = true;
+			}
 		}
 		pub = new PropertyUtilsBean();
+		this.value2StringConverters = value2StringConverters;
 	}
 
 	@Override
@@ -68,12 +76,13 @@ public class CollectionSSMLExporter<T extends List<S>, S extends Serializable> i
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public String getString(int indiceColumna) {
 		try {
 			indiceColumna--;
 			Object o = pub.getProperty(datos.get(processedIndex), columnPaths[indiceColumna]);
-			return o != null ? o.toString() : null;
+			return o != null ? haveStringConverters[indiceColumna] ? ((Converter<Object>) value2StringConverters.get(columnPaths[indiceColumna])).toString(o) : o.toString() : null;
 		} catch (NoSuchMethodException | InvalidPropertyException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new RuntimeException("No fue posible leer la propiedad " + columnPaths[indiceColumna], e);
 		}
@@ -127,5 +136,9 @@ public class CollectionSSMLExporter<T extends List<S>, S extends Serializable> i
 	
 	public void exporta(String nombreArcchivoExcel, OutputStream salida, Progreso progreso) {
 		SpreadsheetMLExporter.exportaArchivo(nombreArcchivoExcel, salida, this, progreso);
+	}
+	
+	public static interface Converter<Q extends Object> {
+		public String toString(Q value);
 	}
 }

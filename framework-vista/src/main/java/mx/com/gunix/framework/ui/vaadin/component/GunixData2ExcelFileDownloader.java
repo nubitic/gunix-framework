@@ -9,10 +9,12 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import mx.com.gunix.framework.ui.vaadin.view.MainViewLayout;
 import mx.com.gunix.framework.util.spreadsheetmlexporter.CollectionSSMLExporter;
 import mx.com.gunix.framework.util.spreadsheetmlexporter.Progreso;
+import mx.com.gunix.framework.util.spreadsheetmlexporter.CollectionSSMLExporter.Converter;
 
 import com.vaadin.server.Extension;
 import com.vaadin.server.FileDownloader;
@@ -35,15 +37,25 @@ public class GunixData2ExcelFileDownloader<T extends List<S>, S extends Serializ
 
 	public GunixData2ExcelFileDownloader(String caption, String fileName, T datos, Class<S> clase, LinkedHashMap<String, String> mapping) {
 		super();
-		doInit(caption, fileName, datos, clase, mapping);
+		doInit(caption, fileName, datos, clase, mapping, null);
 	}
 
 	public GunixData2ExcelFileDownloader(String caption, String fileName, Class<S> clase) {
 		super();
-		doInit(caption, fileName, null, clase, null);
+		doInit(caption, fileName, null, clase, null, null);
 	}
 
-	private void doInit(String caption, String fileName, T datos, Class<S> clase, LinkedHashMap<String, String> mapping) {
+	public GunixData2ExcelFileDownloader(String caption, String fileName, T datos, Class<S> clase, LinkedHashMap<String, String> mapping, Map<String, Converter<?>> value2StringConverters) {
+		super();
+		doInit(caption, fileName, datos, clase, mapping, value2StringConverters);
+	}
+
+	public GunixData2ExcelFileDownloader(String caption, String fileName, Class<S> clase, Map<String, Converter<?>> value2StringConverters) {
+		super();
+		doInit(caption, fileName, null, clase, null, value2StringConverters);
+	}
+
+	private void doInit(String caption, String fileName, T datos, Class<S> clase, LinkedHashMap<String, String> mapping, Map<String, Converter<?>> value2StringConverters) {
 		this.setCompositionRoot(root);
 		this.fileName = fileName;
 		this.clase = clase;
@@ -51,13 +63,17 @@ public class GunixData2ExcelFileDownloader<T extends List<S>, S extends Serializ
 		downloadVisibleButton = new Button(caption);
 		if (datos != null && mapping != null) {
 			downloadVisibleButton.addClickListener(clickEvent -> {
-				doDownload(datos, mapping);
+				doDownload(datos, mapping, value2StringConverters);
 			});
 		}
 		root.addComponent(downloadVisibleButton);
 	}
-
+	
 	public void doDownload(T datos, LinkedHashMap<String, String> mapping) {
+		doDownload(datos, mapping, null); 
+	}
+	
+	public void doDownload(T datos, LinkedHashMap<String, String> mapping, Map<String, Converter<?>> value2StringConverters) {
 		try {
 			String finalFileName = new StringBuilder(timeStampFormatter.format(new Date())).append(fileName).append(".zip").toString();
 			downloadInvisibleButtonId = new StringBuilder(fileName).append(System.currentTimeMillis()).toString();
@@ -88,7 +104,7 @@ public class GunixData2ExcelFileDownloader<T extends List<S>, S extends Serializ
 			fileDownloader.extend(downloadInvisibleButton);
 			MainViewLayout.registraExportacion(downloadInvisibleButton, finalFileName, datos.size());
 			new Thread(() -> {
-				CollectionSSMLExporter<T, S> cssmle = new CollectionSSMLExporter<T, S>(datos, clase, mapping);
+				CollectionSSMLExporter<T, S> cssmle = new CollectionSSMLExporter<T, S>(datos, clase, mapping, value2StringConverters);
 				final Integer datosSize = datos.size();
 				try {
 					cssmle.exporta(fileName, new FileOutputStream(tempExportFile), new Progreso() {
