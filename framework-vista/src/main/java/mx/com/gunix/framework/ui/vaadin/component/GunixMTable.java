@@ -6,7 +6,9 @@ import java.util.Collection;
 
 import mx.com.gunix.framework.ui.vaadin.VaadinUtils;
 
+import org.apache.commons.beanutils.NestedNullException;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.vaadin.viritin.LazyList.CountProvider;
 import org.vaadin.viritin.LazyList.PagingProvider;
 import org.vaadin.viritin.ListContainer;
@@ -130,6 +132,18 @@ public class GunixMTable<T extends Serializable> extends MTable<T> {
 							return ans;
 						}
 
+						@Override
+						public Object getValue() {
+							try {
+								return super.getValue();
+							} catch (RuntimeException ignorar) {
+								if (ExceptionUtils.getRootCause(ignorar) instanceof NestedNullException) {
+									return null;
+								} else {
+									throw ignorar;
+								}
+							}
+						}
 					};
 				}
 

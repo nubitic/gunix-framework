@@ -10,6 +10,7 @@ import java.util.Map;
 import mx.com.gunix.framework.util.SpreadsheetMLExporter;
 import mx.com.gunix.framework.util.Utils;
 
+import org.apache.commons.beanutils.NestedNullException;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.InvalidPropertyException;
@@ -83,6 +84,8 @@ public class CollectionSSMLExporter<T extends List<S>, S extends Serializable> i
 			indiceColumna--;
 			Object o = pub.getProperty(datos.get(processedIndex), columnPaths[indiceColumna]);
 			return o != null ? haveStringConverters[indiceColumna] ? ((Converter<Object>) value2StringConverters.get(columnPaths[indiceColumna])).toString(o) : o.toString() : null;
+		} catch (NestedNullException ignorar) {
+			return null;
 		} catch (NoSuchMethodException | InvalidPropertyException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new RuntimeException("No fue posible leer la propiedad " + columnPaths[indiceColumna], e);
 		}
