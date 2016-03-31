@@ -256,12 +256,16 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		return beans;
 	}
 	
+	protected <R extends Serializable> boolean isValido(Table tabla, R bean, Class<R> clase) {
+		return isValid(tabla, false, bean, clase);
+	}
+	
 	protected boolean isValido(Table tabla, S bean) {
-		return isValid(tabla, false, bean);
+		return isValid(tabla, false, bean, clazz);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private boolean isValid(Table tabla, boolean vacioEsError, S bean){
+	private <R extends Serializable> boolean isValid(Table tabla, boolean vacioEsError, R bean, Class<R> clase){
 		Map<String, Boolean> hayErroresHolder = new HashMap<String, Boolean>();
 		hayErroresHolder.put("hayErrores", false);
 		Container container = tabla.getContainerDataSource();
@@ -274,11 +278,11 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		}
 		tabla.setComponentError(null);
 		Map<Field<?>, Property<?>> prevPropDS = new HashMap<Field<?>, Property<?>>();
-		GunixBeanFieldGroup<S> bfgf = new GunixBeanFieldGroup<S>(clazz);
+		GunixBeanFieldGroup<R> bfgf = new GunixBeanFieldGroup<R>(clase);
 		GunixTableFieldFactory grff = (GunixTableFieldFactory) tabla.getTableFieldFactory();
 		if (bean == null) {
 			container.getItemIds().forEach(beanId -> {
-				validaBean(bfgf, (S) beanId, grff, tabla, container, prevPropDS, hayErroresHolder);
+				validaBean(bfgf, (R) beanId, grff, tabla, container, prevPropDS, hayErroresHolder);
 			});
 		} else {
 			validaBean(bfgf, bean, grff, tabla, container, prevPropDS, hayErroresHolder);
@@ -290,7 +294,7 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void validaBean(GunixBeanFieldGroup<S> bfgf, S beanId, GunixTableFieldFactory grff, Table tabla, Container container, Map<Field<?>, Property<?>> prevPropDS, Map<String, Boolean> hayErroresHolder) {
+	private <R extends Serializable> void validaBean(GunixBeanFieldGroup<R> bfgf, R beanId, GunixTableFieldFactory grff, Table tabla, Container container, Map<Field<?>, Property<?>> prevPropDS, Map<String, Boolean> hayErroresHolder) {
 		bfgf.setItemDataSource(beanId);
 		List<GunixFieldPropertyRel> fieldProps = grff.getFieldsBy(tabla, container, beanId);
 		fieldProps.forEach(fieldProp -> {
@@ -305,8 +309,8 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		try {
 			bfgf.commit(ibve -> {
 				if ("".equals(ibve.getPropertyPath().toString())) {
-					GunixTableBeanErrorGenerator<S> bErrGen = initTableBeanErrorGenerator(tabla);
-					bErrGen.addBeanError((S) ibve.getLeafBean(), ibve.getMessage());
+					GunixTableBeanErrorGenerator<R> bErrGen = initTableBeanErrorGenerator(tabla);
+					bErrGen.addBeanError((R) ibve.getLeafBean(), ibve.getMessage());
 				} else {
 					tabla.setComponentError(new UserError(ibve.getMessage()));
 				}
@@ -328,22 +332,22 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	}
 
 	@SuppressWarnings("unchecked")
-	private GunixTableBeanErrorGenerator<S> initTableBeanErrorGenerator(Table tabla) {
-		GunixTableBeanErrorGenerator<S> gtbeg = null;
+	private <R extends Serializable> GunixTableBeanErrorGenerator<R> initTableBeanErrorGenerator(Table tabla) {
+		GunixTableBeanErrorGenerator<R> gtbeg = null;
 		if (tabla.getItemDescriptionGenerator() == null && tabla.getCellStyleGenerator() == null) {
-			gtbeg = new GunixTableBeanErrorGenerator<S>();
+			gtbeg = new GunixTableBeanErrorGenerator<R>();
 			tabla.setItemDescriptionGenerator(gtbeg);
 			tabla.setCellStyleGenerator(gtbeg);
 		} else {
 			if (tabla.getItemDescriptionGenerator() instanceof GunixTableBeanErrorGenerator) {
-				gtbeg = (GunixTableBeanErrorGenerator<S>) tabla.getItemDescriptionGenerator();
+				gtbeg = (GunixTableBeanErrorGenerator<R>) tabla.getItemDescriptionGenerator();
 			}
 		}
 		return gtbeg;
 	}
 
 	protected boolean isValida(Table tabla, boolean vacioEsError) {
-		return isValid(tabla, vacioEsError, null);
+		return isValid(tabla, vacioEsError, null, clazz);
 	}
 	
 	protected Variable<ActivitiGunixFile> buildGunixFileVariable(String nombreVariable, GunixUploadField uploadField) {

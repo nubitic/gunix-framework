@@ -1,28 +1,56 @@
 package mx.com.gunix.adminapp.service;
 
-
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.groups.Default;
 
+import mx.com.gunix.adminapp.domain.persistence.AmbitoMapper;
+import mx.com.gunix.adminapp.domain.persistence.AplicacionMapper;
+import mx.com.gunix.adminapp.domain.persistence.RolMapper;
+import mx.com.gunix.adminapp.domain.persistence.UsuarioAdminMapper;
+import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
+import mx.com.gunix.framework.security.domain.ACLType;
+import mx.com.gunix.framework.security.domain.Ambito.Permiso;
+import mx.com.gunix.framework.security.domain.ACLTypeMap;
+import mx.com.gunix.framework.security.domain.Aplicacion;
+import mx.com.gunix.framework.security.domain.Usuario;
+import mx.com.gunix.framework.service.GetterService;
+import mx.com.gunix.framework.service.GunixActivitServiceSupport;
+import mx.com.gunix.framework.service.hessian.ByteBuddyUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.remoting.caucho.HessianProxyFactoryBean;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.vote.AuthenticatedVoter;
+import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.domain.CumulativePermission;
+import org.springframework.security.acls.domain.ObjectIdentityImpl;
+import org.springframework.security.acls.domain.PrincipalSid;
+import org.springframework.security.acls.model.Acl;
+import org.springframework.security.acls.model.MutableAcl;
+import org.springframework.security.acls.model.MutableAclService;
+import org.springframework.security.acls.model.NotFoundException;
+import org.springframework.security.acls.model.ObjectIdentity;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.acls.model.Sid;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import mx.com.gunix.adminapp.domain.persistence.AplicacionMapper;
-import mx.com.gunix.adminapp.domain.persistence.RolMapper;
-import mx.com.gunix.adminapp.domain.persistence.UsuarioAdminMapper;
-import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
-import mx.com.gunix.framework.security.domain.Aplicacion;
-import mx.com.gunix.framework.security.domain.Usuario;
-import mx.com.gunix.framework.service.GunixActivitServiceSupport;
+
 
 @Service("usuarioAdminService")
 @Transactional(rollbackFor = Exception.class)
@@ -37,7 +65,16 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 	@Autowired
 	RolMapper rm;
 	
+	@Autowired
+	AmbitoMapper ambm;
+	
+	@Autowired
+	MutableAclService aclService;
+	
 	private PasswordEncoder pe = new BCryptPasswordEncoder();
+	
+	private static Class<GetterService> securedACLGetterInterface;
+	private static Method getMethod;
 	
 	public List<Aplicacion> getAppRoles() {
 		List<Aplicacion> appRoles =  am.getAll();
@@ -97,16 +134,85 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 		um.updateDatosUsuario(idUsuario, usuario.getDatosUsuario());
 		um.deleteRolesUsuario(idUsuario);
 		um.deleteAppUsuario(idUsuario);
-		usuario.getAplicaciones().forEach(aplicacion->{doInsertAppRoles(idUsuario,aplicacion);});
+		usuario.getAplicaciones().forEach(aplicacion -> {
+			doInsertAppRoles(idUsuario, aplicacion);
+			if (aplicacion.getAmbito() != null) {
+				List<Sid> userSid = new ArrayList<Sid>();
+				PrincipalSid psid = new PrincipalSid(usuario.getIdUsuario()); 
+				userSid.add(psid);
+				aplicacion.getAmbito().forEach(ambito -> {
+					if (ambito.getPermisos() != null) {
+						List<ObjectIdentity> objects = new ArrayList<ObjectIdentity>();
+						Map<ObjectIdentity, Permiso> oI2Permiso = new HashMap<ObjectIdentity, Permiso>();
+						ambito.getPermisos().forEach(permiso -> {
+							ObjectIdentity oi = new ObjectIdentityImpl(ambito.getClase(), permiso.getAclType().getId());
+							objects.add(oi);
+							oI2Permiso.put(oi, permiso);
+						});
+						Map<ObjectIdentity, Acl> permisosUsuario = aclService.readAclsById(objects);
+
+						permisosUsuario.forEach((oi, acl) -> {
+							AtomicReference<Permiso> curPer = new AtomicReference<Permiso>();
+							if (acl.isSidLoaded(userSid)) {
+								AtomicInteger entryCounter = new AtomicInteger(0);
+								acl.getEntries().forEach(entry -> {
+									// Se actualizan los ACEs que el usuario ya tenía
+										if (psid.equals(entry.getSid())) {
+											MutableAcl macl = (MutableAcl) acl;
+											boolean haveAdminRights = false;
+											try {
+												haveAdminRights = macl.isGranted(Arrays.asList(new Permission[] { BasePermission.ADMINISTRATION }), userSid, true);
+											} catch (NotFoundException ignorar) {}
+											CumulativePermission permission = buildPermission(curPer.get() == null ? initPerm(curPer, oI2Permiso.remove(oi)) : curPer.get());
+											if (haveAdminRights) {
+												permission.set(BasePermission.ADMINISTRATION);
+											}
+											macl.deleteAce(entryCounter.get());
+											macl.insertAce(entryCounter.get(), permission, psid, true);
+										}
+										entryCounter.addAndGet(1);
+									});
+								aclService.updateAcl((MutableAcl) acl);
+							}
+						});
+						
+						// Se ingresan nuevos ACEs que el usuario no tenía
+						oI2Permiso.forEach((oii, perm) -> {
+							MutableAcl acl = (MutableAcl) permisosUsuario.get(oii);
+							acl.insertAce(acl.getEntries().size(), buildPermission(perm), psid, true);
+							aclService.updateAcl(acl);
+						});
+					}
+				});
+			}
+		});
 	}
 	
-	@SuppressWarnings("null")
+	private Permiso initPerm(AtomicReference<Permiso> curPer, Permiso remove) {
+		curPer.set(remove);
+		return remove;
+	}
+
+	private CumulativePermission buildPermission(Permiso p) {
+		CumulativePermission cumPer = new CumulativePermission();
+
+		if (p.isLectura()) {
+			cumPer.set(BasePermission.READ);
+		}
+		if (p.isEliminacion()) {
+			cumPer.set(BasePermission.DELETE);
+		}
+		if (p.isModificacion()) {
+			cumPer.set(BasePermission.WRITE);
+		}
+		return cumPer;
+	}
+
+	@SuppressWarnings({ "null"})
 	public List<Usuario> getByExample(Boolean esMaestro, Usuario usuario) {
 		List<Usuario> usuarios = null;
 		if (esMaestro) {
-			usuarios = um.getByExample(usuario);
-
-			
+			usuarios = um.getByExample(usuario);			
 		}else{
 			List<Aplicacion> appRoles = getAppRoles();
 			this.agregaVariable("aplicaciones", appRoles);
@@ -124,13 +230,141 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 				if(appRolesUS.isEmpty()){
 					throw new IllegalArgumentException("No se encontrarion Aplicaciónes asociadas al usuario con id: "+u.getIdUsuario()); 
 				}
-				
-				appRolesUS.forEach(app->{
+
+				appRolesUS.forEach(app -> {
 					app.setRoles(um.getRolAppUsuario(u.getIdUsuario(), app.getIdAplicacion()));
+					app.setAmbito(ambm.getByIdAplicacion(app.getIdAplicacion()));
+					if (app.getAmbito() != null) {
+						app.getAmbito().forEach(ambito -> {
+							String[] serviceUrl = ambito.getGetAllUri().split("\\?");
+							try {
+								GetterService gs = createGetter(serviceUrl[0]);
+								List<ACLType> aclTypes = sanitize((List<?>) getMethod.invoke(gs, new Object[] { serviceUrl[1].split("=")[1] + "/getAll", new Object[0], SecurityContextHolder.getContext().getAuthentication().getPrincipal() }));
+								
+								if (aclTypes != null) {
+									List<ObjectIdentity> objects = new ArrayList<ObjectIdentity>();
+									Map<ACLType, ObjectIdentity> aclType2OI = new HashMap<ACLType, ObjectIdentity>();
+									aclTypes.forEach(aclType -> {
+										ObjectIdentity oi = new ObjectIdentityImpl(ambito.getClase(), aclType.getId()); 
+										objects.add(oi);
+										aclType2OI.put(aclType, oi);
+									});
+									List<Sid> userSid = new ArrayList<Sid>();
+									userSid.add(new PrincipalSid(u.getIdUsuario()));
+									Map<ObjectIdentity, Acl> permisosUsuario = aclService.readAclsById(objects, userSid);
+
+									ambito.setPermisos(new ArrayList<Permiso>());
+
+									aclTypes.forEach(aclType -> {
+										ObjectIdentity foundOI = aclType2OI.get(aclType);
+										Acl aclUsr = foundOI != null ? permisosUsuario.get(foundOI) : null;
+										
+										Permiso p = new Permiso();
+										p.setAclType(aclType);
+
+										if (aclUsr != null) {
+											List<Permission> permiso = new ArrayList<Permission>();
+											// READ no tiene try/catch porque no tendría sentido tener permisos de escritura o eliminación sin tener los de lectura, estaríamos ante una mala 
+											// configuración y si ese es el caso nos interesa arrojar la excepción
+											permiso.add(BasePermission.READ);
+											if (aclUsr.isGranted(permiso, userSid, true)) {
+												p.setLectura(true);
+												permiso.clear();
+											}
+											
+											permiso.add(BasePermission.WRITE);
+											try {
+												if (aclUsr.isGranted(permiso, userSid, true)) {
+													p.setModificacion(true);
+												}
+											} catch (NotFoundException ignorar) {
+											} finally {
+												permiso.clear();
+											}
+											
+											permiso.add(BasePermission.DELETE);
+											try {
+												if (aclUsr.isGranted(permiso, userSid, true)) {
+													p.setEliminacion(true);
+												}
+											} catch (NotFoundException ignorar) {
+											} finally {
+												permiso.clear();
+											}
+										}
+										ambito.getPermisos().add(p);
+									});
+								}
+							} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+								throw new RuntimeException(e);
+							}
+						});
+					}
 				});
 				u.setAplicaciones(appRolesUS);
 			}
 		}
 		return usuarios;	
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<ACLType> sanitize(List<?> list) {
+		if (list != null && !list.isEmpty()) {
+			Object sampleMap = null;
+			if ((sampleMap = list.get(0)) instanceof Map) {
+				List<ACLType> wrappedMapACLType = new ArrayList<ACLType>();
+				
+				String idPropertyName = resolve((Map<String, Object>) sampleMap, "id");
+				String descripcionPropertyName = resolve((Map<String, Object>) sampleMap, "descripcion");
+				String claveNegocioPropertyName = resolve((Map<String, Object>) sampleMap, "claveNegocio");
+
+				list.forEach(aclTypeMap -> {
+					wrappedMapACLType.add(new ACLTypeMap((Map<String, Object>) aclTypeMap, idPropertyName, descripcionPropertyName, claveNegocioPropertyName));
+				});
+				return wrappedMapACLType;
+			}
+		}
+		return (List<ACLType>) list;
+	}
+
+	private String resolve(Map<String, Object> aclTypeMap, String property) {
+		AtomicReference<String> actualPropertyName = new AtomicReference<String>();
+		if ("id".equals(property)) {
+			aclTypeMap.forEach((propertyName, value) -> {
+				if (actualPropertyName.get() == null && propertyName.toLowerCase().indexOf("id") != -1 && value != null && (value instanceof Long || long.class.isAssignableFrom(value.getClass()))) {
+					actualPropertyName.set(propertyName);
+				}
+			});
+		} else {
+			if ("descripcion".equals(property)) {
+				aclTypeMap.forEach((propertyName, value) -> {
+					if (actualPropertyName.get() == null && propertyName.toLowerCase().indexOf("desc") != -1 && value != null && value instanceof String) {
+						actualPropertyName.set(propertyName);
+					}
+				});
+			} else {
+				if ("claveNegocio".equals(property)) {
+					aclTypeMap.forEach((propertyName, value) -> {
+						if (actualPropertyName.get() == null && value != null && (propertyName.toLowerCase().indexOf("desc") == -1 && propertyName.toLowerCase().indexOf("id") == -1)) {
+							actualPropertyName.set(propertyName);
+						}
+					});
+				}
+			}
+		}
+		return actualPropertyName.get();
+	}
+
+	@SuppressWarnings("unchecked")
+	private GetterService createGetter(String hostURL) throws NoSuchMethodException, SecurityException {
+		HessianProxyFactoryBean factoryBean = new HessianProxyFactoryBean();
+		if (securedACLGetterInterface == null) {
+			securedACLGetterInterface = (Class<GetterService>) ByteBuddyUtils.appendUsuario(getClass().getClassLoader(), GetterService.class.getName());
+			getMethod = securedACLGetterInterface.getMethod("get", new Class[] { String.class, Object[].class, UserDetails.class });
+		}
+		factoryBean.setServiceInterface(securedACLGetterInterface);
+		factoryBean.setServiceUrl(hostURL + "/getterService");
+		factoryBean.afterPropertiesSet();
+		return (GetterService) factoryBean.getObject();
 	}
 }

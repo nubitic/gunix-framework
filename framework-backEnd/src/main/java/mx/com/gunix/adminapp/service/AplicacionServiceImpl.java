@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.groups.Default;
 
+import mx.com.gunix.adminapp.domain.persistence.AmbitoMapper;
 import mx.com.gunix.adminapp.domain.persistence.AplicacionMapper;
 import mx.com.gunix.adminapp.domain.persistence.FuncionMapper;
 import mx.com.gunix.adminapp.domain.persistence.ModuloMapper;
@@ -19,9 +20,9 @@ import mx.com.gunix.framework.domain.validation.GunixValidationGroups.DatabaseVa
 import mx.com.gunix.framework.persistence.DescriptorCambios;
 import mx.com.gunix.framework.security.domain.Aplicacion;
 import mx.com.gunix.framework.security.domain.Funcion;
-import mx.com.gunix.framework.security.domain.Parametro;
 import mx.com.gunix.framework.security.domain.Funcion.Acceso;
 import mx.com.gunix.framework.security.domain.Modulo;
+import mx.com.gunix.framework.security.domain.Parametro;
 import mx.com.gunix.framework.security.domain.Rol;
 import mx.com.gunix.framework.service.ACLTypeServiceSupport;
 
@@ -47,6 +48,9 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 
 	@Autowired
 	RolMapper rm;
+	
+	@Autowired
+	AmbitoMapper ambm;
 
 	@Override
 	public Aplicacion getById(Long id) {
@@ -68,6 +72,12 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 				rol -> {
 					doInsert(aplicacion, rol);
 				});
+		
+		if (aplicacion.getAmbito() != null) {
+			aplicacion.getAmbito().forEach(ambito->{
+				ambm.inserta(ambito);
+			});
+		}
 	}
 
 	private void doInsert(Aplicacion aplicacion, Rol rol) {
@@ -211,6 +221,13 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 					app.getRoles().forEach(rol -> {
 						rol.setAplicacion(app);
 						rol.setModulos(acomodaFuncionesModulos(app, rm.getFuncionesByIdRol(app.getIdAplicacion(), rol.getIdRol())));
+					});
+				}
+				
+				app.setAmbito(ambm.getByIdAplicacion(app.getIdAplicacion()));
+				if (app.getAmbito() != null) {
+					app.getAmbito().forEach(ambito -> {
+						ambito.setAplicacion(app);
 					});
 				}
 			}

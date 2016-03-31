@@ -5,17 +5,22 @@ import java.util.Iterator;
 import java.util.List;
 
 import mx.com.gunix.framework.processes.domain.Variable;
+import mx.com.gunix.framework.security.domain.Ambito;
 import mx.com.gunix.framework.security.domain.Aplicacion;
 import mx.com.gunix.framework.security.domain.Funcion;
 import mx.com.gunix.framework.security.domain.Modulo;
 import mx.com.gunix.framework.security.domain.Parametro;
 import mx.com.gunix.framework.security.domain.Rol;
+import mx.com.gunix.framework.ui.vaadin.component.GunixMTable;
+import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory;
 import mx.com.gunix.framework.ui.vaadin.spring.GunixVaadinView;
 import mx.com.gunix.framework.ui.vaadin.view.AbstractGunixView;
 import mx.com.gunix.framework.ui.vaadin.view.SecuredView;
 import mx.com.gunix.ui.vaadin.view.adminapp.aplicacion.components.FuncionesTab;
 import mx.com.gunix.ui.vaadin.view.adminapp.aplicacion.components.ModuloForm;
 import mx.com.gunix.ui.vaadin.view.adminapp.aplicacion.components.RolForm;
+
+import org.vaadin.viritin.ListContainer;
 
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.event.FieldEvents.FocusEvent;
@@ -45,13 +50,16 @@ public class AplicacionView extends AbstractGunixView<Aplicacion> implements Sec
 	private Button guardarButton;
 	private Button cancelarButton;
 	private HorizontalLayout botonera;
-	private Accordion modulosRolesAcc;
+	private Accordion modulosRolesAmbitoAcc;
 	private Panel rolesPanel;
 	private VerticalLayout verticalLayout_3;
 	private TabSheet rolesTabS;
 	private Panel modulosPanel;
 	private VerticalLayout verticalLayout_2;
 	private TabSheet modulosTabS;
+	private Panel ambitoPanel;
+	private VerticalLayout verticalLayout_4;
+	private GunixMTable<Ambito> ambitosTable;
 	private TextField icono;
 	private TextField descripcion;
 	private TextField idAplicacion;
@@ -62,6 +70,8 @@ public class AplicacionView extends AbstractGunixView<Aplicacion> implements Sec
 
 	private Boolean esConsulta;
 	private Boolean esModificacion;
+
+	private Ambito ultimoAmbitoAgregadoAMano;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -85,6 +95,12 @@ public class AplicacionView extends AbstractGunixView<Aplicacion> implements Sec
 			aplicacion.getRoles().forEach(rol -> {
 				addRolTab(rol);
 			});
+			if (aplicacion.getAmbito() != null) {
+				aplicacion.getAmbito().forEach(ambito -> {
+					ambitosTable.removeAllItems();
+					((ListContainer<Ambito>) ambitosTable.getContainerDataSource()).addAll(aplicacion.getAmbito());
+				});
+			}
 
 			idAplicacion.setReadOnly(true);
 
@@ -109,8 +125,9 @@ public class AplicacionView extends AbstractGunixView<Aplicacion> implements Sec
 		flyt.setCaption(new StringBuilder($("operación").toString()).append(" de Aplicaciones").toString());
 
 		buildMainLayout();
-		modulosRolesAcc.getTab(0).setIcon(new ThemeResource("img/1440815258_blockdevice.png"));
-		modulosRolesAcc.getTab(1).setIcon(new ThemeResource("img/1440815816_To_do_list.png"));
+		modulosRolesAmbitoAcc.getTab(0).setIcon(new ThemeResource("img/1440815258_blockdevice.png"));
+		modulosRolesAmbitoAcc.getTab(1).setIcon(new ThemeResource("img/1440815816_To_do_list.png"));
+		modulosRolesAmbitoAcc.getTab(2).setIcon(new ThemeResource("img/1459221873_control_panel_access.png"));
 		
 		if (!esConsulta) {
 			modulosAddTab = modulosTabS.addTab(new Panel());
@@ -125,8 +142,8 @@ public class AplicacionView extends AbstractGunixView<Aplicacion> implements Sec
 			rolesTabS.addFocusListener(event -> {
 				doRolesAddTab();
 			});
-			modulosRolesAcc.addSelectedTabChangeListener(event -> {
-				if (modulosRolesAcc.getSelectedTab() == rolesPanel) {
+			modulosRolesAmbitoAcc.addSelectedTabChangeListener(event -> {
+				if (modulosRolesAmbitoAcc.getSelectedTab() == rolesPanel) {
 					if (commitModulos()) {
 						updateRoles();
 					}
@@ -161,18 +178,24 @@ public class AplicacionView extends AbstractGunixView<Aplicacion> implements Sec
 					commitModulos();
 					commitRoles();
 					updateRoles();
-					modulosRolesAcc.getTab(0).setComponentError(null);
-					modulosRolesAcc.getTab(1).setComponentError(null);
-					modulosRolesAcc.setComponentError(null);
+					modulosRolesAmbitoAcc.getTab(0).setComponentError(null);
+					modulosRolesAmbitoAcc.getTab(1).setComponentError(null);
+					modulosRolesAmbitoAcc.getTab(2).setComponentError(null);
+					modulosRolesAmbitoAcc.setComponentError(null);
 					commit(cv -> {
 						UserError ue = new UserError(cv.getMessage());
 						if ("modulos".equals(cv.getPropertyPath().toString())) {
-							modulosRolesAcc.getTab(0).setComponentError(ue);
-							modulosRolesAcc.setComponentError(ue);
+							modulosRolesAmbitoAcc.getTab(0).setComponentError(ue);
+							modulosRolesAmbitoAcc.setComponentError(ue);
 						} else {
 							if ("roles".equals(cv.getPropertyPath().toString()) || cv.getPropertyPath().toString().matches("roles\\[\\d+\\]\\.modulos")) {
-								modulosRolesAcc.getTab(1).setComponentError(ue);
-								modulosRolesAcc.setComponentError(ue);
+								modulosRolesAmbitoAcc.getTab(1).setComponentError(ue);
+								modulosRolesAmbitoAcc.setComponentError(ue);
+							}else{
+								if ("ambitos".equals(cv.getPropertyPath().toString())) {
+									modulosRolesAmbitoAcc.getTab(2).setComponentError(ue);
+									modulosRolesAmbitoAcc.setComponentError(ue);
+								}	
 							}
 						}
 					});
@@ -253,7 +276,7 @@ public class AplicacionView extends AbstractGunixView<Aplicacion> implements Sec
 					fnesTabComp.commit();
 				} catch (CommitException e) {
 					sinError = false;
-					modulosRolesAcc.setSelectedTab(modulosPanel);
+					modulosRolesAmbitoAcc.setSelectedTab(modulosPanel);
 					modulosTabS.setSelectedTab(fnesTabComp);
 				}
 			}
@@ -330,7 +353,21 @@ public class AplicacionView extends AbstractGunixView<Aplicacion> implements Sec
 			});
 			roles.add(r);
 		});
+		List<Ambito> ambitos = new ArrayList<Ambito>();
+		appBean.setAmbito(ambitos);
+		aplicacion.getAmbito().forEach(ambito -> {
+			ambitos.add(cloneAmbito(appBean, ambito));
+		});
 		return appBean;
+	}
+
+	private Ambito cloneAmbito(Aplicacion appBean, Ambito ambito) {
+		Ambito a = new Ambito();
+		a.setAplicacion(appBean);
+		a.setClase(ambito.getClase());
+		a.setDescripcion(ambito.getDescripcion());
+		a.setGetAllUri(ambito.getGetAllUri());
+		return a;
 	}
 
 	private Modulo cloneModulo(Aplicacion appBean, Modulo modulo) {
@@ -598,8 +635,8 @@ public class AplicacionView extends AbstractGunixView<Aplicacion> implements Sec
 		flyt.addComponent(icono);
 
 		// modulosRolesAcc
-		modulosRolesAcc = buildModulosRolesAcc();
-		flyt.addComponent(modulosRolesAcc);
+		modulosRolesAmbitoAcc = buildModulosRolesAcc();
+		flyt.addComponent(modulosRolesAmbitoAcc);
 
 		// botones
 		botonera = new HorizontalLayout();
@@ -624,19 +661,75 @@ public class AplicacionView extends AbstractGunixView<Aplicacion> implements Sec
 
 	private Accordion buildModulosRolesAcc() {
 		// common part: create layout
-		modulosRolesAcc = new Accordion();
-		modulosRolesAcc.setImmediate(true);
-		modulosRolesAcc.setSizeFull();
-		modulosRolesAcc.setHeight("-1px");
+		modulosRolesAmbitoAcc = new Accordion();
+		modulosRolesAmbitoAcc.setImmediate(true);
+		modulosRolesAmbitoAcc.setSizeFull();
+		modulosRolesAmbitoAcc.setHeight("-1px");
 		// modulosPanel
 		modulosPanel = buildModulosPanel();
-		modulosRolesAcc.addTab(modulosPanel, "Módulos", null);
+		modulosRolesAmbitoAcc.addTab(modulosPanel, "Módulos", null);
 
 		// rolesPanel
 		rolesPanel = buildRolesPanel();
-		modulosRolesAcc.addTab(rolesPanel, "Roles", null);
+		modulosRolesAmbitoAcc.addTab(rolesPanel, "Roles", null);
 
-		return modulosRolesAcc;
+		// ambitoPanel
+		ambitoPanel = buildAmbitoPanel();
+		modulosRolesAmbitoAcc.addTab(ambitoPanel, "Ambitos", null);
+		return modulosRolesAmbitoAcc;
+	}
+
+	private Panel buildAmbitoPanel() {
+		// common part: create layout
+		ambitoPanel = new Panel();
+		ambitoPanel.setImmediate(false);
+		ambitoPanel.setSizeFull();
+		// verticalLayout_4
+		verticalLayout_4 = buildVerticalLayout_4();
+		ambitoPanel.setContent(verticalLayout_4);
+
+		return ambitoPanel;
+	}
+
+	private VerticalLayout buildVerticalLayout_4() {
+		// common part: create layout
+		verticalLayout_4 = new VerticalLayout();
+		verticalLayout_4.setImmediate(false);
+		verticalLayout_4.setMargin(true);
+		verticalLayout_4.setSpacing(true);
+
+		// Ambito Table
+		ambitosTable = new GunixMTable<Ambito>(Ambito.class);
+		ambitosTable.setTableFieldFactory(new GunixTableFieldFactory());
+		ambitosTable.setVisibleColumns("clase", "descripcion","getAllUri");
+		ambitosTable.setColumnHeaders(new String[]{"Clase", "Descripción","Get All URI"});
+		ambitosTable.setEditable(!esConsulta);
+		ambitosTable.setImmediate(false);
+		ambitosTable.setHeight("255px");
+		ambitosTable.setWidth("100%");
+		verticalLayout_4.addComponent(ambitosTable);
+		
+		if(!esConsulta){
+			Button agregar = new Button("Agregar");
+			agregar.addClickListener(clickEvent -> {
+				if (ultimoAmbitoAgregadoAManoIsValid()) {
+					Ambito nuevoAmbito = new Ambito();
+					ultimoAmbitoAgregadoAMano = nuevoAmbito;
+					ambitosTable.getContainerDataSource().addItem(nuevoAmbito);
+				}
+			});
+			verticalLayout_4.addComponent(agregar);	
+		}
+
+		return verticalLayout_4;
+	}
+
+	private boolean ultimoAmbitoAgregadoAManoIsValid() {
+		boolean ans = true;
+		if (ultimoAmbitoAgregadoAMano != null) {
+			ans = isValido(ambitosTable, ultimoAmbitoAgregadoAMano, Ambito.class);
+		}
+		return ans;
 	}
 
 	private Panel buildModulosPanel() {

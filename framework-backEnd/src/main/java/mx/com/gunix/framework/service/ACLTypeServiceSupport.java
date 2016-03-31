@@ -8,6 +8,7 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.method.P;
 import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.domain.CumulativePermission;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.MutableAcl;
@@ -43,17 +44,12 @@ public abstract class ACLTypeServiceSupport<T extends ACLType> extends GunixActi
 			} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
-
 		} else {
 			Long newId = shm.nextVal("seguridad.acl_object_identity", "object_id_identity");
 			ObjectIdentity oi = new ObjectIdentityImpl(aclType.getClass(), newId);
 			MutableAcl mAcl = aclService.createAcl(oi);
 			Sid sid = new PrincipalSid(SecurityContextHolder.getContext().getAuthentication());
-			int currIndex = mAcl.getEntries().size();
-			mAcl.insertAce(currIndex, BasePermission.ADMINISTRATION, sid, true);
-			mAcl.insertAce(currIndex + 1, BasePermission.READ, sid, true);
-			mAcl.insertAce(currIndex + 2, BasePermission.WRITE, sid, true);
-			mAcl.insertAce(currIndex + 3, BasePermission.DELETE, sid, true);
+			mAcl.insertAce(mAcl.getEntries().size(), new CumulativePermission().set(BasePermission.ADMINISTRATION).set(BasePermission.READ).set(BasePermission.WRITE).set(BasePermission.DELETE), sid, true);
 			aclService.updateAcl(mAcl);
 			aclType.setId(newId);
 			doInsert(aclType);

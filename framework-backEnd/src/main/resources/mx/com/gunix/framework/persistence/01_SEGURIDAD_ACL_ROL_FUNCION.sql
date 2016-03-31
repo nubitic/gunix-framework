@@ -31,6 +31,9 @@ CREATE INDEX acl_sid_FK1IDX ON acl_sid USING BTREE (sid);
 create table acl_class(
     id bigserial not null primary key,
     class varchar(100) not null,
+    id_aplicacion varchar(30) not null,
+    descripcion varchar(100) not null,
+    get_all_uri varchar(100) not null,
     constraint unique_uk_2 unique(class)
 );
 
@@ -212,16 +215,13 @@ create table PERSISTENT_LOGINS
         LAST_USED timestamp not null
 );
 
-
-INSERT INTO acl_class(class) values ('mx.com.gunix.framework.security.domain.Aplicacion');
+INSERT INTO acl_class(class,descripcion,get_all_uri,id_aplicacion) values ('mx.com.gunix.framework.security.domain.Aplicacion','Aplicaciones alojadas en Gunix','http://localhost:8081/map-backEnd?servicio=aplicacionService','ADMIN_APP');
 INSERT INTO acl_object_identity(object_id_class,owner_sid,entries_inheriting) values( currval(pg_get_serial_sequence('acl_class', 'id')),(select id from acl_sid where sid = 'admin@gunix.mx'),true);
 
-/*INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 0, (select id from acl_sid where sid = 'admin@gunix.mx'), 16, TRUE, FALSE, FALSE);
-INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 1, (select id from acl_sid where sid = 'admin@gunix.mx'), 1, TRUE, FALSE, FALSE);
-INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 2, (select id from acl_sid where sid = 'admin@gunix.mx'), 2, TRUE, FALSE, FALSE);
-INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 3, (select id from acl_sid where sid = 'admin@gunix.mx'), 8, TRUE, FALSE, FALSE);*/
+/*INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 0, (select id from acl_sid where sid = 'admin@gunix.mx'), 27, TRUE, FALSE, FALSE);*/
 
 INSERT INTO APLICACION VALUES('ADMIN_APP',currval(pg_get_serial_sequence('acl_object_identity', 'object_id_identity')),'Gunix Admin App','Gunix.png');
+alter table ACL_CLASS CONSTRAINT "acl_class_aplicacion_fk" FOREIGN KEY (id_aplicacion) REFERENCES aplicacion (id_aplicacion)  ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 	INSERT INTO USUARIO_APLICACION VALUES('admin@gunix.mx','ADMIN_APP');
 

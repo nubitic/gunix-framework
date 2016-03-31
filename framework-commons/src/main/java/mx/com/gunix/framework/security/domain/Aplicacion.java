@@ -45,6 +45,9 @@ public class Aplicacion extends HashCodeByTimeStampAware implements ACLType {
 	@Valid
 	private List<Modulo> modulos;
 
+	@Valid
+	private List<Ambito> ambito;
+	
 	public Long getId() {
 		return id;
 	}
@@ -93,6 +96,14 @@ public class Aplicacion extends HashCodeByTimeStampAware implements ACLType {
 		this.modulos = modulos;
 	}
 
+	public List<Ambito> getAmbito() {
+		return ambito;
+	}
+
+	public void setAmbito(List<Ambito> ambito) {
+		this.ambito = ambito;
+	}
+
 	@Override
 	protected int doHashCode() {
 		final int prime = 31;
@@ -124,9 +135,15 @@ public class Aplicacion extends HashCodeByTimeStampAware implements ACLType {
 		return true;
 	}
 
+	
+
 	@Override
 	public String toString() {
 		return "Aplicacion [id=" + id + ", idAplicacion=" + idAplicacion + "]";
 	}
 
+	@Override
+	public String getClaveNegocio() {
+		return getIdAplicacion();
+	}
 }

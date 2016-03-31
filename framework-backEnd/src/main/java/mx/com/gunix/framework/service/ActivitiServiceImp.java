@@ -231,7 +231,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		Tarea tarea = null;
 		Task task =null;
 		
-		if (pi != null && ((ExecutionEntity) pi).getTasks() != null) {
+		if (validaTasksPrecargadas(pi)) {
 			task = ((ExecutionEntity) pi).getTasks().get(0);
 		} else {
 			task = ts.createTaskQuery().active().processInstanceId(piid).singleResult();
@@ -269,6 +269,14 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			}
 		}
 		return tarea;
+	}
+
+	private boolean validaTasksPrecargadas(ProcessInstance pi) {
+		try {
+			return (pi != null && ((ExecutionEntity) pi).getTasks() != null);
+		} catch (NullPointerException ignorar) {
+			return false;
+		}
 	}
 
 	private void addTransitions(Tarea tarea, List<PvmTransition> oTrans) {

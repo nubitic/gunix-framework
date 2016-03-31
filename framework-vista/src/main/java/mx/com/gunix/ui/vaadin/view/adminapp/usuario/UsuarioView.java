@@ -6,15 +6,24 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-
-
-
+import mx.com.gunix.framework.processes.domain.Variable;
+import mx.com.gunix.framework.security.domain.Ambito;
+import mx.com.gunix.framework.security.domain.Ambito.Permiso;
+import mx.com.gunix.framework.security.domain.Aplicacion;
+import mx.com.gunix.framework.security.domain.Rol;
+import mx.com.gunix.framework.security.domain.Usuario;
+import mx.com.gunix.framework.ui.vaadin.component.GunixMTable;
+import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory;
+import mx.com.gunix.framework.ui.vaadin.spring.GunixVaadinView;
+import mx.com.gunix.framework.ui.vaadin.view.AbstractGunixView;
+import mx.com.gunix.framework.ui.vaadin.view.SecuredView;
 
 import org.josso.selfservices.password.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.PropertyId;
+import com.vaadin.data.util.converter.StringToBooleanConverter;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Accordion;
@@ -23,18 +32,11 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.Notification.Type;
-
-import mx.com.gunix.framework.processes.domain.Variable;
-import mx.com.gunix.framework.security.domain.Aplicacion;
-import mx.com.gunix.framework.security.domain.Rol;
-import mx.com.gunix.framework.security.domain.Usuario;
-import mx.com.gunix.framework.ui.vaadin.spring.GunixVaadinView;
-import mx.com.gunix.framework.ui.vaadin.view.AbstractGunixView;
-import mx.com.gunix.framework.ui.vaadin.view.SecuredView;
+import com.vaadin.ui.VerticalLayout;
 
 
 @GunixVaadinView
@@ -49,9 +51,11 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 	private ComboBox estatus;
 	private Button guardarButton;
 	private Button cancelarButton;
-	private Accordion appRolesAcc;	
+	private Accordion appRolesAcc;
+	private Accordion appAmbitosAcc;	
 	private Panel datosPanel;
 	private Panel appRolesPanel;
+	private Panel appAmbitosPanel;
 	private GridLayout datosGridL;
 	private List<Aplicacion> aplicaciones;
 	private List<Aplicacion> appSelect;
@@ -243,9 +247,94 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		
 		appRolesPanel = buildAppRolesPanel();
 		flyt.addComponent(appRolesPanel);
+		
+		appAmbitosPanel = buildAppAmbitosPanel();
+		flyt.addComponent(appAmbitosPanel);
 	}
 	
 	
+	private Panel buildAppAmbitosPanel() {
+		appAmbitosPanel = new Panel("Ambito Aplicativo");
+		appAmbitosPanel.setIcon(new ThemeResource("img/1459221873_control_panel_access.png"));
+		appAmbitosPanel.setImmediate(false);
+		appAmbitosPanel.setSizeFull();
+		appAmbitosPanel.setHeight("-1px");
+
+		VerticalLayout vl = new VerticalLayout();
+		vl.setMargin(true);
+		appAmbitosAcc = new Accordion();
+		appAmbitosAcc.setImmediate(true);
+		appAmbitosAcc.setSizeFull();
+		appAmbitosAcc.setHeight("-1px");
+
+		for (Aplicacion app : usuario.getAplicaciones()) {
+			if (app.getAmbito() != null && !app.getAmbito().isEmpty()) {
+				appAmbitosAcc.addTab(buildAmbitosPanel(app), app.getDescripcion(), null);
+				appAmbitosAcc.setId("ambitos_" + app.getIdAplicacion());
+			}
+		}
+		
+		vl.addComponent(appAmbitosAcc);
+		appAmbitosPanel.setContent(vl);
+
+		return appAmbitosPanel;
+	}
+	
+	private Component buildAmbitosPanel(Aplicacion app) {
+		Panel ambitosPanel = new Panel();
+		ambitosPanel.setImmediate(false);
+		ambitosPanel.setSizeFull();
+		ambitosPanel.setHeight("-1px");
+		VerticalLayout layout = new VerticalLayout();
+		layout.setMargin(true);
+		layout.setSpacing(true);
+
+		ComboBox ambitos = new ComboBox("Ambito");
+		ambitos.setImmediate(true);
+		
+		if (app.getAmbito() != null) {
+			app.getAmbito().forEach(ambito -> {
+				ambitos.addItem(ambito.getClase());
+				ambitos.setItemCaption(ambito.getClase(), ambito.getDescripcion());
+			});
+		}
+		
+		GunixMTable<Permiso> permisos = new GunixMTable<Permiso>(Permiso.class);		
+		permisos.setTableFieldFactory(new GunixTableFieldFactory());
+		permisos.setVisibleColumns("aclType", "lectura", "modificacion", "eliminacion");
+		permisos.setColumnHeaders(new String[] { "Elemento", "¿Puede ver?", "¿Puede modificar?", "¿Puede eliminar?" });
+		permisos.addGeneratedColumn("aclType", (source, itemId, columnId) -> {
+			return new StringBuilder(((Permiso) itemId).getAclType().getClaveNegocio()).append(" - ").append(((Permiso) itemId).getAclType().getDescripcion()).toString();
+		});
+		
+		permisos.setConverter("lectura", new StringToBooleanConverter("Si", "No"));
+		permisos.setConverter("modificacion", new StringToBooleanConverter("Si", "No"));
+		permisos.setConverter("eliminacion", new StringToBooleanConverter("Si", "No"));
+		permisos.setEditable(!esConsulta);
+		permisos.setImmediate(false);
+		permisos.setHeight("255px");
+		permisos.setWidth("100%");
+		permisos.setVisible(false);
+		
+		ambitos.addValueChangeListener(vlChnEvnt -> {
+			for (Ambito ambito : app.getAmbito()) {
+				if (ambito.getClase().equals(ambitos.getValue())) {
+					ambito.getPermisos().forEach(permiso -> {
+						permisos.getContainerDataSource().addItem(permiso);
+					});
+					break;
+				}
+			}
+			permisos.setVisible(true);
+		});
+		
+		layout.addComponent(ambitos);
+		layout.addComponent(permisos);
+		ambitosPanel.setContent(layout);
+
+		return ambitosPanel;
+	}
+
 	@SuppressWarnings({ "unchecked" })
 	private Panel buildAppRolesPanel(){
 		List<Rol> rolSelect =null;
@@ -255,6 +344,8 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		appRolesPanel.setSizeFull();
 		appRolesPanel.setHeight("-1px");
 		
+		VerticalLayout vl = new VerticalLayout();
+		vl.setMargin(true);
 		appRolesAcc = new Accordion();
 		appRolesAcc.setImmediate(true);
 		appRolesAcc.setSizeFull();
@@ -272,8 +363,8 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 			appRolesAcc.addTab(buildRolesPanel(app,rolSelect), app.getDescripcion(), null);
 			appRolesAcc.setId(app.getIdAplicacion());
 		}
-		
-		appRolesPanel.setContent(appRolesAcc);
+		vl.addComponent(appRolesAcc);
+		appRolesPanel.setContent(vl);
 		
 		return appRolesPanel;
 	}
@@ -414,11 +505,11 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 				usuario.setEliminado(true);	
 			}			
 		}	
-		usuario.setAplicaciones(getAplicacionesRoles());
+		usuario.setAplicaciones(getAplicacionesRolesAmbitos());
 	
 	}
 	
-	private List<Aplicacion> getAplicacionesRoles(){
+	private List<Aplicacion> getAplicacionesRolesAmbitos(){
 		Iterator<Component> i = appRolesAcc.iterator();
 		List<Aplicacion> appSelect = new ArrayList<Aplicacion>();
 		while (i.hasNext()) {
@@ -440,12 +531,21 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 	                	rolSelect.setDescripcion(roles.getItemCaption(r));
 	                	rolesSelec.add(rolSelect);
 	                }
-	                app.setRoles(rolesSelec);	    	
+	                app.setRoles(rolesSelec);	 
 			    	appSelect.add(app);
 			    }
 		    }
 		}
 		
+		appSelect.forEach(app->{
+			usuario.getAplicaciones()
+				.stream()
+				.filter(aplicacion -> (aplicacion.getIdAplicacion().equals(app.getIdAplicacion())))
+				.findFirst()
+				.ifPresent(aplicacion->{
+					app.setAmbito(aplicacion.getAmbito());
+				});
+		});
 		return appSelect;
 
 	}
