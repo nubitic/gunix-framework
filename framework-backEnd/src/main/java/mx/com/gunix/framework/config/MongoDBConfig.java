@@ -15,7 +15,7 @@ import com.mongodb.ServerAddress;
 
 
 @Configuration
-@EnableMongoRepositories(basePackages = "mx.com.gunix.domain.persistence.repository")
+@EnableMongoRepositories(basePackages = "mx.com.gunix.domain.persistence.mongo")
 public class MongoDBConfig {
 
     public @Bean
