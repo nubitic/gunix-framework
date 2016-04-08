@@ -17,32 +17,29 @@ import org.vaadin.spring.config.VaadinConfig;
 import org.vaadin.spring.servlet.SpringAwareVaadinServlet;
 
 public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
-	static boolean isVaadin = !"SPRING_MVC".equals(System.getenv("VIEW_ENGINE"));
 
 	@Override
-	protected void afterSpringSecurityFilterChain(ServletContext servletContext) {		
-		if (isVaadin) {
-			DelegatingFilterProxy httprf = new DelegatingFilterProxy("httpResponseFilter");
-			FilterRegistration.Dynamic httprfReg = servletContext.addFilter("httpResponseFilter", httprf);
-			httprfReg.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
-			
-			RequestContextListener rcl = new RequestContextListener();
-			servletContext.addListener(rcl);
+	protected void afterSpringSecurityFilterChain(ServletContext servletContext) {
+		DelegatingFilterProxy httprf = new DelegatingFilterProxy("httpResponseFilter");
+		FilterRegistration.Dynamic httprfReg = servletContext.addFilter("httpResponseFilter", httprf);
+		httprfReg.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 
-			SpringAwareVaadinServlet savs = new SpringAwareVaadinServlet();
-			ServletRegistration.Dynamic savsReg = servletContext.addServlet(SpringAwareVaadinServlet.class.getName(), savs);
-			savsReg.setAsyncSupported(true);
-			savsReg.setLoadOnStartup(1);
-			savsReg.setInitParameter("widgetset", "mx.com.gunix.framework.ui.vaadin.GunixWidgetset");
-			savsReg.setInitParameter("productionMode", "true");
-			savsReg.addMapping("/*");
-		}else {
-			DispatcherServlet ds = new DispatcherServlet();
-			ServletRegistration.Dynamic dsReg = servletContext.addServlet(DispatcherServlet.class.getName(), ds);
-			dsReg.setLoadOnStartup(1);
-			dsReg.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
-			dsReg.addMapping("/");
-		}
+		RequestContextListener rcl = new RequestContextListener();
+		servletContext.addListener(rcl);
+		
+		SpringAwareVaadinServlet savs = new SpringAwareVaadinServlet();
+		ServletRegistration.Dynamic savsReg = servletContext.addServlet(SpringAwareVaadinServlet.class.getName(), savs);
+		savsReg.setAsyncSupported(true);
+		savsReg.setLoadOnStartup(2);
+		savsReg.setInitParameter("widgetset", "mx.com.gunix.framework.ui.vaadin.GunixWidgetset");
+		savsReg.setInitParameter("productionMode", "true");
+		savsReg.addMapping("/VAADIN/*", "/"+ VaadinSecurityConfig.VAADIN_LOCATION + "*");
+
+		DispatcherServlet ds = new DispatcherServlet();
+		ServletRegistration.Dynamic dsReg = servletContext.addServlet(DispatcherServlet.class.getName(), ds);
+		dsReg.setLoadOnStartup(3);
+		dsReg.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
+		dsReg.addMapping("/");
 	}
 
 	public AppInitializer() {
@@ -52,14 +49,10 @@ public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
 	private static Class<?>[] doLoadClientServiceClass() {
 		List<Class<?>> configClasses = new ArrayList<Class<?>>();
 		configClasses.add(FrameworkClientServiceConfig.class);
-		
-		if (isVaadin) {
-			configClasses.add(VaadinConfig.class);
-			configClasses.add(VaadinSecurityConfig.class);
-		}else {
-			configClasses.add(SpringMVCConfig.class);
-			configClasses.add(SpringMVCSecurityConfig.class);
-		}
+
+		configClasses.add(VaadinConfig.class);
+		configClasses.add(VaadinSecurityConfig.class);
+		configClasses.add(SpringMVCConfig.class);
 
 		configClasses.add(AspectJConfig.class);
 		try {

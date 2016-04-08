@@ -21,6 +21,8 @@ import mx.com.gunix.framework.processes.domain.Tarea;
 import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.security.domain.Usuario;
 
+import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.ActivitiOptimisticLockingException;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
@@ -290,34 +292,45 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 	@Scheduled(cron = "0 0 0 * * *")
 	public void eliminaTodasLasInstanciasVolatilesTerminadasOIniciadasHaceMasDe35Minutos() {
 		if(Boolean.valueOf(System.getenv("ACTIVITI_MASTER"))) {
-			List<ProcessDefinition> pDefsVolatiles = repos.createProcessDefinitionQuery().processDefinitionCategory(VOLATIL).latestVersion().list();
-			Date hace35Minutos = Date.from(Instant.now().minus(35, ChronoUnit.MINUTES));
-			pDefsVolatiles.parallelStream().forEach(
-					pd -> {
-						List<HistoricProcessInstance> hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).startedBefore(hace35Minutos).list();
-						
-						if (ID_APLICACION != null) {
-							if (hpis != null && !hpis.isEmpty()) {
-								rs.createProcessInstanceQuery()
-										.processInstanceIds(hpis.stream().map(hpi -> hpi.getId()).collect(Collectors.toSet()))
-										.variableValueEquals(ID_APLICACION_VAR, ID_APLICACION)
-										.list()
-										.forEach(pi -> {
-											rs.deleteProcessInstance(pi.getId(), "");
-										});
-							}
-							hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).finished().variableValueEquals(ID_APLICACION_VAR, ID_APLICACION).list();
-						} else {
-							hpis.forEach(hpi -> {
-								rs.deleteProcessInstance(hpi.getId(), "");
-							});
-							hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).finished().list();
-						}
-						hpis.parallelStream().forEach(hpi -> {
-							hs.deleteHistoricProcessInstance(hpi.getId());
-						});
-					});
+			doDelete();
+			doDelete();// <---- Para eliminar lo que la primera no pudo debido a problemas de concurrencia.
 		}
+	}
+
+	private void doDelete() {
+		List<ProcessDefinition> pDefsVolatiles = repos.createProcessDefinitionQuery().processDefinitionCategory(VOLATIL).latestVersion().list();
+		Date hace35Minutos = Date.from(Instant.now().minus(35, ChronoUnit.MINUTES));
+		pDefsVolatiles.parallelStream().forEach(
+			pd -> {
+				List<HistoricProcessInstance> hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).startedBefore(hace35Minutos).list();
+				
+				if (ID_APLICACION != null) {
+					if (hpis != null && !hpis.isEmpty()) {
+						rs.createProcessInstanceQuery()
+								.processInstanceIds(hpis.stream().map(hpi -> hpi.getId()).collect(Collectors.toSet()))
+								.variableValueEquals(ID_APLICACION_VAR, ID_APLICACION)
+								.list()
+								.forEach(pi -> {
+									try{
+										rs.deleteProcessInstance(pi.getId(), "");
+									}catch(ActivitiObjectNotFoundException | ActivitiOptimisticLockingException ignorar){}
+								});
+					}
+					hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).finished().variableValueEquals(ID_APLICACION_VAR, ID_APLICACION).list();
+				} else {
+					hpis.forEach(hpi -> {
+						try{
+							rs.deleteProcessInstance(hpi.getId(), "");
+						}catch(ActivitiObjectNotFoundException | ActivitiOptimisticLockingException ignorar){}
+					});
+					hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).finished().list();
+				}
+				hpis.parallelStream().forEach(hpi -> {
+					try{
+						hs.deleteHistoricProcessInstance(hpi.getId());
+					}catch(ActivitiObjectNotFoundException | ActivitiOptimisticLockingException ignorar){}
+				});
+			});
 	}
 
 	@Override

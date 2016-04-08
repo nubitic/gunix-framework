@@ -27,7 +27,10 @@ import org.vaadin.spring.security.web.authentication.VaadinAuthenticationSuccess
 @ComponentScan({ "mx.com.gunix.ui", "mx.com.gunix.framework.ui.vaadin"})
 @EnableVaadinSecurity
 public class VaadinSecurityConfig  extends AbstractSecurityConfig{
-
+	public static final String STATIC_RESOURCES_LOCATION = "/static/";
+	public static final String STATIC_RESOURCES_PATTERN = STATIC_RESOURCES_LOCATION + "**"; 
+	public static final String VAADIN_LOCATION = "vdn/";
+	
 	@Autowired
 	private VaadinSecurityContext vaadinSecurityContext;
 
@@ -84,7 +87,9 @@ public class VaadinSecurityConfig  extends AbstractSecurityConfig{
 	// /images)
 	@Override
 	public void configure(WebSecurity web) throws Exception {
-		web.ignoring().antMatchers("/VAADIN/**");
+		web
+			.ignoring()
+				.antMatchers("/VAADIN/**");
 	}
 
 	@Bean
@@ -97,12 +102,13 @@ public class VaadinSecurityConfig  extends AbstractSecurityConfig{
 	protected String doConfigure(HttpSecurity http) throws Exception {
 		http
 			.authorizeRequests()
-				.antMatchers("/login/**").permitAll()
-				.antMatchers("/public/**").permitAll()
-				.antMatchers("/UIDL/**").permitAll()
-				.antMatchers("/HEARTBEAT/**").authenticated()
+				.antMatchers("/" + VaadinSecurityConfig.VAADIN_LOCATION + "login/**").permitAll()
+				.antMatchers("/" + VaadinSecurityConfig.VAADIN_LOCATION + "public/**").permitAll()
+				.antMatchers("/" + VaadinSecurityConfig.VAADIN_LOCATION + "UIDL/**").permitAll()
+				.antMatchers(STATIC_RESOURCES_PATTERN).permitAll()
+				.antMatchers("/" + VaadinSecurityConfig.VAADIN_LOCATION + "HEARTBEAT/**").authenticated()
 				.antMatchers("/**").authenticated()
 				.anyRequest().authenticated();
-		return "/login";
+		return "/" + VaadinSecurityConfig.VAADIN_LOCATION + "login";
 	}
 }

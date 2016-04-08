@@ -166,7 +166,6 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 				estatus.setEnabled(true);
 			}else{
 				datosPanel.setEnabled(false);
-				//appRolesPanel.setEnabled(false);
 				estatus.setEnabled(false);
 			}
 		}else{
@@ -253,6 +252,7 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	private Panel buildAppAmbitosPanel() {
 		appAmbitosPanel = new Panel("Ambito Aplicativo");
 		appAmbitosPanel.setIcon(new ThemeResource("img/1459221873_control_panel_access.png"));
@@ -266,13 +266,24 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		appAmbitosAcc.setImmediate(true);
 		appAmbitosAcc.setSizeFull();
 		appAmbitosAcc.setHeight("-1px");
-
-		for (Aplicacion app : usuario.getAplicaciones()) {
-			if (app.getAmbito() != null && !app.getAmbito().isEmpty()) {
-				appAmbitosAcc.addTab(buildAmbitosPanel(app), app.getDescripcion(), null);
-				appAmbitosAcc.setId("ambitos_" + app.getIdAplicacion());
+		
+		if (usuario != null && usuario.getAplicaciones() != null) {
+			for (Aplicacion app : usuario.getAplicaciones()) {
+				if (app.getAmbito() != null && !app.getAmbito().isEmpty()) {
+					appAmbitosAcc.addTab(buildAmbitosPanel(app), app.getDescripcion(), null);
+					appAmbitosAcc.setId("ambitos_" + app.getIdAplicacion());
+				}
 			}
 		}
+		
+		for (Aplicacion app : (List<Aplicacion>) $("aplicaciones")) {
+			if (app.getAmbito() != null && !app.getAmbito().isEmpty()) {
+				if (!containsApp(app, appAmbitosAcc)) {
+					appAmbitosAcc.addTab(buildAmbitosPanel(app), app.getDescripcion(), null);
+					appAmbitosAcc.setId("ambitos_" + app.getIdAplicacion());
+				}
+			}
+		}		
 		
 		vl.addComponent(appAmbitosAcc);
 		appAmbitosPanel.setContent(vl);
@@ -280,6 +291,18 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		return appAmbitosPanel;
 	}
 	
+	private boolean containsApp(Aplicacion app, Accordion appAmbitosAcc2) {
+		boolean ans = false;
+		Iterator<Component> compIt = appAmbitosAcc2.iterator();
+		while (compIt.hasNext()) {
+			if (appAmbitosAcc.getTab(compIt.next()).getCaption().equals(app.getDescripcion())) {
+				ans = true;
+				break;
+			}
+		}
+		return ans;
+	}
+
 	private Component buildAmbitosPanel(Aplicacion app) {
 		Panel ambitosPanel = new Panel();
 		ambitosPanel.setImmediate(false);
@@ -319,9 +342,11 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		ambitos.addValueChangeListener(vlChnEvnt -> {
 			for (Ambito ambito : app.getAmbito()) {
 				if (ambito.getClase().equals(ambitos.getValue())) {
-					ambito.getPermisos().forEach(permiso -> {
-						permisos.getContainerDataSource().addItem(permiso);
-					});
+					if (ambito.getPermisos() != null) {
+						ambito.getPermisos().forEach(permiso -> {
+							permisos.getContainerDataSource().addItem(permiso);
+						});
+					}
 					break;
 				}
 			}
@@ -509,6 +534,7 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 	
 	}
 	
+	@SuppressWarnings("unchecked")
 	private List<Aplicacion> getAplicacionesRolesAmbitos(){
 		Iterator<Component> i = appRolesAcc.iterator();
 		List<Aplicacion> appSelect = new ArrayList<Aplicacion>();
@@ -517,7 +543,6 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		    OptionGroup roles = (OptionGroup)panel.getContent();
 		    			
 		    if(roles != null){
-				@SuppressWarnings("unchecked")
 				Collection<String> rSelect = (Collection<String>) roles.getValue();
 		    	
 			    if(rSelect!=null && !rSelect.isEmpty()){
@@ -536,13 +561,19 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 			    }
 		    }
 		}
-		
-		appSelect.forEach(app->{
-			usuario.getAplicaciones()
+		List<Aplicacion> aplicaciones = new ArrayList<Aplicacion>();
+
+		if (esConsulta || esModificacion) {
+			aplicaciones.addAll(usuario.getAplicaciones());
+		} else {
+			aplicaciones.addAll((List<Aplicacion>) $("aplicaciones"));
+		}
+		appSelect.forEach(app -> {
+			aplicaciones
 				.stream()
 				.filter(aplicacion -> (aplicacion.getIdAplicacion().equals(app.getIdAplicacion())))
 				.findFirst()
-				.ifPresent(aplicacion->{
+				.ifPresent(aplicacion -> {
 					app.setAmbito(aplicacion.getAmbito());
 				});
 		});

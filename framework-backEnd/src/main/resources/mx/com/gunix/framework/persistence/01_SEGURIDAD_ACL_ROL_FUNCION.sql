@@ -37,6 +37,8 @@ create table acl_class(
     constraint unique_uk_2 unique(class)
 );
 
+create index acl_class_aplicacion_fk_idx on ACL_CLASS(id_aplicacion);
+
 create table acl_object_identity(
     id bigserial primary key,
     object_id_class bigint not null,
@@ -157,6 +159,7 @@ ALTER TABLE MODULO ADD CONSTRAINT "MODULO_APLICACION_FK1" FOREIGN KEY (ID_APLICA
 CREATE INDEX MODULO_APLICACION_FK1IDX ON MODULO USING BTREE (ID_APLICACION);
 
 CREATE TYPE HORARIO_OPERACION AS ENUM ('LD24','LV24','LV9_18','PERSONALIZADO');
+CREATE TYPE VIEW_ENGINE AS ENUM ('VAADIN','SPRINGMVC');
 
 CREATE TABLE FUNCION
 (
@@ -168,6 +171,7 @@ CREATE TABLE FUNCION
 	PROCESS_KEY VARCHAR(255) NOT NULL DEFAULT '',
 	ORDEN NUMERIC(4,2) NOT NULL DEFAULT 0.0,
 	HORARIO HORARIO_OPERACION NOT NULL DEFAULT 'LD24',
+	VENGINE VIEW_ENGINE,
 	ID_FUNCION_PADRE VARCHAR(30)
 );
 
@@ -221,7 +225,7 @@ INSERT INTO acl_object_identity(object_id_class,owner_sid,entries_inheriting) va
 /*INSERT INTO acl_entry(acl_object_identity, ace_order, sid, mask, granting, audit_success,audit_failure) VALUES (currval(pg_get_serial_sequence('acl_object_identity', 'id')), 0, (select id from acl_sid where sid = 'admin@gunix.mx'), 27, TRUE, FALSE, FALSE);*/
 
 INSERT INTO APLICACION VALUES('ADMIN_APP',currval(pg_get_serial_sequence('acl_object_identity', 'object_id_identity')),'Gunix Admin App','Gunix.png');
-alter table ACL_CLASS CONSTRAINT "acl_class_aplicacion_fk" FOREIGN KEY (id_aplicacion) REFERENCES aplicacion (id_aplicacion)  ON UPDATE NO ACTION ON DELETE NO ACTION;
+alter table ACL_CLASS add CONSTRAINT "acl_class_aplicacion_fk" FOREIGN KEY (id_aplicacion) REFERENCES aplicacion (id_aplicacion)  ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 	INSERT INTO USUARIO_APLICACION VALUES('admin@gunix.mx','ADMIN_APP');
 
@@ -285,6 +289,7 @@ create or replace function MENU_USUARIO(id_usuario text)
                                 PROCESS_KEY text,
                                 ORDEN NUMERIC,
                                 HORARIO TEXT,
+                                VENGINE TEXT,
                                 ID_PARAM text,
                                 VALOR text,
                                 ID_FUNCION_PADRE text,
@@ -331,6 +336,7 @@ h as(
 		F.PROCESS_KEY,
 		F.ORDEN,
 		F.HORARIO::text AS HORARIO,
+		F.VENGINE::text AS VENGINE,
 		case 
 			when RF.NIV_ACC='COMPLETO' then 'true'
 			when RF.NIV_ACC IS NULL then NULL
@@ -407,6 +413,7 @@ q AS(
 		hi.PROCESS_KEY,
 		hi.ORDEN,
 		hi.HORARIO,
+		hi.VENGINE,
 		case
 			WHEN q.ACCESO_COMPLETO='true' THEN q.ACCESO_COMPLETO
 			else hi.ACCESO_COMPLETO 
@@ -443,6 +450,7 @@ SELECT
 	q.PROCESS_KEY,
 	q.ORDEN,
 	q.HORARIO,
+	q.VENGINE,
 	q.ACCESO_COMPLETO,
 	q.ID_FUNCION_PADRE,
 	q.ID_PARAM,
@@ -508,6 +516,7 @@ SELECT
 		hi.PROCESS_KEY,
 		hi.ORDEN,
 		hi.HORARIO,
+		hi.VENGINE,
 		case
 			WHEN hi.ACCESO_COMPLETO IS NULL THEN q2.ACCESO_COMPLETO
 			else hi.ACCESO_COMPLETO 
@@ -543,6 +552,7 @@ SELECT
 	q2.PROCESS_KEY,
 	q2.ORDEN,
 	q2.HORARIO,
+	q2.VENGINE,
 	q2.ACCESO_COMPLETO,
 	q2.ID_FUNCION_PADRE,
 	q2.ID_PARAM,
@@ -573,6 +583,7 @@ SELECT
 	q.PROCESS_KEY,
 	q.ORDEN,
 	q.HORARIO,
+	q.VENGINE,
 	q.ACCESO_COMPLETO,
 	q.ID_FUNCION_PADRE,
 	q.ID_PARAM,
@@ -604,6 +615,7 @@ SELECT
                                 MENU_USUARIO.PROCESS_KEY,
                                 MENU_USUARIO.ORDEN,
                                 MENU_USUARIO.HORARIO,
+                                MENU_USUARIO.VENGINE,
                                 MENU_USUARIO.ID_PARAM,
                                 MENU_USUARIO.VALOR,
                                 MENU_USUARIO.ID_FUNCION_PADRE,

@@ -5,14 +5,14 @@
 	<insert id="inserta">
 		INSERT INTO SEGURIDAD.FUNCION(ID_APLICACION,ID_MODULO,ID_FUNCION,TITULO,DESCRIPCION,
 
-		<if test="hijas == null or hijas.size() == 0">PROCESS_KEY,</if>
+		<if test="hijas == null or hijas.size() == 0">PROCESS_KEY,VENGINE,</if>
 		<if test="padre != null">ID_FUNCION_PADRE,</if>
 
 		ORDEN)
 
 		VALUES(#{modulo.aplicacion.idAplicacion},#{modulo.idModulo},#{idFuncion},#{titulo},#{descripcion},
 
-		<if test="hijas == null or hijas.size() == 0">#{processKey},</if>
+		<if test="hijas == null or hijas.size() == 0">#{processKey},#{viewEngine}::seguridad.view_engine,</if>
 		<if test="padre != null">#{padre.idFuncion},</if>
 
 		#{orden})
@@ -24,6 +24,7 @@
 		<result property="titulo" column="TITULO" />
 		<result property="processKey" column="PROCESS_KEY" />
 		<result property="descripcion" column="DESCRIPCION" />
+		<result property="viewEngine" column="VENGINE" typeHandler="org.apache.ibatis.type.EnumTypeHandler" />
 		<result property="orden" column="ORDEN" />
 		<association property="padre" column="{idAplicacion=ID_APLICACION,idModulo=ID_MODULO,idFuncion=ID_FUNCION_PADRE}" select="mx.com.gunix.adminapp.domain.persistence.FuncionMapper.getByIdFuncion" />
 	</resultMap>
@@ -37,6 +38,7 @@
 				DESCRIPCION, 
 				PROCESS_KEY, 
 				ORDEN, 
+				VENGINE::text AS VENGINE,
 				ID_FUNCION_PADRE 
 			from SEGURIDAD.FUNCION
 			where 
@@ -55,6 +57,9 @@
 				</when>
 				<when test="key == 'processKey'">
 					PROCESS_KEY=#{value}
+				</when>
+				<when test="key == 'viewEngine'">
+					VENGINE=#{value}::seguridad.view_engine
 				</when>
 			</choose>
 		</foreach>

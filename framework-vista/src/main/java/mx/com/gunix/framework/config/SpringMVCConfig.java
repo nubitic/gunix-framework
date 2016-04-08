@@ -16,6 +16,7 @@ import org.springframework.web.servlet.ThemeResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping;
 import org.springframework.web.servlet.theme.FixedThemeResolver;
@@ -35,10 +36,10 @@ public class SpringMVCConfig extends WebMvcConfigurerAdapter {
 	@Override
 	public void addResourceHandlers(final ResourceHandlerRegistry registry) {
 		registry
-			.addResourceHandler(SpringMVCSecurityConfig.STATIC_RESOURCES_PATTERN)
-				.addResourceLocations(SpringMVCSecurityConfig.STATIC_RESOURCES_LOCATION,
-									  "classpath:/META-INF/resources"+SpringMVCSecurityConfig.STATIC_RESOURCES_LOCATION,
-									  "classpath:/VAADIN/widgetsets/mx.com.gunix.framework.ui.vaadin.GunixWidgetset/styles/");
+			.addResourceHandler(VaadinSecurityConfig.STATIC_RESOURCES_PATTERN)
+				.addResourceLocations(VaadinSecurityConfig.STATIC_RESOURCES_LOCATION,
+										"classpath:/META-INF/resources" + VaadinSecurityConfig.STATIC_RESOURCES_LOCATION,
+										"classpath:/VAADIN/widgetsets/mx.com.gunix.framework.ui.vaadin.GunixWidgetset/styles/");
 	}
 
 	@Bean
@@ -94,10 +95,14 @@ public class SpringMVCConfig extends WebMvcConfigurerAdapter {
 	
 	
 	@Bean
-	public MessageSource messageSource(){
-		ResourceBundleMessageSource messageSource =  new ResourceBundleMessageSource();
+	public MessageSource messageSource() {
+		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
 		messageSource.setBasename("messages");
 		return messageSource;
 	}
-	
+
+	@Override
+	public void addViewControllers(ViewControllerRegistry registry) {
+		registry.addViewController("/").setViewName("forward:/WEB-INF/mx/com/gunix/ui/springmvc/framework/home.jsp");
+	}
 }

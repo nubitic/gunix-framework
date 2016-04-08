@@ -178,6 +178,7 @@ public class AplicacionView extends AbstractGunixView<Aplicacion> implements Sec
 					commitModulos();
 					commitRoles();
 					updateRoles();
+					commitAmbito();
 					modulosRolesAmbitoAcc.getTab(0).setComponentError(null);
 					modulosRolesAmbitoAcc.getTab(1).setComponentError(null);
 					modulosRolesAmbitoAcc.getTab(2).setComponentError(null);
@@ -213,6 +214,13 @@ public class AplicacionView extends AbstractGunixView<Aplicacion> implements Sec
 			deepCopy(((List<Aplicacion>) $("resultado")).get(0), aplicacion);
 		}
 		setSizeFull();
+	}
+
+	@SuppressWarnings("unchecked")
+	private void commitAmbito() {
+		if (ambitosTable != null) {
+			aplicacion.setAmbito((List<Ambito>) ambitosTable.getItemIds());
+		}
 	}
 
 	private void updateRoles() {
@@ -355,9 +363,11 @@ public class AplicacionView extends AbstractGunixView<Aplicacion> implements Sec
 		});
 		List<Ambito> ambitos = new ArrayList<Ambito>();
 		appBean.setAmbito(ambitos);
-		aplicacion.getAmbito().forEach(ambito -> {
-			ambitos.add(cloneAmbito(appBean, ambito));
-		});
+		if (aplicacion.getAmbito() != null) {
+			aplicacion.getAmbito().forEach(ambito -> {
+				ambitos.add(cloneAmbito(appBean, ambito));
+			});
+		}
 		return appBean;
 	}
 
@@ -389,6 +399,7 @@ public class AplicacionView extends AbstractGunixView<Aplicacion> implements Sec
 			funcionC.setModulo(modulo);
 			funcionC.setOrden(funcion.getOrden());
 			funcionC.setProcessKey(funcion.getProcessKey());
+			funcionC.setViewEngine(funcion.getViewEngine());
 			funcionC.setTitulo(funcion.getTitulo());
 			if (funcion.getHijas() != null) {
 				funcionC.setHijas(new ArrayList<Funcion>());
@@ -714,6 +725,7 @@ public class AplicacionView extends AbstractGunixView<Aplicacion> implements Sec
 			agregar.addClickListener(clickEvent -> {
 				if (ultimoAmbitoAgregadoAManoIsValid()) {
 					Ambito nuevoAmbito = new Ambito();
+					nuevoAmbito.setAplicacion(aplicacion);
 					ultimoAmbitoAgregadoAMano = nuevoAmbito;
 					ambitosTable.getContainerDataSource().addItem(nuevoAmbito);
 				}

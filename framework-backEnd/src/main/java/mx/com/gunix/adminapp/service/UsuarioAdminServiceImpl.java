@@ -20,14 +20,16 @@ import mx.com.gunix.adminapp.domain.persistence.RolMapper;
 import mx.com.gunix.adminapp.domain.persistence.UsuarioAdminMapper;
 import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
 import mx.com.gunix.framework.security.domain.ACLType;
-import mx.com.gunix.framework.security.domain.Ambito.Permiso;
 import mx.com.gunix.framework.security.domain.ACLTypeMap;
+import mx.com.gunix.framework.security.domain.Ambito;
+import mx.com.gunix.framework.security.domain.Ambito.Permiso;
 import mx.com.gunix.framework.security.domain.Aplicacion;
 import mx.com.gunix.framework.security.domain.Usuario;
 import mx.com.gunix.framework.service.GetterService;
 import mx.com.gunix.framework.service.GunixActivitServiceSupport;
 import mx.com.gunix.framework.service.hessian.ByteBuddyUtils;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.remoting.caucho.HessianProxyFactoryBean;
 import org.springframework.security.access.annotation.Secured;
@@ -56,6 +58,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(rollbackFor = Exception.class)
 @Secured(AuthenticatedVoter.IS_AUTHENTICATED_REMEMBERED)
 public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario> {
+	
+	private static final Logger log = Logger.getLogger(UsuarioAdminServiceImpl.class); 
+	
 	@Autowired
 	AplicacionMapper am;
 	
@@ -77,13 +82,21 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 	private static Method getMethod;
 	
 	public List<Aplicacion> getAppRoles() {
-		List<Aplicacion> appRoles =  am.getAll();
-		if(appRoles==null){
-			throw new IllegalArgumentException("No se encontraron Aplicaciónes");
-		}else{
-			appRoles.forEach(app -> {app.setRoles(rm.getByIdAplicacion(app.getIdAplicacion()));} );						
+		List<Aplicacion> appRoles = am.getAll();
+		if (appRoles == null) {
+			throw new IllegalArgumentException("No se encontraron Aplicaciones");
+		} else {
+			appRoles.forEach(app -> {
+				app.setRoles(rm.getByIdAplicacion(app.getIdAplicacion()));
+				app.setAmbito(ambm.getByIdAplicacion(app.getIdAplicacion()));
+				if (app.getAmbito() != null) {
+					app.getAmbito().forEach(ambito -> {
+						initAmbito(ambito, null);
+					});
+				}
+			});
 		}
-		return appRoles;	
+		return appRoles;
 	}
 
 	public boolean isValid(Usuario usuario){
@@ -120,7 +133,10 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 		usuario.setEncodePassword(encodedPassword);
 		um.insertaUsuario(usuario);
 		um.insertaDatos(usuario.getIdUsuario(), usuario.getDatosUsuario());
-		usuario.getAplicaciones().forEach(aplicacion->{doInsertAppRoles(usuario.getIdUsuario(),aplicacion);});
+		usuario.getAplicaciones().forEach(aplicacion -> {
+			doInsertAppRoles(usuario.getIdUsuario(), aplicacion);
+			doAmbito(usuario.getIdUsuario(), aplicacion, false);
+		});
 	}
 	
 	public void doInsertAppRoles(String idUsuario,Aplicacion aplicacion){
@@ -128,7 +144,7 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 		aplicacion.getRoles().forEach(rol->{um.insertaUsuarioRol(idUsuario, aplicacion.getIdAplicacion(), rol.getIdRol());});
 	}
 	
-	public void doUpdate(Usuario usuario){
+	public void doUpdate(Usuario usuario) {
 		String idUsuario = usuario.getIdUsuario();
 		um.updateUsuario(usuario);
 		um.updateDatosUsuario(idUsuario, usuario.getDatosUsuario());
@@ -136,21 +152,27 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 		um.deleteAppUsuario(idUsuario);
 		usuario.getAplicaciones().forEach(aplicacion -> {
 			doInsertAppRoles(idUsuario, aplicacion);
-			if (aplicacion.getAmbito() != null) {
-				List<Sid> userSid = new ArrayList<Sid>();
-				PrincipalSid psid = new PrincipalSid(usuario.getIdUsuario()); 
-				userSid.add(psid);
-				aplicacion.getAmbito().forEach(ambito -> {
-					if (ambito.getPermisos() != null) {
-						List<ObjectIdentity> objects = new ArrayList<ObjectIdentity>();
-						Map<ObjectIdentity, Permiso> oI2Permiso = new HashMap<ObjectIdentity, Permiso>();
-						ambito.getPermisos().forEach(permiso -> {
-							ObjectIdentity oi = new ObjectIdentityImpl(ambito.getClase(), permiso.getAclType().getId());
-							objects.add(oi);
-							oI2Permiso.put(oi, permiso);
-						});
-						Map<ObjectIdentity, Acl> permisosUsuario = aclService.readAclsById(objects);
-
+			doAmbito(idUsuario, aplicacion, true);
+		});
+	}
+	
+	private void doAmbito(String idUsuario, Aplicacion aplicacion, Boolean isUpdate) {
+		if (aplicacion.getAmbito() != null) {
+			List<Sid> userSid = new ArrayList<Sid>();
+			PrincipalSid psid = new PrincipalSid(idUsuario);
+			userSid.add(psid);
+			aplicacion.getAmbito().forEach(ambito -> {
+				if (ambito.getPermisos() != null) {
+					List<ObjectIdentity> objects = new ArrayList<ObjectIdentity>();
+					Map<ObjectIdentity, Permiso> oI2Permiso = new HashMap<ObjectIdentity, Permiso>();
+					ambito.getPermisos().forEach(permiso -> {
+						ObjectIdentity oi = new ObjectIdentityImpl(ambito.getClase(), permiso.getAclType().getId());
+						objects.add(oi);
+						oI2Permiso.put(oi, permiso);
+					});
+					Map<ObjectIdentity, Acl> permisosUsuario = aclService.readAclsById(objects);
+					
+					if (isUpdate) {
 						permisosUsuario.forEach((oi, acl) -> {
 							AtomicReference<Permiso> curPer = new AtomicReference<Permiso>();
 							if (acl.isSidLoaded(userSid)) {
@@ -162,7 +184,8 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 											boolean haveAdminRights = false;
 											try {
 												haveAdminRights = macl.isGranted(Arrays.asList(new Permission[] { BasePermission.ADMINISTRATION }), userSid, true);
-											} catch (NotFoundException ignorar) {}
+											} catch (NotFoundException ignorar) {
+											}
 											CumulativePermission permission = buildPermission(curPer.get() == null ? initPerm(curPer, oI2Permiso.remove(oi)) : curPer.get());
 											if (haveAdminRights) {
 												permission.set(BasePermission.ADMINISTRATION);
@@ -175,19 +198,19 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 								aclService.updateAcl((MutableAcl) acl);
 							}
 						});
-						
-						// Se ingresan nuevos ACEs que el usuario no tenía
-						oI2Permiso.forEach((oii, perm) -> {
-							MutableAcl acl = (MutableAcl) permisosUsuario.get(oii);
-							acl.insertAce(acl.getEntries().size(), buildPermission(perm), psid, true);
-							aclService.updateAcl(acl);
-						});
 					}
-				});
-			}
-		});
+
+					// Se ingresan nuevos ACEs que el usuario no tenía
+					oI2Permiso.forEach((oii, perm) -> {
+						MutableAcl acl = (MutableAcl) permisosUsuario.get(oii);
+						acl.insertAce(acl.getEntries().size(), buildPermission(perm), psid, true);
+						aclService.updateAcl(acl);
+					});
+				}
+			});
+		}
 	}
-	
+
 	private Permiso initPerm(AtomicReference<Permiso> curPer, Permiso remove) {
 		curPer.set(remove);
 		return remove;
@@ -236,68 +259,7 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 					app.setAmbito(ambm.getByIdAplicacion(app.getIdAplicacion()));
 					if (app.getAmbito() != null) {
 						app.getAmbito().forEach(ambito -> {
-							String[] serviceUrl = ambito.getGetAllUri().split("\\?");
-							try {
-								GetterService gs = createGetter(serviceUrl[0]);
-								List<ACLType> aclTypes = sanitize((List<?>) getMethod.invoke(gs, new Object[] { serviceUrl[1].split("=")[1] + "/getAll", new Object[0], SecurityContextHolder.getContext().getAuthentication().getPrincipal() }));
-								
-								if (aclTypes != null) {
-									List<ObjectIdentity> objects = new ArrayList<ObjectIdentity>();
-									Map<ACLType, ObjectIdentity> aclType2OI = new HashMap<ACLType, ObjectIdentity>();
-									aclTypes.forEach(aclType -> {
-										ObjectIdentity oi = new ObjectIdentityImpl(ambito.getClase(), aclType.getId()); 
-										objects.add(oi);
-										aclType2OI.put(aclType, oi);
-									});
-									List<Sid> userSid = new ArrayList<Sid>();
-									userSid.add(new PrincipalSid(u.getIdUsuario()));
-									Map<ObjectIdentity, Acl> permisosUsuario = aclService.readAclsById(objects, userSid);
-
-									ambito.setPermisos(new ArrayList<Permiso>());
-
-									aclTypes.forEach(aclType -> {
-										ObjectIdentity foundOI = aclType2OI.get(aclType);
-										Acl aclUsr = foundOI != null ? permisosUsuario.get(foundOI) : null;
-										
-										Permiso p = new Permiso();
-										p.setAclType(aclType);
-
-										if (aclUsr != null) {
-											List<Permission> permiso = new ArrayList<Permission>();
-											// READ no tiene try/catch porque no tendría sentido tener permisos de escritura o eliminación sin tener los de lectura, estaríamos ante una mala 
-											// configuración y si ese es el caso nos interesa arrojar la excepción
-											permiso.add(BasePermission.READ);
-											if (aclUsr.isGranted(permiso, userSid, true)) {
-												p.setLectura(true);
-												permiso.clear();
-											}
-											
-											permiso.add(BasePermission.WRITE);
-											try {
-												if (aclUsr.isGranted(permiso, userSid, true)) {
-													p.setModificacion(true);
-												}
-											} catch (NotFoundException ignorar) {
-											} finally {
-												permiso.clear();
-											}
-											
-											permiso.add(BasePermission.DELETE);
-											try {
-												if (aclUsr.isGranted(permiso, userSid, true)) {
-													p.setEliminacion(true);
-												}
-											} catch (NotFoundException ignorar) {
-											} finally {
-												permiso.clear();
-											}
-										}
-										ambito.getPermisos().add(p);
-									});
-								}
-							} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-								throw new RuntimeException(e);
-							}
+							initAmbito(ambito, u);
 						});
 					}
 				});
@@ -305,6 +267,80 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 			}
 		}
 		return usuarios;	
+	}
+
+	private void initAmbito(Ambito ambito, Usuario u) {
+		try {
+			String[] serviceUrl = ambito.getGetAllUri().split("\\?");
+			GetterService gs = createGetter(serviceUrl[0]);
+			List<ACLType> aclTypes = sanitize((List<?>) getMethod.invoke(gs, new Object[] { serviceUrl[1].split("=")[1] + "/getAll", new Object[0], SecurityContextHolder.getContext().getAuthentication().getPrincipal() }));
+			
+			if (aclTypes != null && !aclTypes.isEmpty()) {
+				List<ObjectIdentity> objects = new ArrayList<ObjectIdentity>();
+				Map<ACLType, ObjectIdentity> aclType2OI = new HashMap<ACLType, ObjectIdentity>();
+				aclTypes.forEach(aclType -> {
+					ObjectIdentity oi = new ObjectIdentityImpl(ambito.getClase(), aclType.getId()); 
+					objects.add(oi);
+					aclType2OI.put(aclType, oi);
+				});
+				
+				Map<ObjectIdentity, Acl> permisosUsuario = new HashMap<ObjectIdentity, Acl>();
+				List<Sid> userSid = new ArrayList<Sid>();
+
+				if (u != null) {
+					userSid.add(new PrincipalSid(u.getIdUsuario()));
+					permisosUsuario.putAll(aclService.readAclsById(objects, userSid));
+				}
+
+				ambito.setPermisos(new ArrayList<Permiso>());
+
+				aclTypes.forEach(aclType -> {
+					ObjectIdentity foundOI = aclType2OI.get(aclType);
+					Acl aclUsr = foundOI != null ? permisosUsuario.get(foundOI) : null;
+					
+					Permiso p = new Permiso();
+					p.setAclType(aclType);
+
+					if (aclUsr != null) {
+						List<Permission> permiso = new ArrayList<Permission>();
+						permiso.add(BasePermission.READ);
+						try {
+							if (aclUsr.isGranted(permiso, userSid, true)) {
+								p.setLectura(true);
+							}
+						} catch (NotFoundException ignorar) {
+						} finally {
+							permiso.clear();
+						}
+						
+						permiso.add(BasePermission.WRITE);
+						try {
+							if (aclUsr.isGranted(permiso, userSid, true)) {
+								p.setModificacion(true);
+							}
+						} catch (NotFoundException ignorar) {
+						} finally {
+							permiso.clear();
+						}
+						
+						permiso.add(BasePermission.DELETE);
+						try {
+							if (aclUsr.isGranted(permiso, userSid, true)) {
+								p.setEliminacion(true);
+							}
+						} catch (NotFoundException ignorar) {
+						} finally {
+							permiso.clear();
+						}
+					}
+					ambito.getPermisos().add(p);
+				});
+			}
+		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new RuntimeException(e);
+		} catch (Exception ignorar) {
+			log.error("No fue posible inicializar el ámbito: " + ambito.toString(), ignorar);
+		}
 	}
 
 	@SuppressWarnings("unchecked")

@@ -11,6 +11,7 @@ import mx.com.gunix.framework.processes.domain.Tarea;
 import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.security.domain.Aplicacion;
 import mx.com.gunix.framework.security.domain.Funcion;
+import mx.com.gunix.framework.security.domain.Funcion.ViewEngine;
 import mx.com.gunix.framework.security.domain.Modulo;
 import mx.com.gunix.framework.security.domain.Rol;
 import mx.com.gunix.framework.service.ActivitiService;
@@ -28,10 +29,12 @@ import com.vaadin.navigator.NavigationStateManager;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.Extension;
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
@@ -197,7 +200,7 @@ public class Header extends CustomComponent {
 			rolSelOpt.ifPresent(rolSel -> {
 				boolean isOneModulo = rolSel.getModulos().size() == 1;
 				if(isOneModulo) {
-					seleccionaModulo(rolSel.getModulos().get(0));
+					seleccionaModulo(rolSel, rolSel.getModulos().get(0));
 				} else {
 					int filasModulos = ((filasModulos = rolSel.getModulos().size()) % MODULOS_POR_FILA == 0) ? filasModulos / MODULOS_POR_FILA : (filasModulos / MODULOS_POR_FILA) + 1;
 					if (filasModulos > 1) {
@@ -218,7 +221,7 @@ public class Header extends CustomComponent {
 							Image button = new Image(modulo.getDescripcion(), new ThemeResource("img/" + modulo.getIcono()));
 							button.addStyleName("moduleImageButton");
 							button.addClickListener(clickEvnt -> {
-								seleccionaModulo(modulo);
+								seleccionaModulo(rolSel, modulo);
 							});
 							modulosLayout.addComponent(button, col + colIncr, row + rowIncr);
 
@@ -237,7 +240,7 @@ public class Header extends CustomComponent {
 
 	}
 
-	private void seleccionaModulo(Modulo modulo) {
+	private void seleccionaModulo(Rol rol, Modulo modulo) {
 		menuBar.removeItems();
 		menuBar.setCaption("");
 		menuBar.setEnabled(true);
@@ -254,12 +257,12 @@ public class Header extends CustomComponent {
 			}
 
 			padre.setEnabled(true);
-			recorreFuncionesHijas(padre, optHijas);
+			recorreFuncionesHijas(rol, padre, optHijas);
 		});
 		menuBar.setCaption(modulo.getDescripcion());
 	}
 
-	private void recorreFuncionesHijas(MenuItem padre, Optional<List<Funcion>> optHijas) {
+	private void recorreFuncionesHijas(Rol rol, MenuItem padre, Optional<List<Funcion>> optHijas) {
 		optHijas.ifPresent(hijas -> {
 			hijas.stream().forEach(
 					funcion -> {
@@ -279,7 +282,7 @@ public class Header extends CustomComponent {
 										Notification.show("Funcionalidad Cerrada", "La funcionalidad seleccionada se encuentra disponible sólo de lunes a viernes", Type.ERROR_MESSAGE);
 										break;
 									default:
-										doFuncion(funcion);
+										doFuncion(rol, funcion);
 										break;
 									}
 									break;
@@ -292,7 +295,7 @@ public class Header extends CustomComponent {
 									default:
 										int hora = now.getHour();
 										if (hora >= 9 && hora <= 18) {
-											doFuncion(funcion);
+											doFuncion(rol, funcion);
 										} else {
 											Notification.show("Funcionalidad Cerrada", "La funcionalidad seleccionada se encuentra disponible sólo de lunes a viernes en el Horario de 09:00 a 18:00", Type.ERROR_MESSAGE);
 										}
@@ -302,17 +305,17 @@ public class Header extends CustomComponent {
 								case PERSONALIZADO:
 									break;
 								default:
-									doFuncion(funcion);
+									doFuncion(rol, funcion);
 								}
 							});
 						}
 						nvoPadre.setEnabled(true);
-						recorreFuncionesHijas(nvoPadre, optHijas2);
+						recorreFuncionesHijas(rol, nvoPadre, optHijas2);
 					});
 		});
 	}
 
-	private void doFuncion(Funcion funcion) {
+	private void doFuncion(Rol rol, Funcion funcion) {
 		if (funcion.getProcessKey().startsWith(DESCARGA_ARCHIVO)) {
 			FileDownloader fileDownloader = new FileDownloader(new ClassResource(funcion.getProcessKey().split(":")[1]));
 			if (downloadInvisibleButton.getExtensions() != null) {
@@ -329,18 +332,25 @@ public class Header extends CustomComponent {
 			fileDownloader.extend(downloadInvisibleButton);
 			Page.getCurrent().getJavaScript().execute(JAVASCRIPT_DESCARGA_ARCHIVO);
 		} else {
-			Instancia instancia = as.iniciaProceso(funcion.getProcessKey(), Variable.fromParametros(funcion.getParametros()), "");
 			try {
-				navigator.setTareaActual(instancia.getTareaActual());
-
-				if (instancia.getTareaActual() == null || instancia.getTareaActual().getVista().equals(Tarea.DEFAULT_END_TASK_VIEW)) {
-					navigator.navigateTo(DefaultProcessEndView.class.getName());
-				} else {
-					navigator.navigateTo(instancia.getTareaActual().getVista());
-				}
 				modulosLayout.setVisible(false);
 				panelContenido.setVisible(true);
 				panelContenido.setEnabled(true);
+				if (funcion.getViewEngine() == ViewEngine.SPRINGMVC) {
+					BrowserFrame bf = new BrowserFrame("vaadin.com", new ExternalResource("../startProcess?idAplicacion=" + rol.getAplicacion().getIdAplicacion() + "&idRol=" + rol.getIdRol() + "&idModulo=" + funcion.getModulo().getIdModulo() + "&idFuncion=" + funcion.getIdFuncion()));
+					bf.setSizeFull();
+					bf.setHeight((UI.getCurrent().getPage().getBrowserWindowHeight() - 240) + "px");
+					panelContenido.setContent(bf);
+				} else {
+					Instancia instancia = as.iniciaProceso(funcion.getProcessKey(), Variable.fromParametros(funcion.getParametros()), "");
+					navigator.setTareaActual(instancia.getTareaActual());
+
+					if (instancia.getTareaActual() == null || instancia.getTareaActual().getVista().equals(Tarea.DEFAULT_END_TASK_VIEW)) {
+						navigator.navigateTo(DefaultProcessEndView.class.getName());
+					} else {
+						navigator.navigateTo(instancia.getTareaActual().getVista());
+					}
+				}
 				initBreadCrumb();
 				updateBreadcrumb(funcion);
 				breadCrumbLayout.setVisible(true);

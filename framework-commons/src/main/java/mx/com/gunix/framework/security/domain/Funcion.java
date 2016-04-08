@@ -16,10 +16,11 @@ import mx.com.gunix.framework.domain.HashCodeByTimeStampAware;
 import mx.com.gunix.framework.domain.Identificador;
 import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
 import mx.com.gunix.framework.security.domain.validation.ValidaFuncion;
+import mx.com.gunix.framework.util.CustomLabelEnum;
 
 @ValidaFuncion(groups = BeanValidations.class)
 public class Funcion extends HashCodeByTimeStampAware implements Serializable {
-	public static enum Horario {
+	public static enum Horario implements CustomLabelEnum{
 		LD24("Lunes a Domingo 24 Horas"), LV24("Lunes a Viernes 24 Horas"), LV9_18("Lunes a Viernes de 09 a 18"), PERSONALIZADO("Personalizado...");
 		private final String label;
 
@@ -32,6 +33,19 @@ public class Funcion extends HashCodeByTimeStampAware implements Serializable {
 		}
 	}
 
+	public static enum ViewEngine implements CustomLabelEnum{
+		VAADIN("Vaadin"), SPRINGMVC("Spring MVC");
+		private final String label;
+
+		private ViewEngine(String label) {
+			this.label = label;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+	}
+	
 	public static enum Acceso {
 		COMPLETO, PUNTUAL;
 	}
@@ -63,6 +77,8 @@ public class Funcion extends HashCodeByTimeStampAware implements Serializable {
 
 	@NotNull
 	private Horario horario;
+	
+	private ViewEngine viewEngine;
 
 	private Acceso acceso;
 
@@ -80,6 +96,14 @@ public class Funcion extends HashCodeByTimeStampAware implements Serializable {
 
 	public void setHorario(Horario horario) {
 		this.horario = horario;
+	}
+
+	public ViewEngine getViewEngine() {
+		return viewEngine;
+	}
+
+	public void setViewEngine(ViewEngine viewEngine) {
+		this.viewEngine = viewEngine;
 	}
 
 	private Funcion padre;

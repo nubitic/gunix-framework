@@ -82,6 +82,7 @@ public abstract class CSVBeanImporter<T extends Serializable> {
 							break;
 						}
 					} catch (SuperCsvCellProcessorException errorInfo) {
+						sinRegistros = false;
 						errorProcessor.error(header, errorInfo.getCsvContext(), traduce(errorInfo.getMessage()));
 					}
 				} while (true);
@@ -107,12 +108,13 @@ public abstract class CSVBeanImporter<T extends Serializable> {
 		return message
 					.replace("and max", "y máximo")
 					.replace("contains the forbidden substring", "contiene el texto no permitido")
-					.replace("could not be parsed as a BigDecimal", "no pudo leerse como un número")
-					.replace("could not be parsed as a Date", "no pudo leerse como una fecha")
-					.replace("could not be parsed as a Double", "no pudo leerse como un número")
-					.replace("could not be parsed as a Long", "no pudo leerse como un número")
-					.replace("could not be parsed as an Integer", "no pudo leerse como un número")
-					.replace("could not be parsed as an Long", "no pudo leerse como un número")
+					.replace("could not be parsed as a BigDecimal", "debe tener formato numérico")
+					.replace("could not be parsed as a Date", "debe tener formato de fecha")
+					.replace("could not be parsed as a Double", "debe tener formato numérico")
+					.replace("could not be parsed as a Boolean", "valor no reconocido")
+					.replace("could not be parsed as a Long", "debe tener formato numérico")
+					.replace("could not be parsed as an Integer", "debe tener formato numérico")
+					.replace("could not be parsed as an Long", "debe tener formato numérico")
 					.replace("defined by the regular expression", "definido por el patrón")
 					.replace("does not contain any of the required substrings", "no contiene ninguno de los textos requeridos")
 					.replace("does not lie between the min", "no se encuentra entre el mínimo")

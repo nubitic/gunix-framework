@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import mx.com.gunix.framework.security.domain.Funcion;
+import mx.com.gunix.framework.security.domain.Funcion.ViewEngine;
 import mx.com.gunix.framework.security.domain.Modulo;
 import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup;
 import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory;
@@ -18,6 +20,7 @@ import com.vaadin.data.Property;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.HierarchicalContainer;
+import com.vaadin.data.util.converter.StringToEnumConverter;
 import com.vaadin.server.UserError;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Button;
@@ -70,6 +73,7 @@ public class FuncionesTab extends CustomComponent {
 		funcionesTreeTable.addContainerProperty("titulo", String.class, "", "Título", null, null);
 		funcionesTreeTable.addContainerProperty("descripcion", String.class, "", "Descripción", null, null);
 		funcionesTreeTable.addContainerProperty("processKey", String.class, "", "Proceso", null, null);
+		funcionesTreeTable.addContainerProperty("viewEngine", ViewEngine.class, null, "Tipo de Vista", null, null);
 
 		if (!soloLectura && !esParaRoles) {
 			funcionesTreeTable.addContainerProperty("agregarButton", Button.class, null, "", null, null);
@@ -81,6 +85,19 @@ public class FuncionesTab extends CustomComponent {
 				doAgregarFuncion(event);
 			});
 		} else {
+			funcionesTreeTable.setConverter("viewEngine", new StringToEnumConverter() {
+				private static final long serialVersionUID = 1L;
+
+				@SuppressWarnings("rawtypes")
+				@Override
+				public String convertToPresentation(Enum value, Class<? extends String> targetType, Locale locale) throws ConversionException {
+					if (value == null) {
+						return null;
+					}
+					return ((ViewEngine) value).getLabel();
+				}
+
+			});
 			if (esParaRoles) {
 				funcionesTreeTable.setMultiSelect(true);
 				funcionesTreeTable.setCellStyleGenerator((table, itemId, propertyId) -> {
@@ -107,6 +124,7 @@ public class FuncionesTab extends CustomComponent {
 		funcionesTreeTable.setColumnExpandRatio("titulo", 1.083f);
 		funcionesTreeTable.setColumnExpandRatio("descripcion", 1.083f);
 		funcionesTreeTable.setColumnExpandRatio("processKey", 1.083f);
+		funcionesTreeTable.setColumnExpandRatio("viewEngine", 1.083f);
 
 		this.esSoloLectura = soloLectura;
 		this.esParaRoles = esParaRoles;
@@ -172,8 +190,8 @@ public class FuncionesTab extends CustomComponent {
 				initFuncion(funcionPadre, null);
 			} else {
 				initFuncion((esParaRoles && !esSoloLectura) ?
-							new Object[] { funcionPadre.getIdFuncion(), buildCheckBox(funcionPadre, isSelected), funcionPadre.getTitulo(), funcionPadre.getDescripcion(), funcionPadre.getProcessKey() }
-							:new Object[] { funcionPadre.getIdFuncion(), funcionPadre.getTitulo(), funcionPadre.getDescripcion(), funcionPadre.getProcessKey() }
+							new Object[] { funcionPadre.getIdFuncion(), buildCheckBox(funcionPadre, isSelected), funcionPadre.getTitulo(), funcionPadre.getDescripcion(), funcionPadre.getProcessKey(), funcionPadre.getViewEngine() }
+							:new Object[] { funcionPadre.getIdFuncion(), funcionPadre.getTitulo(), funcionPadre.getDescripcion(), funcionPadre.getProcessKey(), funcionPadre.getViewEngine() }
 							, funcionPadre);
 			}
 			if (isSelected) {
@@ -187,12 +205,12 @@ public class FuncionesTab extends CustomComponent {
 			} else {
 				boolean isSelected=isSelected(funcionHija, funcionesSel);
 				Object[] cells = !esParaRoles ? 
-							new Object[] { funcionHija.getIdFuncion(), funcionHija.getTitulo(), funcionHija.getDescripcion(), funcionHija.getProcessKey(), (funcionHija.getHijas() == null || funcionHija.getHijas().isEmpty()) ? 
+							new Object[] { funcionHija.getIdFuncion(), funcionHija.getTitulo(), funcionHija.getDescripcion(), funcionHija.getProcessKey(), funcionHija.getViewEngine(), (funcionHija.getHijas() == null || funcionHija.getHijas().isEmpty()) ? 
 									buildParametrosButton(funcionHija, esSoloLectura) 
 									: null}
 							: (esParaRoles && !esSoloLectura) ?
-									new Object[] { funcionHija.getIdFuncion(), buildCheckBox(funcionHija, isSelected), funcionHija.getTitulo(), funcionHija.getDescripcion(), funcionHija.getProcessKey() }
-									: new Object[] { funcionHija.getIdFuncion(),funcionHija.getTitulo(), funcionHija.getDescripcion(), funcionHija.getProcessKey() };
+									new Object[] { funcionHija.getIdFuncion(), buildCheckBox(funcionHija, isSelected), funcionHija.getTitulo(), funcionHija.getDescripcion(), funcionHija.getProcessKey(), funcionHija.getViewEngine() }
+									: new Object[] { funcionHija.getIdFuncion(),funcionHija.getTitulo(), funcionHija.getDescripcion(), funcionHija.getProcessKey(), funcionHija.getViewEngine() };
 
 				initFuncion(cells, funcionHija);
 				
@@ -307,6 +325,7 @@ public class FuncionesTab extends CustomComponent {
 				container.getItem(beanItem).getItemProperty("processKey").setValue(f.getProcessKey() == null ? "" : f.getProcessKey());
 			}
 			container.getItem(beanItem).getItemProperty("titulo").setValue(f.getTitulo() == null ? "" : f.getTitulo());
+			container.getItem(beanItem).getItemProperty("viewEngine").setValue(f.getViewEngine());
 			if (f.getPadre() != null) {
 				funcionesTreeTable.setParent(beanItem, funcionesTreeTable.getItemIds().stream().filter(bI -> ((BeanItem<Funcion>) bI).getBean().equals(f.getPadre())).findFirst().get());
 			}
@@ -469,7 +488,7 @@ public class FuncionesTab extends CustomComponent {
 		return sinErrores;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private boolean validaFuncion(HierarchicalContainer container, Funcion funcion) {
 		boolean sinErrores = true;
 		GunixBeanFieldGroup<Funcion> bfgf = getBeanFieldGroupByFuncion(funcion);
@@ -480,13 +499,14 @@ public class FuncionesTab extends CustomComponent {
 			Property<String> tituloProp = container.getContainerProperty(bfgf.getItemDataSource(), "titulo");
 			Property<String> descripcionProp = container.getContainerProperty(bfgf.getItemDataSource(), "descripcion");
 			Property<String> processKeyProp = container.getContainerProperty(bfgf.getItemDataSource(), "processKey");
+			Property<ViewEngine> viewEngineProp = container.getContainerProperty(bfgf.getItemDataSource(), "viewEngine");
 			int components = 0;
-			Map<Field<String>, Property<?>> prevPropDS = new HashMap<Field<String>, Property<?>>();
+			Map<Field, Property<?>> prevPropDS = new HashMap<Field, Property<?>>();
 			AbstractComponent processKeyField = null;
 			while (componentIterator.hasNext()) {
 				Component c = componentIterator.next();
 				if (c instanceof Field) {
-					Field<String> field = (Field<String>) c;
+					Field field = (Field) c;
 					if (field.getPropertyDataSource().equals(idFuncionProp)) {
 						prevPropDS.put(field, field.getPropertyDataSource());
 						((AbstractComponent) field).setComponentError(null);
@@ -515,12 +535,20 @@ public class FuncionesTab extends CustomComponent {
 									bfgf.bind(field, "processKey");
 									field.setValue(processKeyProp.getValue());
 									components++;
+								} else {
+									if (field.getPropertyDataSource().equals(viewEngineProp)) {
+										prevPropDS.put(field, field.getPropertyDataSource());
+										((AbstractComponent) field).setComponentError(null);
+										bfgf.bind(field, "viewEngine");
+										field.setValue(viewEngineProp.getValue());
+										components++;
+									}
 								}
 							}
 						}
 					}
 				}
-				if (components == 4) {
+				if (components == 5) {
 					break;
 				}
 			}

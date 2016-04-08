@@ -18,6 +18,7 @@ import mx.com.gunix.adminapp.domain.persistence.RolMapper;
 import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
 import mx.com.gunix.framework.domain.validation.GunixValidationGroups.DatabaseValidation;
 import mx.com.gunix.framework.persistence.DescriptorCambios;
+import mx.com.gunix.framework.security.domain.Ambito;
 import mx.com.gunix.framework.security.domain.Aplicacion;
 import mx.com.gunix.framework.security.domain.Funcion;
 import mx.com.gunix.framework.security.domain.Funcion.Acceso;
@@ -379,6 +380,12 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 						doInsert(appNew, (Rol) rol);
 					});
 				}
+				
+				if (dc.getInserciones().containsKey("ambito")) {
+					dc.getInserciones().get("ambito").forEach(ambito -> {
+						ambm.inserta((Ambito) ambito);
+					});
+				}
 			}
 		}
 	}
@@ -434,7 +441,8 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 					dcFunc.getCambios().containsKey("descripcion") ||
 					dcFunc.getCambios().containsKey("processKey") ||
 					dcFunc.getCambios().containsKey("orden") ||
-					dcFunc.getCambios().containsKey("horario")) {
+					dcFunc.getCambios().containsKey("horario") ||
+					dcFunc.getCambios().containsKey("viewEngine")) {
 					fm.update(dcFunc);
 				}
 				// Actualizando los parámetros de la función
