@@ -3,6 +3,7 @@ package mx.com.gunix.framework.config;
 import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -16,6 +17,7 @@ import com.mongodb.ServerAddress;
 
 @Configuration
 @EnableMongoRepositories(basePackages = "mx.com.gunix.domain.persistence.mongo")
+@ComponentScan("mx.com.gunix.domain.persistence.mongo")
 public class MongoDBConfig {
 
     public @Bean
