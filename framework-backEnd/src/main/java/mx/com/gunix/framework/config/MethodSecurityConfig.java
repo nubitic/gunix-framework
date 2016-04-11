@@ -1,6 +1,7 @@
 package mx.com.gunix.framework.config;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -17,9 +18,12 @@ import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.access.intercept.AfterInvocationManager;
 import org.springframework.security.acls.AclPermissionEvaluator;
 import org.springframework.security.acls.domain.AclAuthorizationStrategy;
 import org.springframework.security.acls.domain.AclAuthorizationStrategyImpl;
@@ -62,10 +66,6 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration impl
 
     @Bean(name = "cacheManager")
     public CacheManager ehCacheManager() throws IOException {
-        //CacheManager manager = CacheManager.getCacheManager(CacheManager.DEFAULT_NAME);
-        //if(manager!=null){
-        //    return manager;
-        //}
         EhCacheManagerFactoryBean factory = new EhCacheManagerFactoryBean();
         factory.setCacheManagerName(CacheManager.DEFAULT_NAME);
         factory.setShared(true);
@@ -305,5 +305,36 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration impl
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		this.beanFactory=beanFactory;
+	}
+
+	@Override
+	protected AfterInvocationManager afterInvocationManager() {
+		AfterInvocationManager aimOr = super.afterInvocationManager();
+		if (aimOr != null) {
+			AfterInvocationManager aimW = new AfterInvocationManager() {
+
+				@Override
+				public Object decide(Authentication authentication, Object object, Collection<ConfigAttribute> attributes, Object returnedObject) throws AccessDeniedException {
+					Object result = null;
+					try {
+						result = aimOr.decide(authentication, object, attributes, returnedObject);
+					} catch (AccessDeniedException ignorar) {}
+					return result;
+				}
+
+				@Override
+				public boolean supports(ConfigAttribute attribute) {
+					return aimOr.supports(attribute);
+				}
+
+				@Override
+				public boolean supports(Class<?> clazz) {
+					return aimOr.supports(clazz);
+				}
+
+			};
+			return aimW;
+		}
+		return aimOr;
 	}
 }
