@@ -117,7 +117,7 @@ public abstract class CSVBeanImporter<T extends Serializable> {
 					.replace("could not be parsed as an Long", "debe tener formato numérico")
 					.replace("defined by the regular expression", "definido por el patrón")
 					.replace("does not contain any of the required substrings", "no contiene ninguno de los textos requeridos")
-					.replace("does not lie between the min", "no se encuentra entre el mínimo")
+					.replace("does not lie between the min", "debe estar entre el mínimo")
 					.replace("does not match any of the required hashcodes", "no coincide con ninguno de los códigos de identificación requeridos")
 					.replace("does not match the constraint", "no cumple con la restricción")
 					.replace("does not match the regular expression", "no coincide con el patrón")
@@ -138,12 +138,12 @@ public abstract class CSVBeanImporter<T extends Serializable> {
 					.replace("is not included in the allowed set of values", "no está incluido en el conjunto de valores permitidos")
 					.replace("not any of the required lengths", "no tiene ninguna de las longitudes requeridas")
 					.replace("null value encountered", "valor vacío encontrado")
-					.replace("of value", "de valor")
+					.replace("of value", "del valor")
 					.replace("the hashcode of", "el código de identificación de")
 					.replace("the length", "la longitud")
 					.replace("the String should not be empty", "el valor no debe estar vacío")
 					.replace("the String should not be null", "el valor no debe estar vacío")
-					.replace("values (inclusive)", "valores (inclusivo)");
+					.replace("values (inclusive)", " (incluyentes)");
 	}
 
 	public interface ImportedBeanProcessor<T extends Serializable> {

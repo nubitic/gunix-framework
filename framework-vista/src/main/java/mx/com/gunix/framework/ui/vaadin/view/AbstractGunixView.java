@@ -277,6 +277,8 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 			throw new IllegalArgumentException("El bean especificado no se encuentra en la tabla");
 		}
 		tabla.setComponentError(null);
+		GunixTableBeanErrorGenerator<R> bErrGen = initTableBeanErrorGenerator(tabla);
+		bErrGen.clearBeanErrors();
 		Map<Field<?>, Property<?>> prevPropDS = new HashMap<Field<?>, Property<?>>();
 		GunixBeanFieldGroup<R> bfgf = new GunixBeanFieldGroup<R>(clase);
 		GunixTableFieldFactory grff = (GunixTableFieldFactory) tabla.getTableFieldFactory();
@@ -287,15 +289,16 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		} else {
 			validaBean(bfgf, bean, grff, tabla, container, prevPropDS, hayErroresHolder);
 		}
-		if(hayErroresHolder.get("hayErrores")) {
+		if (hayErroresHolder.get("hayErrores") && tabla.getComponentError() == null) {
 			tabla.setComponentError(new UserError("La tabla tiene errores"));
 		}
+		tabla.markAsDirtyRecursive();
 		return !hayErroresHolder.get("hayErrores");
 	}
 	
-	@SuppressWarnings("unchecked")
 	private <R extends Serializable> void validaBean(GunixBeanFieldGroup<R> bfgf, R beanId, GunixTableFieldFactory grff, Table tabla, Container container, Map<Field<?>, Property<?>> prevPropDS, Map<String, Boolean> hayErroresHolder) {
 		bfgf.setItemDataSource(beanId);
+		GunixTableBeanErrorGenerator<R> bErrGen = initTableBeanErrorGenerator(tabla);
 		List<GunixFieldPropertyRel> fieldProps = grff.getFieldsBy(tabla, container, beanId);
 		fieldProps.forEach(fieldProp -> {
 			if (!(GunixViewErrorHandler.getCurrent().isInvalidValueComponent(fieldProp.getField()))) {
@@ -308,12 +311,7 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		});
 		try {
 			bfgf.commit(ibve -> {
-				if ("".equals(ibve.getPropertyPath().toString())) {
-					GunixTableBeanErrorGenerator<R> bErrGen = initTableBeanErrorGenerator(tabla);
-					bErrGen.addBeanError((R) ibve.getLeafBean(), ibve.getMessage());
-				} else {
-					tabla.setComponentError(new UserError(ibve.getMessage()));
-				}
+				bErrGen.addBeanError((R) ibve.getRootBean(), ibve.getMessage());
 			});
 		} catch (CommitException e) {
 			hayErroresHolder.put("hayErrores", true);

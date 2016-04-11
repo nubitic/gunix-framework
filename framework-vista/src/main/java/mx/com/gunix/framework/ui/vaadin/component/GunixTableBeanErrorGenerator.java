@@ -38,5 +38,9 @@ public class GunixTableBeanErrorGenerator<S extends Serializable> implements Cel
 	public void addBeanError(S leafBean, String message) {
 		beanErrors.put(leafBean, message);
 	}
+	
+	public void clearBeanErrors(){
+		beanErrors.clear();
+	}
 
 }
