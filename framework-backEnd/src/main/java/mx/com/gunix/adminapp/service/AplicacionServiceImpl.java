@@ -525,4 +525,9 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public List<Aplicacion> getAllForAdmin() {
+		return am.getAll();
+	}
 }

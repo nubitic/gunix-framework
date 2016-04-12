@@ -273,7 +273,7 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 		try {
 			String[] serviceUrl = ambito.getGetAllUri().split("\\?");
 			GetterService gs = createGetter(serviceUrl[0]);
-			List<ACLType> aclTypes = sanitize((List<?>) getMethod.invoke(gs, new Object[] { serviceUrl[1].split("=")[1] + "/getAll", new Object[0], SecurityContextHolder.getContext().getAuthentication().getPrincipal() }));
+			List<ACLType> aclTypes = sanitize((List<?>) getMethod.invoke(gs, new Object[] { serviceUrl[1].split("=")[1] + "/getAllForAdmin", new Object[0], SecurityContextHolder.getContext().getAuthentication().getPrincipal() }));
 			
 			if (aclTypes != null && !aclTypes.isEmpty()) {
 				List<ObjectIdentity> objects = new ArrayList<ObjectIdentity>();

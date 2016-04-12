@@ -15,6 +15,9 @@ public interface ACLTypeService<T extends ACLType> {
 
 	@PostFilter("hasPermission(filterObject, 'READ')")
 	public List<T> getAll();
+	
+	@PostFilter("hasPermission(filterObject, 'ADMINISTRATION')")
+	public List<T> getAllForAdmin();
 
 	@PostFilter("hasPermission(filterObject, 'READ')")
 	public List<T> getByExample(Boolean esMaestro, T ejemplo);
