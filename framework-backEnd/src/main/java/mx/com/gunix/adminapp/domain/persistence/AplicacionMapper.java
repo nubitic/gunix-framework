@@ -18,7 +18,7 @@ public interface AplicacionMapper {
 	@ResultMap("aplicacionMap")
 	public Aplicacion getByidAplicacion(String idAplicacion);
 
-	@Select("Select ACL_ID as ID,ID_APLICACION, DESCRIPCION, ICONO from SEGURIDAD.APLICACION")
+	@Select("Select ACL_ID as ID,ID_APLICACION, DESCRIPCION, ICONO from SEGURIDAD.APLICACION order by descripcion")
 	@ResultMap("aplicacionMap")
 	public List<Aplicacion> getAll();
 

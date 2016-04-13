@@ -3,7 +3,6 @@ package mx.com.gunix.adminapp.service;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +14,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.groups.Default;
 
 import mx.com.gunix.adminapp.domain.persistence.AmbitoMapper;
-import mx.com.gunix.adminapp.domain.persistence.AplicacionMapper;
 import mx.com.gunix.adminapp.domain.persistence.RolMapper;
 import mx.com.gunix.adminapp.domain.persistence.UsuarioAdminMapper;
 import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
@@ -25,12 +23,14 @@ import mx.com.gunix.framework.security.domain.Ambito;
 import mx.com.gunix.framework.security.domain.Ambito.Permiso;
 import mx.com.gunix.framework.security.domain.Aplicacion;
 import mx.com.gunix.framework.security.domain.Usuario;
+import mx.com.gunix.framework.service.ACLTypeService;
 import mx.com.gunix.framework.service.GetterService;
 import mx.com.gunix.framework.service.GunixActivitServiceSupport;
 import mx.com.gunix.framework.service.hessian.ByteBuddyUtils;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.remoting.caucho.HessianProxyFactoryBean;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.vote.AuthenticatedVoter;
@@ -62,7 +62,8 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 	private static final Logger log = Logger.getLogger(UsuarioAdminServiceImpl.class); 
 	
 	@Autowired
-	AplicacionMapper am;
+	@Qualifier("aplicacionService")
+	ACLTypeService<Aplicacion> am;
 	
 	@Autowired
 	UsuarioAdminMapper um;	
@@ -82,7 +83,7 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 	private static Method getMethod;
 	
 	public List<Aplicacion> getAppRoles() {
-		List<Aplicacion> appRoles = am.getAll();
+		List<Aplicacion> appRoles = am.getAllForAdmin();
 		if (appRoles == null) {
 			throw new IllegalArgumentException("No se encontraron Aplicaciones");
 		} else {
@@ -181,15 +182,7 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 									// Se actualizan los ACEs que el usuario ya tenía
 										if (psid.equals(entry.getSid())) {
 											MutableAcl macl = (MutableAcl) acl;
-											boolean haveAdminRights = false;
-											try {
-												haveAdminRights = macl.isGranted(Arrays.asList(new Permission[] { BasePermission.ADMINISTRATION }), userSid, true);
-											} catch (NotFoundException ignorar) {
-											}
 											CumulativePermission permission = buildPermission(curPer.get() == null ? initPerm(curPer, oI2Permiso.remove(oi)) : curPer.get());
-											if (haveAdminRights) {
-												permission.set(BasePermission.ADMINISTRATION);
-											}
 											macl.deleteAce(entryCounter.get());
 											macl.insertAce(entryCounter.get(), permission, psid, true);
 										}
@@ -206,6 +199,10 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 						acl.insertAce(acl.getEntries().size(), buildPermission(perm), psid, true);
 						aclService.updateAcl(acl);
 					});
+					ambm.deleteFullReadAccessFor(idUsuario, ambito);
+					if (ambito.isPuedeLeerTodos()) {
+						ambm.insertFullReadAccessFor(idUsuario, ambito);
+					}
 				}
 			});
 		}
@@ -227,6 +224,9 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 		}
 		if (p.isModificacion()) {
 			cumPer.set(BasePermission.WRITE);
+		}
+		if (p.isAdministracion()) {
+			cumPer.set(BasePermission.ADMINISTRATION);
 		}
 		return cumPer;
 	}
@@ -290,10 +290,10 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 				if (u != null) {
 					userSid.add(new PrincipalSid(u.getIdUsuario()));
 					permisosUsuario.putAll(aclService.readAclsById(objects, userSid));
+					ambito.setPuedeLeerTodos(ambm.puedeLeerTodo(u.getIdUsuario(), ambito));
 				}
 
 				ambito.setPermisos(new ArrayList<Permiso>());
-
 				aclTypes.forEach(aclType -> {
 					ObjectIdentity foundOI = aclType2OI.get(aclType);
 					Acl aclUsr = foundOI != null ? permisosUsuario.get(foundOI) : null;
@@ -303,14 +303,19 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 
 					if (aclUsr != null) {
 						List<Permission> permiso = new ArrayList<Permission>();
-						permiso.add(BasePermission.READ);
-						try {
-							if (aclUsr.isGranted(permiso, userSid, true)) {
-								p.setLectura(true);
+
+						if (ambito.isPuedeLeerTodos()) {
+							p.setLectura(true);
+						} else {
+							permiso.add(BasePermission.READ);
+							try {
+								if (aclUsr.isGranted(permiso, userSid, true)) {
+									p.setLectura(true);
+								}
+							} catch (NotFoundException ignorar) {
+							} finally {
+								permiso.clear();
 							}
-						} catch (NotFoundException ignorar) {
-						} finally {
-							permiso.clear();
 						}
 						
 						permiso.add(BasePermission.WRITE);
@@ -327,6 +332,16 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 						try {
 							if (aclUsr.isGranted(permiso, userSid, true)) {
 								p.setEliminacion(true);
+							}
+						} catch (NotFoundException ignorar) {
+						} finally {
+							permiso.clear();
+						}
+						
+						permiso.add(BasePermission.ADMINISTRATION);
+						try {
+							if (aclUsr.isGranted(permiso, userSid, true)) {
+								p.setAdministracion(true);
 							}
 						} catch (NotFoundException ignorar) {
 						} finally {

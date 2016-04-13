@@ -68,6 +68,7 @@
 	</resultMap>
 	<resultMap id="appUsuarioMap" type="mx.com.gunix.framework.security.domain.Aplicacion">
 		<result column="ID_APLICACION" property="idAplicacion" />
+		<result column="ACL_ID" property="id" />
 		<result column="DESCRIPCION" property="descripcion" />
 		<result column="ICONO" property="icono" />
 	</resultMap>

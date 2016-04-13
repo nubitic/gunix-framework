@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.security.access.prepost.PostFilter;
 
 public interface UsuarioAdminMapper {
 	@Select("Select ID_USUARIO from SEGURIDAD.USUARIO where ID_USUARIO=#{idUsuario}")
@@ -33,6 +34,7 @@ public interface UsuarioAdminMapper {
 	
 	@Select("SELECT UA.ID_USUARIO AS ID_USUARIO, UA.ID_APLICACION AS ID_APLICACION ,A.DESCRIPCION AS DESCRIPCION, A.ACL_ID AS ACL_ID, A.ICONO AS ICONO FROM SEGURIDAD.USUARIO_APLICACION UA INNER JOIN SEGURIDAD.APLICACION A ON (UA.ID_APLICACION = A.ID_APLICACION) where UA.ID_USUARIO=#{idUsuario}")
 	@ResultMap("appUsuarioMap")
+	@PostFilter("hasPermission(filterObject, 'ADMINISTRATION')")
 	public List<Aplicacion> getAppUsuario(String idUsuario);
 	
 	public List<Rol> getRolAppUsuario(@Param("idUsuario") String idUsuario,@Param("idAplicacion") String idAplicacion);

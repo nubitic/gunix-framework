@@ -3,8 +3,11 @@ package mx.com.gunix.ui.vaadin.view.adminapp.usuario;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.security.domain.Ambito;
@@ -27,10 +30,13 @@ import com.vaadin.data.util.converter.StringToBooleanConverter;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.OptionGroup;
@@ -182,8 +188,6 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 	@Override
 	protected List<Variable<?>> getVariablesTarea() {
 		List<Variable<?>> vars = new ArrayList<Variable<?>>();
-		Variable<Usuario> usuarioVar = new Variable<Usuario>();
-		
 		if(esConsulta||esModificacion){
 			Variable<ArrayList<Usuario>> resultadoVar = new Variable<ArrayList<Usuario>>();
 			resultadoVar.setNombre("resultado");
@@ -197,8 +201,11 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 				vars.add(accionVar);
 			}
 		}
-		usuarioVar.setValor(usuario);
+		
+		Variable<Usuario> usuarioVar = new Variable<Usuario>();
 		usuarioVar.setNombre("usuario");
+		usuarioVar.setValor(cancelar ? null : usuario);
+
 		vars.add(usuarioVar);
 		return vars;
 	}
@@ -266,41 +273,26 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		appAmbitosAcc.setImmediate(true);
 		appAmbitosAcc.setSizeFull();
 		appAmbitosAcc.setHeight("-1px");
-		
+				
+		Set<Aplicacion> aplicaciones = new TreeSet<Aplicacion>(Comparator.comparing(Aplicacion::getDescripcion, String.CASE_INSENSITIVE_ORDER));
+
 		if (usuario != null && usuario.getAplicaciones() != null) {
-			for (Aplicacion app : usuario.getAplicaciones()) {
-				if (app.getAmbito() != null && !app.getAmbito().isEmpty()) {
-					appAmbitosAcc.addTab(buildAmbitosPanel(app), app.getDescripcion(), null);
-					appAmbitosAcc.setId("ambitos_" + app.getIdAplicacion());
-				}
+			aplicaciones.addAll(usuario.getAplicaciones());
+		}
+
+		aplicaciones.addAll((List<Aplicacion>) $("aplicaciones"));
+		
+		for (Aplicacion app : aplicaciones) {
+			if (app.getAmbito() != null && !app.getAmbito().isEmpty()) {
+				appAmbitosAcc.addTab(buildAmbitosPanel(app), app.getDescripcion(), null);
+				appAmbitosAcc.setId("ambitos_" + app.getIdAplicacion());
 			}
 		}
-		
-		for (Aplicacion app : (List<Aplicacion>) $("aplicaciones")) {
-			if (app.getAmbito() != null && !app.getAmbito().isEmpty()) {
-				if (!containsApp(app, appAmbitosAcc)) {
-					appAmbitosAcc.addTab(buildAmbitosPanel(app), app.getDescripcion(), null);
-					appAmbitosAcc.setId("ambitos_" + app.getIdAplicacion());
-				}
-			}
-		}		
 		
 		vl.addComponent(appAmbitosAcc);
 		appAmbitosPanel.setContent(vl);
 
 		return appAmbitosPanel;
-	}
-	
-	private boolean containsApp(Aplicacion app, Accordion appAmbitosAcc2) {
-		boolean ans = false;
-		Iterator<Component> compIt = appAmbitosAcc2.iterator();
-		while (compIt.hasNext()) {
-			if (appAmbitosAcc.getTab(compIt.next()).getCaption().equals(app.getDescripcion())) {
-				ans = true;
-				break;
-			}
-		}
-		return ans;
 	}
 
 	private Component buildAmbitosPanel(Aplicacion app) {
@@ -311,7 +303,11 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		VerticalLayout layout = new VerticalLayout();
 		layout.setMargin(true);
 		layout.setSpacing(true);
-
+		
+		HorizontalLayout hz = new HorizontalLayout();
+		hz.setMargin(false);
+		hz.setSpacing(true);
+		
 		ComboBox ambitos = new ComboBox("Ambito");
 		ambitos.setImmediate(true);
 		
@@ -322,42 +318,71 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 			});
 		}
 		
-		GunixMTable<Permiso> permisos = new GunixMTable<Permiso>(Permiso.class);		
-		permisos.setTableFieldFactory(new GunixTableFieldFactory());
-		permisos.setVisibleColumns("aclType", "lectura", "modificacion", "eliminacion");
-		permisos.setColumnHeaders(new String[] { "Elemento", "¿Puede ver?", "¿Puede modificar?", "¿Puede eliminar?" });
-		permisos.addGeneratedColumn("aclType", (source, itemId, columnId) -> {
-			return new StringBuilder(((Permiso) itemId).getAclType().getClaveNegocio()).append(" - ").append(((Permiso) itemId).getAclType().getDescripcion()).toString();
-		});
-		
-		permisos.setConverter("lectura", new StringToBooleanConverter("Si", "No"));
-		permisos.setConverter("modificacion", new StringToBooleanConverter("Si", "No"));
-		permisos.setConverter("eliminacion", new StringToBooleanConverter("Si", "No"));
-		permisos.setEditable(!esConsulta);
-		permisos.setImmediate(false);
-		permisos.setHeight("255px");
-		permisos.setWidth("100%");
-		permisos.setVisible(false);
-		
 		ambitos.addValueChangeListener(vlChnEvnt -> {
 			for (Ambito ambito : app.getAmbito()) {
 				if (ambito.getClase().equals(ambitos.getValue())) {
 					if (ambito.getPermisos() != null) {
-						ambito.getPermisos().forEach(permiso -> {
-							permisos.getContainerDataSource().addItem(permiso);
+						if (layout.getComponentCount() == 2) {
+							layout.removeComponent(layout.getComponent(1));
+						}
+						layout.addComponent(buildPermisosTable(ambito));
+
+						if (hz.getComponentCount() == 2) {
+							hz.removeComponent(hz.getComponent(1));
+						}
+						CheckBox puedeLeerTodosChkBx = new CheckBox("¿Puede ver todos?");
+						puedeLeerTodosChkBx.setValue(ambito.isPuedeLeerTodos());
+						puedeLeerTodosChkBx.setImmediate(true);
+						puedeLeerTodosChkBx.addValueChangeListener(vlChgEvnt -> {
+							layout.removeComponent(layout.getComponent(1));
+							ambito.setPuedeLeerTodos(puedeLeerTodosChkBx.getValue());
+							if (ambito.isPuedeLeerTodos()) {
+								ambito.getPermisos().forEach(permiso -> {
+									permiso.setLectura(true);
+								});
+							}
+							layout.addComponent(buildPermisosTable(ambito));
 						});
+						hz.addComponent(puedeLeerTodosChkBx);
+						hz.setComponentAlignment(puedeLeerTodosChkBx, Alignment.BOTTOM_CENTER);
 					}
 					break;
 				}
 			}
-			permisos.setVisible(true);
 		});
 		
-		layout.addComponent(ambitos);
-		layout.addComponent(permisos);
+		hz.addComponent(ambitos);
+		layout.addComponent(hz);
 		ambitosPanel.setContent(layout);
 
 		return ambitosPanel;
+	}
+
+	private GunixMTable<Permiso> buildPermisosTable(Ambito ambito) {
+		GunixMTable<Permiso> permisos = new GunixMTable<Permiso>(Permiso.class);
+		permisos.setTableFieldFactory(new GunixTableFieldFactory());
+		permisos.setVisibleColumns(ambito.isPuedeLeerTodos() ? new String[] { "aclType", "modificacion", "eliminacion", "administracion" } : new String[] { "aclType", "lectura", "modificacion", "eliminacion", "administracion" });
+		permisos.setColumnHeaders(ambito.isPuedeLeerTodos() ? new String[] { "Elemento", "¿Puede modificar?", "¿Puede eliminar?", "¿Puede administrar acceso?" } : new String[] { "Elemento", "¿Puede ver?", "¿Puede modificar?", "¿Puede eliminar?", "¿Puede administrar acceso?" });
+		permisos.addGeneratedColumn("aclType", (source, itemId, columnId) -> {
+			return new StringBuilder(((Permiso) itemId).getAclType().getClaveNegocio()).append(" - ").append(((Permiso) itemId).getAclType().getDescripcion()).toString();
+		});
+
+		if (!ambito.isPuedeLeerTodos()) {
+			permisos.setConverter("lectura", new StringToBooleanConverter("Si", "No"));
+		}
+
+		permisos.setConverter("modificacion", new StringToBooleanConverter("Si", "No"));
+		permisos.setConverter("eliminacion", new StringToBooleanConverter("Si", "No"));
+		permisos.setConverter("administracion", new StringToBooleanConverter("Si", "No"));
+		permisos.setEditable(!esConsulta);
+		permisos.setImmediate(false);
+		permisos.setHeight("255px");
+		permisos.setWidth("100%");
+		
+		ambito.getPermisos().forEach(permiso -> {
+			permisos.getContainerDataSource().addItem(permiso);
+		});	
+		return permisos;
 	}
 
 	@SuppressWarnings({ "unchecked" })
@@ -399,17 +424,19 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		rolesPanel.setImmediate(false);
 		rolesPanel.setSizeFull();
 		rolesPanel.setHeight("-1px");
-
-		OptionGroup roles = new OptionGroup(app.getIdAplicacion());
+		VerticalLayout vl = new VerticalLayout();
+		vl.setMargin(true);
+		
+		OptionGroup roles = new OptionGroup();
 		roles.addStyleName("horizontal");
 		roles.setMultiSelect(true);
 		
 		app.getRoles().forEach(rol -> {
-			roles.addItem(rol.getIdRol());
-			roles.setItemCaption(rol.getIdRol(), rol.getDescripcion());
+			roles.addItem(rol);
+			roles.setItemCaption(rol, rol.getDescripcion());
 			if(rolSelect != null){
 				if(buscaRol(rolSelect,rol.getIdRol())){
-					roles.select(rol.getIdRol());
+					roles.select(rol);
 				}
 			}
 
@@ -419,8 +446,9 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		if(esConsulta){
 			rolesPanel.setEnabled(false);
 		}
-				
-		rolesPanel.setContent(roles);
+		
+		vl.addComponent(roles);
+		rolesPanel.setContent(vl);
 		return rolesPanel;
 	}
 	
@@ -540,20 +568,20 @@ public class UsuarioView extends AbstractGunixView<Usuario> implements SecuredVi
 		List<Aplicacion> appSelect = new ArrayList<Aplicacion>();
 		while (i.hasNext()) {
 		    Panel panel = (Panel) i.next();
-		    OptionGroup roles = (OptionGroup)panel.getContent();
+			OptionGroup roles = (OptionGroup) ((VerticalLayout) panel.getContent()).getComponent(0);
 		    			
 		    if(roles != null){
-				Collection<String> rSelect = (Collection<String>) roles.getValue();
+				Collection<Rol> rSelect = (Collection<Rol>) roles.getValue();
 		    	
 			    if(rSelect!=null && !rSelect.isEmpty()){
 			    	Aplicacion app = new Aplicacion();
-			    	List<Rol> rolesSelec = new ArrayList<Rol>();
-			    	app.setIdAplicacion(roles.getCaption());	
+			    	List<Rol> rolesSelec = new ArrayList<Rol>();	
 	  
-	                for (String r : rSelect) {
+	                for (Rol r : rSelect) {
+				    	app.setIdAplicacion(r.getAplicacion().getIdAplicacion());
 	                	Rol rolSelect = new Rol();
-	                	rolSelect.setIdRol(r);
-	                	rolSelect.setDescripcion(roles.getItemCaption(r));
+	                	rolSelect.setIdRol(r.getIdRol());
+	                	rolSelect.setDescripcion(r.getDescripcion());
 	                	rolesSelec.add(rolSelect);
 	                }
 	                app.setRoles(rolesSelec);	 

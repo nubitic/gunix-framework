@@ -66,7 +66,7 @@
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${esMaestro}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow22" sourceRef="usertask5" targetRef="exclusivegateway5"></sequenceFlow>
-      <sequenceFlow id="flow23" name="cancelar" sourceRef="exclusivegateway5" targetRef="starteventModificación">
+      <sequenceFlow id="flow23" name="cancelar" sourceRef="exclusivegateway5" targetRef="usertask4">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${acción=="Cancelar"}]]></conditionExpression>
       </sequenceFlow>
       <serviceTask id="servicetask6" name="Validación" activiti:expression="${usuarioAdminService.isValid(usuario)}" activiti:resultVariableName="esValido"></serviceTask>
@@ -306,8 +306,9 @@
         <omgdi:waypoint x="910.0" y="847.0"></omgdi:waypoint>
         <omgdi:waypoint x="909.0" y="891.0"></omgdi:waypoint>
         <omgdi:waypoint x="666.0" y="891.0"></omgdi:waypoint>
-        <omgdi:waypoint x="407.0" y="891.0"></omgdi:waypoint>
-        <omgdi:waypoint x="407.0" y="755.0"></omgdi:waypoint>
+        <omgdi:waypoint x="450.0" y="891.0"></omgdi:waypoint>
+        <omgdi:waypoint x="450.0" y="793.0"></omgdi:waypoint>
+        <omgdi:waypoint x="552.0" y="770.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
           <omgdc:Bounds height="14.0" width="42.0" x="800.0" y="890.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>

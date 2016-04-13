@@ -56,7 +56,6 @@ CREATE INDEX acl_object_identity_FK1IDX ON acl_object_identity USING BTREE (pare
 CREATE INDEX acl_object_identity_FK2IDX ON acl_object_identity USING BTREE (object_id_class);
 CREATE INDEX acl_object_identity_FK3IDX ON acl_object_identity USING BTREE (owner_sid);
 
-
 create table acl_entry(
     id bigserial primary key,
     acl_object_identity bigint not null,
@@ -73,6 +72,44 @@ create table acl_entry(
 
 CREATE INDEX acl_entry_FK4IDX ON acl_entry USING BTREE (acl_object_identity);
 CREATE INDEX acl_entry_FK5IDX ON acl_entry USING BTREE (sid);
+
+create table acl_fullreadaccess_sid(
+	sid bigint not null,
+	object_id_class bigint not null,
+	constraint unique_uk_5 unique(sid,object_id_class),
+	constraint foreign_fk_6 foreign key(sid) references acl_sid(id)  ON UPDATE NO ACTION ON DELETE NO ACTION,
+	constraint foreign_fk_7 foreign key(object_id_class)references acl_class(id)  ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+CREATE INDEX acl_fullreadaccess_sid_FK6IDX ON acl_fullreadaccess_sid USING BTREE (sid);
+CREATE INDEX acl_fullreadaccess_sid_FK7IDX ON acl_fullreadaccess_sid USING BTREE (object_id_class);
+
+CREATE OR REPLACE FUNCTION MANAGE_FULLACCESSREAD_SIDS_ACES() RETURNS TRIGGER AS $body$
+    BEGIN
+	insert into seguridad.acl_entry(ace_order,acl_object_identity,audit_failure,audit_success,granting,mask,sid)
+	select 
+		coalesce(max(ace.ace_order)+1,0)  as ace_order,
+		oi.id as acl_object_identity,
+		false audit_failure,
+		false audit_success,
+		true granting,
+		1 as mask,
+		afras.sid 
+	from
+	seguridad.acl_object_identity oi inner join
+	seguridad.acl_fullreadaccess_sid afras on(oi.object_id_class = afras.object_id_class) left join
+	seguridad.acl_entry ace on(oi.id=ace.acl_object_identity) 
+	where 
+	not exists (select 1 as existe from seguridad.acl_entry iace where iace.acl_object_identity = ace.acl_object_identity and iace.sid = afras.sid )
+	and afras.object_id_class = (select object_id_class from seguridad.acl_object_identity where id = NEW.id)
+	group by 
+	afras.sid,
+	oi.id;
+        RETURN NEW;
+    END;
+$body$ LANGUAGE plpgsql;
+
+CREATE TRIGGER ACL_UPDATE_FULLACCESREAD_SIDS_ENTRIES_TRGR AFTER INSERT ON acl_object_identity FOR EACH ROW EXECUTE PROCEDURE MANAGE_FULLACCESSREAD_SIDS_ACES();
 
 INSERT INTO USUARIO(ID_USUARIO,PASSWORD,ESTATUS) VALUES('admin@gunix.mx',crypt('loloq123', gen_salt('bf', 16)),'ACTIVO');
 INSERT INTO USUARIO(ID_USUARIO,PASSWORD,ESTATUS) VALUES('anonymous',crypt('anonymous', gen_salt('bf', 16)),'ACTIVO');

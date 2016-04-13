@@ -33,6 +33,8 @@ public class Ambito extends HashCodeByTimeStampAware implements Serializable {
 	private String descripcion;
 
 	private List<Permiso> permisos;
+	
+	private boolean puedeLeerTodos;
 
 	public Aplicacion getAplicacion() {
 		return aplicacion;
@@ -74,6 +76,14 @@ public class Ambito extends HashCodeByTimeStampAware implements Serializable {
 		this.permisos = permisos;
 	}
 
+	public boolean isPuedeLeerTodos() {
+		return puedeLeerTodos;
+	}
+
+	public void setPuedeLeerTodos(boolean puedeLeerTodos) {
+		this.puedeLeerTodos = puedeLeerTodos;
+	}
+
 	@Override
 	public int doHashCode() {
 		final int prime = 31;
@@ -81,6 +91,7 @@ public class Ambito extends HashCodeByTimeStampAware implements Serializable {
 		result = prime * result + ((aplicacion == null) ? 0 : aplicacion.hashCode());
 		result = prime * result + ((clase == null) ? 0 : clase.hashCode());
 		result = prime * result + ((permisos == null) ? 0 : permisos.hashCode());
+		result = prime * result + (puedeLeerTodos ? 1231 : 1237);
 		return result;
 	}
 
@@ -108,6 +119,8 @@ public class Ambito extends HashCodeByTimeStampAware implements Serializable {
 				return false;
 		} else if (!permisos.equals(other.permisos))
 			return false;
+		if (puedeLeerTodos != other.puedeLeerTodos)
+			return false;
 		return true;
 	}
 
@@ -123,7 +136,8 @@ public class Ambito extends HashCodeByTimeStampAware implements Serializable {
 		private boolean lectura;
 		private boolean modificacion;
 		private boolean eliminacion;
-		
+		private boolean administracion;
+
 		public ACLType getAclType() {
 			return aclType;
 		}
@@ -156,11 +170,20 @@ public class Ambito extends HashCodeByTimeStampAware implements Serializable {
 			this.eliminacion = eliminacion;
 		}
 
+		public boolean isAdministracion() {
+			return administracion;
+		}
+
+		public void setAdministracion(boolean administracion) {
+			this.administracion = administracion;
+		}
+
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + ((aclType == null) ? 0 : aclType.hashCode());
+			result = prime * result + (administracion ? 1231 : 1237);
 			result = prime * result + (eliminacion ? 1231 : 1237);
 			result = prime * result + (lectura ? 1231 : 1237);
 			result = prime * result + (modificacion ? 1231 : 1237);
@@ -181,6 +204,8 @@ public class Ambito extends HashCodeByTimeStampAware implements Serializable {
 					return false;
 			} else if (!aclType.equals(other.aclType))
 				return false;
+			if (administracion != other.administracion)
+				return false;
 			if (eliminacion != other.eliminacion)
 				return false;
 			if (lectura != other.lectura)
@@ -192,7 +217,8 @@ public class Ambito extends HashCodeByTimeStampAware implements Serializable {
 
 		@Override
 		public String toString() {
-			return "Permiso [aclType=" + aclType + ", lectura=" + lectura + ", modificacion=" + modificacion + ", eliminacion=" + eliminacion + "]";
+			return "Permiso [aclType=" + aclType + ", lectura=" + lectura + ", modificacion=" + modificacion + ", eliminacion=" + eliminacion + ", administracion=" + administracion + "]";
 		}
+
 	}
 }
