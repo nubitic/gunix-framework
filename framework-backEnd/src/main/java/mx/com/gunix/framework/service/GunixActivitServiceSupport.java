@@ -79,11 +79,41 @@ public abstract class GunixActivitServiceSupport<T extends Serializable> {
 	}
 
 	protected final Set<ConstraintViolation<T>> valida(T serializable, Class<?>... groups) {
+		return valida(serializable, null, groups);
+	}
+
+	protected final Set<ConstraintViolation<T>> valida(T serializable, String[] fieldsIgnorar, Class<?>... groups) {
 		Set<ConstraintViolation<T>> violaciones = validator.validate(serializable, groups);
 		findValidAnnotatedFields(serializable.getClass()).forEach(field -> {
 			filtraFieldsNoIdentificadores(violaciones, field, "");
 		});
+		if (fieldsIgnorar != null && fieldsIgnorar.length > 0) {
+			filtraFieldsIgnorados(violaciones, fieldsIgnorar);
+		}
 		return violaciones;
+	}
+
+	private void filtraFieldsIgnorados(Set<ConstraintViolation<T>> violaciones, String[] fieldsIgnorar) {
+		List<ConstraintViolation<T>> subFieldsViolations = violaciones
+				.stream()
+				.filter(consViol -> isIgnorado(consViol,fieldsIgnorar))
+				.collect(Collectors.toCollection(() -> {return new ArrayList<ConstraintViolation<T>>();}));
+		
+		subFieldsViolations.forEach(consViol->{
+			violaciones.remove(consViol);
+		});
+	}
+
+	private boolean isIgnorado(ConstraintViolation<T> consViol, String[] fieldsIgnorar) {
+		boolean ans = false;
+
+		for (String field : fieldsIgnorar) {
+			consViol.getPropertyPath().toString().startsWith(field);
+			ans = true;
+			break;
+		}
+
+		return ans;
 	}
 
 	private void filtraFieldsNoIdentificadores(Set<ConstraintViolation<T>> violaciones, Field field, String nestedPath) {

@@ -19,6 +19,11 @@
     left: 26% !important;
   }
   
+  .v-Notification.error .v-Notification-caption{
+	color: white;
+	white-space: normal;
+  }
+  
   .invisibleDownloadButton{
   	display: none;
   }

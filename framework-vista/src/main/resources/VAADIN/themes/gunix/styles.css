@@ -12966,6 +12966,11 @@ div.v-layout.v-horizontal.v-widget {
 	left: 26% !important;
 }
 
+.gunix .v-Notification.error .v-Notification-caption {
+	color: white;
+	white-space: normal;
+}
+
 .gunix .invisibleDownloadButton {
 	display: none;
 }
