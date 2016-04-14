@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 import mx.com.gunix.framework.ui.vaadin.VaadinUtils;
+import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory.FieldBuilder;
 
 import org.apache.commons.beanutils.NestedNullException;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -86,6 +87,10 @@ public class GunixMTable<T extends Serializable> extends MTable<T> {
 		if (field instanceof AbstractField) {
 			((AbstractField<?>) field).setConversionError(VaadinUtils.getConversionError(property.getType()));
 		}
+	}
+	
+	public void addCustomFieldBuilder(String propertyId, FieldBuilder builder){
+		((GunixTableFieldFactory)getTableFieldFactory()).addCustomFieldBuilder(propertyId, builder);
 	}
 
 	class GunixListContainer extends ListContainer<T> {
