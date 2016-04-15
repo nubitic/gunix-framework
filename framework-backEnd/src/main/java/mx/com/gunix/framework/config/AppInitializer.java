@@ -34,7 +34,8 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 		if (Boolean.valueOf(System.getenv("STANDALONE_APP"))) {
 			configClasses.add(AdminAppServicesConfig.class);
 		}
-		if (Boolean.valueOf(System.getenv("MONGO_DB_NAME"))) {
+		
+		if (System.getenv("MONGO_DB_NAME") != null) {
 			configClasses.add(MongoDBConfig.class);
 		}
 

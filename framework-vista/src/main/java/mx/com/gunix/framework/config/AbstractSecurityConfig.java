@@ -51,9 +51,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
+import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.RequestCacheAwareFilter;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
 @Configuration
 @ComponentScan({"mx.com.gunix.framework.security" })
@@ -182,6 +184,11 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		CharacterEncodingFilter utf8Filter = new CharacterEncodingFilter();
+		utf8Filter.setEncoding("UTF-8");
+		utf8Filter.setForceEncoding(true);
+		http.addFilterBefore(utf8Filter, CsrfFilter.class);
+		
 		Usuario anonymous = usuarioService.getAnonymous();
 		
 		if(anonymous!=null) {
