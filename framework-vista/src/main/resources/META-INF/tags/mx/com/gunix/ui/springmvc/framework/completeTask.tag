@@ -1,2 +1,3 @@
 <%@ attribute name="label" required="false" type="java.lang.String" %>
-<input type="button" value="${label}" onClick="onCompleteTask('${param.idAplicacion}');"/>
+<%@ attribute name="id" required="false" type="java.lang.String" %>
+<input type="button" value="${label}" id="${id}" onClick="onCompleteTask('${param.idAplicacion}');"/>
