@@ -10,8 +10,8 @@ import mx.com.gunix.framework.security.domain.Parametro;
 
 public class Variable<T extends Serializable> implements Serializable {
 	public static enum Scope {
-		PROCESO, TAREA
-	}
+		PROCESO
+		}
 
 	private static final long serialVersionUID = 1L;
 	private Scope scope = Scope.PROCESO;
@@ -141,5 +141,20 @@ public class Variable<T extends Serializable> implements Serializable {
 	public String toString() {
 		return "Variable [scope=" + scope + ", valor=" + valor + ", nombre=" + nombre + "]";
 	}
+	
+	public static class Builder {
+		List<Variable<?>> variables = new ArrayList<Variable<?>>();
 
+		public <S extends Serializable> Builder add(String nombre, S valor) {
+			Variable<S> var = new Variable<S>();
+			var.setNombre(nombre);
+			var.setValor(valor);
+			variables.add(var);
+			return this;
+		}
+
+		public List<Variable<?>> build() {
+			return variables;
+		}
+	}
 }

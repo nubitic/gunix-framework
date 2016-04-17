@@ -9,6 +9,7 @@ import java.util.Optional;
 import mx.com.gunix.framework.processes.domain.Instancia;
 import mx.com.gunix.framework.processes.domain.Tarea;
 import mx.com.gunix.framework.processes.domain.Variable;
+import mx.com.gunix.framework.security.UserDetails;
 import mx.com.gunix.framework.security.domain.Aplicacion;
 import mx.com.gunix.framework.security.domain.Funcion;
 import mx.com.gunix.framework.security.domain.Funcion.ViewEngine;
@@ -21,6 +22,7 @@ import mx.com.gunix.framework.ui.vaadin.view.DefaultProcessEndView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.lexaden.breadcrumb.Breadcrumb;
@@ -235,9 +237,9 @@ public class Header extends CustomComponent {
 						rowIncr++;
 					}
 				}
+				((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).setSelectedAuthority(aplicacion.getIdAplicacion() + "_" + rolSel.getIdRol());
 			});
 		});
-
 	}
 
 	private void seleccionaModulo(Rol rol, Modulo modulo) {

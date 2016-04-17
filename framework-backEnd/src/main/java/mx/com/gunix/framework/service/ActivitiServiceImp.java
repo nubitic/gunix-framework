@@ -5,20 +5,29 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import mx.com.gunix.framework.activiti.GunixObjectVariableType;
 import mx.com.gunix.framework.activiti.ProcessInstanceCreatedEvntListener;
+import mx.com.gunix.framework.activiti.Utils;
+import mx.com.gunix.framework.processes.domain.Filtro;
 import mx.com.gunix.framework.processes.domain.Instancia;
 import mx.com.gunix.framework.processes.domain.ProgressUpdate;
 import mx.com.gunix.framework.processes.domain.Tarea;
 import mx.com.gunix.framework.processes.domain.Variable;
+import mx.com.gunix.framework.security.UserDetails;
 import mx.com.gunix.framework.security.domain.Usuario;
 
 import org.activiti.engine.ActivitiObjectNotFoundException;
@@ -31,7 +40,9 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.form.TaskFormData;
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
@@ -44,8 +55,10 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -98,7 +111,6 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		});
 		Map<String, Object>[] variablesMaps = toMap(tarea.getVariables());
 		Map<String, Object> variablesProcesoMap = variablesMaps[Variable.Scope.PROCESO.ordinal()];
-		Map<String, Object> variablesTareaMap = variablesMaps[Variable.Scope.TAREA.ordinal()];
 
 		GunixObjectVariableType.setCurrentTarea(tarea);
 		
@@ -106,11 +118,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			rs.setVariables(tarea.getInstancia().getId(), variablesProcesoMap);
 		}
 
-		if (!variablesTareaMap.isEmpty()) {
-			ts.setVariablesLocal(tarea.getId(), variablesProcesoMap);
-		}
-
-		ts.complete(taskId, variablesMaps[Variable.Scope.TAREA.ordinal()]);
+		ts.complete(taskId);
 		tarea.getInstancia().setTareaActual(getCurrentTask(tarea.getInstancia().getId(), null));
 
 		if (tarea.getInstancia().getTareaActual() == null) {
@@ -129,7 +137,6 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 	@SuppressWarnings("unchecked")
 	private Map<String, Object>[] toMap(List<Variable<?>> variables) {
 		Map<String, Object> variablesProcesoMap = new HashMap<String, Object>();
-		Map<String, Object> variablesTareaMap = new HashMap<String, Object>();
 		Optional.ofNullable(variables).ifPresent(vars -> {
 			vars.stream().forEach(variable -> {
 				if (variable != null) {
@@ -137,16 +144,12 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 					case PROCESO:
 						variablesProcesoMap.put(variable.getNombre(), variable.getValor());
 						break;
-					case TAREA:
-						variablesTareaMap.put(variable.getNombre(), variable.getValor());
-						break;
 					}
 				}
 			});
 		});
 		Map<String, Object>[] variablesMaps = new Map[2];
 		variablesMaps[Variable.Scope.PROCESO.ordinal()] = variablesProcesoMap;
-		variablesMaps[Variable.Scope.TAREA.ordinal()] = variablesTareaMap;
 		return variablesMaps;
 	}
 	
@@ -399,5 +402,256 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		
 		instancia.setTareaActual(getCurrentTask(processInstanceId, null));
 		return instancia;
+	}
+
+	@Override
+	public List<Instancia> getPendientes(String processKey, List<Filtro<?>> filtros) {
+		return doConsulta(processKey, filtros, true);
+	}
+
+	@Override
+	public List<Instancia> consulta(String processKey, List<Filtro<?>> filtros) {
+		return doConsulta(processKey, filtros, false);
+	}
+
+	private List<Instancia> doConsulta(String processKey, List<Filtro<?>> filtros, boolean conPerfil) {
+		List<Task> tareas = null;
+		if (conPerfil) {
+			TaskQuery tq = ts.createTaskQuery();
+			tq.processDefinitionKey(processKey);
+			tq.taskCandidateGroup(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getSelectedAuthority());
+			tq.orderByProcessInstanceId().asc();
+			tareas = tq.list();
+		}
+
+		ProcessInstanceQuery piq = rs.createProcessInstanceQuery();
+		piq.processDefinitionKey(processKey);
+		processFilters(filtros, piq);
+		if (tareas != null) {
+			piq.processInstanceIds(tareas.stream().map(task -> {
+				return task.getProcessInstanceId();
+			}).collect(Collectors.toCollection(() -> {
+				return new HashSet<String>();
+			})));
+		}
+		piq.orderByProcessInstanceId().asc();
+		List<ProcessInstance> pids = piq.list();
+		
+		Set<String> pidsEncontradosSet = pids.stream().map(pid -> {
+			return pid.getProcessInstanceId();
+		}).collect(Collectors.toCollection(() -> {
+			return new HashSet<String>();
+		}));
+		
+		/*Historia del proceso*/
+		HistoricProcessInstanceQuery hpiq = hs.createHistoricProcessInstanceQuery();
+		hpiq.processDefinitionKey(processKey);
+		hpiq.processInstanceIds(pidsEncontradosSet);
+		
+		if(tareas == null){
+			hpiq.or();
+			processFilters(filtros, hpiq);
+			hpiq.endOr();
+		}
+		
+		hpiq.orderByProcessInstanceId().asc();
+		List<HistoricProcessInstance> hpis = hpiq.list();
+		
+		/*Se agregan los históricos para consultar todas las tareas historicas*/
+		pidsEncontradosSet.addAll(hpis.stream().map(hpid -> {
+			return hpid.getId();
+		}).collect(Collectors.toCollection(() -> {
+			return new HashSet<String>();
+		})));
+		
+		
+		/*Tareas históricas*/
+		HistoricTaskInstanceQuery htiq = hs.createHistoricTaskInstanceQuery();
+		htiq.finished();
+		htiq.processInstanceIdIn(new ArrayList<String>(pidsEncontradosSet));
+		htiq.orderByProcessInstanceId().asc();
+		htiq.orderByTaskCreateTime().desc();
+		List<HistoricTaskInstance> hTasks = htiq.list();
+		
+		List<Instancia> pidsEncontrados = new ArrayList<Instancia>();
+		AtomicReference<List<Task>> tareasHolder = new AtomicReference<List<Task>>();
+		AtomicReference<List<HistoricProcessInstance>> historicosHolder = new AtomicReference<List<HistoricProcessInstance>>();
+		historicosHolder.set(hpis);
+		tareasHolder.set(tareas);
+		
+		if (pids != null) {
+			pids.forEach(pid -> {
+				Instancia inst = new Instancia();
+				HistoricProcessInstance hpi = getHpi(pid.getId(), historicosHolder.get());
+				inst.setId(pid.getId());
+				inst.setInicio(hpi.getStartTime());
+				inst.setProcessKey(processKey);
+				inst.setTermino(hpi.getEndTime());
+				inst.setUsuario(hpi.getStartUserId());
+				inst.setVolatil(false);
+				List<Comment> processComments = ts.getProcessInstanceComments(pid.getId(), PROCESS_CREATION_COMMENT);
+				if (processComments != null && !processComments.isEmpty()) {
+					inst.setComentario(processComments.get(0).getFullMessage());
+				}
+				if (tareasHolder.get() != null) {
+					inst.setTareaActual(getTarea(inst, tareasHolder.get()));
+				}
+				
+				inst.setTareas(getTareas(inst,hTasks));
+				
+				pidsEncontrados.add(inst);
+			});
+		}
+		
+		/*Recorremos los históricos que quedan*/
+		if (hpis != null && !hpis.isEmpty()) {			
+			hpis.forEach(hpid -> {
+				Instancia inst = new Instancia();
+				inst.setId(hpid.getId());
+				inst.setInicio(hpid.getStartTime());
+				inst.setProcessKey(processKey);
+				inst.setTermino(hpid.getEndTime());
+				inst.setUsuario(hpid.getStartUserId());
+				inst.setVolatil(false);
+				List<Comment> processComments = ts.getProcessInstanceComments(hpid.getId(), PROCESS_CREATION_COMMENT);
+				if (processComments != null && !processComments.isEmpty()) {
+					inst.setComentario(processComments.get(0).getFullMessage());
+				}
+				
+				inst.setTareas(getTareas(inst,hTasks));
+				
+				pidsEncontrados.add(inst);
+			});
+		}
+		
+		Collections.sort(pidsEncontrados, Comparator.comparing(Instancia::getInicio).reversed());
+		
+		return pidsEncontrados;
+	}
+
+	private List<Tarea> getTareas(Instancia inst, List<HistoricTaskInstance> hTasks) {
+		Iterator<HistoricTaskInstance> hTasksIt = hTasks.iterator();
+		List<Tarea> tareas = new ArrayList<Tarea>();
+		boolean found = false;
+		HistoricTaskInstance currTask = null;
+		while (hTasksIt.hasNext()) {
+			if ((currTask = hTasksIt.next()).getProcessInstanceId().equals(inst.getId())) {
+				if (!found) {
+					// Solo obtenemos la primer tarea histórica para simplificar la consulta, si se requieren todas se deberá utilizar el método getInstancia por cada instancia de la que se requiera
+					// su detalle
+					Tarea hT = new Tarea();
+					hT.setInicio(currTask.getCreateTime());
+					hT.setTermino(currTask.getEndTime());
+					hT.setUsuario(currTask.getOwner() == null ? currTask.getAssignee() : currTask.getOwner());
+					hT.setInstancia(inst);
+					List<Comment> taskComments = ts.getTaskComments(currTask.getId(), TASK_COMMENT);
+					if (taskComments != null && !taskComments.isEmpty()) {
+						hT.setComentario(taskComments.get(0).getFullMessage());
+					}
+					found = true;
+				}
+				hTasksIt.remove();
+			} else {
+				if (found) {// Ya no hay más tareas para la instancia
+					break;
+				}
+			}
+		}
+		return tareas;
+	}
+
+	private Tarea getTarea(Instancia inst, List<Task> tareas) {
+		Iterator<Task> tareasIt = tareas.iterator();
+		Task task = null;
+		Tarea tarea = null;
+		while (tareasIt.hasNext()) {
+			if ((task = tareasIt.next()).getProcessInstanceId().equals(inst.getId())) {
+				tarea = new Tarea();
+				tarea.setExecutionId(task.getExecutionId());
+				tarea.setId(task.getId());
+				tarea.setInicio(task.getCreateTime());
+				tarea.setNombre(task.getName());
+				tarea.setInstancia(inst);
+				tareasIt.remove();
+				break;
+			}
+		}
+		return tarea;
+	}
+
+	private HistoricProcessInstance getHpi(String pid, List<HistoricProcessInstance> hpis) {
+		Iterator<HistoricProcessInstance> hpisIt = hpis.iterator();
+		HistoricProcessInstance hpi = null;
+		while (hpisIt.hasNext()) {
+			if ((hpi = hpisIt.next()).getId().equals(pid)) {
+				hpisIt.remove();
+				break;
+			}
+		}
+		return hpi;
+	}
+
+	private void processFilters(List<Filtro<?>> filtros, HistoricProcessInstanceQuery hpiq) {
+		if (filtros != null && !filtros.isEmpty()) {
+			filtros
+				.stream()
+				.filter(filtro->(filtro.getScope()==Variable.Scope.PROCESO))
+				.forEach(filtro->{
+					Map<String, Object> fvm = new TreeMap<String, Object>();
+					fvm.putAll(Utils.toMap(filtro.getNombre(), filtro.getValor()));
+					fvm.forEach((varName, varValue) -> {
+						switch (filtro.getlOp()) {
+						case IGUAL:
+							hpiq.variableValueEquals(varName, varValue);
+							break;
+						case MAYOR_QUE:
+							hpiq.variableValueGreaterThan(varName, varValue);
+							break;
+						case MENOR_QUE:
+							hpiq.variableValueLessThanOrEqual(varName, varValue);
+							break;
+						case DIFERENTE:
+							hpiq.variableValueNotEquals(varName, varValue);
+							break;
+						case LIKE:
+							hpiq.variableValueLike(varName, (String) varValue);
+							break;
+						}
+					});
+				});
+
+		}
+	}
+	
+	private void processFilters(List<Filtro<?>> filtros, ProcessInstanceQuery piq) {
+		if (filtros != null && !filtros.isEmpty()) {
+			filtros
+				.stream()
+				.filter(filtro->(filtro.getScope()==Variable.Scope.PROCESO))
+				.forEach(filtro->{
+					Map<String, Object> fvm = new TreeMap<String, Object>();
+					fvm.putAll(Utils.toMap(filtro.getNombre(), filtro.getValor()));
+					fvm.forEach((varName, varValue) -> {
+						switch (filtro.getlOp()) {
+						case IGUAL:
+							piq.variableValueEquals(varName, varValue);
+							break;
+						case MAYOR_QUE:
+							piq.variableValueGreaterThan(varName, varValue);
+							break;
+						case MENOR_QUE:
+							piq.variableValueLessThanOrEqual(varName, varValue);
+							break;
+						case DIFERENTE:
+							piq.variableValueNotEquals(varName, varValue);
+							break;
+						case LIKE:
+							piq.variableValueLike(varName, (String) varValue);
+							break;
+						}
+					});
+				});
+
+		}
 	}
 }

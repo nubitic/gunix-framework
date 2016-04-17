@@ -26,6 +26,7 @@ public class Tarea implements Serializable {
 	private Instancia instancia;
 	private boolean terminal;
 	private List<String> transiciones;
+	private String nombre;
 
 	public boolean isTerminal() {
 		return terminal;
@@ -121,6 +122,14 @@ public class Tarea implements Serializable {
 
 	public void setTransiciones(List<String> transiciones) {
 		this.transiciones = transiciones;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
 	}
 
 	@Override

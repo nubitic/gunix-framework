@@ -141,9 +141,6 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 				case PROCESO:
 					deleteValue(vie.getName(), tarea.getInstancia().getId(), null);
 					break;
-				case TAREA:
-					deleteValue(vie.getName(), null, tarea.getExecutionId());
-					break;
 				}
 			} else {
 				deleteValue(vie.getName(), executionId, null);
@@ -162,9 +159,6 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 				switch (variable.getScope()) {
 				case PROCESO:
 					rs.setVariables(tarea.getInstancia().getId(), variablesMap);
-					break;
-				case TAREA:
-					rs.setVariablesLocal(tarea.getExecutionId(), variablesMap);
 					break;
 				}
 			}

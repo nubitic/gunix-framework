@@ -9,22 +9,19 @@ import mx.com.gunix.framework.security.domain.Usuario;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-public class UserDetails extends Usuario implements org.springframework.security.core.userdetails.UserDetails{
+public class UserDetails extends Usuario implements org.springframework.security.core.userdetails.UserDetails {
 	private static final long serialVersionUID = 1L;
-	
+
 	private List<SimpleGrantedAuthority> autorities = new ArrayList<SimpleGrantedAuthority>();
-	
+	private SimpleGrantedAuthority selectedAuthority;
+
 	public UserDetails(Usuario usuario) {
-		if(usuario.getAplicaciones()!=null){
-			usuario.getAplicaciones()
-						.stream()
-						.forEach(aplicacion->{
-							aplicacion.getRoles()
-										.stream()
-										.forEach(rol->{
-											autorities.add(new SimpleGrantedAuthority(rol.getIdRol()));
-										});
-						});
+		if (usuario.getAplicaciones() != null) {
+			usuario.getAplicaciones().stream().forEach(aplicacion -> {
+				aplicacion.getRoles().stream().forEach(rol -> {
+					autorities.add(new SimpleGrantedAuthority(aplicacion.getIdAplicacion() + "_" + rol.getIdRol()));
+				});
+			});
 		}
 		setAplicaciones(usuario.getAplicaciones());
 		setIdUsuario(usuario.getIdUsuario());
@@ -34,12 +31,12 @@ public class UserDetails extends Usuario implements org.springframework.security
 		setActivo(usuario.isActivo());
 		setDatosUsuario(usuario.getDatosUsuario());
 	}
-	
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return autorities;
 	}
-	
+
 	@Override
 	public String getUsername() {
 		return getIdUsuario();
@@ -63,6 +60,14 @@ public class UserDetails extends Usuario implements org.springframework.security
 	@Override
 	public boolean isEnabled() {
 		return isActivo();
+	}
+
+	public void setSelectedAuthority(String rol) {
+		selectedAuthority = autorities.stream().filter(sga -> (sga.getAuthority().equals(rol))).findFirst().orElse(null);
+	}
+
+	public String getSelectedAuthority() {
+		return selectedAuthority.getAuthority();
 	}
 
 }
