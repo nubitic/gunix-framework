@@ -118,6 +118,7 @@ public class MainController {
 				uiModel.addAttribute(commandName, modelMap.get(commandName) == null ? agc.getBean() : modelMap.get(commandName));
 				uiModel.addAttribute("commandName", commandName);
 			}
+			agc.setTareaActual(instancia.getTareaActual());
 			uiModel.addAttribute("jspView", agc.doConstruct(uiModel).replace(".", "/"));
 		}
 		return instancia;
