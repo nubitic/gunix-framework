@@ -3,9 +3,7 @@ package mx.com.gunix.framework.ui.springmvc;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import mx.com.gunix.framework.processes.domain.Tarea;
 import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.service.ActivitiService;
+import mx.com.gunix.framework.ui.GunixVariableGetter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -25,9 +24,12 @@ import org.springframework.web.servlet.mvc.Controller;
 
 public abstract class AbstractGunixController<S extends Serializable> implements Controller {
 	private ServletRequestDataBinder binder;
-	private Map<String, Serializable> varCache = new HashMap<String, Serializable>();
-	private static final Serializable NULL_OBJECT = new Serializable() {private static final long serialVersionUID = 1L;};
-	private Tarea tarea;	
+
+	private Tarea tarea;
+	
+	@Autowired
+	GunixVariableGetter vg;
+	
 	@Autowired
 	Validator validator;
 	
@@ -82,19 +84,6 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 	}
 
 	protected final Serializable $(String nombreVariable) {
-		Serializable s = varCache.get(nombreVariable);
-		if (s == null) {
-			s = as.getVar(tarea.getInstancia(), nombreVariable);
-			if (s == null) {
-				varCache.put(nombreVariable, NULL_OBJECT);
-			} else {
-				varCache.put(nombreVariable, s);
-			}
-		} else {
-			if (s == NULL_OBJECT) {
-				s = null;
-			}
-		}
-		return s;
+		return vg.get(tarea.getInstancia(), nombreVariable);
 	}
 }

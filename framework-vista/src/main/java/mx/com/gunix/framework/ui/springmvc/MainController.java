@@ -58,12 +58,8 @@ public class MainController {
 	public String ajaxFragment(Model uiModel, HttpServletRequest request) throws BeansException, ClassNotFoundException {
 		if ("content".equals(request.getParameter("fragments"))) {
 			Map<String, Tarea> appTareaActualMap = getTareaActualMap(request);
-			Instancia instancia = null;
-
-			if (request.getParameter("isCompleteTask") != null && "true".equals(request.getParameter("isCompleteTask"))) {
-				instancia = doControl(request, null, uiModel, appTareaActualMap, true);
-			}
-			doControl(request, instancia, uiModel, appTareaActualMap, false);
+			 
+			doControl(request, null, uiModel, appTareaActualMap, true);
 		}
 		return "index";
 	}
@@ -79,49 +75,55 @@ public class MainController {
 		return appTareaActualMap;
 	}
 
-	@SuppressWarnings("unchecked")
-	private <S extends Serializable> Instancia doControl(HttpServletRequest request, Instancia instancia, Model uiModel, Map<String, Tarea> appTareaActualMap, boolean isCompleteTask) throws BeansException, ClassNotFoundException {
-		if (!isCompleteTask && (instancia.getTareaActual() == null || instancia.getTareaActual().getVista().equals(Tarea.DEFAULT_END_TASK_VIEW))) {
-			uiModel.addAttribute("jspView", "framework.defaultProcessEndView".replace(".", "/"));
+	private <S extends Serializable> void doControl(HttpServletRequest request, Instancia instancia, Model uiModel, Map<String, Tarea> appTareaActualMap, boolean isCompleteTask) throws BeansException, ClassNotFoundException {
+		Tarea tareaActual = null;
+		if (isCompleteTask) {
+			tareaActual = appTareaActualMap.get(request.getParameter("idAplicacion"));
 		} else {
-			Tarea tareaActual = null;
-			if (isCompleteTask) {
-				tareaActual = appTareaActualMap.get(request.getParameter("idAplicacion"));
-			} else {
-				appTareaActualMap.put(request.getParameter("idAplicacion"), instancia.getTareaActual());
-				toModel(uiModel, instancia.getVariables());
-			}
-
-			Class<?> agcClass = getClass().getClassLoader().loadClass(isCompleteTask ? tareaActual.getVista() : instancia.getTareaActual().getVista());
-			AbstractGunixController<S> agc = (AbstractGunixController<S>) applicationContext.getBean(agcClass);
-			final GunixSpringMVCView annotation = applicationContext.findAnnotationOnBean(applicationContext.getBeanNamesForType(agcClass)[0], GunixSpringMVCView.class);
-			String commandName = annotation.value();
-
-			try {
-				agc.preInitDataBinder(null, commandName);
-				if (isCompleteTask) {
-					tareaActual.setVariables(agc.getVariablesTarea(request));
-					tareaActual.setComentario(agc.getComentarioTarea(request));
-
-					instancia = as.completaTarea(tareaActual);
-				}
-
-			} catch (BindException e) {
-				if (isCompleteTask) {
-					uiModel.addAllAttributes(e.getBindingResult().getModel());
-					instancia = tareaActual.getInstancia();
-				}
-			}
-
-			if (!"na".equals(commandName)) {
-				Map<String, Object> modelMap = uiModel.asMap();
-				uiModel.addAttribute(commandName, modelMap.get(commandName) == null ? agc.getBean() : modelMap.get(commandName));
-				uiModel.addAttribute("commandName", commandName);
-			}
-			agc.setTareaActual(instancia.getTareaActual());
-			uiModel.addAttribute("jspView", agc.doConstruct(uiModel).replace(".", "/"));
+			appTareaActualMap.put(request.getParameter("idAplicacion"), instancia.getTareaActual());
+			toModel(uiModel, instancia.getVariables());
 		}
-		return instancia;
+		AbstractGunixController<S> agc = null;
+
+		try {
+			if (isCompleteTask) {
+				agc = getAgc(tareaActual.getVista(), uiModel);
+				tareaActual.setVariables(agc.getVariablesTarea(request));
+				tareaActual.setComentario(agc.getComentarioTarea(request));
+				instancia = as.completaTarea(tareaActual);
+			}
+			
+			String newJspView = null;
+			if ((instancia.getTareaActual() == null || instancia.getTareaActual().getVista().equals(Tarea.DEFAULT_END_TASK_VIEW))) {
+				newJspView = "framework.defaultProcessEndView".replace(".", "/");
+			} else {
+				agc = getAgc(instancia.getTareaActual().getVista(), uiModel);
+				agc.setTareaActual(instancia.getTareaActual());
+				newJspView = agc.doConstruct(uiModel).replace(".", "/");
+			}
+
+			uiModel.addAttribute("jspView", newJspView);
+		} catch (BindException e) {
+			if (isCompleteTask) {
+				uiModel.addAllAttributes(e.getBindingResult().getModel());
+				instancia = tareaActual.getInstancia();
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private <S extends Serializable> AbstractGunixController<S> getAgc(String claseVista, Model uiModel) throws BindException, ClassNotFoundException {
+		Class<?> agcClass = getClass().getClassLoader().loadClass(claseVista);
+		AbstractGunixController<S> agc = (AbstractGunixController<S>) applicationContext.getBean(agcClass);
+		final GunixSpringMVCView annotation = applicationContext.findAnnotationOnBean(applicationContext.getBeanNamesForType(agcClass)[0], GunixSpringMVCView.class);
+		String commandName = annotation.value();
+		agc.preInitDataBinder(null, commandName);
+		if (!"na".equals(commandName)) {
+			Map<String, Object> modelMap = uiModel.asMap();
+			uiModel.addAttribute(commandName, modelMap.get(commandName) == null ? agc.getBean() : modelMap.get(commandName));
+			uiModel.addAttribute("commandName", commandName);
+		}
+		return agc;
 	}
 
 	private void toModel(Model uiModel, List<Variable<?>> variables) {

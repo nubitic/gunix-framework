@@ -18,6 +18,7 @@ import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.service.ActivitiService;
 import mx.com.gunix.framework.service.GetterService;
 import mx.com.gunix.framework.ui.GunixFile;
+import mx.com.gunix.framework.ui.GunixVariableGetter;
 import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup;
 import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup.OnBeanValidationErrorCallback;
 import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory;
@@ -54,13 +55,13 @@ import com.vaadin.ui.VerticalLayout;
 public abstract class AbstractGunixView<S extends Serializable> extends VerticalLayout implements View {
 	private static final ThreadLocal<Map<Notification.Type, Set<String>>> notificacionesMap = new ThreadLocal<Map<Notification.Type, Set<String>>>();
 	private Class<S> clazz;
-	private Map<String, Serializable> varCache = new HashMap<String, Serializable>();
 	private static final long serialVersionUID = 1L;
-	
-	private static final Serializable NULL_OBJECT = new Serializable() {private static final long serialVersionUID = 1L;};
 	
 	TareaActualNavigator taNav;
 	private Tarea tarea;
+	
+	@Autowired
+	GunixVariableGetter vg;
 	
 	@Autowired
 	@Lazy
@@ -194,20 +195,7 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	}
 
 	protected final Serializable $(String nombreVariable) {
-		Serializable s = varCache.get(nombreVariable);
-		if (s == null) {
-			s = as.getVar(tarea.getInstancia(), nombreVariable);
-			if (s == null) {
-				varCache.put(nombreVariable, NULL_OBJECT);
-			} else {
-				varCache.put(nombreVariable, s);
-			}
-		} else {
-			if (s == NULL_OBJECT) {
-				s = null;
-			}
-		}
-		return s;
+		return vg.get(tarea.getInstancia(), nombreVariable);
 	}
 
 	protected final S getBean() {
