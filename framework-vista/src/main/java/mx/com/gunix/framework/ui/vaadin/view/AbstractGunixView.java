@@ -134,6 +134,7 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		setId(new StringBuilder(getClass().getName()).append(":").append(hashCode()).toString());
 		taNav = (TareaActualNavigator) UI.getCurrent().getNavigator();
 		tarea = taNav.getTareaActual();
+		vg.setInstancia(tarea.getInstancia());
 		preInitFieldGroup();
 		doConstruct();
 		addComponent(flyt);
@@ -195,7 +196,7 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	}
 
 	protected final Serializable $(String nombreVariable) {
-		return vg.get(tarea.getInstancia(), nombreVariable);
+		return vg.get(nombreVariable);
 	}
 
 	protected final S getBean() {

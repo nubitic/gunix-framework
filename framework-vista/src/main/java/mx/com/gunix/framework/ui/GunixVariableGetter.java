@@ -8,26 +8,31 @@ import mx.com.gunix.framework.processes.domain.Instancia;
 import mx.com.gunix.framework.service.ActivitiService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 @Component
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Scope(WebApplicationContext.SCOPE_REQUEST)
 public final class GunixVariableGetter implements Serializable {
 	private static final long serialVersionUID = 1L;
-
-	@Autowired
-	@Lazy
-	ActivitiService as;
-
 	private Map<String, Serializable> varCache = new HashMap<String, Serializable>();
 	private static final Serializable NULL_OBJECT = new Serializable() {
 		private static final long serialVersionUID = 1L;
 	};
+	
+	@Autowired
+	@Lazy
+	ActivitiService as;
 
-	public Serializable get(Instancia instancia, String nombreVariable) {
+	private Instancia instancia;
+
+	public void setInstancia(Instancia instancia) {
+		this.instancia = instancia;
+	}
+
+	public Serializable get(String nombreVariable) {
 
 		Serializable s = varCache.get(nombreVariable);
 		if (s == null) {

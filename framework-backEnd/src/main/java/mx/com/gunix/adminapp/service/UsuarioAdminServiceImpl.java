@@ -1,5 +1,6 @@
 package mx.com.gunix.adminapp.service;
 
+import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import mx.com.gunix.framework.service.GetterService;
 import mx.com.gunix.framework.service.GunixActivitServiceSupport;
 import mx.com.gunix.framework.service.hessian.ByteBuddyUtils;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -51,8 +53,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-
 
 @Service("usuarioAdminService")
 @Transactional(rollbackFor = Exception.class)
@@ -351,8 +351,14 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 					ambito.getPermisos().add(p);
 				});
 			}
-		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException e) {
 			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			if (ExceptionUtils.getRootCause(e) instanceof FileNotFoundException) {
+				log.error("No fue posible inicializar el ámbito: " + ambito.toString(), e);
+			} else {
+				throw new RuntimeException(e);
+			}
 		} catch (Exception ignorar) {
 			log.error("No fue posible inicializar el ámbito: " + ambito.toString(), ignorar);
 		}

@@ -2,6 +2,7 @@ package mx.com.gunix.framework.config;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,9 @@ import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
+import com.mongodb.MongoTimeoutException;
+import com.mongodb.ServerAddress;
 
 import de.flapdoodle.embed.mongo.Command;
 import de.flapdoodle.embed.mongo.MongodExecutable;
@@ -47,18 +51,25 @@ import de.flapdoodle.embed.process.store.StaticArtifactStoreBuilder;
 @EnableMongoRepositories(basePackages = "mx.com.gunix.domain.persistence.mongo")
 @ComponentScan("mx.com.gunix.domain.persistence.mongo")
 public class MongoDBConfig {
-
+	private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MongoDBConfig.class);
+	
 	public @Bean MongoDbFactory mongoDbFactory() throws Exception {
 		MongoClient mongoClient = null;
 
 		int mongoPort = (System.getenv("MONGO_PORT") != null && !System.getenv("MONGO_PORT").isEmpty() ? Integer.parseInt(System.getenv("MONGO_PORT")) : 27017);
 		String mongoDB = System.getenv("MONGO_DB_NAME");
 		
+		String mongoServer = (System.getenv("MONGO_HOSTNAME") != null && !System.getenv("MONGO_HOSTNAME").isEmpty() ? System.getenv("MONGO_HOSTNAME") : "localhost");
+		String mongoUser = System.getenv("MONGO_USER");
+		String mongoPassword = System.getenv("MONGO_PASSWORD");
+				
 		try {
-			mongoClient = getMongoClient(mongoPort);
-		} catch (Exception ignorar) {
+			mongoClient = getMongoClient(mongoServer, mongoPort, mongoUser, mongoPassword, mongoDB);
+		} catch (MongoTimeoutException ignorar) {
+			//Si no fue posible conectarse a mongo se 1) instala y 2 ) levanta una instancia de mongod 
+			log.warn("Iniciando servidor local Mongo, si no es lo esperado favor de verificar los datos de conexión a mongo");
 			startMongoDB(mongoPort);
-			mongoClient = getMongoClient(mongoPort);
+			mongoClient = getMongoClient(mongoServer, mongoPort, mongoUser, mongoPassword, mongoDB);
 		}
 
 		return new SimpleMongoDbFactory(mongoClient, mongoDB);
@@ -69,12 +80,17 @@ public class MongoDBConfig {
 
 		return mongoTemplate;
 	}
-    
-	private MongoClient getMongoClient(int mongoPort) throws Exception{
+
+	private MongoClient getMongoClient(String mongoServer, int mongoPort, String mongoUser, String mongoPassword, String mongoDB) throws Exception {
 		MongoClient mongoClient = null;
-		
-		mongoClient = new MongoClient("localhost", mongoPort);
-		mongoClient.getDatabaseNames();
+		MongoCredential credential = null;
+
+		if (mongoUser != null && !mongoUser.isEmpty() && mongoPassword != null && !mongoPassword.isEmpty()) {
+			credential = MongoCredential.createCredential(mongoUser, mongoDB, mongoPassword.toCharArray());
+		}
+
+		mongoClient = new MongoClient(new ServerAddress(mongoServer, mongoPort), credential != null ? Arrays.asList(credential) : null);
+		mongoClient.getDatabaseNames(); // Prueba la conexión.
 		return mongoClient;
 	}
     

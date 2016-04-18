@@ -24,8 +24,6 @@ import org.springframework.web.servlet.mvc.Controller;
 
 public abstract class AbstractGunixController<S extends Serializable> implements Controller {
 	private ServletRequestDataBinder binder;
-
-	private Tarea tarea;
 	
 	@Autowired
 	GunixVariableGetter vg;
@@ -80,10 +78,10 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 	}
 
 	void setTareaActual(Tarea tarea) {
-		this.tarea = tarea;
+		vg.setInstancia(tarea.getInstancia());
 	}
 
 	protected final Serializable $(String nombreVariable) {
-		return vg.get(tarea.getInstancia(), nombreVariable);
+		return vg.get(nombreVariable);
 	}
 }
