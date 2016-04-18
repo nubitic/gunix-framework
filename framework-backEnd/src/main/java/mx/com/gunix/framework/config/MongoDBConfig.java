@@ -90,7 +90,7 @@ public class MongoDBConfig {
 		}
 
 		mongoClient = new MongoClient(new ServerAddress(mongoServer, mongoPort), credential != null ? Arrays.asList(credential) : null);
-		mongoClient.getDatabaseNames(); // Prueba la conexión.
+		mongoClient.getDB(mongoDB).getCollectionNames();//Prueba la conexión
 		return mongoClient;
 	}
     
