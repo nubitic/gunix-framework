@@ -58,7 +58,7 @@ public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
 
 		configClasses.add(AspectJConfig.class);
 
-		if (System.getenv("LOGICALDOC_HOSTNAME") != null) {
+		if (Boolean.parseBoolean(System.getenv("LOGICALDOC_ENABLED"))) {
 			configClasses.add(LogicalDocConfig.class);
 		}
 		try {

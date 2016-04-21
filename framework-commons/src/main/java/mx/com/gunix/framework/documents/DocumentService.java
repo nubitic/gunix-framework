@@ -47,8 +47,8 @@ public class DocumentService {
 	static String DEFAULT_WORKSPACE_NAME;
 
 	static {
-		usuarioLD = System.getenv("LOGICALDOC_USER");
-		passwordLD = System.getenv("LOGICALDOC_PASSWORD");
+		usuarioLD = System.getenv("LOGICALDOC_USER") == null ? "admin" : System.getenv("LOGICALDOC_USER");
+		passwordLD = System.getenv("LOGICALDOC_PASSWORD") == null ? "admin" : System.getenv("LOGICALDOC_PASSWORD");
 	}
 
 	/**

@@ -4,9 +4,10 @@ import java.io.Serializable;
 
 import javax.validation.constraints.NotNull;
 
+import mx.com.gunix.framework.domain.HashCodeByTimeStampAware;
 import mx.com.gunix.framework.domain.Identificador;
 
-public class Carpeta implements Serializable {
+public class Carpeta extends HashCodeByTimeStampAware implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Identificador
@@ -48,5 +49,35 @@ public class Carpeta implements Serializable {
 		}
 		pathStrBldr.append(nombre);
 		return pathStrBldr.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Carpeta other = (Carpeta) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Carpeta [" + getPath() + ", id=" + id + "]";
+	}
+
+	@Override
+	protected int doHashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
 	}
 }

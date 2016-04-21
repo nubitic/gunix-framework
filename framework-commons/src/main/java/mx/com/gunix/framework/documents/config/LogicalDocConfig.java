@@ -27,9 +27,9 @@ public class LogicalDocConfig {
 
 	@Bean
 	public AuthService ldAuthService() throws Exception {
-		AuthService authService = new AuthClient(getLogicalDocURL() + "/Auth");
+		AuthService authService = new AuthClient(EmbeddedLogicalDocManager.getLogicalDocURL() + "/services/Auth");
 		try {
-			authService.logout(authService.login(System.getenv("LOGICALDOC_USER"), System.getenv("LOGICALDOC_PASSWORD")));
+			authService.logout(authService.login(System.getenv("LOGICALDOC_USER") == null ? "admin" : System.getenv("LOGICALDOC_USER"), System.getenv("LOGICALDOC_PASSWORD") == null ? "admin" : System.getenv("LOGICALDOC_PASSWORD")));
 		} catch (Fault ignorar) {
 			if (ExceptionUtils.getRootCause(ignorar) instanceof ConnectException) {
 				// Si la conexión no se pudo establecer entonces iniciamos/instalamos logicaldoc
@@ -41,20 +41,17 @@ public class LogicalDocConfig {
 
 	@Bean
 	public FolderService ldFolderService() throws IOException {
-		return new FolderClient(getLogicalDocURL() + "/Folder");
+		return new FolderClient(EmbeddedLogicalDocManager.getLogicalDocURL() + "/services/Folder");
 	}
 
 	@Bean
 	public DocumentService ldDocumentService() throws IOException {
-		return new DocumentClient(getLogicalDocURL() + "/Document");
+		return new DocumentClient(EmbeddedLogicalDocManager.getLogicalDocURL() + "/services/Document");
 	}
 
 	@Bean
 	public SearchService ldSearchService() throws IOException {
-		return new SearchClient(getLogicalDocURL() + "/Search");
+		return new SearchClient(EmbeddedLogicalDocManager.getLogicalDocURL() + "/services/Search");
 	}
 
-	private String getLogicalDocURL() {
-		return System.getenv("LOGICALDOC_HOSTNAME") + (System.getenv("LOGICALDOC_PORT") != null ? ":" + System.getenv("LOGICALDOC_PORT") : "") + "/" + (System.getenv("LOGICALDOC_CONTEXT") != null ? System.getenv("LOGICALDOC_CONTEXT") : "") + "/services";
-	}
 }

@@ -36,7 +36,7 @@ public final class EmbeddedLogicalDocManager {
 		}
 		log.info("Iniciando LogicalDoc");
 		doStart(logicalDocHomeFile, false);
-		log.info("LogicalDoc iniciado en: " + System.getenv("LOGICALDOC_HOSTNAME") + (System.getenv("LOGICALDOC_PORT") != null ? ":" + System.getenv("LOGICALDOC_PORT") : "") + "/" + (System.getenv("LOGICALDOC_CONTEXT") != null ? System.getenv("LOGICALDOC_CONTEXT") : ""));
+		log.info("LogicalDoc iniciado en: " + getLogicalDocURL());
 		log.info("Usuario: admin");
 		log.info("Pass: admin");
 	}
@@ -134,11 +134,11 @@ public final class EmbeddedLogicalDocManager {
 		cmd.add(logicalDocHomeFile.getAbsolutePath() + File.separator + "webapp-runner.jar");
 
 		cmd.add("--port");
-		cmd.add((System.getenv("LOGICALDOC_PORT") != null ? System.getenv("LOGICALDOC_PORT") : "80"));
+		cmd.add((System.getenv("LOGICALDOC_PORT") != null ? System.getenv("LOGICALDOC_PORT") : "7080"));
 		cmd.add("--temp-directory");
 		cmd.add(logicalDocHomeFile.getAbsolutePath() + File.separator + "tomcat");
 		cmd.add("--path");
-		cmd.add(System.getenv("LOGICALDOC_CONTEXT") != null ? "/" + System.getenv("LOGICALDOC_CONTEXT") : "/");
+		cmd.add(System.getenv("LOGICALDOC_CONTEXT") != null ? "/" + System.getenv("LOGICALDOC_CONTEXT") : "/logicaldoc");
 
 		cmd.add(logicalDocHomeFile.getAbsolutePath() + File.separator + "logicalDoc");
 
@@ -153,10 +153,14 @@ public final class EmbeddedLogicalDocManager {
 				EmbeddedServerUtils.log(log, process, null);
 				throw new RuntimeException("No fue posible iniciar LogicalDoc");
 			}
-		} catch (IllegalThreadStateException ignorar) {}//Still alive!
+		} catch (IllegalThreadStateException ignorar) {}// Still alive!
 
 		if (forRestart) {
 			process.destroy();
 		}
+	}
+
+	public static String getLogicalDocURL() {
+		return (System.getenv("LOGICALDOC_HOSTNAME") != null ? System.getenv("LOGICALDOC_HOSTNAME") : "http://localhost:") + (System.getenv("LOGICALDOC_PORT") != null ? System.getenv("LOGICALDOC_PORT") : "7080") + "/" + (System.getenv("LOGICALDOC_CONTEXT") != null ? System.getenv("LOGICALDOC_CONTEXT") : "logicaldoc");
 	}
 }

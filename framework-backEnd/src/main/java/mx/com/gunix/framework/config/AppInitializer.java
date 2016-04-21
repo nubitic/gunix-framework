@@ -41,7 +41,7 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 			configClasses.add(MongoDBConfig.class);
 		}
 		
-		if (System.getenv("LOGICALDOC_HOSTNAME") != null) {
+		if (Boolean.parseBoolean(System.getenv("LOGICALDOC_ENABLED"))) {
 			configClasses.add(LogicalDocConfig.class);
 		}
 
