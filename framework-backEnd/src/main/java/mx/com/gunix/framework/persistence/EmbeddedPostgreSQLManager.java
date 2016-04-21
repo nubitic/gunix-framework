@@ -2,21 +2,15 @@ package mx.com.gunix.framework.persistence;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
-import org.apache.commons.compress.utils.IOUtils;
+import mx.com.gunix.framework.util.EmbeddedServerUtils;
+
 import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -108,10 +102,10 @@ public final class EmbeddedPostgreSQLManager {
 
 		if (!bdInicializada(pgsqlHomeFile, usuario, passwordFile.getAbsolutePath(), database)) {
 			log.info("Creando Tablas, Secuencias...");
-			initDB(pgsqlHomeFile, usuario, passwordFile.getAbsolutePath(), database, classLoader);
+			initDB(pgsqlHomeFile, usuario, database, classLoader);
 		}
 		
-		ejecutaAppScripts(pgsqlHomeFile, usuario, passwordFile.getAbsolutePath(), database);
+		ejecutaAppScripts(pgsqlHomeFile, usuario, database);
 
 		passwordFile.delete();
 
@@ -123,12 +117,12 @@ public final class EmbeddedPostgreSQLManager {
 		log.info("base de datos: " + database);
 	}
 
-	private static void ejecutaAppScripts(File pgsqlHomeFile, String usuario, String password, String database) {
+	private static void ejecutaAppScripts(File pgsqlHomeFile, String usuario, String database) {
 		try {
 			Resource[] appScriptsResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/domain/persistence/scripts/**/*.sql");
 			if (appScriptsResources != null) {
 				for (Resource appScriptResource : appScriptsResources) {
-					ejecutaScript(appScriptResource.getInputStream(), pgsqlHomeFile, usuario, password, database);
+					EmbeddedServerUtils.ejecutaScript(appScriptResource.getInputStream(), pgsqlHomeFile, usuario, database, log);
 				}
 			}
 		} catch (IOException e) {
@@ -136,41 +130,10 @@ public final class EmbeddedPostgreSQLManager {
 		}
 	}
 
-	private static void initDB(File pgsqlHomeFile, String usuario, String password, String database, ClassLoader classLoader) {
-		ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/01_SEGURIDAD_ACL_ROL_FUNCION.sql"), pgsqlHomeFile, usuario, password, database);
-		ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/02_ACTIVITI.sql"), pgsqlHomeFile, usuario, password, database);
-		ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/03_ADMON_SEG.sql"), pgsqlHomeFile, usuario, password, database);
-	}
-
-	private static void ejecutaScript(InputStream scriptStream, File pgsqlHomeFile, String usuario, String password, String database) {
-		try {
-			File scriptFile = File.createTempFile("script", ".sql");
-
-			IOUtils.copy(scriptStream, new FileOutputStream(scriptFile));
-
-			List<String> cmd = new ArrayList<String>();
-			cmd.add(getCommandPath(pgsqlHomeFile, "psql"));
-			cmd.add("-e");
-			cmd.add("-f");
-			cmd.add(scriptFile.getAbsolutePath());
-			cmd.add("-U");
-			cmd.add(usuario);
-			cmd.add("-d");
-			cmd.add(database);
-
-			ProcessBuilder processBuilder = new ProcessBuilder(cmd);
-			processBuilder.redirectErrorStream(true);
-			final Process process = processBuilder.start();
-			log(process);
-			process.waitFor(5, TimeUnit.SECONDS);
-			scriptFile.delete();
-			if (process.exitValue() != 0) {
-				log(process);
-				throw new RuntimeException("No fue posible ejecuar el script ");
-			}
-		} catch (IOException | InterruptedException e) {
-			throw new RuntimeException("No fue posible verificar si la base de datos ya se está ejecutando", e);
-		}
+	private static void initDB(File pgsqlHomeFile, String usuario, String database, ClassLoader classLoader) {
+		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/01_SEGURIDAD_ACL_ROL_FUNCION.sql"), pgsqlHomeFile, usuario, database, log);
+		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/02_ACTIVITI.sql"), pgsqlHomeFile, usuario, database, log);
+		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/03_ADMON_SEG.sql"), pgsqlHomeFile, usuario, database, log);
 	}
 
 	private static boolean bdInicializada(File pgsqlHomeFile, String usuario, String absolutePath, String database) {
@@ -224,7 +187,7 @@ public final class EmbeddedPostgreSQLManager {
 			Process process = processBuilder.start();
 
 			process.waitFor();
-			log(process);
+			EmbeddedServerUtils.log(log, process, null);
 		} catch (IOException | InterruptedException e) {
 			throw new RuntimeException("No se pudo inicializar el servidor de base de datos", e);
 		}
@@ -242,7 +205,7 @@ public final class EmbeddedPostgreSQLManager {
 			processBuilder.redirectErrorStream(true);
 			Process process = processBuilder.start();
 			process.waitFor();
-			log(process);
+			EmbeddedServerUtils.log(log, process, null);
 		} catch (IOException | InterruptedException e) {
 			throw new RuntimeException("No fue posible iniciar la base de datos", e);
 		}
@@ -250,7 +213,7 @@ public final class EmbeddedPostgreSQLManager {
 	}
 
 	private static String getCommandPath(File pgsqlHomeFile, String command) {
-		return new File(new File(pgsqlHomeFile, "bin"), command).getAbsolutePath();
+		return EmbeddedServerUtils.getCommandPath(new File(pgsqlHomeFile, "bin"), command);
 	}
 
 	private static void start(File pgsqlHomeFile, String dataDir, String usuario, String contraseña) {
@@ -260,17 +223,33 @@ public final class EmbeddedPostgreSQLManager {
 
 			cmd.add("-D");
 			cmd.add(dataDir);
+			
+			cmd.add("-c");
+			cmd.add("log_destination=stderr");
+			cmd.add("-c");
+			cmd.add("logging_collector=on");
+			cmd.add("-c");
+			cmd.add("log_directory=pg_log");
+			cmd.add("-c");
+			cmd.add("log_filename=postgresql-%a.log");
+			cmd.add("-c");
+			cmd.add("log_truncate_on_rotation=on");
+			cmd.add("-c");
+			cmd.add("log_rotation_age=1d");
+			cmd.add("-c");
+			cmd.add("log_rotation_size=0");
 
 			ProcessBuilder processBuilder = new ProcessBuilder(cmd);
 			processBuilder.redirectErrorStream(true);
 			Process process = processBuilder.start();
-
+			
+			EmbeddedServerUtils.log(log, process, "«pg_log».");
+			
 			if (process.isAlive()) {
 				while (!started(pgsqlHomeFile, usuario, contraseña)) {
 					Thread.sleep(3000);
 				}
 			} else {
-				log(process);
 				if (!started(pgsqlHomeFile, usuario, contraseña)) {
 					throw new RuntimeException("No fue posible iniciar la base de datos");
 				}
@@ -293,82 +272,11 @@ public final class EmbeddedPostgreSQLManager {
 			processBuilder.redirectErrorStream(true);
 			final Process process = processBuilder.start();
 			process.waitFor();
-			log(process);
+			EmbeddedServerUtils.log(log, process, null);
 			return process.exitValue() == 0;
 		} catch (IOException | InterruptedException e) {
 			throw new RuntimeException("No fue posible verificar si la base de datos ya se está ejecutando", e);
 		}
-	}
-
-	public static void log(Process process) throws IOException {
-		if (log.isInfoEnabled()) {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			String linea = null;
-			while ((linea = reader.readLine()) != null)
-				log.info(linea);
-			reader.close();
-		}
-	}
-
-	public static File descargaArchivo(String fileURL, String tempFilePrefix, String tempFileSufix) throws IOException {
-
-		URL url = new URL(fileURL);
-		HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
-		httpConn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
-		int responseCode = httpConn.getResponseCode();
-		File downloadedFile = File.createTempFile(tempFilePrefix, tempFileSufix);
-
-		// always check HTTP response code first
-		if (responseCode == HttpURLConnection.HTTP_OK) {
-			String fileName = "";
-			String contentType = httpConn.getContentType();
-			long contentLength = httpConn.getContentLengthLong();
-			fileName = fileURL.substring(fileURL.lastIndexOf("/") + 1, fileURL.length());
-
-			log.info("Content-Type = " + contentType);
-			log.info("Content-Length = " + contentLength);
-			log.info("fileName = " + fileName);
-
-			// opens input stream from the HTTP connection
-			InputStream inputStream = httpConn.getInputStream();
-
-			// opens an output stream to save into file
-			FileOutputStream outputStream = new FileOutputStream(downloadedFile);
-
-			int bytesRead = -1;
-			byte[] buffer = new byte[8192];
-			int steps = 16;
-			long totalBytesReaded = 0;
-			int avanceAnterior = -1;
-			while ((bytesRead = inputStream.read(buffer)) != -1) {
-				totalBytesReaded += bytesRead;
-				outputStream.write(buffer, 0, bytesRead);
-				if (log.isInfoEnabled()) {
-					int avance = (int) ((totalBytesReaded * steps) / contentLength);
-					if (avance > avanceAnterior && (avance % 4) == 0) {
-						StringBuilder progress = new StringBuilder("Progreso: |");
-						for (int i = 0; i < steps; i++) {
-							if (avance > i) {
-								progress.append("=");
-							} else {
-								progress.append(" ");
-							}
-						}
-						progress.append("|\r");
-						System.out.print(progress.toString());
-						avanceAnterior = avance;
-					}
-				}
-			}
-			outputStream.close();
-			inputStream.close();
-
-			log.info("Archivo Descargado");
-		} else {
-			throw new RuntimeException("No fue posible descargar el archivo, codigo HTTP:" + responseCode);
-		}
-		httpConn.disconnect();
-		return downloadedFile;
 	}
 
 	private static void downloadPostgreSQLDist(File pgsqlHomeFile, String osType, String arch) throws IOException {
@@ -377,18 +285,18 @@ public final class EmbeddedPostgreSQLManager {
 				+ "-binaries." + ("*nix".equals(osType) ? "tar.gz" : "zip");
 
 		String postgreSQLAbsPath = pgsqlHomeFile.getAbsolutePath() + File.separator;
-		File downloadedFile = descargaArchivo(fileURL, "postgreSQLDist", null);
+		File downloadedFile = EmbeddedServerUtils.descargaArchivo(fileURL, "postgreSQLDist", null, log);
 		if ("*nix".equals(osType) || "mac".equals(osType)) {
-			extractTar(downloadedFile, postgreSQLAbsPath);
+			EmbeddedServerUtils.extractTar(downloadedFile, postgreSQLAbsPath, log);
 		} else {
-			extractZip(downloadedFile, postgreSQLAbsPath);
+			EmbeddedServerUtils.extractZip(downloadedFile, postgreSQLAbsPath, log);
 		}
 
 		downloadedFile.delete();
 
 		if ("win".equals(osType)) {
 			fileURL = "https://download.microsoft.com/download/B/0/1/B0105F32-5B05-41D0-81A1-DD87A5A05D00/vcredist_x" + ("64".equals(arch) ? "64" : "86") + ".exe";
-			downloadedFile = descargaArchivo(fileURL, "vcredist", ".exe");
+			downloadedFile = EmbeddedServerUtils.descargaArchivo(fileURL, "vcredist", ".exe", log);
 			log.info("Instalando Visual C++ Redistributable Package");
 			try {
 				List<String> cmd = new ArrayList<String>();
@@ -407,64 +315,6 @@ public final class EmbeddedPostgreSQLManager {
 		}
 	}
 
-	public static void extractZip(File downloadedFile, String postgreSQLAbsPath) throws IOException {
-		log.info("Extrayendo: " + downloadedFile.getName());
-		// get the zip file content
-		ZipInputStream zis = new ZipInputStream(new FileInputStream(downloadedFile));
-		// get the zipped file list entry
-		ZipEntry ze = zis.getNextEntry();
-		byte[] buffer = new byte[4096];
-		while (ze != null) {
 
-			String fileName = ze.getName();
-			File newFile = new File(postgreSQLAbsPath + fileName);
 
-			if (ze.isDirectory()) {
-				// create all non exists folders
-				// else you will hit FileNotFoundException for compressed folder
-				newFile.mkdirs();
-			} else {
-				FileOutputStream fos = new FileOutputStream(newFile);
-
-				int len;
-				while ((len = zis.read(buffer)) > 0) {
-					fos.write(buffer, 0, len);
-				}
-
-				fos.close();
-			}
-			ze = zis.getNextEntry();
-		}
-
-		zis.closeEntry();
-		zis.close();
-
-		log.info("extracción completada con éxito!!");
-	}
-
-	public static void extractTar(File downloadedFile, String postgreSQLAbsPath) throws IOException {
-		log.info("Extrayendo: " + downloadedFile.getName());
-		
-		new File(postgreSQLAbsPath).mkdirs();
-
-		List<String> cmd = new ArrayList<String>();
-		
-		cmd.add("tar");
-		cmd.add("-zxvf");
-		cmd.add(downloadedFile.getAbsolutePath());
-		cmd.add("-C");
-		cmd.add(postgreSQLAbsPath);
-
-		ProcessBuilder processBuilder = new ProcessBuilder(cmd);
-		processBuilder.redirectErrorStream(true);
-		final Process process = processBuilder.start();
-		try {
-			log(process);
-			process.waitFor();
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-
-		log.info("extracción completada con éxito!!");
-	}
 }

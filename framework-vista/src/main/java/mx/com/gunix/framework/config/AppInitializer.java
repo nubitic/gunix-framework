@@ -9,6 +9,8 @@ import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 
+import mx.com.gunix.framework.documents.config.LogicalDocConfig;
+
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.filter.DelegatingFilterProxy;
@@ -26,14 +28,14 @@ public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
 
 		RequestContextListener rcl = new RequestContextListener();
 		servletContext.addListener(rcl);
-		
+
 		SpringAwareVaadinServlet savs = new SpringAwareVaadinServlet();
 		ServletRegistration.Dynamic savsReg = servletContext.addServlet(SpringAwareVaadinServlet.class.getName(), savs);
 		savsReg.setAsyncSupported(true);
 		savsReg.setLoadOnStartup(2);
 		savsReg.setInitParameter("widgetset", "mx.com.gunix.framework.ui.vaadin.GunixWidgetset");
 		savsReg.setInitParameter("productionMode", "true");
-		savsReg.addMapping("/VAADIN/*", "/"+ VaadinSecurityConfig.VAADIN_LOCATION + "*");
+		savsReg.addMapping("/VAADIN/*", "/" + VaadinSecurityConfig.VAADIN_LOCATION + "*");
 
 		DispatcherServlet ds = new DispatcherServlet();
 		ServletRegistration.Dynamic dsReg = servletContext.addServlet(DispatcherServlet.class.getName(), ds);
@@ -55,6 +57,10 @@ public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
 		configClasses.add(SpringMVCConfig.class);
 
 		configClasses.add(AspectJConfig.class);
+
+		if (System.getenv("LOGICALDOC_HOSTNAME") != null) {
+			configClasses.add(LogicalDocConfig.class);
+		}
 		try {
 			configClasses.add(AppInitializer.class.getClassLoader().loadClass("mx.com.gunix.config.ClientServiceConfig"));
 		} catch (ClassNotFoundException e) {

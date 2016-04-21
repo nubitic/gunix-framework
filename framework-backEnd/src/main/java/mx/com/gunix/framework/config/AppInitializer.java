@@ -3,6 +3,8 @@ package mx.com.gunix.framework.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import mx.com.gunix.framework.documents.config.LogicalDocConfig;
+
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 public class AppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
@@ -37,6 +39,10 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 		
 		if (System.getenv("MONGO_DB_NAME") != null) {
 			configClasses.add(MongoDBConfig.class);
+		}
+		
+		if (System.getenv("LOGICALDOC_HOSTNAME") != null) {
+			configClasses.add(LogicalDocConfig.class);
 		}
 
 		try {

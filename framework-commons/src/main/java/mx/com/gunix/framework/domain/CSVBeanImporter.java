@@ -109,6 +109,7 @@ public abstract class CSVBeanImporter<T extends Serializable> {
 					.replace("and max", "y máximo")
 					.replace("contains the forbidden substring", "contiene el texto no permitido")
 					.replace("could not be parsed as a BigDecimal", "debe tener formato numérico")
+					.replace("could not be parsed as a enum of type", "valor inválido para ")
 					.replace("could not be parsed as a Date", "debe tener formato de fecha")
 					.replace("could not be parsed as a Double", "debe tener formato numérico")
 					.replace("could not be parsed as a Boolean", "valor no reconocido")

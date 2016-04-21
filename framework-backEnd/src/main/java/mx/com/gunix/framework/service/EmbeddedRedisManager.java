@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import mx.com.gunix.framework.persistence.EmbeddedPostgreSQLManager;
+import mx.com.gunix.framework.util.EmbeddedServerUtils;
 
 import org.apache.log4j.Logger;
 
@@ -83,7 +83,7 @@ public final class EmbeddedRedisManager {
 					Thread.sleep(3000);
 				}
 			} else {
-				EmbeddedPostgreSQLManager.log(process);
+				EmbeddedServerUtils.log(log, process, null);
 				if (!started(redisHomeFile)) {
 					throw new RuntimeException("No fue posible iniciar Redis");
 				}
@@ -97,11 +97,11 @@ public final class EmbeddedRedisManager {
 		String fileURL = "win".equals(osType) ? "https://github.com/MSOpenTech/redis/releases/download/win-3.0.501/Redis-x64-3.0.501.zip" : "";
 
 		String redisAbsPath = redisHomeFile.getAbsolutePath() + File.separator;
-		File downloadedFile = EmbeddedPostgreSQLManager.descargaArchivo(fileURL, "redisDist", null);
+		File downloadedFile = EmbeddedServerUtils.descargaArchivo(fileURL, "redisDist", null, log);
 		if ("*nix".equals(osType) || "mac".equals(osType)) {
-			EmbeddedPostgreSQLManager.extractTar(downloadedFile, redisAbsPath);
+			EmbeddedServerUtils.extractTar(downloadedFile, redisAbsPath, log);
 		} else {
-			EmbeddedPostgreSQLManager.extractZip(downloadedFile, redisAbsPath);
+			EmbeddedServerUtils.extractZip(downloadedFile, redisAbsPath, log);
 		}
 
 		downloadedFile.delete();

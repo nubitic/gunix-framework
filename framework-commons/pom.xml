@@ -10,6 +10,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<super-csv.version>2.4.0</super-csv.version>
 		<dozer.version>5.5.1</dozer.version>
+		<logicaldoc.version>7.4.2</logicaldoc.version>
 	</properties>
 	<artifactId>framework-commons</artifactId>
 	<repositories>
@@ -29,6 +30,11 @@
 				<enabled>true</enabled>
 				<updatePolicy>always</updatePolicy>
 			</snapshots>
+		</repository>
+		<repository>
+			<id>logicaldoc</id>
+			<name>LogicalDOC Repository</name>
+			<url>http://logicaldoc.sourceforge.net/maven</url>
 		</repository>
 	</repositories>
 	<dependencies>
@@ -102,6 +108,40 @@
 			<groupId>net.bytebuddy</groupId>
 			<artifactId>byte-buddy</artifactId>
 			<version>1.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>jdk.tools</groupId>
+			<artifactId>jdk.tools</artifactId>
+			<version>1.8.0</version>
+			<scope>system</scope>
+			<systemPath>${JAVA_1_8_HOME}/lib/tools.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>com.logicaldoc</groupId>
+			<artifactId>logicaldoc-webservice</artifactId>
+			<version>${logicaldoc.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>spring-asm</artifactId>
+					<groupId>org.springframework</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.logicaldoc</groupId>
+			<artifactId>logicaldoc-core</artifactId>
+			<version>${logicaldoc.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>xercesImpl</artifactId>
+					<groupId>xerces</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.logicaldoc</groupId>
+			<artifactId>logicaldoc-util</artifactId>
+			<version>${logicaldoc.version}</version>
 		</dependency>
 	</dependencies>
 	<distributionManagement>

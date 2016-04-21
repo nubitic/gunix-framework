@@ -51,7 +51,7 @@ import de.flapdoodle.embed.process.store.StaticArtifactStoreBuilder;
 @EnableMongoRepositories(basePackages = "mx.com.gunix.domain.persistence.mongo")
 @ComponentScan("mx.com.gunix.domain.persistence.mongo")
 public class MongoDBConfig {
-	private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MongoDBConfig.class);
+	private static Logger logger = LoggerFactory.getLogger(MongoDBConfig.class.getName());
 	
 	public @Bean MongoDbFactory mongoDbFactory() throws Exception {
 		MongoClient mongoClient = null;
@@ -67,7 +67,7 @@ public class MongoDBConfig {
 			mongoClient = getMongoClient(mongoServer, mongoPort, mongoUser, mongoPassword, mongoDB);
 		} catch (MongoTimeoutException ignorar) {
 			//Si no fue posible conectarse a mongo se 1) instala y 2 ) levanta una instancia de mongod 
-			log.warn("Iniciando servidor local Mongo, si no es lo esperado favor de verificar los datos de conexión a mongo");
+			logger.warn("Iniciando servidor local Mongo, si no es lo esperado favor de verificar los datos de conexión a mongo");
 			startMongoDB(mongoPort);
 			mongoClient = getMongoClient(mongoServer, mongoPort, mongoUser, mongoPassword, mongoDB);
 		}
@@ -95,7 +95,6 @@ public class MongoDBConfig {
 	}
     
     private void startMongoDB(int mongoPort) throws Exception{
-		Logger logger = LoggerFactory.getLogger(getClass().getName());
     	Command command = Command.MongoD;
     	String mongoInstallationDir = System.getenv("MONGO_INSTALL_PATH") != null ? System.getenv("MONGO_INSTALL_PATH") : System.getProperty("user.home") + File.separatorChar + ".embeddedMongodb";
 		
