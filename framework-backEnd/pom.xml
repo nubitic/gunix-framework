@@ -60,7 +60,7 @@
 		<dependency>
 			<groupId>de.flapdoodle.embed</groupId>
 			<artifactId>de.flapdoodle.embed.mongo</artifactId>
-			<version>1.50.3-SNAPSHOT</version>
+			<version>1.50.3</version>
 		</dependency>
 		<dependency>
 			<groupId>mx.com.gunix</groupId>
