@@ -37,14 +37,6 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>org.openl.rules.activiti-repo</id>
-			<url>https://raw.github.com/loloq123/org.openl.rules.activiti/mvn-repo/</url>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-			</snapshots>
-		</repository>
-		<repository>
 			<id>oss.sonatype.org.snapshots</id>
 			<name>OSS Sonatype Snapshot Repository</name>
 			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
@@ -75,7 +67,7 @@
 			<artifactId>activiti-engine</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>mx.com.gunix</groupId>
+			<groupId>org.openl.rules</groupId>
 			<artifactId>org.openl.rules.activiti</artifactId>
 		</dependency>
 		<dependency>

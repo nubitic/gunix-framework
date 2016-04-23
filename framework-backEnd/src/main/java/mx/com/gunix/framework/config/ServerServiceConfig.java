@@ -20,7 +20,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import com.hunteron.core.Hessian;
 
 @Configuration
-@ComponentScan({ "mx.com.gunix.service", "mx.com.gunix.framework.service" ,"org.openl.rules.activiti.spring"})
+@ComponentScan({ "mx.com.gunix.service", "mx.com.gunix.framework.service"})
 @EnableWebMvc
 public class ServerServiceConfig extends WebMvcConfigurerAdapter {
 	@Bean

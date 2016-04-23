@@ -429,10 +429,7 @@ q AS(
 		end as ID_APLICACION,
                 hi.DESCRIPCION_APLICACION,
                 hi.ICONO_APLICACION,
-		case
-			WHEN hi.ID_ROL IS NULL THEN q.ID_ROL
-			else hi.ID_ROL 
-		end as ID_ROL,
+		q.ID_ROL as id_rol,
 		case
 			WHEN hi.DESCRIPCION_ROL IS NULL THEN q.DESCRIPCION_ROL
 			else hi.DESCRIPCION_ROL 

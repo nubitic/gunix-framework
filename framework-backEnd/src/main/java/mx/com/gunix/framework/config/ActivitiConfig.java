@@ -66,6 +66,7 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ContextResource;
@@ -80,6 +81,7 @@ import org.springframework.util.ReflectionUtils;
 
 @Configuration
 @EnableScheduling
+@ImportResource("classpath:openl-activiti-beans.xml")
 public class ActivitiConfig {
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
@@ -137,14 +139,14 @@ public class ActivitiConfig {
 
 		speConf.setIdGenerator(idGenerator());
 		speConf.setDeploymentMode(ResourceParentFolderAutoDeploymentStrategy.DEPLOYMENT_MODE);
-		
+
 		Resource[] appPackedBPMNResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/procesos/**/*.*");
 		Resource[] resources = new Resource[(appPackedBPMNResources != null ? appPackedBPMNResources.length : 0)];
-		
+
 		if (appPackedBPMNResources != null && appPackedBPMNResources.length > 0) {
 			System.arraycopy(appPackedBPMNResources, 0, resources, 0, appPackedBPMNResources.length);
 		}
-		
+
 		if (Boolean.valueOf(System.getenv("STANDALONE_APP"))) {
 			Resource[] adminAppResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/adminapp/procesos/*.bpmn");
 
@@ -157,9 +159,9 @@ public class ActivitiConfig {
 				resources = adminAppResources;
 			}
 		}
-		
+
 		speConf.setDeploymentResources(resources);
-		
+
 		VariableInstanceEntityManager vim = variableInstanceEntityManager();
 
 		List<SessionFactory> vimList = new ArrayList<SessionFactory>();
@@ -171,27 +173,26 @@ public class ActivitiConfig {
 		varTypes.add(new FloatType());
 		speConf.setCustomPreVariableTypes(varTypes);// Se establece primero en la lista que se usa para el guardado
 		speConf.setCustomPostVariableTypes(varTypes);// Se establece como el último en asignarse en el Mapa que se usa para la recuperación
-		
-		
+
 		Map<String, List<ActivitiEventListener>> eventListeners = new HashMap<String, List<ActivitiEventListener>>();
-		
+
 		List<ActivitiEventListener> openLEvntListners = new ArrayList<ActivitiEventListener>();
 		openLEvntListners.add(new OpenLResourcesHandleListener());
 		eventListeners.put(ActivitiEventType.ENTITY_UPDATED + "," + ActivitiEventType.ENTITY_DELETED, openLEvntListners);
-		
+
 		List<ActivitiEventListener> jobFailureEvntListners = new ArrayList<ActivitiEventListener>();
-		jobFailureEvntListners.add(jobExecutionFailureEvntListener());		
+		jobFailureEvntListners.add(jobExecutionFailureEvntListener());
 		eventListeners.put(ActivitiEventType.JOB_EXECUTION_FAILURE.toString(), jobFailureEvntListners);
-		
+
 		List<ActivitiEventListener> entityCreatedEvntListners = new ArrayList<ActivitiEventListener>();
-		entityCreatedEvntListners.add(new ProcessInstanceCreatedEvntListener());		
+		entityCreatedEvntListners.add(new ProcessInstanceCreatedEvntListener());
 		eventListeners.put(ActivitiEventType.ENTITY_CREATED.toString(), entityCreatedEvntListners);
-		
+
 		speConf.setTypedEventListeners(eventListeners);
 
 		return speConf;
 	}
-	
+
 	@Bean
 	public JobExecutionFailureEvntListener jobExecutionFailureEvntListener() {
 		return new JobExecutionFailureEvntListener();
@@ -222,7 +223,7 @@ public class ActivitiConfig {
 	public GunixObjectVariableType gunixObjectVariableType() {
 		return new GunixObjectVariableType();
 	}
-	
+
 	@Bean
 	public ProcessEngineFactoryBean processEngineFactoryBean(SpringProcessEngineConfiguration speConf) throws Exception {
 		ProcessEngineFactoryBean pefbean = new ProcessEngineFactoryBean() {
@@ -295,12 +296,12 @@ public class ActivitiConfig {
 		pefbean.setProcessEngineConfiguration(speConf);
 		return pefbean;
 	}
-	
+
 	@Bean
 	public VariableInstanceEntityManager variableInstanceEntityManager() {
 		return new VariableInstanceEntityManager();
 	}
-	
+
 	@Bean
 	public RepositoryService repositoryService(ProcessEngineFactoryBean pefb) throws Exception {
 		return pefb.getObject().getRepositoryService();
@@ -335,14 +336,14 @@ public class ActivitiConfig {
 	public TaskService taskService(ProcessEngineFactoryBean pefb) throws Exception {
 		return pefb.getObject().getTaskService();
 	}
-	
+
 	static final class SpringAsyncSecuredExecutor extends SpringAsyncExecutor implements SpringRejectedJobsHandler {
 		private static Logger log = LoggerFactory.getLogger(SpringAsyncSecuredExecutor.class);
 
 		@Autowired
 		@Lazy
 		RuntimeService rs;
-		
+
 		public SpringAsyncSecuredExecutor(TaskExecutor taskExecutor) {
 			super(taskExecutor, null);
 			setRejectedJobsHandler(this);
@@ -369,16 +370,16 @@ public class ActivitiConfig {
 			}
 		}
 	}
-	
+
 	static final class JobExecutionFailureEvntListener implements ActivitiEventListener {
 		@Autowired
 		@Lazy
 		private ActivitiService activitiService;
-		
+
 		@Autowired
 		@Lazy
 		private ManagementService ms;
-		
+
 		@Override
 		public void onEvent(ActivitiEvent event) {
 			if (event instanceof ActivitiExceptionEvent) {
