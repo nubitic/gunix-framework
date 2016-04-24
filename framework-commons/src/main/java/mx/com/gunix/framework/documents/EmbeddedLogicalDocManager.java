@@ -138,7 +138,7 @@ public final class EmbeddedLogicalDocManager {
 		cmd.add("--temp-directory");
 		cmd.add(logicalDocHomeFile.getAbsolutePath() + File.separator + "tomcat");
 		cmd.add("--path");
-		cmd.add(System.getenv("LOGICALDOC_CONTEXT") != null ? "/" + System.getenv("LOGICALDOC_CONTEXT") : "/logicaldoc");
+		cmd.add(System.getenv("LOGICALDOC_CONTEXT") != null ? System.getenv("LOGICALDOC_CONTEXT") : "/logicaldoc");
 
 		cmd.add(logicalDocHomeFile.getAbsolutePath() + File.separator + "logicalDoc");
 
@@ -161,6 +161,6 @@ public final class EmbeddedLogicalDocManager {
 	}
 
 	public static String getLogicalDocURL() {
-		return (System.getenv("LOGICALDOC_HOSTNAME") != null ? System.getenv("LOGICALDOC_HOSTNAME") : "http://localhost:") + (System.getenv("LOGICALDOC_PORT") != null ? System.getenv("LOGICALDOC_PORT") : "7080") + "/" + (System.getenv("LOGICALDOC_CONTEXT") != null ? System.getenv("LOGICALDOC_CONTEXT") : "logicaldoc");
+		return (System.getenv("LOGICALDOC_HOSTNAME") != null ? System.getenv("LOGICALDOC_HOSTNAME") : "http://localhost:") + (System.getenv("LOGICALDOC_PORT") != null ? System.getenv("LOGICALDOC_PORT") : "7080") + (System.getenv("LOGICALDOC_CONTEXT") != null ? System.getenv("LOGICALDOC_CONTEXT") : "/logicaldoc");
 	}
 }

@@ -14,7 +14,7 @@ public class VaadinAuthenticationFailureHandler implements org.vaadin.spring.sec
 	public void onAuthenticationFailure(AuthenticationException exception) throws Exception {
 		Throwable cause = null;
 		if (!((cause = ExceptionUtils.getCause(exception)) instanceof AuthenticationException)) {
-			logger.error("Error al autenticar", cause);
+			logger.error("Error al autenticar: " + cause.getMessage(), cause);
 		}
 		Notification.show("Usuario y/o Contraseña incorrectos");
 	}

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import mx.com.gunix.framework.config.VaadinSecurityConfig;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
@@ -22,11 +20,6 @@ import org.springframework.util.Assert;
 
 public class GenericVaadinSecurity extends org.vaadin.spring.security.GenericVaadinSecurity {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-
-	/*public GenericVaadinSecurity() {
-		super();
-		setLogoutProcessingUrl("/" + VaadinSecurityConfig.VAADIN_LOCATION + "login?logout");
-	}*/
 
 	@Override
 	public boolean hasAccessToSecuredObject(Object securedObject) {

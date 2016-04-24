@@ -76,7 +76,6 @@ public class VaadinSecurityConfig  extends AbstractSecurityConfig{
 		SavedRequestAwareVaadinAuthenticationSuccessHandler handler = new SavedRequestAwareVaadinAuthenticationSuccessHandler();
 
 		handler.setRedirectStrategy(vaadinRedirectStrategy());
-		//handler.setRequestCache(requestCache());
 		handler.setDefaultTargetUrl("/");
 		handler.setAlwaysUseDefaultTargetUrl(true);
 		handler.setTargetUrlParameter("r");
