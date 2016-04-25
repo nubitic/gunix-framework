@@ -11,6 +11,7 @@
 		<super-csv.version>2.4.0</super-csv.version>
 		<dozer.version>5.5.1</dozer.version>
 		<logicaldoc.version>7.4.2</logicaldoc.version>
+		<cxf.version>2.7.11</cxf.version>
 	</properties>
 	<artifactId>framework-commons</artifactId>
 	<repositories>
@@ -96,6 +97,21 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.10</version>
+		</dependency>
+		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
 			<version>1.9.2</version>
@@ -110,11 +126,22 @@
 			<version>1.1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>jdk.tools</groupId>
-			<artifactId>jdk.tools</artifactId>
-			<version>1.8.0</version>
-			<scope>system</scope>
-			<systemPath>${JAVA_1_8_HOME}/lib/tools.jar</systemPath>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-frontend-jaxws</artifactId>
+			<version>${cxf.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http</artifactId>
+			<version>${cxf.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
@@ -124,6 +151,50 @@
 				<exclusion>
 					<artifactId>spring-asm</artifactId>
 					<groupId>org.springframework</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jettison</artifactId>
+					<groupId>org.codehaus.jettison</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-beanutils</artifactId>
+					<groupId>commons-beanutils</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>ant</artifactId>
+					<groupId>org.apache.ant</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jackson-jaxrs</artifactId>
+					<groupId>org.codehaus.jackson</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>hibernate-ehcache</artifactId>
+					<groupId>org.hibernate</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-httpclient</artifactId>
+					<groupId>commons-httpclient</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>xmlschema-core</artifactId>
+					<groupId>org.apache.ws.xmlschema</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>cxf-bundle</artifactId>
+					<groupId>org.apache.cxf</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>xmlbeans</artifactId>
+					<groupId>org.apache.xmlbeans</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-collections</artifactId>
+					<groupId>commons-collections</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-codec</artifactId>
+					<groupId>commons-codec</groupId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -136,12 +207,130 @@
 					<artifactId>xercesImpl</artifactId>
 					<groupId>xerces</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>commons-beanutils</artifactId>
+					<groupId>commons-beanutils</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>hibernate-ehcache</artifactId>
+					<groupId>org.hibernate</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-httpclient</artifactId>
+					<groupId>commons-httpclient</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>lucene-core</artifactId>
+					<groupId>org.apache.lucene</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>lucene-highlighter</artifactId>
+					<groupId>org.apache.lucene</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>lucene-memory</artifactId>
+					<groupId>org.apache.lucene</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>solr-velocity</artifactId>
+					<groupId>org.apache.solr</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jai-core</artifactId>
+					<groupId>javax.media</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>poi</artifactId>
+					<groupId>org.apache.poi</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>solr-core</artifactId>
+					<groupId>org.apache.solr</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>zip4j</artifactId>
+					<groupId>net.lingala.zip4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>poi-scratchpad</artifactId>
+					<groupId>org.apache.poi</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>nekohtml</artifactId>
+					<groupId>net.sourceforge.nekohtml</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>pdfbox</artifactId>
+					<groupId>org.apache.pdfbox</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>xmlbeans</artifactId>
+					<groupId>org.apache.xmlbeans</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-collections</artifactId>
+					<groupId>commons-collections</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-codec</artifactId>
+					<groupId>commons-codec</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>quartz</artifactId>
+					<groupId>org.quartz-scheduler</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>solr-solrj</artifactId>
+					<groupId>org.apache.solr</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jai-codec</artifactId>
+					<groupId>com.sun.media</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>poi-ooxml</artifactId>
+					<groupId>org.apache.poi</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>lucene-analyzers-common</artifactId>
+					<groupId>org.apache.lucene</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jmimemagic</artifactId>
+					<groupId>jmimemagic</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>lucene-misc</artifactId>
+					<groupId>org.apache.lucene</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-compress</artifactId>
+					<groupId>org.apache.commons</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>icu4j</artifactId>
+					<groupId>com.ibm.icu</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
 			<artifactId>logicaldoc-util</artifactId>
 			<version>${logicaldoc.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-codec</artifactId>
+					<groupId>commons-codec</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>bcprov-jdk15on</artifactId>
+					<groupId>org.bouncycastle</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>bcmail-jdk15on</artifactId>
+					<groupId>org.bouncycastle</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 	<distributionManagement>
