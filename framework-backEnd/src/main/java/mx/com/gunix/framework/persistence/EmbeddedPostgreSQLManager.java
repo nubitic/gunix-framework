@@ -1,6 +1,7 @@
 package mx.com.gunix.framework.persistence;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,15 +10,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import mx.com.gunix.framework.util.EmbeddedServerUtils;
 
 import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+
+import mx.com.gunix.framework.util.EmbeddedServerUtils;
 
 public final class EmbeddedPostgreSQLManager {
 	private static Logger log = Logger.getLogger(EmbeddedPostgreSQLManager.class);
@@ -121,14 +123,54 @@ public final class EmbeddedPostgreSQLManager {
 	}
 
 	private static void ejecutaAppScripts(File pgsqlHomeFile, String usuario, String database) {
-		try {
+		try {			
 			Resource[] appScriptsResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/domain/persistence/scripts/**/*.sql");
 			if (appScriptsResources != null) {
 				List<Resource> appScriptsResourcesList = Arrays.asList(appScriptsResources);				
 				Collections.sort(appScriptsResourcesList, Comparator.comparing(Resource::getFilename));
 				
-				for (Resource appScriptResource : appScriptsResourcesList) {
-					EmbeddedServerUtils.ejecutaScript(appScriptResource.getInputStream(), pgsqlHomeFile, usuario, database, log);
+				List<Resource> currentAppScriptsResourcesList = new ArrayList<Resource>();
+				
+				File prevExecutedScripts = new File(pgsqlHomeFile, "gunixPrevExecutedScripts");
+				if (!prevExecutedScripts.exists()) {
+					prevExecutedScripts.mkdirs();
+				} else {
+					File[] executedScripts = prevExecutedScripts.listFiles();
+					if (executedScripts != null) {
+						
+						Iterator<Resource> appScriptIt = appScriptsResourcesList.iterator();
+						while (appScriptIt.hasNext()) {
+							boolean found = false;
+							Resource currRes = appScriptIt.next(); 
+							for (File executedScript : executedScripts) {
+								if (currRes.getFilename().equals(executedScript.getName())) {
+									found = true;
+									break;
+								}	
+							}
+							if(!found){
+								currentAppScriptsResourcesList.add(currRes);
+							}
+						}
+					}
+				}
+				
+				for (Resource appScriptResource : currentAppScriptsResourcesList) {
+					BufferedWriter writer = new BufferedWriter(new FileWriter(new File(prevExecutedScripts, appScriptResource.getFilename())));
+					EmbeddedServerUtils.ejecutaScript(appScriptResource.getInputStream(), pgsqlHomeFile, usuario, database, new Logger(appScriptResource.getFilename()) {
+						@Override
+						public void info(Object message) {
+							try {
+								writer.write(message.toString());
+								writer.newLine();
+								log.info(message);
+							} catch (IOException e) {
+								throw new RuntimeException(e);
+							}
+						}
+
+					});
+					writer.close();
 				}
 			}
 		} catch (IOException e) {
