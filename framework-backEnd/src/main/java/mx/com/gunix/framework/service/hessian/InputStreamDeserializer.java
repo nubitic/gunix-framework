@@ -16,7 +16,6 @@ public class InputStreamDeserializer extends AbstractDeserializer {
 	public Object readObject(AbstractHessianInput in) throws IOException {
 		InputStream is = in.readInputStream();
 		final File tempFile = File.createTempFile("hessianIS", ".tmp");
-		tempFile.deleteOnExit();
 		FileOutputStream out = new FileOutputStream(tempFile);
 		IOUtils.copy(is, out);
 		out.close();

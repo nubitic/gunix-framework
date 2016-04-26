@@ -348,6 +348,10 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	protected Serializable get(String uri, Object... args) {
 		return gs.get(uri, args);
 	}
+	
+	protected void bind(String propertyId, Field<?> field) {
+		fieldGroup.bind(field, propertyId);
+	}
 
 	protected abstract void doEnter(ViewChangeEvent event);
 

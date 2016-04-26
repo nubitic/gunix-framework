@@ -11,6 +11,53 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 public final class ZipEntryWorker {
+	private static final class ZipInputStreamWrapper extends InputStream {
+		ZipInputStream innerZipIs;
+		public ZipInputStreamWrapper(ZipInputStream innerZipIs) {
+			this.innerZipIs = innerZipIs;
+		}
+
+		@Override
+		public long skip(long n) throws IOException {
+			return innerZipIs.skip(n);
+		}
+
+		@Override
+		public int available() throws IOException {
+			return innerZipIs.available();
+		}
+
+		@Override
+		public synchronized void mark(int readlimit) {
+			innerZipIs.mark(readlimit);
+		}
+
+		@Override
+		public synchronized void reset() throws IOException {
+			innerZipIs.reset();
+		}
+
+		@Override
+		public boolean markSupported() {
+			return innerZipIs.markSupported();
+		}
+
+		@Override
+		public int read(byte[] b) throws IOException {
+			return innerZipIs.read(b);
+		}
+
+		@Override
+		public int read(byte[] b, int off, int len) throws IOException {
+			return innerZipIs.read(b, off, len);
+		}
+
+		@Override
+		public int read() throws IOException {
+			return innerZipIs.read();
+		}
+	}
+
 	static Charset ISO88591 = Charset.forName("ISO-8859-1");
 	
 	public static void withSingleZipEntry(File file, BiConsumer<String, InputStream> ew) throws ZipException, IOException {
@@ -34,7 +81,15 @@ public final class ZipEntryWorker {
 		}
 	}
 
+	public static void withSingleZipEntry(InputStream zipIs, BiConsumer<String, InputStream> ew) throws ZipException, IOException {
+		doProcessZipEntries(zipIs, ew, false);
+	}
+
 	public static void withAllZipEntries(InputStream zipIs, BiConsumer<String, InputStream> ew) throws ZipException, IOException {
+		doProcessZipEntries(zipIs, ew, true);
+	}
+
+	private static void doProcessZipEntries(InputStream zipIs, BiConsumer<String, InputStream> ew, boolean isAllEntries) throws ZipException, IOException {
 		if (!(zipIs instanceof ZipInputStream)) {
 			zipIs = new ZipInputStream(zipIs, ISO88591);
 		}
@@ -42,50 +97,11 @@ public final class ZipEntryWorker {
 		ZipEntry ze = null;
 		ZipInputStream innerZipIs = (ZipInputStream) zipIs;
 		while ((ze = innerZipIs.getNextEntry()) != null) {
-			ew.accept(ze.getName(), new InputStream() {
-
-				@Override
-				public long skip(long n) throws IOException {
-					return innerZipIs.skip(n);
-				}
-
-				@Override
-				public int available() throws IOException {
-					return innerZipIs.available();
-				}
-
-				@Override
-				public synchronized void mark(int readlimit) {
-					innerZipIs.mark(readlimit);
-				}
-
-				@Override
-				public synchronized void reset() throws IOException {
-					innerZipIs.reset();
-				}
-
-				@Override
-				public boolean markSupported() {
-					return innerZipIs.markSupported();
-				}
-
-				@Override
-				public int read(byte[] b) throws IOException {
-					return innerZipIs.read(b);
-				}
-
-				@Override
-				public int read(byte[] b, int off, int len) throws IOException {
-					return innerZipIs.read(b, off, len);
-				}
-
-				@Override
-				public int read() throws IOException {
-					return innerZipIs.read();
-				}
-
-			});
+			ew.accept(ze.getName(), new ZipInputStreamWrapper(innerZipIs));
 			innerZipIs.closeEntry();
+			if (!isAllEntries) {
+				break;
+			}
 		}
 		innerZipIs.close();
 	}
