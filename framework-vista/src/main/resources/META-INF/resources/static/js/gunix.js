@@ -1,3 +1,5 @@
+var urlExceptions = ['uploadFile'];
+
 function getAjaxOptions(url,data){
 	return {
 			url: url,
@@ -8,10 +10,6 @@ function getAjaxOptions(url,data){
 			data:data
 		};
 	
-}
-
-function ajaxFail( jqxhr, settings, exception ) {
-	console.log("Ajax call failed", exception);
 }
 
 var isLoading=false;
@@ -43,11 +41,45 @@ $(document).ajaxComplete(function( event, xhr, settings ) {
 		isLoading=false;
 	});
 
+$(document).ajaxError(function(event, xhr, settings, exception) {
+	console.log("ajaxError");
+	console.log("ajaxError.event", event);
+	console.log("ajaxError.jqXHR", xhr);
+	console.log("ajaxError.ajaxSettings", settings);
+	console.log("ajaxError.thrownError", exception);
+});
+
+$.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+	options.type = "POST";
+	
+	
+	if($.inArray(originalOptions.url, urlExceptions) < 0){
+		if (originalOptions.url.indexOf(cGunixViewPath) < 0) {
+			if (originalOptions.url.charAt(0) == '/') {
+				options.url = cGunixViewPath + originalOptions.url;
+			} else {
+				options.url = cGunixViewPath + "/" + originalOptions.url;
+			}
+		}
+	}
+		
+	if (originalOptions.data instanceof FormData) {
+		options.data.append('idAplicacion', cIdAplicacion);
+	} else {
+		options.data = $.param($.extend(originalOptions.data, {
+			idAplicacion : cIdAplicacion
+		}));
+	}
+});
+
 function onCompleteTask(idAplicacion){
 	jQuery.ajax(getAjaxOptions(showFragment+"content&idAplicacion="+idAplicacion+"&isCompleteTask=true", $("#gunixMainForm").serialize()))
 	.done(
 		function(newContent) {
 			$("#content").html(newContent);
-		})
-	.fail(ajaxFail);	
+		});	
+}
+
+function buildHrefGet(uri, params) {
+	return cGunixViewPath + "/" + uri + "?idAplicacion=" + cIdAplicacion + "&" + (params != null && params != undefined ? $.param(params):'');
 }

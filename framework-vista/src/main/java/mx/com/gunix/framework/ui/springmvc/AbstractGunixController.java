@@ -1,39 +1,55 @@
 package mx.com.gunix.framework.ui.springmvc;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import mx.com.gunix.framework.processes.domain.Tarea;
-import mx.com.gunix.framework.processes.domain.Variable;
-import mx.com.gunix.framework.service.ActivitiService;
-import mx.com.gunix.framework.ui.GunixVariableGetter;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.ServletRequestDataBinder;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.Controller;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.springframework.web.servlet.mvc.multiaction.InternalPathMethodNameResolver;
+import org.springframework.web.servlet.mvc.multiaction.MethodNameResolver;
+
+import mx.com.gunix.framework.processes.domain.Tarea;
+import mx.com.gunix.framework.processes.domain.Variable;
+import mx.com.gunix.framework.service.GetterService;
+import mx.com.gunix.framework.ui.GunixVariableGetter;
 
 public abstract class AbstractGunixController<S extends Serializable> implements Controller {
 	private ServletRequestDataBinder binder;
-	
+	private MethodNameResolver methodNameResolver = new InternalPathMethodNameResolver();
+
+	private Map<String, Method> methodMap = new HashMap<String, Method>();
+	private static final Method NOT_FOUND_METHOD = ReflectionUtils.findMethod(AbstractGunixController.class, "notFoundMethod");
+
 	@Autowired
 	GunixVariableGetter vg;
-	
+
 	@Autowired
 	Validator validator;
-	
+
 	@Autowired
 	@Lazy
-	ActivitiService as;
+	GetterService gs;
+
+	@Autowired
+	RequestMappingHandlerAdapter rmha;
 
 	protected abstract String doConstruct(Model uiModel);
 
@@ -41,10 +57,34 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 
 	protected abstract String getComentarioTarea(HttpServletRequest request);
 
-	protected abstract String doEnter(HttpServletRequest request);
+	protected abstract String doEnter(HttpServletRequest request, Model uiModel);
 
+	@SuppressWarnings("unchecked")
 	public final ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		return new ModelAndView(doEnter(request).replace(".", "/"), null);
+		vg.setInstancia(Utils.getTareaActual(request).getInstancia());
+		String methodName = methodNameResolver.getHandlerMethodName(request);
+
+		if (methodName != null) {
+			Method m = methodMap.get(methodName);
+			if (m == null) {
+				for (Method cM : ReflectionUtils.getAllDeclaredMethods(getClass())) {
+					if (methodName.equals(cM.getName())) {
+						m = cM;
+						break;
+					}
+				}
+				if (m == null) {
+					m = NOT_FOUND_METHOD;
+				}
+				methodMap.put(methodName, m);
+			}
+			if (m != NOT_FOUND_METHOD) {
+				return rmha.handle(request, response, new HandlerMethod(this, m));
+			}
+		}
+		// Si llega a hasta este punto se realiza la invocación default a doEnter
+		Model uiModel = new ExtendedModelMap();
+		return new ModelAndView(doEnter(request, uiModel).replace(".", "/"), (Map<String, ?>) uiModel);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -83,5 +123,13 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 
 	protected final Serializable $(String nombreVariable) {
 		return vg.get(nombreVariable);
+	}
+
+	protected Serializable get(String uri, Object... args) {
+		return gs.get(uri, args);
+	}
+	
+	@SuppressWarnings("unused")
+	private final void notFoundMethod() {
 	}
 }

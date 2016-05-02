@@ -1,13 +1,17 @@
-package mx.com.gunix.framework.ui;
+package mx.com.gunix.framework.util;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.Serializable;
 
 public class GunixFile implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private File file;
+	private transient File file;
 	private String fileName;
 	private String mimeType;
+	private InputStream is;
 
 	public GunixFile(String fileName) {
 		this.fileName = fileName;
@@ -35,6 +39,22 @@ public class GunixFile implements Serializable {
 
 	public void setMimeType(String mimeType) {
 		this.mimeType = mimeType;
+	}
+
+	public InputStream getIs() {
+		return is;
+	}
+
+	public void setIs(InputStream is) {
+		this.is = is;
+	}
+
+	public InputStream fetchInputStream() {
+		try {
+			return is = new FileInputStream(file);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

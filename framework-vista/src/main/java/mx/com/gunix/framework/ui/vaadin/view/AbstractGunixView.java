@@ -17,7 +17,6 @@ import mx.com.gunix.framework.processes.domain.Tarea;
 import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.service.ActivitiService;
 import mx.com.gunix.framework.service.GetterService;
-import mx.com.gunix.framework.ui.GunixFile;
 import mx.com.gunix.framework.ui.GunixVariableGetter;
 import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup;
 import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup.OnBeanValidationErrorCallback;
@@ -28,6 +27,7 @@ import mx.com.gunix.framework.ui.vaadin.component.GunixUploadField;
 import mx.com.gunix.framework.ui.vaadin.component.GunixViewErrorHandler;
 import mx.com.gunix.framework.ui.vaadin.component.Header.TareaActualNavigator;
 import mx.com.gunix.framework.util.ActivitiGunixFile;
+import mx.com.gunix.framework.util.GunixFile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

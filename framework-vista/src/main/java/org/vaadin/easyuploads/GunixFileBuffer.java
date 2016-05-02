@@ -2,12 +2,12 @@ package org.vaadin.easyuploads;
 
 import java.io.File;
 
-import mx.com.gunix.framework.ui.GunixFile;
-
 import org.vaadin.easyuploads.FileBuffer;
 import org.vaadin.easyuploads.FileFactory;
 import org.vaadin.easyuploads.UploadField;
 import org.vaadin.easyuploads.UploadField.FieldType;
+
+import mx.com.gunix.framework.util.GunixFile;
 
 public class GunixFileBuffer extends FileBuffer {
 	private static final long serialVersionUID = 1L;

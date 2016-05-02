@@ -1,18 +1,23 @@
 package mx.com.gunix.framework.config;
 
-import mx.com.gunix.framework.ui.springmvc.tiles3.AjaxTilesView;
+import java.util.List;
 
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.core.MethodParameter;
 import org.springframework.js.ajax.AjaxUrlBasedViewResolver;
 import org.springframework.ui.context.ThemeSource;
 import org.springframework.ui.context.support.ResourceBundleThemeSource;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.bind.support.WebDataBinderFactory;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ThemeResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -23,12 +28,16 @@ import org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMap
 import org.springframework.web.servlet.theme.FixedThemeResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.tiles3.TilesConfigurer;
-import org.springframework.context.MessageSource;
+
+import mx.com.gunix.framework.ui.springmvc.MainController;
+import mx.com.gunix.framework.ui.springmvc.tiles3.AjaxTilesView;
+import mx.com.gunix.framework.util.GunixFile;
 
 @EnableWebMvc
 @Configuration
 @ComponentScan({"mx.com.gunix.ui","mx.com.gunix.framework.ui"})
 public class SpringMVCConfig extends WebMvcConfigurerAdapter {
+	
 	@Override
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
@@ -41,6 +50,21 @@ public class SpringMVCConfig extends WebMvcConfigurerAdapter {
 				.addResourceLocations(VaadinSecurityConfig.STATIC_RESOURCES_LOCATION,
 										"classpath:/META-INF/resources" + VaadinSecurityConfig.STATIC_RESOURCES_LOCATION,
 										"classpath:/VAADIN/widgetsets/mx.com.gunix.framework.ui.vaadin.GunixWidgetset/styles/");
+	}
+
+	@Override
+	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+		argumentResolvers.add(new HandlerMethodArgumentResolver() {
+			@Override
+			public boolean supportsParameter(MethodParameter parameter) {
+				return parameter.getParameterType().equals(GunixFile.class);
+			}
+
+			@Override
+			public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+				return webRequest.getAttribute(MainController.GUNIX_FILE_UPLOAD_ATTR, NativeWebRequest.SCOPE_REQUEST);
+			}
+		});
 	}
 
 	@Bean
@@ -82,8 +106,10 @@ public class SpringMVCConfig extends WebMvcConfigurerAdapter {
 	}
 	
 	@Bean
-	public HandlerMapping controllerClassNameHandlerMapping() {
+	public ControllerClassNameHandlerMapping controllerClassNameHandlerMapping() {
 		ControllerClassNameHandlerMapping ccnhm = new ControllerClassNameHandlerMapping();
+		ccnhm.setCaseSensitive(true);
+		ccnhm.setUseTrailingSlashMatch(true);
 		ccnhm.setOrder(4);
 		return ccnhm;
 	}

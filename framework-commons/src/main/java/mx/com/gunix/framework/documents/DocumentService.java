@@ -132,7 +132,7 @@ public class DocumentService {
 
 			Documento doc = new Documento();
 			doc.setCarpeta(padre);
-			doc.setNombre(nombre);
+			doc.setFileName(nombre);
 			doc.setId(document.getId());
 			//doc.setAtributos(atributos != null ? new LinkedHashMap<String, String>(atributos) : null);
 			return doc;
@@ -192,7 +192,7 @@ public class DocumentService {
 		WSDocument document = ds.getDocumentByCustomId(sid, rutaDocumento);
 		Documento doc = new Documento();
 		doc.setId(document.getId());
-		doc.setNombre(document.getFileName());
+		doc.setFileName(document.getFileName());
 		//doc.setAtributos(fromExtendedAttributes(document.getExtendedAttributes()));
 		Carpeta parentHolder = new Carpeta();
 		completaRuta(sid, root, parentHolder, document.getFolderId());

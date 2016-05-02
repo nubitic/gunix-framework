@@ -1,13 +1,13 @@
 package mx.com.gunix.framework.documents.domain;
 
-import java.io.Serializable;
 import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
 import mx.com.gunix.framework.domain.Identificador;
+import mx.com.gunix.framework.util.ActivitiGunixFile;
 
-public class Documento implements Serializable {
+public class Documento extends ActivitiGunixFile {
 	private static final long serialVersionUID = 1L;
 
 	public static final String CONTENT_TYPE = "content-type";
@@ -15,9 +15,6 @@ public class Documento implements Serializable {
 
 	@Identificador
 	private Long id;
-
-	@NotNull
-	private String nombre;
 
 	@NotNull
 	private Carpeta carpeta;
@@ -30,14 +27,6 @@ public class Documento implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getNombre() {
-		return nombre;
-	}
-
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
 	}
 
 	public Carpeta getCarpeta() {
@@ -75,7 +64,7 @@ public class Documento implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Documento [id=" + id + ", nombre=" + nombre + ", carpeta=" + carpeta + "]";
+		return "Documento [id=" + id + ", nombre=" + getFileName() + ", carpeta=" + carpeta + "]";
 	}
 
 	/*

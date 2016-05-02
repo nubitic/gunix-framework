@@ -15,6 +15,9 @@
 		<link rel="stylesheet" type="text/css" href="${showLoading_css_url}" />
 		<link rel="SHORTCUT ICON" href="${images}/favicon.ico" />
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"><!-- required for FF3 and Opera --></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.12.1/js/vendor/jquery.ui.widget.min.js"><!-- required for FF3 and Opera --></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.12.1/js/jquery.iframe-transport.min.js"><!-- required for FF3 and Opera --></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.12.1/js/jquery.fileupload.min.js"><!-- required for FF3 and Opera --></script>
 		<script src="${jquery_showLoading_min_js_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
 		<spring:url value="/ajaxFragment?fragments=" var="showFragment"/>
 		<script type="text/javascript">
