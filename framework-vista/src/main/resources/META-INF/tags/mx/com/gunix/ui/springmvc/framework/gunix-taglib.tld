@@ -14,4 +14,8 @@
 		<name>uploadFile</name>
 		<path>/META-INF/tags/mx/com/gunix/ui/springmvc/framework/uploadFile.tag</path>
 	</tag-file>
+	<tag-file>
+		<name>mapToHtmlAttrString</name>
+		<path>/META-INF/tags/mx/com/gunix/ui/springmvc/framework/mapToHtmlAttrString.tag</path>
+	</tag-file>
 </taglib>

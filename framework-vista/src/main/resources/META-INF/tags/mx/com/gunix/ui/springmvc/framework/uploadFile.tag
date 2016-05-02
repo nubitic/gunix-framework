@@ -7,8 +7,10 @@
 <%@ attribute name="responseType" required="false" type="java.lang.String" description="Tipo de respuesta esperada"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="gunix" uri="/framework/tags"%>
+<%@ tag dynamic-attributes="dynAttrs" %>
 <c:set var="randUploadId">upload<%= java.lang.Math.round(java.lang.Math.random() * 100) %></c:set>
-<input type="file" data-url="uploadFile" id="${not empty id?id:randUploadId}" ${not empty accept?'accept="'.concat(accept).concat('"'):''} ${not empty value?'value="'.concat(value).concat('"'):''} />
+<input type="file" data-url="uploadFile" id="${not empty id?id:randUploadId}" ${not empty accept?'accept="'.concat(accept).concat('"'):''} ${not empty value?'value="'.concat(value).concat('"'):''} <gunix:mapToHtmlAttrString map="${dynAttrs}"/>  />
 <div id="${not empty id?id:randUploadId}Progress" style="width: 35%;">
 	<div class="bar" style="width: 0%; height: 10px; border-radius: 3px; border-right-width: 0; border-left-width: 0; border-top-width: 0; border-bottom-width: 0; background-color: #197de1; background-image: -webkit-linear-gradient(top, #1b87e3 2%, #166ed5 98%); background-image: linear-gradient(to bottom, #1b87e3 2%, #166ed5 98%);"></div>
 </div>

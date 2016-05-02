@@ -1,3 +1,4 @@
 <%@ attribute name="label" required="false" type="java.lang.String" %>
-<%@ attribute name="id" required="false" type="java.lang.String" %>
-<input type="button" value="${label}" id="${id}" onClick="onCompleteTask('${param.idAplicacion}');"/>
+<%@ taglib prefix="gunix" uri="/framework/tags"%>
+<%@ tag dynamic-attributes="dynAttrs" %>
+<input type="button" value="${label}" onClick="onCompleteTask('${param.idAplicacion}');" <gunix:mapToHtmlAttrString map="${dynAttrs}"/> />

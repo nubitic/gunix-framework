@@ -20,6 +20,7 @@ public class ActivitiGunixFile extends GunixFile {
 		this.nombreVariable = nombreVariable;
 		setMimeType(mimeType);
 		setFile(file);
+		fetchInputStream();
 	}
 
 	public String getNombreVariable() {
