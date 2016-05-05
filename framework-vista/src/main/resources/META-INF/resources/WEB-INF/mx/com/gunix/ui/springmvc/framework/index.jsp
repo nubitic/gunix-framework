@@ -19,9 +19,8 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.12.1/js/jquery.iframe-transport.min.js"><!-- required for FF3 and Opera --></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.12.1/js/jquery.fileupload.min.js"><!-- required for FF3 and Opera --></script>
 		<script src="${jquery_showLoading_min_js_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
-		<spring:url value="/ajaxFragment?fragments=" var="showFragment"/>
 		<script type="text/javascript">
-			var showFragment= "${showFragment}";
+			var showFragment= "ajaxFragment?fragments=";
 		</script>
 		<script src="${gunix_js_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
 	</head>

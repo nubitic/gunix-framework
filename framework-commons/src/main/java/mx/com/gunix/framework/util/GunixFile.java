@@ -51,7 +51,7 @@ public class GunixFile implements Serializable {
 
 	public InputStream fetchInputStream() {
 		try {
-			return is = new FileInputStream(file);
+			return file != null ? (is = new FileInputStream(file)) : is;
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}

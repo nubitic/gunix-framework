@@ -1,4 +1,4 @@
-var urlExceptions = ['uploadFile'];
+var urlExceptions = ['uploadFile','ajaxFragment'];
 
 function getAjaxOptions(url,data){
 	return {
@@ -18,7 +18,7 @@ var startTimer = null;
 
 $(document).ajaxStart(function() {
 		var startTime = Date.now();
-		var duration = 0.8;
+		var duration = 0.5;
 		startTimer = setInterval(function () {
 		    var diff = (Date.now() - startTime) / 1000;
 		    if (diff > duration) {
@@ -50,25 +50,29 @@ $(document).ajaxError(function(event, xhr, settings, exception) {
 });
 
 $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
-	options.type = "POST";
-	
-	
-	if($.inArray(originalOptions.url, urlExceptions) < 0){
-		if (originalOptions.url.indexOf(cGunixViewPath) < 0) {
-			if (originalOptions.url.charAt(0) == '/') {
-				options.url = cGunixViewPath + originalOptions.url;
-			} else {
-				options.url = cGunixViewPath + "/" + originalOptions.url;
+	if(!(/^http/i.test(originalOptions.url))){
+		options.type = "POST";
+		if($.inArray(originalOptions.url.split('?')[0], urlExceptions) < 0){
+			if (originalOptions.url.indexOf(cGunixViewPath) < 0) {
+				if (originalOptions.url.charAt(0) == '/') {
+					options.url = cGunixViewPath + originalOptions.url;
+				} else {
+					options.url = cGunixViewPath + "/" + originalOptions.url;
+				}
 			}
 		}
-	}
-		
-	if (originalOptions.data instanceof FormData) {
-		options.data.append('idAplicacion', cIdAplicacion);
-	} else {
-		options.data = $.param($.extend(originalOptions.data, {
-			idAplicacion : cIdAplicacion
-		}));
+			
+		if (originalOptions.data instanceof FormData) {
+			options.data.append('idAplicacion', cIdAplicacion);
+		} else {
+			if(typeof(originalOptions.data) == 'string'){
+				options.data = originalOptions.data + '&idAplicacion='+cIdAplicacion;
+			}else{
+				options.data = $.param($.extend(originalOptions.data, {
+					idAplicacion : cIdAplicacion
+				}));	
+			}
+		}
 	}
 });
 

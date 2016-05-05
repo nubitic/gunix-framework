@@ -63,14 +63,14 @@ public class MainController {
 	public String main(Model uiModel, HttpServletRequest request) throws BeansException, ClassNotFoundException {
 		Funcion funcion = determinaFuncion(request);
 		Instancia instancia = as.iniciaProceso(funcion.getProcessKey(), Variable.fromParametros(funcion.getParametros()), "");
-		doControl(request, instancia, uiModel, false);
+		doControl(request, instancia, uiModel, false, false);
 		return "index";
 	}
 
 	@RequestMapping(value = "/ajaxFragment", method = { RequestMethod.POST })
 	public String ajaxFragment(Model uiModel, HttpServletRequest request) throws BeansException, ClassNotFoundException {
 		if ("content".equals(request.getParameter("fragments"))) {		 
-			doControl(request, null, uiModel, true);
+			doControl(request, null, uiModel, true, false);
 		}
 		return "index";
 	}
@@ -88,7 +88,7 @@ public class MainController {
 		return "forward:" + (forwardFileTo.startsWith(contextPath) ? forwardFileTo.replaceAll(contextPath, "") : forwardFileTo);
 	}
 	
-	private <S extends Serializable> void doControl(HttpServletRequest request, Instancia instancia, Model uiModel, boolean isCompleteTask) throws BeansException, ClassNotFoundException {
+	private <S extends Serializable> void doControl(HttpServletRequest request, Instancia instancia, Model uiModel, boolean isCompleteTask, boolean isCommitFailed) throws BeansException, ClassNotFoundException {
 		Tarea tareaActual = null;
 		if (isCompleteTask) {
 			tareaActual = Utils.getTareaActual(request);
@@ -112,7 +112,7 @@ public class MainController {
 			} else {
 				agc = getAgc(null, instancia.getTareaActual().getVista(), uiModel);
 				agc.setTareaActual(instancia.getTareaActual());
-				newJspView = agc.doConstruct(uiModel).replace(".", "/");
+				newJspView = (isCommitFailed ? agc.doEnter(request, uiModel) :agc.doConstruct(request.getSession(), uiModel)).replace(".", "/");
 			}
 			String[] urls = (String[]) ReflectionUtils.invokeMethod(generatePathMappings, ccnhm, new Object[] { agc.getClass() });
 			uiModel.addAttribute("jspView", newJspView);
@@ -121,7 +121,7 @@ public class MainController {
 			if (isCompleteTask) {
 				uiModel.addAllAttributes(e.getBindingResult().getModel());
 				instancia = tareaActual.getInstancia();
-				doControl(request, instancia, uiModel, false);
+				doControl(request, instancia, uiModel, false, true);
 			}
 		}
 	}

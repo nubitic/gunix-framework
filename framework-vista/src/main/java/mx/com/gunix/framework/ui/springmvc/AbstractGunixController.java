@@ -10,8 +10,10 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
@@ -34,7 +36,7 @@ import mx.com.gunix.framework.ui.GunixVariableGetter;
 public abstract class AbstractGunixController<S extends Serializable> implements Controller {
 	private ServletRequestDataBinder binder;
 	private MethodNameResolver methodNameResolver = new InternalPathMethodNameResolver();
-
+	private Boolean parameterBindingEmptyStringIsNull = Boolean.TRUE;
 	private Map<String, Method> methodMap = new HashMap<String, Method>();
 	private static final Method NOT_FOUND_METHOD = ReflectionUtils.findMethod(AbstractGunixController.class, "notFoundMethod");
 
@@ -51,7 +53,7 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 	@Autowired
 	RequestMappingHandlerAdapter rmha;
 
-	protected abstract String doConstruct(Model uiModel);
+	protected abstract String doConstruct(HttpSession session, Model uiModel);
 
 	protected abstract List<Variable<?>> getVariablesTarea(HttpServletRequest request);
 
@@ -94,7 +96,9 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 		}
 		return (S) binder.getTarget();
 	}
-
+	protected void bindDejaStringVacioAsStringVacio() {
+		parameterBindingEmptyStringIsNull = Boolean.FALSE;
+	}
 	@SuppressWarnings("unchecked")
 	void preInitDataBinder(HttpServletRequest request, String commandName) throws BindException {
 		Type genSuperType = getClass().getGenericSuperclass();
@@ -104,6 +108,9 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 				Class<S> clazz = ((Class<S>) typeArguments[0]);
 				try {
 					binder = new ServletRequestDataBinder(clazz.newInstance(), commandName);
+					if (parameterBindingEmptyStringIsNull) {
+						binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
+					}
 					if (request != null) {
 						binder.addValidators(validator);
 						binder.bind(request);
