@@ -123,8 +123,14 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 
 		if (!isExecutionContextActive) {
 			tarea = currentTarea.get();
-			if (tarea != null) {
-				variable = tarea.getVariables().stream().filter(var -> var.getNombre().equals(vie.getName()) && (var.getValor() == value || (var.getValor() != null && var.getValor().equals(value)))).findFirst().get();
+			if (tarea != null && (pi == null || pi.getId().equals(tarea.getInstancia().getId()))) {
+				variable = tarea.getVariables()
+									.stream()
+									.filter(var -> 
+											var.getNombre().equals(vie.getName()) && (var.getValor() == value || (var.getValor() != null && var.getValor().equals(value)))
+											)
+									.findFirst()
+									.get();
 			} else {
 				if (pi != null) {
 					variable = new Variable<String>(); //El scope por default es PROCESO

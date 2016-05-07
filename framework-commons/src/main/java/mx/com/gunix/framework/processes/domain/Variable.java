@@ -26,6 +26,15 @@ public class Variable<T extends Serializable> implements Serializable {
 	private Map mapValue;
 	private Serializable objectValue;
 
+	public Variable(String nombre, T valor) {
+		super();
+		this.nombre = nombre;
+		this.valor = valor;
+	}
+
+	public Variable() {
+	}
+
 	public static Variable<String> fromParametro(Parametro parametro) {
 		Variable<String> v = new Variable<String>();
 		v.setNombre(parametro.getNombre());

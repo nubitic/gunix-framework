@@ -61,13 +61,9 @@ public class GunixFile implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((file == null) ? 0 : file.hashCode());
+		result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
+		result = prime * result + ((mimeType == null) ? 0 : mimeType.hashCode());
 		return result;
-	}
-
-	@Override
-	public String toString() {
-		return fileName != null ? fileName : "";
 	}
 
 	@Override
@@ -79,12 +75,22 @@ public class GunixFile implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		GunixFile other = (GunixFile) obj;
-		if (file == null) {
-			if (other.file != null)
+		if (fileName == null) {
+			if (other.fileName != null)
 				return false;
-		} else if (!file.equals(other.file))
+		} else if (!fileName.equals(other.fileName))
+			return false;
+		if (mimeType == null) {
+			if (other.mimeType != null)
+				return false;
+		} else if (!mimeType.equals(other.mimeType))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "GunixFile [fileName=" + fileName + ", mimeType=" + mimeType + "]";
 	}
 
 }

@@ -65,9 +65,10 @@ $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
 		if (originalOptions.data instanceof FormData) {
 			options.data.append('idAplicacion', cIdAplicacion);
 		} else {
-			if(typeof(originalOptions.data) == 'string'){
+			if(typeof(originalOptions.data) == 'string' && options.data.indexOf('&idAplicacion=') < 0){
 				options.data = originalOptions.data + '&idAplicacion='+cIdAplicacion;
 			}else{
+				if(typeof(options.data.idAplicacion) == 'undefined')
 				options.data = $.param($.extend(originalOptions.data, {
 					idAplicacion : cIdAplicacion
 				}));	
@@ -76,12 +77,16 @@ $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
 	}
 });
 
-function onCompleteTask(idAplicacion){
-	jQuery.ajax(getAjaxOptions(showFragment+"content&idAplicacion="+idAplicacion+"&isCompleteTask=true", $("#gunixMainForm").serialize()))
-	.done(
-		function(newContent) {
-			$("#content").html(newContent);
-		});	
+function onCompleteTask(idAplicacion, preCompleteTask) {
+	if (typeof (preCompleteTask) == 'function') {
+		preCompleteTask(this);
+	}
+	jQuery.ajax(
+			getAjaxOptions(showFragment + "content&idAplicacion=" + idAplicacion + "&isCompleteTask=true", $("#gunixMainForm").serialize()))
+				.done(
+				function(newContent) {
+					$("#content").html(newContent);
+				});
 }
 
 function buildHrefGet(uri, params) {
