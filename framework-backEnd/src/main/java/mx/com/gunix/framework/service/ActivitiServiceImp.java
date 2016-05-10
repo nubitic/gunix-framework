@@ -416,18 +416,22 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 
 	private List<Instancia> doConsulta(String processKey, List<Filtro<?>> filtros, boolean conPerfil) {
 		List<Task> tareas = null;
-		if (conPerfil) {
-			TaskQuery tq = ts.createTaskQuery();
-			tq.processDefinitionKey(processKey);
-			tq.taskCandidateGroup(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getSelectedAuthority());
-			tq.orderByProcessInstanceId().asc();
-			tareas = tq.list();
+		
+		
+		//Primero se busca las tareas 
+		TaskQuery tq = ts.createTaskQuery();
+		tq.processDefinitionKey(processKey);
+		tq.orderByProcessInstanceId().asc();		
+		if (conPerfil) {			
+			tq.taskCandidateGroup(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getSelectedAuthority());			
 		}
+		
+		tareas = tq.list();
 
 		ProcessInstanceQuery piq = rs.createProcessInstanceQuery();
 		piq.processDefinitionKey(processKey);
 		processFilters(filtros, piq);
-		if (tareas != null) {
+		if (tareas != null && !tareas.isEmpty()) {
 			piq.processInstanceIds(tareas.stream().map(task -> {
 				return task.getProcessInstanceId();
 			}).collect(Collectors.toCollection(() -> {
@@ -448,7 +452,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		hpiq.processDefinitionKey(processKey);
 		hpiq.processInstanceIds(pidsEncontradosSet);
 		
-		if(tareas == null){
+		if(tareas == null && filtros != null && !filtros.isEmpty()){
 			hpiq.or();
 			processFilters(filtros, hpiq);
 			hpiq.endOr();
