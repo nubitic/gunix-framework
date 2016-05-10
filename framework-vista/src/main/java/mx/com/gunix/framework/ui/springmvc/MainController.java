@@ -55,6 +55,8 @@ public class MainController {
 	ControllerClassNameHandlerMapping ccnhm;
 	
 	private static final Method generatePathMappings = ReflectionUtils.findMethod(ControllerClassNameHandlerMapping.class, "generatePathMappings", new Class[] { Class.class });
+
+	public static final String DEFAULT_END_TASK_SPRINGMVC_VIEW = "framework/defaultProcessEndView";
 	static{
 		ReflectionUtils.makeAccessible(generatePathMappings);
 	}
@@ -108,7 +110,7 @@ public class MainController {
 			
 			String newJspView = null;
 			if ((instancia.getTareaActual() == null || instancia.getTareaActual().getVista().equals(Tarea.DEFAULT_END_TASK_VIEW))) {
-				newJspView = "framework.defaultProcessEndView".replace(".", "/");
+				newJspView = DEFAULT_END_TASK_SPRINGMVC_VIEW;
 			} else {
 				agc = getAgc(null, instancia.getTareaActual().getVista(), uiModel);
 				agc.setTareaActual(instancia.getTareaActual());
