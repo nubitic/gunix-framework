@@ -107,8 +107,12 @@ public class Utils {
 										if ((propType.isPrimitive() && propType.getName().equals("boolean")) || Boolean.class.isAssignableFrom(propType)) {
 											value = ((Long) value == 1);
 										} else {
-											if (propType.isAssignableFrom(Date.class)) {
-												value = new Date((Long) value);
+											if ((propType.isPrimitive() && propType.getName().equals("int")) || Integer.class.isAssignableFrom(propType)) {
+												value = ((Long) value).intValue();
+											} else {
+												if (propType.isAssignableFrom(Date.class)) {
+													value = new Date((Long) value);
+												}
 											}
 										}
 									}

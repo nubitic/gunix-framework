@@ -41,7 +41,23 @@ public class Instancia implements Serializable {
 	public void setVariables(List<Variable<?>> variables) {
 		this.variables = variables;
 	}
-
+	
+	@SuppressWarnings("unchecked")
+	public <S extends Serializable> S findVariable(String nombre, Class<S> expectedType) {
+		S s = null;
+		if (variables != null) {
+			Variable<S> var = (Variable<S>) variables
+												.stream()
+												.filter(varF -> varF.getNombre().equals(nombre))
+												.findFirst()
+												.orElse(null);
+			if (var != null) {
+				s = var.getValor();
+			}
+		}
+		return s;
+	}
+	
 	public String getComentario() {
 		return comentario;
 	}

@@ -34,7 +34,7 @@ import mx.com.gunix.framework.service.GetterService;
 import mx.com.gunix.framework.ui.GunixVariableGetter;
 
 public abstract class AbstractGunixController<S extends Serializable> implements Controller {
-	private ServletRequestDataBinder binder;
+	private static final ThreadLocal<ServletRequestDataBinder> binder = new ThreadLocal<ServletRequestDataBinder>();
 	private MethodNameResolver methodNameResolver = new InternalPathMethodNameResolver();
 	private Boolean parameterBindingEmptyStringIsNull = Boolean.TRUE;
 	private Map<String, Method> methodMap = new HashMap<String, Method>();
@@ -60,10 +60,17 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 	protected abstract String getComentarioTarea(HttpServletRequest request);
 
 	protected abstract String doEnter(HttpServletRequest request, Model uiModel);
+	
+	protected void configBinder(ServletRequestDataBinder binder) {
+		if (parameterBindingEmptyStringIsNull) {
+			binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
+		}
+	}
 
 	@SuppressWarnings("unchecked")
 	public final ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		vg.setInstancia(Utils.getTareaActual(request).getInstancia());
+		preInitDataBinder(request,request.getParameter("cgCommandName"), false);
 		String methodName = methodNameResolver.getHandlerMethodName(request);
 
 		if (methodName != null) {
@@ -91,31 +98,31 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 
 	@SuppressWarnings("unchecked")
 	protected final S getBean() {
-		if (binder == null) {
+		if (binder.get() == null) {
 			throw new IllegalStateException("No se puede obtener el Bean dado que no se indicó el tipo específico para la clase genérica AbstractGunixController");
 		}
-		return (S) binder.getTarget();
+		return (S) binder.get().getTarget();
 	}
 	protected void bindDejaStringVacioAsStringVacio() {
 		parameterBindingEmptyStringIsNull = Boolean.FALSE;
 	}
 	@SuppressWarnings("unchecked")
-	void preInitDataBinder(HttpServletRequest request, String commandName) throws BindException {
+	void preInitDataBinder(HttpServletRequest request, String commandName, boolean validar) throws BindException {
 		Type genSuperType = getClass().getGenericSuperclass();
 		if (genSuperType instanceof ParameterizedType) {
 			Type[] typeArguments = ((ParameterizedType) genSuperType).getActualTypeArguments();
 			if (typeArguments.length == 1) {
 				Class<S> clazz = ((Class<S>) typeArguments[0]);
 				try {
-					binder = new ServletRequestDataBinder(clazz.newInstance(), commandName);
-					if (parameterBindingEmptyStringIsNull) {
-						binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
-					}
+					binder.set(new ServletRequestDataBinder(clazz.newInstance(), commandName));
+					configBinder(binder.get());
 					if (request != null) {
-						binder.addValidators(validator);
-						binder.bind(request);
-						binder.validate();
-						binder.close();
+						binder.get().addValidators(validator);
+						binder.get().bind(request);
+						if(validar){
+							binder.get().validate();
+						}
+						binder.get().close();
 					}
 				} catch (InstantiationException | IllegalAccessException e) {
 					throw new IllegalArgumentException("No fue posible inicializar el ServletRequestDataBinder con una nueva instancia de " + clazz.getName(), e);

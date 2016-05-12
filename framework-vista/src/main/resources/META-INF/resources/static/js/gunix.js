@@ -74,6 +74,19 @@ $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
 				}));	
 			}
 		}
+
+		if (originalOptions.data instanceof FormData) {
+			options.data.append('cgCommandName', cgCommandName);
+		} else {
+			if(typeof(originalOptions.data) == 'string' && options.data.indexOf('&cgCommandName=') < 0){
+				options.data = originalOptions.data + '&cgCommandName='+cgCommandName;
+			}else{
+				if(typeof(options.data.cgCommandName) == 'undefined')
+				options.data = $.param($.extend(originalOptions.data, {
+					cgCommandName : cgCommandName
+				}));	
+			}
+		}
 	}
 });
 

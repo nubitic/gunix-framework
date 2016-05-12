@@ -5,6 +5,7 @@
 	<script type="text/javascript">
 		var cGunixViewPath = "<spring:url value="${cGunixViewPath}"/>";
 		var cIdAplicacion = "${param.idAplicacion}";
-		</script>
+		var cgCommandName = "${commandName}";
+	</script>
 	<tiles:insertAttribute name="formContent" ignore="true" />
 </form:form>

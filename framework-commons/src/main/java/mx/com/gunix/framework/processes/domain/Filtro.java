@@ -1,6 +1,8 @@
 package mx.com.gunix.framework.processes.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class Filtro<T extends Serializable> extends Variable<T> {
 	private static final long serialVersionUID = 1L;
@@ -45,5 +47,20 @@ public final class Filtro<T extends Serializable> extends Variable<T> {
 	public String toString() {
 		return "Filtro [" + getNombre() + " " + lOp + " " + getValor() + "]";
 	}
+	public static class Builder {
+		List<Filtro<?>> filtros = new ArrayList<Filtro<?>>();
 
+		public <S extends Serializable> Builder add(String nombre, Operador op, S valor) {
+			Filtro<S> filtro = new Filtro<S>();
+			filtro.setNombre(nombre);
+			filtro.setValor(valor);
+			filtro.setlOp(op);
+			filtros.add(filtro);
+			return this;
+		}
+
+		public List<Filtro<?>> build() {
+			return filtros;
+		}
+	}
 }

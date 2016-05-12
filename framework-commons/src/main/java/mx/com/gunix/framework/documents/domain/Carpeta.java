@@ -50,6 +50,10 @@ public class Carpeta extends HashCodeByTimeStampAware implements Serializable {
 		pathStrBldr.append(nombre);
 		return pathStrBldr.toString();
 	}
+	
+	public void setPath(String path){
+		//Se agrega este método unicamente para que el proceso de deserealizacion se pueda llevar a cabo correctamente
+	}
 
 	@Override
 	public boolean equals(Object obj) {

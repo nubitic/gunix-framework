@@ -134,7 +134,7 @@ public class MainController {
 		AbstractGunixController<S> agc = (AbstractGunixController<S>) applicationContext.getBean(agcClass);
 		final GunixSpringMVCView annotation = applicationContext.findAnnotationOnBean(applicationContext.getBeanNamesForType(agcClass)[0], GunixSpringMVCView.class);
 		String commandName = annotation.value();
-		agc.preInitDataBinder(request, commandName);
+		agc.preInitDataBinder(request, commandName, request != null);
 		if (!"na".equals(commandName)) {
 			Map<String, Object> modelMap = uiModel.asMap();
 			uiModel.addAttribute(commandName, modelMap.get(commandName) == null ? agc.getBean() : modelMap.get(commandName));
