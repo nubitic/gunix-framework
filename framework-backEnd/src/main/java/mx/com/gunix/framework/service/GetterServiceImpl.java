@@ -43,7 +43,7 @@ public class GetterServiceImpl implements GetterService, ApplicationContextAware
 																		.asList(args)
 																		.stream()
 																		.map(s -> {
-																			return s.getClass();
+																				return s != null ? s.getClass() : null;
 																			})
 																		.collect(Collectors.toList())
 																		.toArray(new Class<?>[] {}):new Class<?>[] {});
@@ -77,7 +77,7 @@ public class GetterServiceImpl implements GetterService, ApplicationContextAware
 			return false;
 		} else {
 			for (int i = 0; i < destino.length; i++) {
-				if (!destino[i].isAssignableFrom(fuente[i])) {
+				if (fuente[i] !=null && !destino[i].isAssignableFrom(fuente[i])) {
 					return false;
 				}
 			}
