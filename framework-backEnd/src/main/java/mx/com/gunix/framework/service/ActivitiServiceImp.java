@@ -104,34 +104,41 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 
 	@Override
 	public Instancia completaTarea(Tarea tarea) {
-		String taskId = tarea.getId();
-		ts.claim(taskId, ((Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getIdUsuario());
-		Optional.ofNullable(tarea.getComentario()).ifPresent(comment -> {
-			ts.addComment(taskId, tarea.getInstancia().getId(), TASK_COMMENT, comment);
-		});
-		Map<String, Object>[] variablesMaps = toMap(tarea.getVariables());
-		Map<String, Object> variablesProcesoMap = variablesMaps[Variable.Scope.PROCESO.ordinal()];
+		try {
+			String taskId = tarea.getId();
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			String usuario = ((Usuario) auth.getPrincipal()).getIdUsuario();
+			is.setAuthenticatedUserId(usuario);
+			ts.claim(taskId, usuario);
+			Optional.ofNullable(tarea.getComentario()).ifPresent(comment -> {
+				ts.addComment(taskId, tarea.getInstancia().getId(), TASK_COMMENT, comment);
+			});
+			Map<String, Object>[] variablesMaps = toMap(tarea.getVariables());
+			Map<String, Object> variablesProcesoMap = variablesMaps[Variable.Scope.PROCESO.ordinal()];
 
-		GunixObjectVariableType.setCurrentTarea(tarea);
-		
-		if (!variablesProcesoMap.isEmpty()) {
-			rs.setVariables(tarea.getInstancia().getId(), variablesProcesoMap);
+			GunixObjectVariableType.setCurrentTarea(tarea);
+
+			if (!variablesProcesoMap.isEmpty()) {
+				rs.setVariables(tarea.getInstancia().getId(), variablesProcesoMap);
+			}
+
+			ts.complete(taskId);
+			tarea.getInstancia().setTareaActual(getCurrentTask(tarea.getInstancia().getId(), null));
+
+			if (tarea.getInstancia().getTareaActual() == null) {
+				tarea.getInstancia().setTareaActual(Tarea.DEFAULT_END_TASK);
+			} else {
+				tarea.getInstancia().getTareaActual().setInstancia(tarea.getInstancia());
+			}
+
+			if (tarea.getInstancia().getTareaActual().isTerminal()) {
+				ts.complete(tarea.getInstancia().getTareaActual().getId());
+			}
+
+			return tarea.getInstancia();
+		} finally {
+			is.setAuthenticatedUserId(null);
 		}
-
-		ts.complete(taskId);
-		tarea.getInstancia().setTareaActual(getCurrentTask(tarea.getInstancia().getId(), null));
-
-		if (tarea.getInstancia().getTareaActual() == null) {
-			tarea.getInstancia().setTareaActual(Tarea.DEFAULT_END_TASK);
-		} else {
-			tarea.getInstancia().getTareaActual().setInstancia(tarea.getInstancia());
-		}
-
-		if (tarea.getInstancia().getTareaActual().isTerminal()) {
-			ts.complete(tarea.getInstancia().getTareaActual().getId());
-		}
-
-		return tarea.getInstancia();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -385,6 +392,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		}
 		
 		instancia.setTareaActual(getCurrentTask(processInstanceId, null));
+		instancia.getTareaActual().setInstancia(instancia);
 		return instancia;
 	}
 
@@ -656,6 +664,16 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 					});
 				});
 
+		}
+	}
+
+	@Override
+	public void setVar(Instancia instancia, String varName, Serializable varValue) {
+		GunixObjectVariableType.setCurrentVar(instancia.getId(), varValue);
+		try {
+			rs.setVariable(instancia.getId(), varName, varValue);
+		} finally {
+			GunixObjectVariableType.removeCurrentVar();
 		}
 	}
 }

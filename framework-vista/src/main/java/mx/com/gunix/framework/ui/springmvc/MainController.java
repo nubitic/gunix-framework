@@ -106,6 +106,7 @@ public class MainController {
 				tareaActual.setVariables(agc.getVariablesTarea(request));
 				tareaActual.setComentario(agc.getComentarioTarea(request));
 				instancia = as.completaTarea(tareaActual);
+				Utils.setTareaActual(request, instancia.getTareaActual());
 			}
 			
 			String newJspView = null;

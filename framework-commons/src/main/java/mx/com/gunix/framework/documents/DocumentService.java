@@ -189,14 +189,17 @@ public class DocumentService {
 	}
 
 	private Documento doGetDocumento(String sid, Carpeta root, String rutaDocumento) throws Exception {
-		WSDocument document = ds.getDocumentByCustomId(sid, rutaDocumento);
-		Documento doc = new Documento();
-		doc.setId(document.getId());
-		doc.setFileName(document.getFileName());
-		//doc.setAtributos(fromExtendedAttributes(document.getExtendedAttributes()));
-		Carpeta parentHolder = new Carpeta();
-		completaRuta(sid, root, parentHolder, document.getFolderId());
-		doc.setCarpeta(parentHolder.getPadre());
+		WSDocument document = ds.getDocumentByCustomId(sid, rutaDocumento.charAt(0) == '/' ? rutaDocumento : root.getPath() + "/" + rutaDocumento);
+		Documento doc = null;
+		if (document != null) {
+			doc = new Documento();
+			doc.setId(document.getId());
+			doc.setFileName(document.getFileName());
+			// doc.setAtributos(fromExtendedAttributes(document.getExtendedAttributes()));
+			Carpeta parentHolder = new Carpeta();
+			completaRuta(sid, root, parentHolder, document.getFolderId());
+			doc.setCarpeta(parentHolder.getPadre());
+		}
 		return doc;
 	}
 

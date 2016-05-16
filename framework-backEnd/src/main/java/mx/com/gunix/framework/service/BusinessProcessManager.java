@@ -13,6 +13,8 @@ import mx.com.gunix.framework.processes.domain.Variable;
 public interface BusinessProcessManager {
 	public Serializable getVar(Instancia instancia, String varName);
 
+	public void setVar(Instancia instancia, String varName, Serializable varValue);
+	
 	public Instancia getInstancia(String processInstanceId);
 
 	public Instancia completaTarea(Tarea tarea);

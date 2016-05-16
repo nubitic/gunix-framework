@@ -11,14 +11,6 @@ import java.util.concurrent.RejectedExecutionException;
 
 import javax.sql.DataSource;
 
-import mx.com.gunix.framework.activiti.ExecuteAsyncSecuredRunnable;
-import mx.com.gunix.framework.activiti.FloatType;
-import mx.com.gunix.framework.activiti.GunixObjectVariableType;
-import mx.com.gunix.framework.activiti.ProcessInstanceCreatedEvntListener;
-import mx.com.gunix.framework.activiti.persistence.entity.VariableInstanceEntityManager;
-import mx.com.gunix.framework.processes.domain.ProgressUpdate;
-import mx.com.gunix.framework.service.ActivitiService;
-
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
@@ -59,6 +51,7 @@ import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.activiti.spring.SpringRejectedJobsHandler;
 import org.activiti.spring.autodeployment.AutoDeploymentStrategy;
 import org.activiti.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
+import org.openl.rules.activiti.spring.OpenLEngine;
 import org.openl.rules.activiti.spring.OpenLResourcesHandleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +59,6 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ContextResource;
@@ -79,9 +71,16 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ReflectionUtils;
 
+import mx.com.gunix.framework.activiti.ExecuteAsyncSecuredRunnable;
+import mx.com.gunix.framework.activiti.FloatType;
+import mx.com.gunix.framework.activiti.GunixObjectVariableType;
+import mx.com.gunix.framework.activiti.ProcessInstanceCreatedEvntListener;
+import mx.com.gunix.framework.activiti.persistence.entity.VariableInstanceEntityManager;
+import mx.com.gunix.framework.processes.domain.ProgressUpdate;
+import mx.com.gunix.framework.service.ActivitiService;
+
 @Configuration
 @EnableScheduling
-@ImportResource("classpath:openl-activiti-beans.xml")
 public class ActivitiConfig {
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
@@ -335,6 +334,11 @@ public class ActivitiConfig {
 	@Bean
 	public TaskService taskService(ProcessEngineFactoryBean pefb) throws Exception {
 		return pefb.getObject().getTaskService();
+	}
+	
+	@Bean
+	public OpenLEngine openLRules(){
+		return new mx.com.gunix.framework.openlrules.activiti.spring.OpenLEngine();
 	}
 
 	static final class SpringAsyncSecuredExecutor extends SpringAsyncExecutor implements SpringRejectedJobsHandler {

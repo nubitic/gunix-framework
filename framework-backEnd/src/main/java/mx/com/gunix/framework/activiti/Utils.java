@@ -16,7 +16,10 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
+
+import mx.com.gunix.framework.service.hessian.GunixFileInputStream;
 
 public class Utils {
 	private static final String NESTED_REFERENCE = "\"#\"";
@@ -26,6 +29,8 @@ public class Utils {
 	
 	private static Boolean isGroovyPresent;
 	private static Class<?> groovyMetaClass;
+	
+	private static Logger log = Logger.getLogger(Utils.class);
 	
 	@SuppressWarnings({ "rawtypes" })
 	public static Object fromMap(String varName, TreeMap<String, Object> stringifiedObject, ClassLoader classLoader) {
@@ -38,8 +43,9 @@ public class Utils {
 				Pattern mapPattern = Pattern.compile("\\(.+\\)");
 				final boolean isNotObject;
 				final boolean isItereable;
-
-				Optional classObj = Optional.ofNullable(stringifiedObject.get(varName + ".class"));
+				String varClass = new StringBuilder(varName).append(".class").toString();
+				
+				Optional classObj = Optional.ofNullable(stringifiedObject.get(varClass));
 				String classStr = classObj.isPresent() ? classObj.get().toString() : null;
 
 				if (classStr != null) {
@@ -71,8 +77,6 @@ public class Utils {
 				});
 
 				Map<String, Object> childTypes = new TreeMap<String, Object>();
-
-				String varClass = varName + ".class";
 
 				stringifiedObject.keySet().stream().filter(key -> (!key.equals(varClass)) && key.endsWith(".class")).forEach(key -> {
 					try {
@@ -121,8 +125,10 @@ public class Utils {
 								pub.setNestedProperty(ans, prop, value);
 							}
 						}
-					} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+					} catch (InvocationTargetException | IllegalAccessException e) {
 						throw new RuntimeException(e);
+					} catch (NoSuchMethodException e) {
+						log.warn("No se encontró un método para establecer el valor " + value, e);
 					}
 				});
 
@@ -232,6 +238,10 @@ public class Utils {
 				if (groovyMetaClass.isAssignableFrom(clazz)) {
 					return;
 				}
+			}
+			
+			if(GunixFileInputStream.class.isAssignableFrom(clazz)){
+				return;
 			}
 			
 			if (BeanUtils.isSimpleProperty(clazz)) {

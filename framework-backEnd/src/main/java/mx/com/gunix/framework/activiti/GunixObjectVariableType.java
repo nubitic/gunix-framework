@@ -4,14 +4,11 @@ import static mx.com.gunix.framework.service.ActivitiService.VOLATIL;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.TreeMap;
-
-import mx.com.gunix.framework.activiti.persistence.entity.VariableInstanceMapper;
-import mx.com.gunix.framework.processes.domain.Instancia;
-import mx.com.gunix.framework.processes.domain.Tarea;
-import mx.com.gunix.framework.processes.domain.Variable;
 
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.impl.cmd.NeedsActiveExecutionCmd;
@@ -29,6 +26,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
+import mx.com.gunix.framework.activiti.persistence.entity.VariableInstanceMapper;
+import mx.com.gunix.framework.processes.domain.Instancia;
+import mx.com.gunix.framework.processes.domain.Tarea;
+import mx.com.gunix.framework.processes.domain.Variable;
+
 public class GunixObjectVariableType extends NullType implements VariableType {
 	public static final String GUNIX_OBJECT = "gunix-serializable";
 	private static final Field executionIdField;
@@ -45,6 +47,9 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 		}
 	}
 	private static final ThreadLocal<Tarea> currentTarea = new ThreadLocal<Tarea>();
+	private static final ThreadLocal<Stack<Map<Serializable,String>>> currentVar = ThreadLocal.withInitial(() -> {
+		return new Stack<Map<Serializable, String>>();
+	});
 
 	@Autowired
 	@Lazy
@@ -56,6 +61,16 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 
 	public static void setCurrentTarea(Tarea tarea) {
 		currentTarea.set(tarea);
+	}
+
+	public static void setCurrentVar(String pid, Serializable valor) {
+		Map<Serializable, String> pidVar = new HashMap<Serializable, String>();
+		pidVar.put(valor, pid);
+		currentVar.get().push(pidVar);
+	}
+
+	public static void removeCurrentVar() {
+		currentVar.get().pop();
 	}
 
 	@Override
@@ -70,15 +85,16 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 
 	@Override
 	public boolean isAbleToStore(Object value) {
-		return !isVolatil() && ((value != null && !BeanUtils.isSimpleProperty(value.getClass()) && (value instanceof Serializable)) || super.isAbleToStore(value));
+		return !isVolatil(value) && ((value != null && !BeanUtils.isSimpleProperty(value.getClass()) && (value instanceof Serializable)) || super.isAbleToStore(value));
 	}
 
-	private boolean isVolatil() {
+	private boolean isVolatil(Object value) {
 		boolean isVolatil = true;
-		ProcessInstance pi = ProcessInstanceCreatedEvntListener.getLastCreated();
-		CommandContext cmdCtx = Context.getCommandContext();
-		if(cmdCtx != null){
-			if(pi == null){
+		if (currentVar.get().isEmpty() || !currentVar.get().peek().keySet().stream().filter(valor -> valor == value).findFirst().isPresent()) {
+			ProcessInstance pi = ProcessInstanceCreatedEvntListener.getLastCreated();
+			CommandContext cmdCtx = Context.getCommandContext();
+			if (cmdCtx != null) {
+				if (pi == null) {
 					if (cmdCtx.getCommand() instanceof NeedsActiveExecutionCmd) {
 						try {
 							ExecutionEntity execution = cmdCtx.getExecutionEntityManager().findExecutionById((String) executionIdField.get(cmdCtx.getCommand()));
@@ -86,26 +102,21 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 						} catch (IllegalArgumentException | IllegalAccessException e) {
 							throw new RuntimeException(e);
 						}
-					}else{
+					} else {
 						if (cmdCtx.getCommand() instanceof StartProcessInstanceCmd) {
 							try {
-								isVolatil = VOLATIL.equals(
-										cmdCtx
-									      .getProcessEngineConfiguration()
-									      .getDeploymentManager()
-									      .findDeployedLatestProcessDefinitionByKey((String) processDefinitionKeyField.get(cmdCtx.getCommand())).getCategory());
+								isVolatil = VOLATIL.equals(cmdCtx.getProcessEngineConfiguration().getDeploymentManager().findDeployedLatestProcessDefinitionByKey((String) processDefinitionKeyField.get(cmdCtx.getCommand())).getCategory());
 							} catch (IllegalArgumentException | IllegalAccessException e) {
 								throw new RuntimeException(e);
 							}
 						}
-					}	
-			} else {
-				isVolatil = VOLATIL.equals(
-						cmdCtx
-					      .getProcessEngineConfiguration()
-					      .getDeploymentManager()
-					      .findDeployedProcessDefinitionById(pi.getProcessDefinitionId()).getCategory());
+					}
+				} else {
+					isVolatil = VOLATIL.equals(cmdCtx.getProcessEngineConfiguration().getDeploymentManager().findDeployedProcessDefinitionById(pi.getProcessDefinitionId()).getCategory());
+				}
 			}
+		} else {
+			isVolatil = false;
 		}
 		return isVolatil;
 	}
@@ -114,40 +125,24 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 	public void setValue(Object value, ValueFields valueFields) {
 		VariableInstanceEntity vie = (VariableInstanceEntity) valueFields;
 		ProcessInstance pi = ProcessInstanceCreatedEvntListener.getLastCreated();
-		boolean isExecutionContextActive = Context.isExecutionContextActive() && pi == null;
-		String executionId = isExecutionContextActive ? Context.getExecutionContext().getProcessInstance().getId() : null;
+		boolean isExecutionContextActive = Context.isExecutionContextActive() && pi == null && (currentVar.get().isEmpty() || !currentVar.get().peek().containsKey(value));
+		String executionId = isExecutionContextActive ? Context.getExecutionContext().getProcessInstance().getId() : pi == null ? currentVar.get().peek().get(value) : null ;
 		boolean isUpdateValue = vie.getRevision() > 0;
 
 		Tarea tarea = null;
-		Variable<?> variable = null;
 
 		if (!isExecutionContextActive) {
 			tarea = currentTarea.get();
-			if (tarea != null && (pi == null || pi.getId().equals(tarea.getInstancia().getId()))) {
-				variable = tarea.getVariables()
-									.stream()
-									.filter(var -> 
-											var.getNombre().equals(vie.getName()) && (var.getValor() == value || (var.getValor() != null && var.getValor().equals(value)))
-											)
-									.findFirst()
-									.get();
-			} else {
-				if (pi != null) {
-					variable = new Variable<String>(); //El scope por default es PROCESO
-					tarea = new Tarea();
-					tarea.setInstancia(new Instancia());
-					tarea.getInstancia().setId(pi.getId());
-				}
+			if (tarea == null || executionId != null) {
+				tarea = new Tarea();
+				tarea.setInstancia(new Instancia());
+				tarea.getInstancia().setId(pi != null ? pi.getId() : executionId);
 			}
 		}
 
 		if (isUpdateValue) {
 			if (!isExecutionContextActive) {
-				switch (variable.getScope()) {
-				case PROCESO:
-					deleteValue(vie.getName(), pi != null ? pi.getId() : tarea.getInstancia().getId(), null);
-					break;
-				}
+				deleteValue(vie.getName(), pi != null ? pi.getId() : tarea.getInstancia().getId(), null);
 			} else {
 				deleteValue(vie.getName(), executionId, null);
 			}
@@ -162,11 +157,7 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 			if (isExecutionContextActive) {
 				rs.setVariables(executionId, variablesMap);
 			} else {
-				switch (variable.getScope()) {
-				case PROCESO:
-					rs.setVariables(pi != null ? pi.getId() : tarea.getInstancia().getId(), variablesMap);
-					break;
-				}
+				rs.setVariables(pi != null ? pi.getId() : tarea.getInstancia().getId(), variablesMap);
 			}
 		}
 	}

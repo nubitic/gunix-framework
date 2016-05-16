@@ -92,7 +92,9 @@ $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
 
 function onCompleteTask(idAplicacion, preCompleteTask, boton) {
 	if (typeof (preCompleteTask) == 'function') {
-		preCompleteTask(boton);
+		if(preCompleteTask(boton) == false){
+			return false;
+		}
 	}
 	jQuery.ajax(
 			getAjaxOptions(showFragment + "content&idAplicacion=" + idAplicacion + "&isCompleteTask=true", $("#gunixMainForm").serialize()))
