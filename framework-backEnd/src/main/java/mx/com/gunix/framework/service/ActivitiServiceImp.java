@@ -450,9 +450,9 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			
 			//Cuando la consulta no se cierra por las tareas de un perfil determinado entonces se incluyen las instancias historicas que cumplan con los filtros indicados 
 			if(!conPerfil && filtros != null && !filtros.isEmpty()){
-				hpiq.or();
+//				hpiq.or();
 				processFilters(filtros, hpiq);
-				hpiq.endOr();
+//				hpiq.endOr();
 			}
 			
 			hpiq.orderByProcessInstanceId().asc();
