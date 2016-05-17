@@ -118,11 +118,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 
 			GunixObjectVariableType.setCurrentTarea(tarea);
 
-			if (!variablesProcesoMap.isEmpty()) {
-				rs.setVariables(tarea.getInstancia().getId(), variablesProcesoMap);
-			}
-
-			ts.complete(taskId);
+			ts.complete(taskId,variablesProcesoMap);
 			tarea.getInstancia().setTareaActual(getCurrentTask(tarea.getInstancia().getId(), null));
 
 			if (tarea.getInstancia().getTareaActual() == null) {
@@ -374,7 +370,11 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		
 		instancia.setVolatil(VOLATIL.equals(repos.getProcessDefinition(hpi.getProcessDefinitionId()).getCategory()));
 		
-		List<HistoricTaskInstance> tareasCompletadas = hs.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).finished().list();
+		List<HistoricTaskInstance> tareasCompletadas = hs.createHistoricTaskInstanceQuery()
+																	.processInstanceId(processInstanceId)
+																	.finished()
+																	.orderByTaskCreateTime().desc()
+																	.list();
 		if (tareasCompletadas != null) {
 			instancia.setTareas(new ArrayList<Tarea>());
 			tareasCompletadas.forEach(hti -> {
@@ -382,6 +382,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 				hT.setInicio(hti.getCreateTime());
 				hT.setTermino(hti.getEndTime());
 				hT.setInstancia(instancia);
+				hT.setNombre(hti.getName());
 				hT.setUsuario(hti.getOwner() == null ? hti.getAssignee() : hti.getOwner());
 				List<Comment> taskComments = ts.getTaskComments(hti.getId(), TASK_COMMENT);
 				if (taskComments != null && !taskComments.isEmpty()) {
