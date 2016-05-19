@@ -28,6 +28,8 @@ import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.bpmn.data.ItemInstance;
 import org.activiti.engine.impl.cfg.IdGenerator;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.activiti.engine.impl.context.Context;
+import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.el.ReadOnlyMapELResolver;
 import org.activiti.engine.impl.el.VariableScopeElResolver;
 import org.activiti.engine.impl.interceptor.SessionFactory;
@@ -42,6 +44,7 @@ import org.activiti.engine.impl.javax.el.MapELResolver;
 import org.activiti.engine.impl.javax.el.MethodNotFoundException;
 import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
+import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.variable.VariableType;
 import org.activiti.spring.ApplicationContextElResolver;
 import org.activiti.spring.ProcessEngineFactoryBean;
@@ -178,6 +181,31 @@ public class ActivitiConfig {
 		List<ActivitiEventListener> openLEvntListners = new ArrayList<ActivitiEventListener>();
 		openLEvntListners.add(new OpenLResourcesHandleListener());
 		eventListeners.put(ActivitiEventType.ENTITY_UPDATED + "," + ActivitiEventType.ENTITY_DELETED, openLEvntListners);
+		
+		List<ActivitiEventListener> identityLinkDeleteTaskEvntListners = new ArrayList<ActivitiEventListener>();
+		identityLinkDeleteTaskEvntListners.add(new ActivitiEventListener() {
+
+			@Override
+			public void onEvent(ActivitiEvent event) {
+				Object entity = ((ActivitiEntityEvent) event).getEntity();
+				if (entity instanceof TaskEntity && event.getType() == ActivitiEventType.ENTITY_DELETED) {
+					TaskEntity te = (TaskEntity) entity;
+					if (te.getIdentityLinks() != null && !te.getIdentityLinks().isEmpty()) {
+						DbSqlSession dbSqlSession = Context.getCommandContext().getSession(DbSqlSession.class);
+						te.getIdentityLinks().forEach(idLk -> {
+							dbSqlSession.delete(idLk);
+						});
+					}
+				}
+			}
+
+			@Override
+			public boolean isFailOnException() {
+				return true;
+			}
+
+		});
+		eventListeners.put(ActivitiEventType.ENTITY_DELETED.toString(),identityLinkDeleteTaskEvntListners);
 
 		List<ActivitiEventListener> jobFailureEvntListners = new ArrayList<ActivitiEventListener>();
 		jobFailureEvntListners.add(jobExecutionFailureEvntListener());
