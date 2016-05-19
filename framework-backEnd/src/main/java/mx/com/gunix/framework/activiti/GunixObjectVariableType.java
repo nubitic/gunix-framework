@@ -16,6 +16,7 @@ import org.activiti.engine.impl.cmd.StartProcessInstanceCmd;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti.engine.impl.variable.NullType;
 import org.activiti.engine.impl.variable.ValueFields;
@@ -29,7 +30,6 @@ import org.springframework.context.annotation.Lazy;
 import mx.com.gunix.framework.activiti.persistence.entity.VariableInstanceMapper;
 import mx.com.gunix.framework.processes.domain.Instancia;
 import mx.com.gunix.framework.processes.domain.Tarea;
-import mx.com.gunix.framework.processes.domain.Variable;
 
 public class GunixObjectVariableType extends NullType implements VariableType {
 	public static final String GUNIX_OBJECT = "gunix-serializable";
@@ -163,23 +163,28 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 	}
 
 	@Override
-	public Object getValue(ValueFields valueFields) {
-		VariableInstanceEntity vie = (VariableInstanceEntity) valueFields;
+	public Object getValue(ValueFields vie) {
 		TreeMap<String, Object> mappedObject = new TreeMap<String, Object>();
 
 		List<Map<String, Object>> vars = null;
 
-		if (vie.getTaskId() == null) {
-			vars = vim.findGunixObjectByNameAndExecutionId(vie.getExecutionId(), vie.getName());
+		if (vie instanceof HistoricVariableInstanceEntity) {
+			if (vie.getTaskId() == null) {
+				vars = vim.findHistoricGunixObjectByNameAndExecutionId(vie.getExecutionId(), vie.getName());
+			} 
 		} else {
-			vars = vim.findGunixObjectByNameAndTaskId(vie.getTaskId(), vie.getName());
+			if (vie.getTaskId() == null) {
+				vars = vim.findGunixObjectByNameAndExecutionId(vie.getExecutionId(), vie.getName());
+			} else {
+				vars = vim.findGunixObjectByNameAndTaskId(vie.getTaskId(), vie.getName());
+			}
 		}
 
 		vars.stream().forEach(map -> {
 			mappedObject.put((String) map.get("key"), getValue(map));
 		});
 
-		return mappedObject.isEmpty() ? super.getValue(valueFields) : Utils.fromMap(vie.getName(), mappedObject, getClass().getClassLoader());
+		return mappedObject.isEmpty() ? super.getValue(vie) : Utils.fromMap(vie.getName(), mappedObject, getClass().getClassLoader());
 	}
 
 	private Object getValue(Map<String, Object> map) {

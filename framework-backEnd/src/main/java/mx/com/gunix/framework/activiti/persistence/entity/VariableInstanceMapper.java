@@ -126,6 +126,22 @@ public interface VariableInstanceMapper {
 			"	  name_ as key,"+
 			"	  " + DOUBLE_KEY + " ,"+
 			"	  " + LONG_KEY + " ,"+
+			"	  text_||COALESCE(text2_,'')   as " + TEXT_KEY + 
+			"	FROM"+
+			"	  ACTIVITI.act_hi_varinst"+
+			"	WHERE"+
+			"	  EXECUTION_ID_ = #{executionId} and TASK_ID_ is null"+
+			"	AND var_type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}.%' or name_ LIKE '${varName}[%')")
+	@ResultType(Map.class)
+	@Options(flushCache=true)
+	public List<Map<String,Object>> findHistoricGunixObjectByNameAndExecutionId(@Param("executionId") String executionId, @Param("varName") String varName);
+	
+	@Select("SELECT"+
+			"	  id_ ,"+
+			"	  rev_ ,"+
+			"	  name_ as key,"+
+			"	  " + DOUBLE_KEY + " ,"+
+			"	  " + LONG_KEY + " ,"+
 			"	  text_||COALESCE(text2_,'')   as " + TEXT_KEY +
 			"	FROM"+
 			"	  ACTIVITI.ACT_RU_VARIABLE"+

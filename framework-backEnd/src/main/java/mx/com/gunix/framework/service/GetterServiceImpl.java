@@ -19,6 +19,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ConcurrentReferenceHashMap;
 import org.springframework.util.ReflectionUtils;
 
+import com.thoughtworks.xstream.core.util.Primitives;
+
 @Service
 @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 public class GetterServiceImpl implements GetterService, ApplicationContextAware {
@@ -48,7 +50,7 @@ public class GetterServiceImpl implements GetterService, ApplicationContextAware
 																		.collect(Collectors.toList())
 																		.toArray(new Class<?>[] {}):new Class<?>[] {});
 			if (m == null) {
-				throw new IllegalArgumentException("No se encontró el método " + methodName + " y argumentos: " + (argTypes != null ? Arrays.toString(argTypes) : "SIN ARGUMENTOS"));
+				throw new IllegalArgumentException("No se encontró el método " + methodName + " con argumentos: " + (argTypes != null ? Arrays.toString(argTypes) : "SIN ARGUMENTOS"));
 			}
 			return (Serializable) ReflectionUtils.invokeMethod(m, service, args);
 		} else {
@@ -77,12 +79,20 @@ public class GetterServiceImpl implements GetterService, ApplicationContextAware
 			return false;
 		} else {
 			for (int i = 0; i < destino.length; i++) {
-				if (fuente[i] !=null && !destino[i].isAssignableFrom(fuente[i])) {
+				if (fuente[i] !=null && !(destino[i].isAssignableFrom(fuente[i]) || checkPrimitiveWrappers(destino[i],fuente[i]) || checkPrimitiveWrappers(fuente[i], destino[i]) )) {
 					return false;
 				}
 			}
 			return true;
 		}
+	}
+
+	private boolean checkPrimitiveWrappers(Class<?> destino, Class<?> fuente) {
+		boolean ans = false;
+		if (destino.isPrimitive() && Primitives.unbox(fuente) == destino) {
+			ans = true;
+		}
+		return ans;
 	}
 
 	private Method[] getDeclaredMethods(Class<?> clazz) {

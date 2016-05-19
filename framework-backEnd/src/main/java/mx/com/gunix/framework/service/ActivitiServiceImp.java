@@ -19,17 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import mx.com.gunix.framework.activiti.GunixObjectVariableType;
-import mx.com.gunix.framework.activiti.ProcessInstanceCreatedEvntListener;
-import mx.com.gunix.framework.activiti.Utils;
-import mx.com.gunix.framework.processes.domain.Filtro;
-import mx.com.gunix.framework.processes.domain.Instancia;
-import mx.com.gunix.framework.processes.domain.ProgressUpdate;
-import mx.com.gunix.framework.processes.domain.Tarea;
-import mx.com.gunix.framework.processes.domain.Variable;
-import mx.com.gunix.framework.security.UserDetails;
-import mx.com.gunix.framework.security.domain.Usuario;
-
+import org.activiti.bpmn.model.UserTask;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.ActivitiOptimisticLockingException;
 import org.activiti.engine.FormService;
@@ -67,6 +57,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import mx.com.gunix.framework.activiti.GunixObjectVariableType;
+import mx.com.gunix.framework.activiti.ProcessInstanceCreatedEvntListener;
+import mx.com.gunix.framework.activiti.Utils;
+import mx.com.gunix.framework.processes.domain.Filtro;
+import mx.com.gunix.framework.processes.domain.Instancia;
+import mx.com.gunix.framework.processes.domain.ProgressUpdate;
+import mx.com.gunix.framework.processes.domain.Tarea;
+import mx.com.gunix.framework.processes.domain.Variable;
+import mx.com.gunix.framework.security.UserDetails;
+import mx.com.gunix.framework.security.domain.Usuario;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -393,7 +394,9 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		}
 		
 		instancia.setTareaActual(getCurrentTask(processInstanceId, null));
-		instancia.getTareaActual().setInstancia(instancia);
+		if(instancia.getTareaActual()!=null){
+			instancia.getTareaActual().setInstancia(instancia);
+		}
 		return instancia;
 	}
 
@@ -442,91 +445,109 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 				return new HashSet<String>();
 			}));
 			
-			/*Historia del proceso encontrado y que sigue en ejecución*/
-			HistoricProcessInstanceQuery hpiq = hs.createHistoricProcessInstanceQuery();
-			hpiq.processDefinitionKey(processKey);
-			if (!pidsEncontradosSet.isEmpty()) {
-				hpiq.processInstanceIds(pidsEncontradosSet);
-			}
-			
-			//Cuando la consulta no se cierra por las tareas de un perfil determinado entonces se incluyen las instancias historicas que cumplan con los filtros indicados 
-			if(!conPerfil && filtros != null && !filtros.isEmpty()){
-//				hpiq.or();
-				processFilters(filtros, hpiq);
-//				hpiq.endOr();
-			}
-			
-			hpiq.orderByProcessInstanceId().asc();
-			List<HistoricProcessInstance> hpis = hpiq.list();
-			
-			/*Se consolidan los que siguen en ejecución como los historicos encontrados*/
-			pidsEncontradosSet.addAll(hpis.stream().map(hpid -> {
-				return hpid.getId();
-			}).collect(Collectors.toCollection(() -> {
-				return new HashSet<String>();
-			})));
-			
-			if(!pidsEncontradosSet.isEmpty()){
-				/*Tareas históricas*/
-				HistoricTaskInstanceQuery htiq = hs.createHistoricTaskInstanceQuery();
-				htiq.finished();
-				htiq.processInstanceIdIn(new ArrayList<String>(pidsEncontradosSet));
-				htiq.orderByProcessInstanceId().asc();
-				htiq.orderByTaskCreateTime().desc();
-				List<HistoricTaskInstance> hTasks = htiq.list();
-				
-				AtomicReference<List<Task>> tareasHolder = new AtomicReference<List<Task>>();
-				AtomicReference<List<HistoricProcessInstance>> historicosHolder = new AtomicReference<List<HistoricProcessInstance>>();
-				historicosHolder.set(hpis);
-				tareasHolder.set(tareas);
-				
-				//Primero procesamos los procesos que siguen en ejecución
-				if (pids != null) {
-					pids.forEach(pid -> {
-						Instancia inst = new Instancia();
-						HistoricProcessInstance hpi = getHpi(pid.getId(), historicosHolder.get());
-						inst.setId(pid.getId());
-						inst.setInicio(hpi.getStartTime());
-						inst.setProcessKey(processKey);
-						inst.setTermino(hpi.getEndTime());
-						inst.setUsuario(hpi.getStartUserId());
-						inst.setVolatil(false);
-						List<Comment> processComments = ts.getProcessInstanceComments(pid.getId(), PROCESS_CREATION_COMMENT);
-						if (processComments != null && !processComments.isEmpty()) {
-							inst.setComentario(processComments.get(0).getFullMessage());
-						}
-						if (tareasHolder.get() != null) {
-							inst.setTareaActual(getTarea(inst, tareasHolder.get()));
-						}
-						
-						inst.setTareas(getTareas(inst,hTasks));
-						inst.setVariables(getVariables(inst, projectionVars));
-						pidsEncontrados.add(inst);
-					});
+			if ((conPerfil && !pidsEncontradosSet.isEmpty()) || !conPerfil) {
+				/*Historia del proceso encontrado y que sigue en ejecución*/
+				HistoricProcessInstanceQuery hpiq = hs.createHistoricProcessInstanceQuery();
+				hpiq.processDefinitionKey(processKey);
+				if (conPerfil && !pidsEncontradosSet.isEmpty()) {
+					hpiq.processInstanceIds(pidsEncontradosSet);
 				}
 				
-				/*Recorremos los históricos que quedan*/
-				if (hpis != null && !hpis.isEmpty()) {			
-					hpis.forEach(hpid -> {
-						Instancia inst = new Instancia();
-						inst.setId(hpid.getId());
-						inst.setInicio(hpid.getStartTime());
-						inst.setProcessKey(processKey);
-						inst.setTermino(hpid.getEndTime());
-						inst.setUsuario(hpid.getStartUserId());
-						inst.setVolatil(false);
-						List<Comment> processComments = ts.getProcessInstanceComments(hpid.getId(), PROCESS_CREATION_COMMENT);
-						if (processComments != null && !processComments.isEmpty()) {
-							inst.setComentario(processComments.get(0).getFullMessage());
-						}
-						
-						inst.setTareas(getTareas(inst,hTasks));
-						inst.setVariables(getVariables(inst, projectionVars));
-						pidsEncontrados.add(inst);
-					});
+				//Cuando la consulta no se cierra por las tareas de un perfil determinado entonces se incluyen las instancias historicas que cumplan con los filtros indicados 
+				if(!conPerfil && filtros != null && !filtros.isEmpty()){
+	//				hpiq.or();
+					processFilters(filtros, hpiq);
+	//				hpiq.endOr();
 				}
 				
-				Collections.sort(pidsEncontrados, Comparator.comparing(Instancia::getInicio).reversed());
+				hpiq.orderByProcessInstanceId().asc();
+				List<HistoricProcessInstance> hpis = hpiq.list();
+				
+				/*Se consolidan los que siguen en ejecución como los historicos encontrados*/
+				pidsEncontradosSet.addAll(hpis.stream().map(hpid -> {
+					return hpid.getId();
+				}).collect(Collectors.toCollection(() -> {
+					return new HashSet<String>();
+				})));
+				
+				if(!pidsEncontradosSet.isEmpty()){
+					/*Tareas históricas*/
+					HistoricTaskInstanceQuery htiq = hs.createHistoricTaskInstanceQuery();
+					htiq.finished();
+					htiq.processInstanceIdIn(new ArrayList<String>(pidsEncontradosSet));
+					htiq.orderByProcessInstanceId().asc();
+					htiq.orderByTaskCreateTime().desc();
+					List<HistoricTaskInstance> hTasks = htiq.list();
+					
+					AtomicReference<List<Task>> tareasHolder = new AtomicReference<List<Task>>();
+					AtomicReference<List<HistoricProcessInstance>> historicosHolder = new AtomicReference<List<HistoricProcessInstance>>();
+					historicosHolder.set(hpis);
+					
+					if (!conPerfil && pids != null && !pids.isEmpty()) {
+						TaskQuery tq = ts.createTaskQuery();
+						tareasHolder.set(tq.processDefinitionKey(processKey)
+											.active()
+											.processInstanceIdIn(pids
+																	.stream()
+																	.map(pid->{
+																		return pid.getId();
+																		})
+																	.collect(Collectors.toList()))
+											.orderByProcessInstanceId().asc()
+											.list());
+					} else {
+						tareasHolder.set(tareas);
+					}
+					
+					
+					//Primero procesamos los procesos que siguen en ejecución
+					if (pids != null) {
+						pids.forEach(pid -> {
+							Instancia inst = new Instancia();
+							HistoricProcessInstance hpi = getHpi(pid.getId(), historicosHolder.get());
+							inst.setId(pid.getId());
+							inst.setInicio(hpi.getStartTime());
+							inst.setProcessKey(processKey);
+							inst.setTermino(hpi.getEndTime());
+							inst.setUsuario(hpi.getStartUserId());
+							inst.setVolatil(false);
+							List<Comment> processComments = ts.getProcessInstanceComments(pid.getId(), PROCESS_CREATION_COMMENT);
+							if (processComments != null && !processComments.isEmpty()) {
+								inst.setComentario(processComments.get(0).getFullMessage());
+							}
+							if (tareasHolder.get() != null) {
+								inst.setTareaActual(getTarea(inst, tareasHolder.get()));
+							}
+							
+							inst.setTareas(getTareas(inst,hTasks));
+							inst.setVariables(getVariables(inst, projectionVars));
+							pidsEncontrados.add(inst);
+						});
+					}
+					
+					/*Recorremos los históricos que quedan*/
+					if (hpis != null && !hpis.isEmpty()) {			
+						hpis.forEach(hpid -> {
+							Instancia inst = new Instancia();
+							inst.setId(hpid.getId());
+							inst.setInicio(hpid.getStartTime());
+							inst.setProcessKey(processKey);
+							inst.setTermino(hpid.getEndTime());
+							inst.setUsuario(hpid.getStartUserId());
+							inst.setVolatil(false);
+							List<Comment> processComments = ts.getProcessInstanceComments(hpid.getId(), PROCESS_CREATION_COMMENT);
+							if (processComments != null && !processComments.isEmpty()) {
+								inst.setComentario(processComments.get(0).getFullMessage());
+							}
+							
+							inst.setTareas(getTareas(inst,hTasks));
+							inst.setVariables(getVariables(inst, projectionVars));
+							pidsEncontrados.add(inst);
+						});
+					}
+					
+					Collections.sort(pidsEncontrados, Comparator.comparing(Instancia::getInicio).reversed());
+				}
 			}
 		}
 		return pidsEncontrados;
@@ -555,6 +576,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 					Tarea hT = new Tarea();
 					hT.setInicio(currTask.getCreateTime());
 					hT.setTermino(currTask.getEndTime());
+					hT.setNombre(currTask.getName());
 					hT.setUsuario(currTask.getOwner() == null ? currTask.getAssignee() : currTask.getOwner());
 					hT.setInstancia(inst);
 					List<Comment> taskComments = ts.getTaskComments(currTask.getId(), TASK_COMMENT);
@@ -562,6 +584,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 						hT.setComentario(taskComments.get(0).getFullMessage());
 					}
 					found = true;
+					tareas.add(hT);
 				}
 				hTasksIt.remove();
 			} else {
@@ -676,5 +699,21 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		} finally {
 			GunixObjectVariableType.removeCurrentVar();
 		}
+	}
+
+	@Override
+	public List<String> getEstadosProceso(String processKey) {
+		return repos.getBpmnModel(repos.createProcessDefinitionQuery()
+											.processDefinitionKey(processKey)
+											.latestVersion()
+											.singleResult()
+											.getId())
+					.getProcessById(processKey)
+					.findFlowElementsOfType(UserTask.class)
+					.stream()
+						.map(userTask -> {
+								return userTask.getName();
+							})
+						.collect(Collectors.toList());
 	}
 }
