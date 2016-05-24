@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.aop.framework.Advised;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -39,7 +41,7 @@ public class GetterServiceImpl implements GetterService, ApplicationContextAware
 		String methodName = serviceNameAndMethod[1];
 
 		if (applicationContext.containsBean(serviceName)) {
-			Object service = applicationContext.getBean(serviceName);
+			Object service = getTargetObject(applicationContext.getBean(serviceName));
 			Class<?>[] argTypes = null;
 			Method m = findMethod(service.getClass(), methodName, args!=null?argTypes = Arrays
 																		.asList(args)
@@ -55,6 +57,18 @@ public class GetterServiceImpl implements GetterService, ApplicationContextAware
 			return (Serializable) ReflectionUtils.invokeMethod(m, service, args);
 		} else {
 			throw new IllegalArgumentException("No se encontró el servicio " + serviceName);
+		}
+	}
+	
+	private Object getTargetObject(Object proxy) {
+		if (AopUtils.isJdkDynamicProxy(proxy)) {
+			try {
+				return ((Advised) proxy).getTargetSource().getTarget();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			return proxy; // expected to be cglib proxy then, which is simply a specialized class
 		}
 	}
 
