@@ -38,6 +38,8 @@ import org.activiti.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.TerminateEndEventActivityBehavior;
+import org.activiti.engine.impl.context.Context;
+import org.activiti.engine.impl.db.PersistentObject;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
@@ -420,6 +422,24 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			tq.taskCandidateGroup(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getSelectedAuthority());
 			tq.orderByProcessInstanceId().asc();
 			tareas = tq.list();
+
+			if (Context.getCommandContext() != null && tareas!=null && !tareas.isEmpty()) {
+				List<PersistentObject> pos = Context.getCommandContext().getDbSqlSession().getUpdatedObjects();
+				AtomicReference<List<Task>> tareasHolder = new AtomicReference<List<Task>>(tareas);
+				if (pos != null && !pos.isEmpty()) {
+					pos.forEach(po -> {
+						Task task = tareasHolder.get()
+										.stream()
+										.filter(tarea -> po.getId().equals(tarea.getId()))
+										.findFirst()
+										.orElse(null);
+						if (task != null && po instanceof HistoricTaskInstance) {
+							//La tarea fue completada dentro de la ejecución actual y no ha sido registrada en la bd por eso aún la vemos en la consulta, procedemos a descartarla manualmente
+							tareasHolder.get().remove(task);
+						}
+					});
+				}
+			}
 		}
 		
 		
@@ -455,9 +475,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 				
 				//Cuando la consulta no se cierra por las tareas de un perfil determinado entonces se incluyen las instancias historicas que cumplan con los filtros indicados 
 				if(!conPerfil && filtros != null && !filtros.isEmpty()){
-	//				hpiq.or();
 					processFilters(filtros, hpiq);
-	//				hpiq.endOr();
 				}
 				
 				hpiq.orderByProcessInstanceId().asc();

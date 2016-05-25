@@ -15,8 +15,8 @@
 	</modules>
 
 	<properties>
-		<openl.version>5.17.1</openl.version>
-		<activiti.version>5.19.0.2</activiti.version>
+		<openl.version>5.17.2</openl.version>
+		<activiti.version>5.20.0</activiti.version>
 		<javac.path>${JAVA_1_8_HOME}/bin/javac</javac.path>
 		<slf4j.version>1.7.12</slf4j.version>
 		<aspectj.version>1.8.5</aspectj.version>
