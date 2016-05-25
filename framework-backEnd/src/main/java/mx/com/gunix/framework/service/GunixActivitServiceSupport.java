@@ -20,17 +20,17 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validator;
 
-import mx.com.gunix.framework.domain.Identificador;
-import mx.com.gunix.framework.persistence.DescriptorCambios;
-import mx.com.gunix.framework.processes.domain.ProgressUpdate;
-
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import mx.com.gunix.framework.domain.Identificador;
+import mx.com.gunix.framework.persistence.DescriptorCambios;
+import mx.com.gunix.framework.processes.domain.ProgressUpdate;
 
 public abstract class GunixActivitServiceSupport<T extends Serializable> {
 	private interface FoundAction {
@@ -55,9 +55,9 @@ public abstract class GunixActivitServiceSupport<T extends Serializable> {
 
 	private String getVarNameToUpdate(ExecutionEntity ee, Object var) {
 		String varName = null;
-		Map<String, VariableInstanceEntity> varMap = ee.getVariableInstances();
+		Map<String, VariableInstance> varMap = ee.getVariableInstances();
 		if (varMap != null && !varMap.isEmpty()) {
-			Optional<VariableInstanceEntity> ovie = varMap.values().stream().filter(ivie -> ivie.getCachedValue() == var).findFirst();
+			Optional<VariableInstance> ovie = varMap.values().stream().filter(ivie -> ivie.getCachedValue() == var).findFirst();
 			if (ovie.isPresent()) {
 				varName = ovie.get().getName();
 			}

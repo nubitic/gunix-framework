@@ -12,6 +12,7 @@ import org.activiti.engine.EngineServices;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -288,6 +289,56 @@ public class ActivitiDelegateExecutionAroundAspect {
 								GunixObjectVariableType.removeCurrentVar();
 							}
 						}
+					}
+
+					@Override
+					public Map<String, VariableInstance> getVariableInstances() {
+						return de.getVariableInstances();
+					}
+
+					@Override
+					public Map<String, VariableInstance> getVariableInstances(Collection<String> variableNames) {
+						return de.getVariableInstances(variableNames);
+					}
+
+					@Override
+					public Map<String, VariableInstance> getVariableInstances(Collection<String> variableNames, boolean fetchAllVariables) {
+						return de.getVariableInstances(variableNames, fetchAllVariables);
+					}
+
+					@Override
+					public Map<String, VariableInstance> getVariableInstancesLocal() {
+						return de.getVariableInstancesLocal();
+					}
+
+					@Override
+					public Map<String, VariableInstance> getVariableInstancesLocal(Collection<String> variableNames) {
+						return de.getVariableInstancesLocal(variableNames);
+					}
+
+					@Override
+					public Map<String, VariableInstance> getVariableInstancesLocal(Collection<String> variableNames, boolean fetchAllVariables) {
+						return de.getVariableInstancesLocal(variableNames, fetchAllVariables);
+					}
+
+					@Override
+					public VariableInstance getVariableInstance(String variableName) {
+						return de.getVariableInstance(variableName);
+					}
+
+					@Override
+					public VariableInstance getVariableInstance(String variableName, boolean fetchAllVariables) {
+						return de.getVariableInstance(variableName, fetchAllVariables);
+					}
+
+					@Override
+					public VariableInstance getVariableInstanceLocal(String variableName) {
+						return de.getVariableInstanceLocal(variableName);
+					}
+
+					@Override
+					public VariableInstance getVariableInstanceLocal(String variableName, boolean fetchAllVariables) {
+						return de.getVariableInstanceLocal(variableName, fetchAllVariables);
 					}
 				};
 				break;
