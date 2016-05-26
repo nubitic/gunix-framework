@@ -19,6 +19,7 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 
+import mx.com.gunix.framework.activiti.persistence.entity.VariableInstanceMapper;
 import mx.com.gunix.framework.service.hessian.GunixFileInputStream;
 
 public class Utils {
@@ -33,7 +34,11 @@ public class Utils {
 	private static Logger log = Logger.getLogger(Utils.class);
 	
 	@SuppressWarnings({ "rawtypes" })
-	public static Object fromMap(String varName, TreeMap<String, Object> stringifiedObject, ClassLoader classLoader) {
+	public static Object fromMap(String varName, List<Map<String, Object>> vars, ClassLoader classLoader) {
+		TreeMap<String, Object> stringifiedObject = new TreeMap<String, Object>();
+		vars.stream().forEach(map -> {
+			stringifiedObject.put((String) map.get("key"), getValue(map));
+		});
 		final Object ans;
 		if (!stringifiedObject.isEmpty()) {
 			try {
@@ -171,6 +176,18 @@ public class Utils {
 			}
 		} else {
 			ans = null;
+		}
+		return ans;
+	}
+	
+	private static Object getValue(Map<String, Object> map) {
+		Object ans = null;
+		ans = map.get(VariableInstanceMapper.LONG_KEY);
+		if (ans == null) {
+			ans = map.get(VariableInstanceMapper.DOUBLE_KEY);
+		}
+		if (ans == null) {
+			ans = map.get(VariableInstanceMapper.TEXT_KEY);
 		}
 		return ans;
 	}

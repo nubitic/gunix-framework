@@ -52,6 +52,7 @@ import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -63,6 +64,7 @@ import org.springframework.transaction.annotation.Transactional;
 import mx.com.gunix.framework.activiti.GunixObjectVariableType;
 import mx.com.gunix.framework.activiti.ProcessInstanceCreatedEvntListener;
 import mx.com.gunix.framework.activiti.Utils;
+import mx.com.gunix.framework.activiti.persistence.entity.VariableInstanceMapper;
 import mx.com.gunix.framework.processes.domain.Filtro;
 import mx.com.gunix.framework.processes.domain.Instancia;
 import mx.com.gunix.framework.processes.domain.ProgressUpdate;
@@ -94,6 +96,10 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 	
 	@Autowired
 	RedisTemplate<String, ProgressUpdate> redisProgressUpdateTemplate;
+	
+	@Autowired
+	@Lazy
+	VariableInstanceMapper vim;
 	
 	public static final String CURRENT_AUTHENTICATION_USUARIO_VAR = "CURRENT_AUTHENTICATION_USUARIO_VAR";
 	public static final String CURRENT_AUTHENTICATION_ROLES_VAR = "CURRENT_AUTHENTICATION_ROLES_VAR";
@@ -213,11 +219,22 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		Serializable ser = null;
 		if (((instancia.isVolatil() && !instancia.getTareaActual().isTerminal()) || !instancia.isVolatil()) && instancia.getTermino() == null) {
 			ser = rs.getVariable(instancia.getId(), varName, Serializable.class);
+			if (ser == null) {
+				List<Map<String, Object>> vars = vim.findGunixObjectByNameAndExecutionId(instancia.getId(), varName);
+				if (vars != null && !vars.isEmpty()) {
+					ser = (Serializable) Utils.fromMap(varName, vars, getClass().getClassLoader());
+				}
+			}
 		} else {
 			List<HistoricVariableInstance> hvis = hs.createHistoricVariableInstanceQuery().processInstanceId(instancia.getId()).excludeTaskVariables().variableName(varName).list();
 			if (hvis != null && !hvis.isEmpty()) {
 				ser = (Serializable) hvis.get(0).getValue();
-			} 
+			} else {
+				List<Map<String, Object>> vars = vim.findHistoricGunixObjectByNameAndExecutionId(instancia.getId(), varName);
+				if (vars != null && !vars.isEmpty()) {
+					ser = (Serializable) Utils.fromMap(varName, vars, getClass().getClassLoader());
+				}
+			}
 		}
 		return ser;
 	}

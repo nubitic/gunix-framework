@@ -164,14 +164,12 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 
 	@Override
 	public Object getValue(ValueFields vie) {
-		TreeMap<String, Object> mappedObject = new TreeMap<String, Object>();
-
 		List<Map<String, Object>> vars = null;
 
 		if (vie instanceof HistoricVariableInstanceEntity) {
 			if (vie.getTaskId() == null) {
 				vars = vim.findHistoricGunixObjectByNameAndExecutionId(vie.getExecutionId(), vie.getName());
-			} 
+			}
 		} else {
 			if (vie.getTaskId() == null) {
 				vars = vim.findGunixObjectByNameAndExecutionId(vie.getExecutionId(), vie.getName());
@@ -180,23 +178,7 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 			}
 		}
 
-		vars.stream().forEach(map -> {
-			mappedObject.put((String) map.get("key"), getValue(map));
-		});
-
-		return mappedObject.isEmpty() ? super.getValue(vie) : Utils.fromMap(vie.getName(), mappedObject, getClass().getClassLoader());
-	}
-
-	private Object getValue(Map<String, Object> map) {
-		Object ans = null;
-		ans = map.get(VariableInstanceMapper.LONG_KEY);
-		if (ans == null) {
-			ans = map.get(VariableInstanceMapper.DOUBLE_KEY);
-		}
-		if (ans == null) {
-			ans = map.get(VariableInstanceMapper.TEXT_KEY);
-		}
-		return ans;
+		return vars == null || vars.isEmpty() ? super.getValue(vie) : Utils.fromMap(vie.getName(), vars, getClass().getClassLoader());
 	}
 
 	public void deleteValue(String name, String executionId, String taskId) {
