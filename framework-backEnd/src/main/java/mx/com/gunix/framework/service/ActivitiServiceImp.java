@@ -57,6 +57,7 @@ import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,7 +103,6 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 	VariableInstanceMapper vim;
 	
 	public static final String CURRENT_AUTHENTICATION_USUARIO_VAR = "CURRENT_AUTHENTICATION_USUARIO_VAR";
-	public static final String CURRENT_AUTHENTICATION_ROLES_VAR = "CURRENT_AUTHENTICATION_ROLES_VAR";
 	private final int MAX_UPDATES_PER_FETCH = 100;
 	private static final String ID_APLICACION_VAR = "ID_APLICACION";
 
@@ -165,24 +165,21 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		return variablesMaps;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public Instancia iniciaProceso(String processKey, List<Variable<?>> variables, String comentario) {
 		Instancia instancia = null;
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			String usuario = ((Usuario) auth.getPrincipal()).getIdUsuario();
-			is.setAuthenticatedUserId(usuario);
+			UserDetails usuario = ((UserDetails) auth.getPrincipal());
+			is.setAuthenticatedUserId(usuario.getIdUsuario());
 			
 			ProcessInstance pi = rs.startProcessInstanceByKey(processKey, toMap(variables)[Variable.Scope.PROCESO.ordinal()]);
-			rs.setVariable(pi.getProcessInstanceId(), CURRENT_AUTHENTICATION_USUARIO_VAR, usuario);
-			if (auth.getAuthorities() != null && !auth.getAuthorities().isEmpty()) {
-				StringBuilder roles = new StringBuilder();
-				auth.getAuthorities().forEach(ga -> {
-					roles.append(ga.toString()).append(",");
-				});
-				roles.deleteCharAt(roles.length() - 1);
-				rs.setVariable(pi.getProcessInstanceId(), CURRENT_AUTHENTICATION_ROLES_VAR, roles.toString());
-			}
+			UserDetails usuarioSimpl = new UserDetails(usuario);
+			usuarioSimpl.setAuthorities((List<GrantedAuthority>) usuario.getAuthorities());
+			usuarioSimpl.setSelectedAuthority(usuario.getSelectedAuthority());
+			usuarioSimpl.setAplicaciones(null);
+			rs.setVariable(pi.getProcessInstanceId(), CURRENT_AUTHENTICATION_USUARIO_VAR, usuarioSimpl);
 			if (ID_APLICACION != null) {
 				rs.setVariable(pi.getProcessInstanceId(), ID_APLICACION_VAR, ID_APLICACION);
 			}
@@ -190,7 +187,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			instancia.setId(pi.getId());
 			instancia.setComentario(comentario);
 			instancia.setProcessKey(pi.getBusinessKey());
-			instancia.setUsuario(usuario);
+			instancia.setUsuario(usuario.getIdUsuario());
 			instancia.setVariables(Collections.unmodifiableList(variables));
 			instancia.setVolatil(VOLATIL.equals(repos.getProcessDefinition(pi.getProcessDefinitionId()).getCategory()));
 			
@@ -383,9 +380,9 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		instancia.setProcessKey(hpi.getBusinessKey());
 		
 		if (isHistoric) {
-			instancia.setUsuario((String) hs.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).variableName(CURRENT_AUTHENTICATION_USUARIO_VAR).singleResult().getValue());
+			instancia.setUsuario(((UserDetails)hs.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).variableName(CURRENT_AUTHENTICATION_USUARIO_VAR).singleResult().getValue()).getIdUsuario());
 		} else {
-			instancia.setUsuario((String) rs.getVariable(processInstanceId, CURRENT_AUTHENTICATION_USUARIO_VAR));
+			instancia.setUsuario(((UserDetails)rs.getVariable(processInstanceId, CURRENT_AUTHENTICATION_USUARIO_VAR)).getIdUsuario());
 		}
 		
 		instancia.setVolatil(VOLATIL.equals(repos.getProcessDefinition(hpi.getProcessDefinitionId()).getCategory()));
