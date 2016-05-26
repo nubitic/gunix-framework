@@ -100,14 +100,13 @@ public class Utils {
 								nestedReferences.put(key, (String) value);
 							} else {
 								String prop = isNotObject ? key.substring(isItereable ? key.indexOf("[") : key.indexOf("(")) : key.substring(varName.length() + 1);
+								Class<?> propType = pub.getPropertyType(ans, prop);
 								if (value instanceof Double) {
-									Class<?> propType = pub.getPropertyType(ans, prop);
 									if ((propType.isPrimitive() && propType.getName().equals("float")) || Float.class.isAssignableFrom(propType)) {
 										value = ((Double) value).floatValue();
 									}
 								} else {
 									if (value instanceof Long) {
-										Class<?> propType = pub.getPropertyType(ans, prop);
 										if ((propType.isPrimitive() && propType.getName().equals("boolean")) || Boolean.class.isAssignableFrom(propType)) {
 											value = ((Long) value == 1);
 										} else {
@@ -118,6 +117,15 @@ public class Utils {
 													value = new Date((Long) value);
 												}
 											}
+										}
+									}
+								}
+								if (propType != null && propType.isEnum()) {
+									Enum[] enumConstants = (Enum[]) propType.getEnumConstants();
+									for (Enum enumConstant : enumConstants) {
+										if (enumConstant.name().equals(value)) {
+											value = enumConstant;
+											break;
 										}
 									}
 								}
@@ -302,7 +310,12 @@ public class Utils {
 	}
 
 	private static void doPut(Map<String, Object> stringifiedObject, CharSequence currFieldStrBldr, Class<?> clazz, Object nestedObject) {
-		stringifiedObject.put(currFieldStrBldr.toString(), clazz.equals(Class.class) ? ((Class<?>) nestedObject).getName() : nestedObject);
+		stringifiedObject.put(currFieldStrBldr.toString(), 
+								clazz.equals(Class.class) ? 
+										((Class<?>) nestedObject).getName() : 
+											(clazz.isEnum() ? 
+													((Enum<?>) nestedObject).name() : 
+														nestedObject));
 	}
 
 	static class GunixArrayList extends ArrayList<Object> {
