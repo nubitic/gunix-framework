@@ -291,7 +291,7 @@ public final class EmbeddedPostgreSQLManager {
 			processBuilder.redirectErrorStream(true);
 			Process process = processBuilder.start();
 			
-			EmbeddedServerUtils.log(log, process, "«pg_log».");
+			EmbeddedServerUtils.log(log, process, "pg_log");
 			
 			if (process.isAlive()) {
 				while (!started(pgsqlHomeFile, usuario, contraseña)) {
