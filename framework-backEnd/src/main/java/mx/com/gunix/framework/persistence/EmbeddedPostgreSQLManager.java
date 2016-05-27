@@ -134,6 +134,7 @@ public final class EmbeddedPostgreSQLManager {
 				File prevExecutedScripts = new File(pgsqlHomeFile, "gunixPrevExecutedScripts");
 				if (!prevExecutedScripts.exists()) {
 					prevExecutedScripts.mkdirs();
+					currentAppScriptsResourcesList=appScriptsResourcesList;
 				} else {
 					File[] executedScripts = prevExecutedScripts.listFiles();
 					if (executedScripts != null) {
@@ -156,6 +157,7 @@ public final class EmbeddedPostgreSQLManager {
 				}
 				
 				for (Resource appScriptResource : currentAppScriptsResourcesList) {
+					log.info("<<<<<<<<<<<<<<<<<<< "+ appScriptResource.getFilename() +" >>>>>>>>>>>>>>>>>>>");
 					BufferedWriter writer = new BufferedWriter(new FileWriter(new File(prevExecutedScripts, appScriptResource.getFilename())));
 					EmbeddedServerUtils.ejecutaScript(appScriptResource.getInputStream(), pgsqlHomeFile, usuario, database, new Logger(appScriptResource.getFilename()) {
 						@Override
