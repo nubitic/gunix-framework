@@ -64,7 +64,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import mx.com.gunix.framework.activiti.GunixObjectVariableType;
 import mx.com.gunix.framework.activiti.ProcessInstanceCreatedEvntListener;
-import mx.com.gunix.framework.activiti.Utils;
+import mx.com.gunix.framework.activiti.GunixVariableSerializer;
 import mx.com.gunix.framework.activiti.persistence.entity.VariableInstanceMapper;
 import mx.com.gunix.framework.processes.domain.Filtro;
 import mx.com.gunix.framework.processes.domain.Instancia;
@@ -219,7 +219,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			if (ser == null) {
 				List<Map<String, Object>> vars = vim.findGunixObjectByNameAndExecutionId(instancia.getId(), varName);
 				if (vars != null && !vars.isEmpty()) {
-					ser = (Serializable) Utils.fromMap(varName, vars, getClass().getClassLoader());
+					ser = (Serializable) GunixVariableSerializer.deserialize(varName, vars, getClass().getClassLoader());
 				}
 			}
 		} else {
@@ -229,7 +229,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			} else {
 				List<Map<String, Object>> vars = vim.findHistoricGunixObjectByNameAndExecutionId(instancia.getId(), varName);
 				if (vars != null && !vars.isEmpty()) {
-					ser = (Serializable) Utils.fromMap(varName, vars, getClass().getClassLoader());
+					ser = (Serializable) GunixVariableSerializer.deserialize(varName, vars, getClass().getClassLoader());
 				}
 			}
 		}
@@ -666,7 +666,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 				.filter(filtro->(filtro.getScope()==Variable.Scope.PROCESO))
 				.forEach(filtro->{
 					Map<String, Object> fvm = new TreeMap<String, Object>();
-					fvm.putAll(Utils.toMap(filtro.getNombre(), filtro.getValor()));
+					fvm.putAll(GunixVariableSerializer.serialize(filtro.getNombre(), filtro.getValor()));
 					fvm.forEach((varName, varValue) -> {
 						switch (filtro.getlOp()) {
 						case IGUAL:
@@ -698,7 +698,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 				.filter(filtro->(filtro.getScope()==Variable.Scope.PROCESO))
 				.forEach(filtro->{
 					Map<String, Object> fvm = new TreeMap<String, Object>();
-					fvm.putAll(Utils.toMap(filtro.getNombre(), filtro.getValor()));
+					fvm.putAll(GunixVariableSerializer.serialize(filtro.getNombre(), filtro.getValor()));
 					fvm.forEach((varName, varValue) -> {
 						switch (filtro.getlOp()) {
 						case IGUAL:

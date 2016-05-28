@@ -222,4 +222,35 @@ public final class EmbeddedServerUtils {
 			throw new RuntimeException("No fue posible ejecuar el script", e);
 		}
 	}
+
+	public static boolean existeEsquema(File pgsqlHomeFile, String usuario, String database, String esquema) {
+		try {
+			List<String> cmd = new ArrayList<String>();
+			cmd.add(getCommandPath(new File(pgsqlHomeFile, "bin"), "psql"));
+			cmd.add("-c");
+			cmd.add("select count(*) as existe from information_schema.schemata where schema_name='"+esquema+"';");
+			cmd.add("-U");
+			cmd.add(usuario);
+			cmd.add("-d");
+			cmd.add(database);
+
+			ProcessBuilder processBuilder = new ProcessBuilder(cmd);
+			processBuilder.redirectErrorStream(true);
+			final Process process = processBuilder.start();
+			process.waitFor();
+
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String readedLine = null;
+			while ((readedLine = reader.readLine()) != null) {
+				// Si la línea actual es la columna existe, leo dos posiciones más para determinar si el esquema existe o no
+				if (readedLine.contains("existe") && (readedLine = reader.readLine()) != null && "1".equals(readedLine = reader.readLine().trim())) {
+					reader.close();
+					return true;
+				}
+			}
+			return false;
+		} catch (IOException | InterruptedException e) {
+			throw new RuntimeException("No fue posible verificar si la base de datos ya se está ejecutando", e);
+		}
+	}
 }

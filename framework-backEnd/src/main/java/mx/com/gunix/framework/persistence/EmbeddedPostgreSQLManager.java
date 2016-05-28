@@ -1,11 +1,9 @@
 package mx.com.gunix.framework.persistence;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -105,7 +103,7 @@ public final class EmbeddedPostgreSQLManager {
 			crearBD(pgsqlHomeFile, usuario, passwordFile.getAbsolutePath(), database);
 		}
 
-		if (!bdInicializada(pgsqlHomeFile, usuario, passwordFile.getAbsolutePath(), database)) {
+		if (!EmbeddedServerUtils.existeEsquema(pgsqlHomeFile, usuario, database,"seguridad")) {
 			log.info("Creando Tablas, Secuencias...");
 			initDB(pgsqlHomeFile, usuario, database, classLoader);
 		}
@@ -184,37 +182,6 @@ public final class EmbeddedPostgreSQLManager {
 		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/01_SEGURIDAD_ACL_ROL_FUNCION.sql"), pgsqlHomeFile, usuario, database, log);
 		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/02_ACTIVITI.sql"), pgsqlHomeFile, usuario, database, log);
 		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/03_ADMON_SEG.sql"), pgsqlHomeFile, usuario, database, log);
-	}
-
-	private static boolean bdInicializada(File pgsqlHomeFile, String usuario, String absolutePath, String database) {
-		try {
-			List<String> cmd = new ArrayList<String>();
-			cmd.add(getCommandPath(pgsqlHomeFile, "psql"));
-			cmd.add("-c");
-			cmd.add("select count(*) as existe_seguridad from information_schema.schemata where schema_name='seguridad';");
-			cmd.add("-U");
-			cmd.add(usuario);
-			cmd.add("-d");
-			cmd.add(database);
-
-			ProcessBuilder processBuilder = new ProcessBuilder(cmd);
-			processBuilder.redirectErrorStream(true);
-			final Process process = processBuilder.start();
-			process.waitFor();
-
-			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			String readedLine = null;
-			while ((readedLine = reader.readLine()) != null) {
-				// Si la línea actual es la columna existe_seguridad, leo dos posiciones más para determinar si el esquema existe o no
-				if (readedLine.contains("existe_seguridad") && (readedLine = reader.readLine()) != null && "1".equals(readedLine = reader.readLine().trim())) {
-					reader.close();
-					return true;
-				}
-			}
-			return false;
-		} catch (IOException | InterruptedException e) {
-			throw new RuntimeException("No fue posible verificar si la base de datos ya se está ejecutando", e);
-		}
 	}
 
 	private static void initServer(File pgsqlHomeFile, String usuario, String password, String database, String dataDir, String esMXLocale) {

@@ -22,19 +22,20 @@ import org.springframework.beans.BeanUtils;
 import mx.com.gunix.framework.activiti.persistence.entity.VariableInstanceMapper;
 import mx.com.gunix.framework.service.hessian.GunixFileInputStream;
 
-public class Utils {
+public class GunixVariableSerializer {
 	private static final String NESTED_REFERENCE = "\"#\"";
 
 	private static final String EMPTY_COLLECTION_NESTED_REFERENCE = NESTED_REFERENCE + Iterable.class + "|1";
 	private static final String EMPTY_MAP_NESTED_REFERENCE = NESTED_REFERENCE + Map.class + "|0";
-	
+	private static Pattern iterablePattern = Pattern.compile("\\[\\d+\\]");
+	private static Pattern mapPattern = Pattern.compile("\\(.+\\)");
 	private static Boolean isGroovyPresent;
 	private static Class<?> groovyMetaClass;
 	
-	private static Logger log = Logger.getLogger(Utils.class);
+	private static Logger log = Logger.getLogger(GunixVariableSerializer.class);
 	
 	@SuppressWarnings({ "rawtypes" })
-	public static Object fromMap(String varName, List<Map<String, Object>> vars, ClassLoader classLoader) {
+	public static Object deserialize(String varName, List<Map<String, Object>> vars, ClassLoader classLoader) {
 		TreeMap<String, Object> stringifiedObject = new TreeMap<String, Object>();
 		vars.stream().forEach(map -> {
 			stringifiedObject.put((String) map.get("key"), getValue(map));
@@ -44,8 +45,7 @@ public class Utils {
 			try {
 				PropertyUtilsBean pub = new PropertyUtilsBean();
 				Map<String, Object> iterableMapTypes = new TreeMap<String, Object>();
-				Pattern iterablePattern = Pattern.compile("\\[\\d+\\]");
-				Pattern mapPattern = Pattern.compile("\\(.+\\)");
+
 				final boolean isNotObject;
 				final boolean isItereable;
 				String varClass = new StringBuilder(varName).append(".class").toString();
@@ -167,7 +167,8 @@ public class Utils {
 					}
 					controlCount++;
 					if (!nestedReferences.isEmpty() && (controlCount > tope50Ciclos)) {
-						throw new IllegalStateException("No fue posible resolver todas las dependencias anidadas dentro de 50 ciclos");
+						log.warn("No fue posible resolver las siguientes dependencias anidadas dentro de 50 ciclos: " + nestedReferences);
+						nestedReferences.clear();
 					}
 				} while (!nestedReferences.isEmpty());
 
@@ -180,7 +181,7 @@ public class Utils {
 		return ans;
 	}
 	
-	private static Object getValue(Map<String, Object> map) {
+	public static Object getValue(Map<String, Object> map) {
 		Object ans = null;
 		ans = map.get(VariableInstanceMapper.LONG_KEY);
 		if (ans == null) {
@@ -238,7 +239,7 @@ public class Utils {
 		}
 	}
 
-	public static Map<String, Object> toMap(String varName, Object object) {
+	public static Map<String, Object> serialize(String varName, Object object) {
 		Map<String, Object> stringifiedObject = new TreeMap<String, Object>();
 		List<String> processedObjectsHashes = new ArrayList<String>();
 		doAppend(object, stringifiedObject, varName, processedObjectsHashes);

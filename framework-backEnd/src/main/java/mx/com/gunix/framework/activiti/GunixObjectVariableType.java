@@ -11,6 +11,7 @@ import java.util.Stack;
 import java.util.TreeMap;
 
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.delegate.VariableScope;
 import org.activiti.engine.impl.cmd.NeedsActiveExecutionCmd;
 import org.activiti.engine.impl.cmd.StartProcessInstanceCmd;
 import org.activiti.engine.impl.context.Context;
@@ -21,6 +22,7 @@ import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti.engine.impl.variable.NullType;
 import org.activiti.engine.impl.variable.ValueFields;
 import org.activiti.engine.impl.variable.VariableType;
+import org.activiti.engine.impl.variable.VariableTypes;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.springframework.beans.BeanUtils;
@@ -150,7 +152,7 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 
 		if (value != null) {
 			Map<String, Object> variablesMap = new TreeMap<String, Object>();
-			variablesMap.putAll(Utils.toMap(vie.getName(), value));
+			variablesMap.putAll(GunixVariableSerializer.serialize(vie.getName(), value));
 
 			vie.setTextValue(value.getClass().getName());
 
@@ -178,7 +180,7 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 			}
 		}
 
-		return vars == null || vars.isEmpty() ? super.getValue(vie) : Utils.fromMap(vie.getName(), vars, getClass().getClassLoader());
+		return vars == null || vars.isEmpty() ? super.getValue(vie) : GunixVariableSerializer.deserialize(vie.getName(), vars, getClass().getClassLoader());
 	}
 
 	public void deleteValue(String name, String executionId, String taskId) {
@@ -189,8 +191,31 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 		} else {
 			vars = vim.findGunixObjectByNameAndTaskId(taskId, name);
 		}
+		
+		/*ExecutionEntity ee = null;
+		Boolean isExecutionActive = Context.isExecutionContextActive() && (ee = Context.getExecutionContext().getExecution()) instanceof VariableScope;
+		VariableScope vs = isExecutionActive ? (VariableScope) ee : null;
+		VariableTypes vTypes = isExecutionActive?Context.getProcessEngineConfiguration().getVariableTypes():null;*/
 		vars.stream().forEach(map -> {
-			vim.delete((String) map.get("id_"), (int) map.get("rev_"));
+			/*if (isExecutionActive) {
+				Object value = GunixVariableSerializer.getValue(map);
+				VariableInstanceEntity variableInstance = VariableInstanceEntity.create((String) map.get("key"), vTypes.findVariableType(value), value);
+				variableInstance.setId((String) map.get("id_"));
+				variableInstance.setExecutionId(((ExecutionEntity)vs).getId());
+				variableInstance.setRevision((int) map.get("rev_"));
+				variableInstance.delete();
+				variableInstance.setValue(null);
+
+			    // Record historic variable deletion
+			    Context.getCommandContext().getHistoryManager()
+			    	.recordVariableRemoved(variableInstance);
+
+			    // Record historic detail
+			    Context.getCommandContext().getHistoryManager()
+			      .recordHistoricDetailVariableCreate(variableInstance, (ExecutionEntity) vs,  true);
+			} else {*/
+				vim.delete((String) map.get("id_"), (int) map.get("rev_"));
+			//}
 		});
 	}
 }

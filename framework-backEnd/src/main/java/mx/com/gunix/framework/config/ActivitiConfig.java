@@ -38,6 +38,7 @@ import org.activiti.engine.impl.javax.el.BeanELResolver;
 import org.activiti.engine.impl.javax.el.CompositeELResolver;
 import org.activiti.engine.impl.javax.el.DynamicBeanPropertyELResolver;
 import org.activiti.engine.impl.javax.el.ELContext;
+import org.activiti.engine.impl.javax.el.ELException;
 import org.activiti.engine.impl.javax.el.ELResolver;
 import org.activiti.engine.impl.javax.el.ListELResolver;
 import org.activiti.engine.impl.javax.el.MapELResolver;
@@ -305,7 +306,7 @@ public class ActivitiConfig {
 												context.setPropertyResolved(true);
 												return result;
 											} catch (Throwable e) {
-												throw new MethodNotFoundException("Cannot find method " + method + " with " + params.length + " parameters in " + base.getClass(), e);
+												throw new ELException("Error al invocar el método '" + method + "' con " + params.length + " parámetro(s) en " + base.getClass(), e);
 											}
 										} else {
 											throw mnfe;
