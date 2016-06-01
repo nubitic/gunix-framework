@@ -1,18 +1,26 @@
 package mx.com.gunix.framework.activiti;
 
-import org.activiti.engine.impl.variable.DoubleType;
 import org.activiti.engine.impl.variable.ValueFields;
+import org.activiti.engine.impl.variable.VariableType;
 
-public class FloatType extends DoubleType {
+public class FloatType implements VariableType {
+	public String getTypeName() {
+		return "float";
+	}
+
+	public boolean isCachable() {
+		return true;
+	}
 
 	@Override
 	public Object getValue(ValueFields valueFields) {
-		return ((Double) super.getValue(valueFields)).floatValue();
+		Double d = valueFields.getDoubleValue();
+		return d != null ? d.floatValue() : null;
 	}
 
 	@Override
 	public void setValue(Object value, ValueFields valueFields) {
-		super.setValue(((Float) value).doubleValue(), valueFields);
+		valueFields.setDoubleValue(value != null ? ((Float) value).doubleValue() : null);
 	}
 
 	@Override

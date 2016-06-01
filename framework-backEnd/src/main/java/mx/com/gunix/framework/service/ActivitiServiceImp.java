@@ -62,9 +62,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import mx.com.gunix.framework.activiti.GunixObjectVariableType;
-import mx.com.gunix.framework.activiti.ProcessInstanceCreatedEvntListener;
 import mx.com.gunix.framework.activiti.GunixVariableSerializer;
+import mx.com.gunix.framework.activiti.persistence.entity.GunixObjectVariableType;
 import mx.com.gunix.framework.activiti.persistence.entity.VariableInstanceMapper;
 import mx.com.gunix.framework.processes.domain.Filtro;
 import mx.com.gunix.framework.processes.domain.Instancia;
@@ -114,6 +113,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 	@Override
 	public Instancia completaTarea(Tarea tarea) {
 		try {
+			GunixObjectVariableType.setCurrentInstancia(tarea.getInstancia());
 			String taskId = tarea.getId();
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			String usuario = ((Usuario) auth.getPrincipal()).getIdUsuario();
@@ -143,6 +143,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			return tarea.getInstancia();
 		} finally {
 			is.setAuthenticatedUserId(null);
+			GunixObjectVariableType.removeCurrentInstancia();
 		}
 	}
 
@@ -201,9 +202,9 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			} else {
 				instancia.setTareaActual(Tarea.DEFAULT_END_TASK);
 			}
-			ProcessInstanceCreatedEvntListener.consumeLastCreated();
 		} finally {
 			is.setAuthenticatedUserId(null);
+			GunixObjectVariableType.removeCurrentInstancia();
 		}
 		return instancia;
 	}
@@ -216,7 +217,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		Serializable ser = null;
 		if (((instancia.isVolatil() && !instancia.getTareaActual().isTerminal()) || !instancia.isVolatil()) && instancia.getTermino() == null) {
 			ser = rs.getVariable(instancia.getId(), varName, Serializable.class);
-			if (ser == null) {
+			if (!instancia.isVolatil() && ser == null) {
 				List<Map<String, Object>> vars = vim.findGunixObjectByNameAndExecutionId(instancia.getId(), varName);
 				if (vars != null && !vars.isEmpty()) {
 					ser = (Serializable) GunixVariableSerializer.deserialize(varName, vars, getClass().getClassLoader());
@@ -227,9 +228,11 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			if (hvis != null && !hvis.isEmpty()) {
 				ser = (Serializable) hvis.get(0).getValue();
 			} else {
-				List<Map<String, Object>> vars = vim.findHistoricGunixObjectByNameAndExecutionId(instancia.getId(), varName);
-				if (vars != null && !vars.isEmpty()) {
-					ser = (Serializable) GunixVariableSerializer.deserialize(varName, vars, getClass().getClassLoader());
+				if (!instancia.isVolatil()) {
+					List<Map<String, Object>> vars = vim.findHistoricGunixObjectByNameAndExecutionId(instancia.getId(), varName);
+					if (vars != null && !vars.isEmpty()) {
+						ser = (Serializable) GunixVariableSerializer.deserialize(varName, vars, getClass().getClassLoader());
+					}
 				}
 			}
 		}
@@ -725,12 +728,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 
 	@Override
 	public void setVar(Instancia instancia, String varName, Serializable varValue) {
-		GunixObjectVariableType.setCurrentVar(instancia.getId(), varValue);
-		try {
-			rs.setVariable(instancia.getId(), varName, varValue);
-		} finally {
-			GunixObjectVariableType.removeCurrentVar();
-		}
+		rs.setVariable(instancia.getId(), varName, varValue);
 	}
 
 	@Override

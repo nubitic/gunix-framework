@@ -85,29 +85,35 @@ CREATE INDEX acl_fullreadaccess_sid_FK6IDX ON acl_fullreadaccess_sid USING BTREE
 CREATE INDEX acl_fullreadaccess_sid_FK7IDX ON acl_fullreadaccess_sid USING BTREE (object_id_class);
 
 CREATE OR REPLACE FUNCTION MANAGE_FULLACCESSREAD_SIDS_ACES() RETURNS TRIGGER AS $body$
-    BEGIN
-	insert into seguridad.acl_entry(ace_order,acl_object_identity,audit_failure,audit_success,granting,mask,sid)
-	select 
-		coalesce(max(ace.ace_order)+1,0)  as ace_order,
-		oi.id as acl_object_identity,
-		false audit_failure,
-		false audit_success,
-		true granting,
-		1 as mask,
-		afras.sid 
-	from
-	seguridad.acl_object_identity oi inner join
-	seguridad.acl_fullreadaccess_sid afras on(oi.object_id_class = afras.object_id_class) left join
-	seguridad.acl_entry ace on(oi.id=ace.acl_object_identity) 
-	where 
-	not exists (select 1 as existe from seguridad.acl_entry iace where iace.acl_object_identity = ace.acl_object_identity and iace.sid = afras.sid )
-	and afras.object_id_class = (select object_id_class from seguridad.acl_object_identity where id = NEW.id)
-	group by 
-	afras.sid,
-	oi.id;
-        RETURN NEW;
-    END;
+DECLARE
+ currSid bigint;
+ BEGIN
+	 FOR currSid IN select sid from seguridad.acl_fullreadaccess_sid where object_id_class = NEW.object_id_class LOOP
+		 insert into seguridad.acl_entry(ace_order,acl_object_identity,audit_failure,audit_success,granting,mask,sid)
+		 select
+		  coalesce(max(ace.ace_order)+1,0) as ace_order,
+		  oi.id as acl_object_identity,
+		  false audit_failure,
+		  false audit_success,
+		  true granting,
+		  1 as mask,
+		  afras.sid
+		 from
+		 seguridad.acl_object_identity oi inner join
+		 seguridad.acl_fullreadaccess_sid afras on(oi.object_id_class = afras.object_id_class) left join
+		 seguridad.acl_entry ace on(oi.id=ace.acl_object_identity)
+		 where
+		 not exists (select 1 as existe from seguridad.acl_entry iace where iace.acl_object_identity = ace.acl_object_identity and iace.sid = afras.sid )
+		 and afras.object_id_class = NEW.object_id_class
+		 and afras.sid=currSid
+		 group by
+		 afras.sid,
+		 oi.id;
+	end loop;
+    RETURN NEW;
+ END;
 $body$ LANGUAGE plpgsql;
+
 
 CREATE TRIGGER ACL_UPDATE_FULLACCESREAD_SIDS_ENTRIES_TRGR AFTER INSERT ON acl_object_identity FOR EACH ROW EXECUTE PROCEDURE MANAGE_FULLACCESSREAD_SIDS_ACES();
 

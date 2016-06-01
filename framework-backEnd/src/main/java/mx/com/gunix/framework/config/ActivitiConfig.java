@@ -32,7 +32,6 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.el.ReadOnlyMapELResolver;
 import org.activiti.engine.impl.el.VariableScopeElResolver;
-import org.activiti.engine.impl.interceptor.SessionFactory;
 import org.activiti.engine.impl.javax.el.ArrayELResolver;
 import org.activiti.engine.impl.javax.el.BeanELResolver;
 import org.activiti.engine.impl.javax.el.CompositeELResolver;
@@ -77,9 +76,8 @@ import org.springframework.util.ReflectionUtils;
 
 import mx.com.gunix.framework.activiti.ExecuteAsyncSecuredRunnable;
 import mx.com.gunix.framework.activiti.FloatType;
-import mx.com.gunix.framework.activiti.GunixObjectVariableType;
 import mx.com.gunix.framework.activiti.ProcessInstanceCreatedEvntListener;
-import mx.com.gunix.framework.activiti.persistence.entity.VariableInstanceEntityManager;
+import mx.com.gunix.framework.activiti.persistence.entity.GunixObjectVariableType;
 import mx.com.gunix.framework.processes.domain.ProgressUpdate;
 import mx.com.gunix.framework.service.ActivitiService;
 
@@ -165,12 +163,6 @@ public class ActivitiConfig {
 
 		speConf.setDeploymentResources(resources);
 
-		VariableInstanceEntityManager vim = variableInstanceEntityManager();
-
-		List<SessionFactory> vimList = new ArrayList<SessionFactory>();
-		vimList.add(vim);
-		speConf.setCustomSessionFactories(vimList);
-
 		List<VariableType> varTypes = new ArrayList<VariableType>();
 		varTypes.add(gunixObjectVariableType());
 		varTypes.add(new FloatType());
@@ -183,19 +175,21 @@ public class ActivitiConfig {
 		openLEvntListners.add(new OpenLResourcesHandleListener());
 		eventListeners.put(ActivitiEventType.ENTITY_UPDATED + "," + ActivitiEventType.ENTITY_DELETED, openLEvntListners);
 		
-		List<ActivitiEventListener> identityLinkDeleteTaskEvntListners = new ArrayList<ActivitiEventListener>();
-		identityLinkDeleteTaskEvntListners.add(new ActivitiEventListener() {
+		List<ActivitiEventListener> taskAndVariableDeleteEvntListners = new ArrayList<ActivitiEventListener>();
+		taskAndVariableDeleteEvntListners.add(new ActivitiEventListener() {
 
 			@Override
 			public void onEvent(ActivitiEvent event) {
 				Object entity = ((ActivitiEntityEvent) event).getEntity();
-				if (entity instanceof TaskEntity && event.getType() == ActivitiEventType.ENTITY_DELETED) {
-					TaskEntity te = (TaskEntity) entity;
-					if (te.getIdentityLinks() != null && !te.getIdentityLinks().isEmpty()) {
-						DbSqlSession dbSqlSession = Context.getCommandContext().getSession(DbSqlSession.class);
-						te.getIdentityLinks().forEach(idLk -> {
-							dbSqlSession.delete(idLk);
-						});
+				if (event.getType() == ActivitiEventType.ENTITY_DELETED) {
+					if (entity instanceof TaskEntity) {
+						TaskEntity te = (TaskEntity) entity;
+						if (te.getIdentityLinks() != null && !te.getIdentityLinks().isEmpty()) {
+							DbSqlSession dbSqlSession = Context.getCommandContext().getSession(DbSqlSession.class);
+							te.getIdentityLinks().forEach(idLk -> {
+								dbSqlSession.delete(idLk);
+							});
+						}
 					}
 				}
 			}
@@ -206,7 +200,7 @@ public class ActivitiConfig {
 			}
 
 		});
-		eventListeners.put(ActivitiEventType.ENTITY_DELETED.toString(),identityLinkDeleteTaskEvntListners);
+		eventListeners.put(ActivitiEventType.ENTITY_DELETED.toString(),taskAndVariableDeleteEvntListners);
 
 		List<ActivitiEventListener> jobFailureEvntListners = new ArrayList<ActivitiEventListener>();
 		jobFailureEvntListners.add(jobExecutionFailureEvntListener());
@@ -300,13 +294,22 @@ public class ActivitiConfig {
 													}
 												}
 											}
-
-											try {
-												Object result = Proxy.getInvocationHandler(base).invoke(base, m, params);
-												context.setPropertyResolved(true);
-												return result;
-											} catch (Throwable e) {
-												throw new ELException("Error al invocar el método '" + method + "' con " + params.length + " parámetro(s) en " + base.getClass(), e);
+											
+											if (m != null) {
+												try {
+													Object result = null;
+													if (Proxy.isProxyClass(base.getClass())) {
+														result = Proxy.getInvocationHandler(base).invoke(base, m, params);
+													} else {
+														result = ReflectionUtils.invokeMethod(m, base, params);
+													}
+													context.setPropertyResolved(true);
+													return result;
+												} catch (Throwable e) {
+													throw new ELException("Error al invocar el método '" + method + "' con " + params.length + " parámetro(s) en la clase " + base.getClass(), e);
+												}
+											}else{
+												throw mnfe;
 											}
 										} else {
 											throw mnfe;
@@ -323,11 +326,6 @@ public class ActivitiConfig {
 		};
 		pefbean.setProcessEngineConfiguration(speConf);
 		return pefbean;
-	}
-
-	@Bean
-	public VariableInstanceEntityManager variableInstanceEntityManager() {
-		return new VariableInstanceEntityManager();
 	}
 
 	@Bean
@@ -376,6 +374,10 @@ public class ActivitiConfig {
 		@Autowired
 		@Lazy
 		RuntimeService rs;
+		
+		@Autowired
+		@Lazy
+		RepositoryService repos;
 
 		public SpringAsyncSecuredExecutor(TaskExecutor taskExecutor) {
 			super(taskExecutor, null);
@@ -385,7 +387,7 @@ public class ActivitiConfig {
 		@Override
 		public boolean executeAsyncJob(JobEntity job) {
 			try {
-				taskExecutor.execute(new ExecuteAsyncSecuredRunnable(job, commandExecutor, rs));
+				taskExecutor.execute(new ExecuteAsyncSecuredRunnable(job, commandExecutor, rs, repos));
 			} catch (RejectedExecutionException e) {
 				rejectedJobsHandler.jobRejected(this, job);
 				return false;
@@ -397,7 +399,7 @@ public class ActivitiConfig {
 		public void jobRejected(AsyncExecutor asyncExecutor, JobEntity job) {
 			try {
 				// execute rejected work in caller thread (potentially blocking job acquisition)
-				new ExecuteAsyncSecuredRunnable(job, asyncExecutor.getCommandExecutor(), rs).run();
+				new ExecuteAsyncSecuredRunnable(job, asyncExecutor.getCommandExecutor(), rs, repos).run();
 			} catch (Exception e) {
 				log.error("Failed to execute rejected job " + job.getId(), e);
 			}

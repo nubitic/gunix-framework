@@ -6,7 +6,11 @@ import java.util.List;
 
 public class Instancia implements Serializable {
 	private static final long serialVersionUID = 1L;
-
+	
+	public Instancia(){
+		
+	}
+	
 	private String processKey;
 	private String id;
 	private List<Variable<?>> variables;
