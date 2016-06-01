@@ -63,10 +63,6 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 	public static void removeCurrentInstancia() {
 		currentInstancia.get().pop();
 	}
-	
-	static Instancia getCurrentInstancia(){
-		return currentInstancia.get().peek();
-	}
 
 	@Override
 	public String getTypeName() {
