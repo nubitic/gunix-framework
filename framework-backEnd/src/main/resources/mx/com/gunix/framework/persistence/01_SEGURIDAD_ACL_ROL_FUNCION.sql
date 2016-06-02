@@ -310,374 +310,230 @@ alter table ACL_CLASS add CONSTRAINT "acl_class_aplicacion_fk" FOREIGN KEY (id_a
 
         INSERT INTO USUARIO_ROL VALUES('anonymous','ADMIN_APP','PUBLIC');
 
-create or replace function MENU_USUARIO(id_usuario text)
-  returns table (
-	ID_USUARIO text,
-	PASSWORD text,
-	ELIMINADO text,
-	BLOQUEADO text,
-	ACTIVO text,
-	ID_APLICACION text,
-	DESCRIPCION_APLICACION text,
-        ICONO_APLICACION text,
-                ID_ROL text,
-                DESCRIPCION_ROL TEXT,
-                HABILITADO_ROL BOOLEAN,
-                        ID_MODULO text,
-                        DESCRIPCION_MODULO text,
-                        ICONO_MODULO text,
-                                ID_FUNCION text,
-                                TITULO text,
-                                DESCRIPCION_FUNCION text,
-                                PROCESS_KEY text,
-                                ORDEN NUMERIC,
-                                HORARIO TEXT,
-                                VENGINE TEXT,
-                                ID_PARAM text,
-                                VALOR text,
-                                ID_FUNCION_PADRE text,
-                                        TITULO_PADRE text,
-                                        DESCRIPCION_PADRE text,
-                                        PROCESS_KEY_PADRE text,
-                                        ORDEN_PADRE NUMERIC,
-                                        ID_PARAM_PADRE text,
-                                        VALOR_PADRE text)
-as
-$body$
-WITH RECURSIVE
-h as(
-	select
-		U.ID_USUARIO,
-		U.PASSWORD,
-		case
-			when U.ESTATUS='ELIMINADO' then 'true'
-			WHEN U.ID_USUARIO IS NULL THEN NULL
-			else 'false' 
-		end as ELIMINADO,
-		case
-			when U.ESTATUS='BLOQUEADO' then 'true'
-			WHEN U.ID_USUARIO IS NULL THEN NULL
-			else 'false' 
-		end as BLOQUEADO,
-		case
-			when U.ESTATUS='ACTIVO' then 'true'
-			WHEN U.ID_USUARIO IS NULL THEN NULL
-			else 'false' 
-		end as ACTIVO,
-                APP.ID_APLICACION,
-                APP.DESCRIPCION AS DESCRIPCION_APLICACION,
-                APP.ICONO AS ICONO_APLICACION,
-		UR.ID_ROL,
-		RL.DESCRIPCION AS DESCRIPCION_ROL,
-		RL.HABILITADO AS HABILITADO_ROL,
-		M.ID_MODULO,
-		M.DESCRIPCION AS DESCRIPCION_MODULO,
-		M.ICONO AS ICONO_MODULO,
-		F.ID_FUNCION,
-		F.TITULO,
-		F.DESCRIPCION AS DESCRIPCION_FUNCION,
-		F.PROCESS_KEY,
-		F.ORDEN,
-		F.HORARIO::text AS HORARIO,
-		F.VENGINE::text AS VENGINE,
-		case 
-			when RF.NIV_ACC='COMPLETO' then 'true'
-			when RF.NIV_ACC IS NULL then NULL
-			else 'false' 
-		end as ACCESO_COMPLETO,
-		F.ID_FUNCION_PADRE,
-		PF.ID_PARAM,
-		PF.VALOR
-	from
-		SEGURIDAD.FUNCION F  LEFT JOIN
-		SEGURIDAD.MODULO M ON (M.ID_APLICACION=F.ID_APLICACION AND M.ID_MODULO=F.ID_MODULO) LEFT JOIN 
-		SEGURIDAD.PARAM_FUNCION PF ON (PF.ID_APLICACION=F.ID_APLICACION AND PF.ID_MODULO=F.ID_MODULO AND PF.ID_FUNCION=F.ID_FUNCION) LEFT JOIN
-		SEGURIDAD.APLICACION APP ON (APP.ID_APLICACION=F.ID_APLICACION) LEFT JOIN
-		SEGURIDAD.ROL_FUNCION RF ON (F.ID_APLICACION=RF.ID_APLICACION AND F.ID_MODULO = RF.ID_MODULO AND F.ID_FUNCION=RF.ID_FUNCION) LEFT JOIN
-		SEGURIDAD.ROL RL ON (RL.ID_APLICACION = RF.ID_APLICACION AND RL.ID_ROL = RF.ID_ROL) LEFT JOIN
-		SEGURIDAD.USUARIO_ROL UR ON (UR.ID_APLICACION=RF.ID_APLICACION AND UR.ID_ROL = RF.ID_ROL) LEFT JOIN
-		SEGURIDAD.USUARIO U ON (U.ID_USUARIO=UR.ID_USUARIO and U.ID_USUARIO= $1)
-), 
-q AS(
-	SELECT
-		H.*,
-		1 AS level, 
-		ARRAY[ID_APLICACION||'-'||ID_MODULO||'-'||ID_FUNCION||'-'||orden] AS breadcrumb 
-	FROM
-		H
-	where
-		ID_FUNCION_PADRE is null        
-	UNION ALL
-	SELECT
-		case
-			WHEN hi.ID_USUARIO IS NULL THEN q.id_usuario
-			else hi.ID_USUARIO 
-		end as ID_USUARIO,
-		case
-			WHEN hi.PASSWORD IS NULL THEN q.PASSWORD
-			else hi.PASSWORD 
-		end as PASSWORD,
-		case
-			WHEN hi.ELIMINADO IS NULL THEN q.ELIMINADO
-			else hi.ELIMINADO 
-		end as ELIMINADO,
-		case
-			WHEN hi.BLOQUEADO IS NULL THEN q.BLOQUEADO
-			else hi.BLOQUEADO 
-		end as BLOQUEADO,
-		case
-			WHEN hi.ACTIVO IS NULL THEN q.ACTIVO
-			else hi.ACTIVO 
-		end as ACTIVO,
-		case
-			WHEN hi.ID_APLICACION IS NULL THEN q.ID_APLICACION
-			else hi.ID_APLICACION 
-		end as ID_APLICACION,
-                hi.DESCRIPCION_APLICACION,
-                hi.ICONO_APLICACION,
-		q.ID_ROL as id_rol,
-		case
-			WHEN hi.DESCRIPCION_ROL IS NULL THEN q.DESCRIPCION_ROL
-			else hi.DESCRIPCION_ROL 
-		end as DESCRIPCION_ROL,
-		case
-			WHEN hi.HABILITADO_ROL IS NULL THEN q.HABILITADO_ROL
-			else hi.HABILITADO_ROL 
-		end as HABILITADO_ROL,
-		hi.ID_MODULO,
-		hi.DESCRIPCION_MODULO,
-		hi.ICONO_MODULO,
-		hi.ID_FUNCION,
-		hi.TITULO,
-		hi.DESCRIPCION_FUNCION,
-		hi.PROCESS_KEY,
-		hi.ORDEN,
-		hi.HORARIO,
-		hi.VENGINE,
-		case
-			WHEN q.ACCESO_COMPLETO='true' THEN q.ACCESO_COMPLETO
-			else hi.ACCESO_COMPLETO 
-		end as ACCESO_COMPLETO,
-		hi.ID_FUNCION_PADRE,
-		hi.ID_PARAM,
-		hi.VALOR,
-		q.level + 1 AS level,
-		Q.breadcrumb || (q.ID_APLICACION||'-'||q.ID_MODULO||'-'||q.ID_FUNCION||'-'||q.orden)
-	FROM
-		q
-	JOIN
-		h hi ON (hi.ID_APLICACION = q.ID_APLICACION AND hi.ID_MODULO = q.id_MODULO AND hi.ID_FUNCION_PADRE = q.id_FUNCION )
-),
-R AS (
-SELECT
-	q.ID_USUARIO,
-	q.PASSWORD,
-	q.ELIMINADO,
-	q.BLOQUEADO,
-	q.ACTIVO,
-	q.ID_APLICACION,
-        q.DESCRIPCION_APLICACION,
-        q.ICONO_APLICACION,
-	q.ID_ROL,
-	q.DESCRIPCION_ROL,
-	q.HABILITADO_ROL,
-	q.ID_MODULO,
-	q.DESCRIPCION_MODULO,
-	q.ICONO_MODULO,
-	q.ID_FUNCION,
-	q.TITULO,
-	q.DESCRIPCION_FUNCION,
-	q.PROCESS_KEY,
-	q.ORDEN,
-	q.HORARIO,
-	q.VENGINE,
-	q.ACCESO_COMPLETO,
-	q.ID_FUNCION_PADRE,
-	q.ID_PARAM,
-	q.VALOR
-FROM
-	q
-),
-Q2 AS (
-SELECT
-		R.*,
-		1 AS level, 
-		ARRAY[ID_APLICACION||'-'||ID_MODULO||'-'||ID_FUNCION||'-'||orden] AS breadcrumb
-	FROM
-		R
-	where
-		ACCESO_COMPLETO ='false'       
-	UNION ALL
-	SELECT
-		case
-			WHEN hi.ID_USUARIO IS NULL THEN q2.id_usuario
-			else hi.ID_USUARIO 
-		end as ID_USUARIO,
-		case
-			WHEN hi.PASSWORD IS NULL THEN q2.PASSWORD
-			else hi.PASSWORD 
-		end as PASSWORD,
-		case
-			WHEN hi.ELIMINADO IS NULL THEN q2.ELIMINADO
-			else hi.ELIMINADO 
-		end as ELIMINADO,
-		case
-			WHEN hi.BLOQUEADO IS NULL THEN q2.BLOQUEADO
-			else hi.BLOQUEADO 
-		end as BLOQUEADO,
-		case
-			WHEN hi.ACTIVO IS NULL THEN q2.ACTIVO
-			else hi.ACTIVO 
-		end as ACTIVO,
-		case
-			WHEN hi.ID_APLICACION IS NULL THEN q2.ID_APLICACION
-			else hi.ID_APLICACION 
-		end as ID_APLICACION,
-                hi.DESCRIPCION_APLICACION,
-                hi.ICONO_APLICACION,
-		case
-			WHEN hi.ID_ROL IS NULL THEN q2.ID_ROL
-			else hi.ID_ROL 
-		end as ID_ROL,
-          case
-			WHEN hi.DESCRIPCION_ROL IS NULL THEN q2.DESCRIPCION_ROL
-			else hi.DESCRIPCION_ROL 
-		end as DESCRIPCION_ROL,
-          case
-			WHEN hi.HABILITADO_ROL IS NULL THEN q2.HABILITADO_ROL
-			else hi.HABILITADO_ROL 
-		end as DESCRIPCION_ROL,
-		hi.ID_MODULO,
-		hi.DESCRIPCION_MODULO,
-		hi.ICONO_MODULO,
-		hi.ID_FUNCION,
-		hi.TITULO,
-		hi.DESCRIPCION_FUNCION,
-		hi.PROCESS_KEY,
-		hi.ORDEN,
-		hi.HORARIO,
-		hi.VENGINE,
-		case
-			WHEN hi.ACCESO_COMPLETO IS NULL THEN q2.ACCESO_COMPLETO
-			else hi.ACCESO_COMPLETO 
-		end as ACCESO_COMPLETO,
-		hi.ID_FUNCION_PADRE,
-		hi.ID_PARAM,
-		hi.VALOR,
-		q2.level + 1 AS level,
-		Q2.breadcrumb || (q2.ID_APLICACION||'-'||q2.ID_MODULO||'-'||q2.ID_FUNCION||'-'||q2.orden)
-	FROM
-		q2
-	JOIN
-		R hi ON (hi.ID_APLICACION = q2.ID_APLICACION AND hi.ID_MODULO = q2.id_MODULO AND hi.ID_FUNCION = q2.id_FUNCION_PADRE )
-), MENU_USUARIO AS (
-SELECT 
-	q2.ID_USUARIO,
-	q2.PASSWORD,
-	q2.ELIMINADO,
-	q2.BLOQUEADO,
-	q2.ACTIVO,
-	q2.ID_APLICACION,
-        q2.DESCRIPCION_APLICACION,
-        q2.ICONO_APLICACION,
-	q2.ID_ROL,
-	q2.DESCRIPCION_ROL,
-	q2.HABILITADO_ROL,
-	q2.ID_MODULO,
-	q2.DESCRIPCION_MODULO,
-	q2.ICONO_MODULO,
-	q2.ID_FUNCION,
-	q2.TITULO,
-	q2.DESCRIPCION_FUNCION,
-	q2.PROCESS_KEY,
-	q2.ORDEN,
-	q2.HORARIO,
-	q2.VENGINE,
-	q2.ACCESO_COMPLETO,
-	q2.ID_FUNCION_PADRE,
-	q2.ID_PARAM,
-	q2.VALOR,
-	q.level,
-	Q.breadcrumb::varchar
-FROM 
-	Q2 join Q ON(q2.ID_APLICACION=Q.ID_APLICACION AND q2.ID_MODULO=Q.ID_MODULO AND q2.ID_FUNCION=Q.ID_FUNCION)
-UNION ALL
-SELECT
-	q.ID_USUARIO,
-	q.PASSWORD,
-	q.ELIMINADO,
-	q.BLOQUEADO,
-	q.ACTIVO,
-	q.ID_APLICACION,
-        q.DESCRIPCION_APLICACION,
-        q.ICONO_APLICACION,
-	q.ID_ROL,
-	q.DESCRIPCION_ROL,
-	q.HABILITADO_ROL,
-	q.ID_MODULO,
-	q.DESCRIPCION_MODULO,
-	q.ICONO_MODULO,
-	q.ID_FUNCION,
-	q.TITULO,
-	q.DESCRIPCION_FUNCION,
-	q.PROCESS_KEY,
-	q.ORDEN,
-	q.HORARIO,
-	q.VENGINE,
-	q.ACCESO_COMPLETO,
-	q.ID_FUNCION_PADRE,
-	q.ID_PARAM,
-	q.VALOR,
-	q.level,
-	Q.breadcrumb::varchar	
-FROM
-	Q
-WHERE Q.ACCESO_COMPLETO='true'
-)
-SELECT
-	MENU_USUARIO.ID_USUARIO,
-	MENU_USUARIO.PASSWORD,
-	MENU_USUARIO.ELIMINADO,
-	MENU_USUARIO.BLOQUEADO,
-	MENU_USUARIO.ACTIVO,
-	MENU_USUARIO.ID_APLICACION,
-        MENU_USUARIO.DESCRIPCION_APLICACION,
-        MENU_USUARIO.ICONO_APLICACION,
-                MENU_USUARIO.ID_ROL,
-                MENU_USUARIO.DESCRIPCION_ROL,
-                MENU_USUARIO.HABILITADO_ROL,
-                        MENU_USUARIO.ID_MODULO,
-                        MENU_USUARIO.DESCRIPCION_MODULO,
-                        MENU_USUARIO.ICONO_MODULO,
-                                MENU_USUARIO.ID_FUNCION,
-                                MENU_USUARIO.TITULO,
-                                MENU_USUARIO.DESCRIPCION_FUNCION,
-                                MENU_USUARIO.PROCESS_KEY,
-                                MENU_USUARIO.ORDEN,
-                                MENU_USUARIO.HORARIO,
-                                MENU_USUARIO.VENGINE,
-                                MENU_USUARIO.ID_PARAM,
-                                MENU_USUARIO.VALOR,
-                                MENU_USUARIO.ID_FUNCION_PADRE,
-                                        F.TITULO AS TITULO_PADRE,
-                                        F.DESCRIPCION AS DESCRIPCION_PADRE,
-                                        F.PROCESS_KEY AS PROCESS_KEY_PADRE,
-                                        F.ORDEN AS ORDEN_PADRE,
-                                        PF.ID_PARAM AS ID_PARAM_PADRE,
-                                        PF.VALOR AS VALOR_PADRE
-FROM
-	MENU_USUARIO LEFT JOIN
-	SEGURIDAD.FUNCION F ON(F.ID_APLICACION = MENU_USUARIO.ID_APLICACION AND F.ID_MODULO = MENU_USUARIO.ID_MODULO AND F.ID_FUNCION = MENU_USUARIO.ID_FUNCION_PADRE)LEFT JOIN 
-	SEGURIDAD.PARAM_FUNCION PF ON (PF.ID_APLICACION = F.ID_APLICACION AND PF.ID_MODULO=F.ID_MODULO AND PF.ID_FUNCION=F.ID_FUNCION)
-where 
-	MENU_USUARIO.ID_USUARIO is not null
-	AND 	MENU_USUARIO.HABILITADO_ROL=TRUE
-ORDER BY
-        MENU_USUARIO.breadcrumb,
-        MENU_USUARIO.orden,
-        MENU_USUARIO.TITULO
-$body$
-language sql;
+CREATE OR REPLACE FUNCTION menu_usuario(id_usr text)
+ RETURNS TABLE(id_usuario text, password text, eliminado text, bloqueado text, activo text, id_aplicacion text, descripcion_aplicacion text, icono_aplicacion text, id_rol text, descripcion_rol text, habilitado_rol boolean, id_modulo text, descripcion_modulo text, icono_modulo text, id_funcion text, titulo text, descripcion_funcion text, process_key text, orden numeric, horario text, vengine text, id_param text, valor text, id_funcion_padre text, titulo_padre text, descripcion_padre text, process_key_padre text, orden_padre numeric, id_param_padre text, valor_padre text)
+AS $function$
+DECLARE 
+    usuario record;
+    appRol record;
+    funcion record;
+BEGIN
+	FOR usuario IN(select
+				U.ID_USUARIO,
+				U.PASSWORD,
+				case
+					when U.ESTATUS='ELIMINADO' then 'true'
+					WHEN U.ID_USUARIO IS NULL THEN NULL
+					else 'false' 
+				end as ELIMINADO,
+				case
+					when U.ESTATUS='BLOQUEADO' then 'true'
+					WHEN U.ID_USUARIO IS NULL THEN NULL
+					else 'false' 
+				end as BLOQUEADO,
+				case
+					when U.ESTATUS='ACTIVO' then 'true'
+					WHEN U.ID_USUARIO IS NULL THEN NULL
+					else 'false' 
+				end as ACTIVO
+			from
+				SEGURIDAD.USUARIO U
+			where 
+				U.ID_USUARIO= id_usr) LOOP
+		FOR appRol IN(select
+				APP.ID_APLICACION,
+				APP.DESCRIPCION AS DESCRIPCION_APLICACION,
+				APP.ICONO AS ICONO_APLICACION,
+					UR.ID_ROL,
+					RL.DESCRIPCION AS DESCRIPCION_ROL,
+					RL.HABILITADO AS HABILITADO_ROL
+				from
+					SEGURIDAD.APLICACION APP inner JOIN
+					SEGURIDAD.USUARIO_ROL UR ON (UR.ID_APLICACION=APP.ID_APLICACION) inner JOIN
+					SEGURIDAD.ROL RL ON (RL.ID_APLICACION = UR.ID_APLICACION AND RL.ID_ROL = UR.ID_ROL)
+				where 
+					UR.ID_USUARIO= id_usr
+				order by APP.id_aplicacion, UR.id_rol) LOOP
+			FOR funcion IN(WITH RECURSIVE
+							h as(
+								select
+							        F.ID_APLICACION,
+									F.ID_MODULO,
+									F.ID_FUNCION,
+									F.ORDEN,
+									case 
+										when RF.NIV_ACC='COMPLETO' then 'true'
+										when RF.NIV_ACC IS NULL then NULL
+										else 'false' 
+									end as ACCESO_COMPLETO,
+									F.ID_FUNCION_PADRE
+								from
+									SEGURIDAD.FUNCION F  LEFT JOIN
+									SEGURIDAD.ROL_FUNCION RF ON (F.ID_APLICACION=RF.ID_APLICACION AND F.ID_MODULO = RF.ID_MODULO AND F.ID_FUNCION=RF.ID_FUNCION AND RF.ID_APLICACION=appRol.id_aplicacion AND RF.ID_ROL=appRol.id_rol)
+							), 
+							q AS(
+								SELECT
+									H.*,
+									1 AS level, 
+									ARRAY[H.ID_APLICACION||'-'||H.ID_MODULO||'-'||H.ID_FUNCION||'-'||H.orden] AS breadcrumb 
+								FROM
+									H
+								where
+									H.ID_FUNCION_PADRE is null        
+								UNION 
+								SELECT
+									case
+										WHEN hi.ID_APLICACION IS NULL THEN q.ID_APLICACION
+										else hi.ID_APLICACION 
+									end as ID_APLICACION,
+									hi.ID_MODULO,
+									hi.ID_FUNCION,
+									hi.ORDEN,
+									case
+										WHEN q.ACCESO_COMPLETO='true' THEN q.ACCESO_COMPLETO
+										else hi.ACCESO_COMPLETO 
+									end as ACCESO_COMPLETO,
+									hi.ID_FUNCION_PADRE,
+									q.level + 1 AS level,
+									Q.breadcrumb || (q.ID_APLICACION||'-'||q.ID_MODULO||'-'||q.ID_FUNCION||'-'||q.orden)
+								FROM
+									q
+								JOIN
+									h hi ON (hi.ID_APLICACION = q.ID_APLICACION AND hi.ID_MODULO = q.id_MODULO AND hi.ID_FUNCION_PADRE = q.id_FUNCION )
+							),
+							R AS (
+							SELECT
+								q.ID_APLICACION,
+								q.ID_MODULO,
+								q.ID_FUNCION,
+								q.ORDEN,
+								q.ACCESO_COMPLETO,
+								q.ID_FUNCION_PADRE
+							FROM
+								q
+							),
+							Q2 AS (
+							SELECT
+									R.*,
+									1 AS level, 
+									ARRAY[R.ID_APLICACION||'-'||R.ID_MODULO||'-'||R.ID_FUNCION||'-'||R.orden] AS breadcrumb
+								FROM
+									R
+								where
+									R.ACCESO_COMPLETO ='false'       
+								UNION 
+								SELECT
+									case
+										WHEN hi.ID_APLICACION IS NULL THEN q2.ID_APLICACION
+										else hi.ID_APLICACION 
+									end as ID_APLICACION,
+									hi.ID_MODULO,
+									hi.ID_FUNCION,
+									hi.ORDEN,
+									case
+										WHEN hi.ACCESO_COMPLETO IS NULL THEN q2.ACCESO_COMPLETO
+										else hi.ACCESO_COMPLETO 
+									end as ACCESO_COMPLETO,
+									hi.ID_FUNCION_PADRE,
+									q2.level + 1 AS level,
+									Q2.breadcrumb || (q2.ID_APLICACION||'-'||q2.ID_MODULO||'-'||q2.ID_FUNCION||'-'||q2.orden)
+								FROM
+									q2
+								JOIN
+									R hi ON (hi.ID_APLICACION = q2.ID_APLICACION AND hi.ID_MODULO = q2.id_MODULO AND hi.ID_FUNCION = q2.id_FUNCION_PADRE )
+							), FUNCIONES_ROL AS (
+							SELECT 
+								q2.ID_APLICACION,
+								q2.ID_MODULO,
+								q2.ID_FUNCION,
+								q2.ORDEN,
+								q2.ACCESO_COMPLETO,
+								q2.ID_FUNCION_PADRE,
+								q.level,
+								Q.breadcrumb::varchar
+							FROM 
+								Q2 join Q ON(q2.ID_APLICACION=Q.ID_APLICACION AND q2.ID_MODULO=Q.ID_MODULO AND q2.ID_FUNCION=Q.ID_FUNCION)
+							UNION 
+							SELECT
+								q.ID_APLICACION,
+								q.ID_MODULO,
+								q.ID_FUNCION,
+								q.ORDEN,
+								q.ACCESO_COMPLETO,
+								q.ID_FUNCION_PADRE,
+								q.level,
+								Q.breadcrumb::varchar	
+							FROM
+								Q
+							WHERE Q.ACCESO_COMPLETO='true'
+							)
+							SELECT                     
+								M.ID_MODULO,
+		                        M.DESCRIPCION AS DESCRIPCION_MODULO,
+		                        M.ICONO AS ICONO_MODULO,
+		                                F.ID_FUNCION,
+		                                F.TITULO,
+		                                F.DESCRIPCION AS DESCRIPCION_FUNCION,
+		                                F.PROCESS_KEY,
+		                                F.ORDEN,
+		                                F.HORARIO,
+		                                F.VENGINE,
+		                                PF.ID_PARAM,
+		                                PF.VALOR,
+		                                F.ID_FUNCION_PADRE,
+		                                        FP.TITULO AS TITULO_PADRE,
+		                                        FP.DESCRIPCION AS DESCRIPCION_PADRE,
+		                                        FP.PROCESS_KEY AS PROCESS_KEY_PADRE,
+		                                        FP.ORDEN AS ORDEN_PADRE,
+		                                        PFP.ID_PARAM AS ID_PARAM_PADRE,
+		                                        PFP.VALOR AS VALOR_PADRE
+							FROM
+								FUNCIONES_ROL FR INNER JOIN
+								SEGURIDAD.FUNCION F ON(F.ID_APLICACION = FR.ID_APLICACION AND F.ID_MODULO = FR.ID_MODULO AND F.ID_FUNCION = FR.ID_FUNCION) INNER JOIN
+								SEGURIDAD.MODULO M ON (M.ID_APLICACION=F.ID_APLICACION AND M.ID_MODULO=F.ID_MODULO) LEFT JOIN
+								SEGURIDAD.PARAM_FUNCION PF ON (PF.ID_APLICACION=F.ID_APLICACION AND PF.ID_MODULO=F.ID_MODULO AND PF.ID_FUNCION=F.ID_FUNCION) LEFT JOIN
+								SEGURIDAD.FUNCION FP ON(FP.ID_APLICACION = FR.ID_APLICACION AND FP.ID_MODULO = FR.ID_MODULO AND FP.ID_FUNCION = FR.ID_FUNCION_PADRE) LEFT JOIN 
+								SEGURIDAD.PARAM_FUNCION PFP ON (PFP.ID_APLICACION = FP.ID_APLICACION AND PFP.ID_MODULO=FP.ID_MODULO AND PFP.ID_FUNCION=FP.ID_FUNCION)
+							ORDER BY
+							        FR.breadcrumb DESC,
+							        FR.orden) LOOP
+				id_usuario := usuario.ID_USUARIO;
+				password := usuario.PASSWORD;
+				eliminado := usuario.ELIMINADO;
+				bloqueado := usuario.bloqueado;
+				activo := usuario.activo;
+				id_aplicacion := appRol.id_aplicacion;
+				descripcion_aplicacion := appRol.descripcion_aplicacion;
+				icono_aplicacion := appRol.icono_aplicacion;
+				id_rol := appRol.id_rol;
+				descripcion_rol := appRol.descripcion_rol;
+				habilitado_rol := appRol.habilitado_rol;
+				id_modulo := funcion.id_modulo;
+				descripcion_modulo := funcion.descripcion_modulo;
+				icono_modulo := funcion.icono_modulo;
+				id_funcion := funcion.id_funcion;
+				titulo := funcion.titulo;
+				descripcion_funcion := funcion.descripcion_funcion;
+				process_key := funcion.process_key;
+				orden := funcion.orden;
+				horario := funcion.horario;
+				vengine := funcion.vengine;
+				id_param := funcion.id_param;
+				valor := funcion.valor;
+				id_funcion_padre := funcion.id_funcion_padre;
+				titulo_padre := funcion.titulo_padre;
+				descripcion_padre := funcion.descripcion_padre;
+				process_key_padre := funcion.process_key_padre;
+				orden_padre := funcion.orden_padre;
+				id_param_padre := funcion.id_param_padre;
+				valor_padre := funcion.valor_padre;
+				RETURN NEXT;
+			END LOOP;
+		END LOOP;
+	END LOOP;
+END;
+$function$
+LANGUAGE 'plpgsql' VOLATILE;
 
 CREATE TABLE JOSSO_SESSION
 (

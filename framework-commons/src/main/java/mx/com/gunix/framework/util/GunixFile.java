@@ -90,7 +90,7 @@ public class GunixFile implements Serializable {
 
 	@Override
 	public String toString() {
-		return "GunixFile [fileName=" + fileName + ", mimeType=" + mimeType + "]";
+		return fileName != null ? fileName : "";
 	}
 
 }
