@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,6 +19,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 import mx.com.gunix.framework.util.EmbeddedServerUtils;
+import mx.com.gunix.framework.util.ZipEntryWorker;
 
 public final class EmbeddedPostgreSQLManager {
 	private static Logger log = Logger.getLogger(EmbeddedPostgreSQLManager.class);
@@ -123,6 +125,15 @@ public final class EmbeddedPostgreSQLManager {
 	private static void ejecutaAppScripts(File pgsqlHomeFile, String usuario, String database) {
 		try {			
 			Resource[] appScriptsResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/domain/persistence/scripts/**/*.sql");
+			Resource[] appZippedScriptsResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/domain/persistence/scripts/**/*.zip");
+			Resource[] unifiedScriptResources = new Resource[(appScriptsResources != null ? appScriptsResources.length : 0) + (appZippedScriptsResources != null ? appZippedScriptsResources.length : 0)];
+			if (appScriptsResources != null) {
+				System.arraycopy(appScriptsResources, 0, unifiedScriptResources, 0, appScriptsResources.length);
+			}
+			if (appZippedScriptsResources != null) {
+				System.arraycopy(appZippedScriptsResources, 0, unifiedScriptResources, (appScriptsResources != null ? appScriptsResources.length : 0), appZippedScriptsResources.length);
+			}
+			appScriptsResources = unifiedScriptResources;
 			if (appScriptsResources != null) {
 				List<Resource> appScriptsResourcesList = Arrays.asList(appScriptsResources);				
 				Collections.sort(appScriptsResourcesList, Comparator.comparing(Resource::getFilename));
@@ -157,25 +168,35 @@ public final class EmbeddedPostgreSQLManager {
 				for (Resource appScriptResource : currentAppScriptsResourcesList) {
 					log.info("<<<<<<<<<<<<<<<<<<< "+ appScriptResource.getFilename() +" >>>>>>>>>>>>>>>>>>>");
 					BufferedWriter writer = new BufferedWriter(new FileWriter(new File(prevExecutedScripts, appScriptResource.getFilename())));
-					EmbeddedServerUtils.ejecutaScript(appScriptResource.getInputStream(), pgsqlHomeFile, usuario, database, new Logger(appScriptResource.getFilename()) {
-						@Override
-						public void info(Object message) {
-							try {
-								writer.write(message.toString());
-								writer.newLine();
-								log.info(message);
-							} catch (IOException e) {
-								throw new RuntimeException(e);
-							}
-						}
-
-					});
+					if (appScriptResource.getFilename().toLowerCase().endsWith(".zip")) {
+						ZipEntryWorker.withAllZipEntries(appScriptResource.getInputStream(), (sqlFileName, sqlIs)->{
+							ejecutaScript(sqlIs, pgsqlHomeFile, usuario, database, appScriptResource.getFilename(), writer);
+						});
+					} else {
+						ejecutaScript(appScriptResource.getInputStream(), pgsqlHomeFile, usuario, database, appScriptResource.getFilename(), writer);
+					}
 					writer.close();
 				}
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private static void ejecutaScript(InputStream scriptIS, File pgsqlHomeFile, String usuario, String database, String fileName, BufferedWriter writer) {
+		EmbeddedServerUtils.ejecutaScript(scriptIS, pgsqlHomeFile, usuario, database, new Logger(fileName) {
+			@Override
+			public void info(Object message) {
+				try {
+					writer.write(message.toString());
+					writer.newLine();
+					log.info(message);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+		});
 	}
 
 	private static void initDB(File pgsqlHomeFile, String usuario, String database, ClassLoader classLoader) {

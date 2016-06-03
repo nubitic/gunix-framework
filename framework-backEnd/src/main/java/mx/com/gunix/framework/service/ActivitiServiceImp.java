@@ -211,32 +211,37 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 	
 	@Override
 	public Serializable getVar(Instancia instancia, String varName) {
-		if (instancia.isVolatil() && instancia.getTareaActual() == null) {
-			throw new IllegalArgumentException("Para procesos volatiles la tarea actual no debe ser null");
-		}
-		Serializable ser = null;
-		if (((instancia.isVolatil() && !instancia.getTareaActual().isTerminal()) || !instancia.isVolatil()) && instancia.getTermino() == null) {
-			ser = rs.getVariable(instancia.getId(), varName, Serializable.class);
-			if (!instancia.isVolatil() && ser == null) {
-				List<Map<String, Object>> vars = vim.findGunixObjectByNameAndExecutionId(instancia.getId(), varName);
-				if (vars != null && !vars.isEmpty()) {
-					ser = (Serializable) GunixVariableSerializer.deserialize(varName, vars, getClass().getClassLoader());
-				}
+		try {
+			GunixObjectVariableType.setCurrentInstancia(instancia);
+			if (instancia.isVolatil() && instancia.getTareaActual() == null) {
+				throw new IllegalArgumentException("Para procesos volatiles la tarea actual no debe ser null");
 			}
-		} else {
-			List<HistoricVariableInstance> hvis = hs.createHistoricVariableInstanceQuery().processInstanceId(instancia.getId()).excludeTaskVariables().variableName(varName).list();
-			if (hvis != null && !hvis.isEmpty()) {
-				ser = (Serializable) hvis.get(0).getValue();
-			} else {
-				if (!instancia.isVolatil()) {
-					List<Map<String, Object>> vars = vim.findHistoricGunixObjectByNameAndExecutionId(instancia.getId(), varName);
+			Serializable ser = null;
+			if (((instancia.isVolatil() && !instancia.getTareaActual().isTerminal()) || !instancia.isVolatil()) && instancia.getTermino() == null) {
+				ser = rs.getVariable(instancia.getId(), varName, Serializable.class);
+				if (!instancia.isVolatil() && ser == null) {
+					List<Map<String, Object>> vars = vim.findGunixObjectByNameAndExecutionId(instancia.getId(), varName);
 					if (vars != null && !vars.isEmpty()) {
 						ser = (Serializable) GunixVariableSerializer.deserialize(varName, vars, getClass().getClassLoader());
 					}
 				}
+			} else {
+				List<HistoricVariableInstance> hvis = hs.createHistoricVariableInstanceQuery().processInstanceId(instancia.getId()).excludeTaskVariables().variableName(varName).list();
+				if (hvis != null && !hvis.isEmpty()) {
+					ser = (Serializable) hvis.get(0).getValue();
+				} else {
+					if (!instancia.isVolatil()) {
+						List<Map<String, Object>> vars = vim.findHistoricGunixObjectByNameAndExecutionId(instancia.getId(), varName);
+						if (vars != null && !vars.isEmpty()) {
+							ser = (Serializable) GunixVariableSerializer.deserialize(varName, vars, getClass().getClassLoader());
+						}
+					}
+				}
 			}
+			return ser;
+		} finally {
+			GunixObjectVariableType.removeCurrentInstancia();
 		}
-		return ser;
 	}
 
 	private Tarea getCurrentTask(String piid, ProcessInstance pi) {
@@ -735,7 +740,12 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 
 	@Override
 	public void setVar(Instancia instancia, String varName, Serializable varValue) {
-		rs.setVariable(instancia.getId(), varName, varValue);
+		try {
+			GunixObjectVariableType.setCurrentInstancia(instancia);
+			rs.setVariable(instancia.getId(), varName, varValue);
+		} finally {
+			GunixObjectVariableType.removeCurrentInstancia();
+		}
 	}
 
 	@Override
