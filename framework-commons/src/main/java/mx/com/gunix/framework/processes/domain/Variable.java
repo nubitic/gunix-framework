@@ -116,7 +116,7 @@ public class Variable<T extends Serializable> implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
-		result = prime * result + ((scope == null) ? 0 : scope.hashCode());
+		result = prime * result + ((scope == null) ? 0 : scope.ordinal());
 		result = prime * result + ((valor == null) ? 0 : valor.hashCode());
 		return result;
 	}
