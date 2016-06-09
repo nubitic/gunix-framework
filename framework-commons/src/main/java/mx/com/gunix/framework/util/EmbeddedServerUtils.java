@@ -209,6 +209,7 @@ public final class EmbeddedServerUtils {
 			cmd.add(database);
 
 			ProcessBuilder processBuilder = new ProcessBuilder(cmd);
+			processBuilder.environment().put("PGOPTIONS", "-c search_path=" + System.getenv("DB_APP_SCHEMA"));
 			processBuilder.redirectErrorStream(true);
 			final Process process = processBuilder.start();
 			log(log, process, null);

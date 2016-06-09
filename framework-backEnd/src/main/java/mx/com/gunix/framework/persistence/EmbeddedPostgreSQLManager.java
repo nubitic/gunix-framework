@@ -139,6 +139,7 @@ public final class EmbeddedPostgreSQLManager {
 				Collections.sort(appScriptsResourcesList, Comparator.comparing(Resource::getFilename));
 				
 				List<Resource> currentAppScriptsResourcesList = new ArrayList<Resource>();
+				String appSchemaName = System.getenv("DB_APP_SCHEMA").toUpperCase();
 				
 				File prevExecutedScripts = new File(pgsqlHomeFile, "gunixPrevExecutedScripts");
 				if (!prevExecutedScripts.exists()) {
@@ -151,12 +152,13 @@ public final class EmbeddedPostgreSQLManager {
 						Iterator<Resource> appScriptIt = appScriptsResourcesList.iterator();
 						while (appScriptIt.hasNext()) {
 							boolean found = false;
-							Resource currRes = appScriptIt.next(); 
+							Resource currRes = appScriptIt.next();
+							String possiblyExecutedScript = appSchemaName + "_" + currRes.getFilename() + ".log";
 							for (File executedScript : executedScripts) {
-								if (currRes.getFilename().equals(executedScript.getName())) {
+								if (possiblyExecutedScript.equals(executedScript.getName())) {
 									found = true;
 									break;
-								}	
+								}
 							}
 							if(!found){
 								currentAppScriptsResourcesList.add(currRes);
@@ -167,7 +169,7 @@ public final class EmbeddedPostgreSQLManager {
 				
 				for (Resource appScriptResource : currentAppScriptsResourcesList) {
 					log.info("<<<<<<<<<<<<<<<<<<< "+ appScriptResource.getFilename() +" >>>>>>>>>>>>>>>>>>>");
-					BufferedWriter writer = new BufferedWriter(new FileWriter(new File(prevExecutedScripts, appScriptResource.getFilename())));
+					BufferedWriter writer = new BufferedWriter(new FileWriter(new File(prevExecutedScripts, appSchemaName + "_" + appScriptResource.getFilename() + ".log")));
 					if (appScriptResource.getFilename().toLowerCase().endsWith(".zip")) {
 						ZipEntryWorker.withAllZipEntries(appScriptResource.getInputStream(), (sqlFileName, sqlIs)->{
 							ejecutaScript(sqlIs, pgsqlHomeFile, usuario, database, appScriptResource.getFilename(), writer);
