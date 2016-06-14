@@ -445,7 +445,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			Filtro<String> filtroEstatus = null;
 			Filtro<Boolean> filtroEnded = null;
 
-			if (filtros != null && filtros.isEmpty()) {
+			if (filtros != null && !filtros.isEmpty()) {
 				filtroEstatus = (Filtro<String>) filtros.stream().filter(f -> f.getNombre() == Filtro.FILTRO_ESTATUS).findFirst().orElse(null);
 				filtroEnded = (Filtro<Boolean>) filtros.stream().filter(f -> f.getNombre() == Filtro.FILTRO_ENDED).findFirst().orElse(null);
 			}
