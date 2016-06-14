@@ -434,18 +434,42 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		return doConsulta(processKey, filtros, false, projectionVars);
 	}
 
-	private List<Instancia> doConsulta(String processKey, List<Filtro<?>> filtros, boolean conPerfil, String... projectionVars) {
+	@SuppressWarnings("unchecked")
+	private List<Instancia> doConsulta(String processKey, List<Filtro<?>> filtros, boolean esParaPendientes, String... projectionVars) {
 		try{
 			Instancia instancia = new Instancia();
 			instancia.setVolatil(ActivitiService.VOLATIL.equals(repos.createProcessDefinitionQuery().processDefinitionKey(processKey).latestVersion().singleResult().getCategory()));
 			GunixObjectVariableType.setCurrentInstancia(instancia);
 			List<Task> tareas = null;
 			List<Instancia> pidsEncontrados = new ArrayList<Instancia>();
+			Filtro<String> filtroEstatus = null;
+			Filtro<Boolean> filtroEnded = null;
+
+			if (filtros != null && filtros.isEmpty()) {
+				filtroEstatus = (Filtro<String>) filtros.stream().filter(f -> f.getNombre() == Filtro.FILTRO_ESTATUS).findFirst().orElse(null);
+				filtroEnded = (Filtro<Boolean>) filtros.stream().filter(f -> f.getNombre() == Filtro.FILTRO_ENDED).findFirst().orElse(null);
+			}
+			
+			if ((filtroEstatus != null && filtroEnded != null) || (esParaPendientes && (filtroEstatus != null || filtroEnded != null))) {
+				throw new IllegalArgumentException("Combinación de filtros mutuamente excluyentes: a) Por estatus y terminados ó b) Pendientes con estatatus específico o terminados");
+			}
+			
+			/* Si se requieren instancias que se encuentren en un estatus específico entonces el comportamiento debe ser muy parecido a cuando se desean
+			 * saber los pendientes para un determinado rol, solo que ahora se deben filtrar por aquellas que se encuentran en un estatus específico.
+			 * */
+			if (filtroEstatus != null) {
+				esParaPendientes = true;
+			}
+			
 			//Primero se busca las tareas 
-			if (conPerfil) {
+			if (esParaPendientes) {
 				TaskQuery tq = ts.createTaskQuery();
 				tq.processDefinitionKey(processKey);
-				tq.taskCandidateGroup(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getSelectedAuthority());
+				if (filtroEstatus != null) {
+					tq.taskName(filtroEstatus.getValor());
+				} else {
+					tq.taskCandidateGroup(((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getSelectedAuthority());
+				}
 				tq.orderByProcessInstanceId().asc();
 				tareas = tq.list();
 	
@@ -469,41 +493,48 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			}
 			
 			
-			if ((conPerfil && !tareas.isEmpty()) || !conPerfil) {
-				ProcessInstanceQuery piq = rs.createProcessInstanceQuery();
-				piq.processDefinitionKey(processKey);
-				processFilters(filtros, piq);
+			if ((esParaPendientes && !tareas.isEmpty()) || !esParaPendientes) {
+				Set<String> pidsEncontradosSet = null;
+				List<ProcessInstance> pids = null;
 				
-				/*Si hay tareas pendientes la consulta se cerrara a unicamente las instancias de las tareas encontradas*/
-				if (tareas != null && !tareas.isEmpty()) {
-					piq.processInstanceIds(tareas.stream().map(task -> {
-						return task.getProcessInstanceId();
+				if (filtroEnded == null) {
+					ProcessInstanceQuery piq = rs.createProcessInstanceQuery();
+					piq.processDefinitionKey(processKey);
+					processFilters(filtros, piq);
+					
+					/*Si hay tareas pendientes la consulta se cerrara a unicamente las instancias de las tareas encontradas*/
+					if (tareas != null && !tareas.isEmpty()) {
+						piq.processInstanceIds(tareas.stream().map(task -> {
+							return task.getProcessInstanceId();
+						}).collect(Collectors.toCollection(() -> {
+							return new HashSet<String>();
+						})));
+					}
+					piq.orderByProcessInstanceId().asc();
+					pids = piq.list();
+					
+					pidsEncontradosSet = pids.stream().map(pid -> {
+						return pid.getProcessInstanceId();
 					}).collect(Collectors.toCollection(() -> {
 						return new HashSet<String>();
-					})));
+					}));
 				}
-				piq.orderByProcessInstanceId().asc();
-				List<ProcessInstance> pids = piq.list();
 				
-				Set<String> pidsEncontradosSet = pids.stream().map(pid -> {
-					return pid.getProcessInstanceId();
-				}).collect(Collectors.toCollection(() -> {
-					return new HashSet<String>();
-				}));
-				
-				if ((conPerfil && !pidsEncontradosSet.isEmpty()) || !conPerfil) {
+				if ((esParaPendientes && pidsEncontradosSet != null && !pidsEncontradosSet.isEmpty()) || !esParaPendientes) {
 					/*Historia del proceso encontrado y que sigue en ejecución*/
 					HistoricProcessInstanceQuery hpiq = hs.createHistoricProcessInstanceQuery();
 					hpiq.processDefinitionKey(processKey);
-					if (conPerfil && !pidsEncontradosSet.isEmpty()) {
+					if (esParaPendientes && pidsEncontradosSet != null && !pidsEncontradosSet.isEmpty()) {
 						hpiq.processInstanceIds(pidsEncontradosSet);
 					}
 					
 					//Cuando la consulta no se cierra por las tareas de un perfil determinado entonces se incluyen las instancias historicas que cumplan con los filtros indicados 
-					if(!conPerfil && filtros != null && !filtros.isEmpty()){
+					if(!esParaPendientes && filtros != null && !filtros.isEmpty()){
 						processFilters(filtros, hpiq);
 					}
-					
+					if (filtroEnded != null) {
+						hpiq.finished();
+					}
 					hpiq.orderByProcessInstanceId().asc();
 					List<HistoricProcessInstance> hpis = hpiq.list();
 					
@@ -514,7 +545,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 						return new HashSet<String>();
 					})));
 					
-					if(!pidsEncontradosSet.isEmpty()){
+					if(pidsEncontradosSet!=null && !pidsEncontradosSet.isEmpty()){
 						/*Tareas históricas*/
 						HistoricTaskInstanceQuery htiq = hs.createHistoricTaskInstanceQuery();
 						htiq.finished();
@@ -527,7 +558,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 						AtomicReference<List<HistoricProcessInstance>> historicosHolder = new AtomicReference<List<HistoricProcessInstance>>();
 						historicosHolder.set(hpis);
 						
-						if (!conPerfil && pids != null && !pids.isEmpty()) {
+						if (!esParaPendientes && pids != null && !pids.isEmpty()) {
 							TaskQuery tq = ts.createTaskQuery();
 							tareasHolder.set(tq.processDefinitionKey(processKey)
 												.active()

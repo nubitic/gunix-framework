@@ -6,6 +6,8 @@ import java.util.List;
 
 public final class Filtro<T extends Serializable> extends Variable<T> {
 	private static final long serialVersionUID = 1L;
+	public static final String FILTRO_ESTATUS = "FILTRO_ESTATUS_";
+	public static final String FILTRO_ENDED ="FILTRO_ENDED_";
 
 	public static enum Operador {
 		IGUAL, MAYOR_QUE, MENOR_QUE, DIFERENTE, LIKE
@@ -55,6 +57,24 @@ public final class Filtro<T extends Serializable> extends Variable<T> {
 			filtro.setNombre(nombre);
 			filtro.setValor(valor);
 			filtro.setlOp(op);
+			filtros.add(filtro);
+			return this;
+		}
+		
+		public <S extends Serializable> Builder estatusEs(String estatus){
+			Filtro<String> filtro = new Filtro<String>();
+			filtro.setNombre(FILTRO_ESTATUS);
+			filtro.setValor(estatus);
+			filtro.setlOp(Operador.IGUAL);
+			filtros.add(filtro);
+			return this;
+		}
+		
+		public <S extends Serializable> Builder terminados() {
+			Filtro<Boolean> filtro = new Filtro<Boolean>();
+			filtro.setNombre(FILTRO_ENDED);
+			filtro.setValor(Boolean.TRUE);
+			filtro.setlOp(Operador.IGUAL);
 			filtros.add(filtro);
 			return this;
 		}
