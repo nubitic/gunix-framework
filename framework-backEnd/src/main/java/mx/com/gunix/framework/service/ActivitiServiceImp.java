@@ -518,6 +518,8 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 					}).collect(Collectors.toCollection(() -> {
 						return new HashSet<String>();
 					}));
+				} else {
+					pidsEncontradosSet = new HashSet<String>();
 				}
 				
 				if ((esParaPendientes && pidsEncontradosSet != null && !pidsEncontradosSet.isEmpty()) || !esParaPendientes) {
