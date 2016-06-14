@@ -452,6 +452,13 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			
 			if ((filtroEstatus != null && filtroEnded != null) || (esParaPendientes && (filtroEstatus != null || filtroEnded != null))) {
 				throw new IllegalArgumentException("Combinación de filtros mutuamente excluyentes: a) Por estatus y terminados ó b) Pendientes con estatatus específico o terminados");
+			} else {
+				if (filtroEstatus != null) {
+					filtros.remove(filtroEstatus);
+				}
+				if (filtroEnded != null) {
+					filtros.remove(filtroEnded);
+				}
 			}
 			
 			/* Si se requieren instancias que se encuentren en un estatus específico entonces el comportamiento debe ser muy parecido a cuando se desean
