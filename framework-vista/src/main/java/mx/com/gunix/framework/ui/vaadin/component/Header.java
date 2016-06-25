@@ -475,7 +475,10 @@ public class Header extends CustomComponent {
 		panelContenido.setEnabled(false);
 		panelContenido.setImmediate(false);
 		panelContenido.setVisible(false);
-		panelContenido.setWidth("100.0%");
+		panelContenido.setWidth((UI.getCurrent().getPage().getBrowserWindowWidth()-55)+"px");
+		UI.getCurrent().getPage().addBrowserWindowResizeListener(evnt -> {
+			panelContenido.setWidth((evnt.getWidth() - 55) + "px");
+		});
 		panelContenido.setHeight("100.0%");
 
 		// verticalLayout_2

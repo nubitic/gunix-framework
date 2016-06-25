@@ -103,7 +103,7 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 
 		if (vie instanceof HistoricVariableInstanceEntity) {
 			if (vie.getTaskId() == null) {
-				vars = vim.findHistoricGunixObjectByNameAndExecutionIdAndRevision(vie.getExecutionId(), vie.getName(), ((HistoricVariableInstanceEntity) vie).getRevision());
+				vars = vim.findHistoricGunixObjectByNameAndExecutionIdAndRevision(vie.getExecutionId(), vie.getName());
 			}
 		} else {
 			if (vie instanceof HasRevision) {

@@ -139,6 +139,7 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		doConstruct();
 		addComponent(flyt);
 		postInitFieldGroup();
+		UI.getCurrent().markAsDirtyRecursive();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -227,6 +228,7 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		tarea = taNav.getTareaActual();
 		doEnter(event);
 		Responsive.makeResponsive(this);
+		UI.getCurrent().markAsDirtyRecursive();
 	}
 	
 	Tarea getTarea() {
