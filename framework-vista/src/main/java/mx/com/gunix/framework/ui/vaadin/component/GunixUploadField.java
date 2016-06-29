@@ -162,7 +162,7 @@ public class GunixUploadField extends UploadField {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("<em>");
-		Object value = getValue();
+		Object value = receiver.getLastFileName();
 		String string = value == null ? null : value.toString();
 		if (string.length() > 200) {
 			string = string.substring(0, 199) + "...";
