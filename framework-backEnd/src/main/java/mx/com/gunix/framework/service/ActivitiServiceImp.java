@@ -541,9 +541,15 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 					if(!esParaPendientes && filtros != null && !filtros.isEmpty()){
 						processFilters(filtros, hpiq);
 					}
+					
 					if (filtroEnded != null) {
-						hpiq.finished();
+						if (filtroEnded.getValor()) {
+							hpiq.finished();
+						} else {
+							hpiq.unfinished();
+						}
 					}
+					
 					hpiq.orderByProcessInstanceId().asc();
 					List<HistoricProcessInstance> hpis = hpiq.list();
 					

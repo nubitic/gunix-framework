@@ -78,6 +78,15 @@ public final class Filtro<T extends Serializable> extends Variable<T> {
 			filtros.add(filtro);
 			return this;
 		}
+		
+		public <S extends Serializable> Builder enProceso() {
+			Filtro<Boolean> filtro = new Filtro<Boolean>();
+			filtro.setNombre(FILTRO_ENDED);
+			filtro.setValor(Boolean.FALSE);
+			filtro.setlOp(Operador.IGUAL);
+			filtros.add(filtro);
+			return this;
+		}
 
 		public List<Filtro<?>> build() {
 			return filtros;

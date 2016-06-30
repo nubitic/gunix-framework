@@ -27,8 +27,8 @@ public class GunixVariableSerializer {
 
 	private static final String EMPTY_COLLECTION_NESTED_REFERENCE = NESTED_REFERENCE + Iterable.class + "|1";
 	private static final String EMPTY_MAP_NESTED_REFERENCE = NESTED_REFERENCE + Map.class + "|0";
-	private static Pattern iterablePattern = Pattern.compile("\\[\\d+\\]");
-	private static Pattern mapPattern = Pattern.compile("\\(.+\\)");
+	private static Pattern iterablePattern = Pattern.compile("\\[\\d+\\]$");
+	private static Pattern mapPattern = Pattern.compile("\\(.+\\)$");
 	private static Boolean isGroovyPresent;
 	private static Class<?> groovyMetaClass;
 	
