@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,8 +28,8 @@ public class GunixVariableSerializer {
 
 	private static final String EMPTY_COLLECTION_NESTED_REFERENCE = NESTED_REFERENCE + Iterable.class + "|1";
 	private static final String EMPTY_MAP_NESTED_REFERENCE = NESTED_REFERENCE + Map.class + "|0";
-	private static Pattern iterablePattern = Pattern.compile("\\[\\d+\\]$");
-	private static Pattern mapPattern = Pattern.compile("\\(.+\\)$");
+	private static Pattern iterablePattern = Pattern.compile("\\[\\d+\\]");
+	private static Pattern mapPattern = Pattern.compile("\\(.+\\)");
 	private static Boolean isGroovyPresent;
 	private static Class<?> groovyMetaClass;
 	
@@ -97,15 +98,32 @@ public class GunixVariableSerializer {
 				stringifiedObject.putAll(childTypes);
 
 				Map<String, String> nestedReferences = new TreeMap<String, String>();
-
+				
+				AtomicReference<Boolean> isStandAloneItereableVar = new AtomicReference<Boolean>(Boolean.FALSE); 
 				stringifiedObject.forEach((key, value) -> {
 					try {
 						if (!key.endsWith(".class") && !key.equals(varName)) {
 							if ((value instanceof String) && value.toString().startsWith(NESTED_REFERENCE)) {
 								nestedReferences.put(key, (String) value);
 							} else {
-								String prop = isNotObject ? key.substring(isItereable ? key.indexOf("[") : key.indexOf("(")) : key.substring(varName.length() + 1);
-								Class<?> propType = pub.getPropertyType(ans, prop);
+								String prop = null;
+								int arrKeyIdx = -1;
+								if (isNotObject) {
+									if (isItereable && (arrKeyIdx = key.indexOf("[")) == -1) {
+										isStandAloneItereableVar.set(Boolean.TRUE);
+										return;
+									} else {
+										if (isStandAloneItereableVar.get()) {
+											prop = key.substring(key.lastIndexOf("["), key.lastIndexOf("]")+1);
+										} else {
+											prop = isItereable ? key.substring(arrKeyIdx) : key.substring(key.indexOf("("));
+										}
+									}
+								} else {
+									prop = key.substring(varName.length() + 1);
+								}
+								
+								Class<?> propType = isStandAloneItereableVar.get() ? value.getClass() : pub.getPropertyType(ans, prop);
 								if (value instanceof Double) {
 									if ((propType.isPrimitive() && propType.getName().equals("float")) || Float.class.isAssignableFrom(propType)) {
 										value = ((Double) value).floatValue();
