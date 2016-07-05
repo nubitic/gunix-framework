@@ -38,7 +38,7 @@ public class GunixVariableSerializer {
 	@SuppressWarnings({ "rawtypes" })
 	public static Object deserialize(String varName, List<Map<String, Object>> vars, ClassLoader classLoader) {
 		TreeMap<String, Object> stringifiedObject = new TreeMap<String, Object>();
-		vars.parallelStream().forEach(map -> {
+		vars.stream().forEach(map -> {
 			stringifiedObject.put((String) map.get("key"), getValue(map));
 		});
 		final Object ans;
@@ -77,14 +77,14 @@ public class GunixVariableSerializer {
 					}
 				}
 
-				stringifiedObject.keySet().parallelStream().filter(key -> iterablePattern.matcher(key).find() || mapPattern.matcher(key).find()).forEach(key -> {
+				stringifiedObject.keySet().stream().filter(key -> iterablePattern.matcher(key).find() || mapPattern.matcher(key).find()).forEach(key -> {
 					doMatcher(key, iterablePattern.matcher(key), new GunixArrayList(), iterableMapTypes);
 					doMatcher(key, mapPattern.matcher(key), new HashMap(), iterableMapTypes);
 				});
 
 				Map<String, Object> childTypes = new TreeMap<String, Object>();
 
-				stringifiedObject.keySet().parallelStream().filter(key -> (!key.equals(varClass)) && key.endsWith(".class")).forEach(key -> {
+				stringifiedObject.keySet().stream().filter(key -> (!key.equals(varClass)) && key.endsWith(".class")).forEach(key -> {
 					try {
 						Class<?> childClass = classLoader.loadClass(stringifiedObject.get(key).toString());
 						String newKey = key.substring(0, key.length() - 6);
