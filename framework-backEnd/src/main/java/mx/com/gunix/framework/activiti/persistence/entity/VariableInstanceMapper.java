@@ -25,7 +25,8 @@ public interface VariableInstanceMapper {
 			"	  ACTIVITI.ACT_RU_VARIABLE"+
 			"	WHERE"+
 			"	  EXECUTION_ID_ = #{executionId} and TASK_ID_ is null and REV_ >= #{revision}"+
-			"	AND type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}%' or name_ LIKE '${varName}[%' or name_ LIKE '${varName}(%')")
+			"	AND type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}%' or name_ LIKE '${varName}[%' or name_ LIKE '${varName}(%')" + 
+			" order by name_ ")
 	@ResultType(Map.class)
 	@Options(flushCache=true)
 	public List<Map<String,Object>> findGunixObjectByNameAndExecutionIdAndRevision(@Param("executionId") String executionId, @Param("varName") String varName, @Param("revision") Integer revision);
@@ -42,7 +43,8 @@ public interface VariableInstanceMapper {
 			"	WHERE"+
 			"	  EXECUTION_ID_ = #{executionId} and TASK_ID_ is null"+
 			"   AND rev_ >= (select rev_ from ACTIVITI.ACT_RU_VARIABLE v2 where v2.EXECUTION_ID_ = #{executionId} and v2.TASK_ID_ is null and v2.type_='"+GunixObjectVariableType.GUNIX_OBJECT+"' and strpos(#{varName},v2.name_)=1)" +
-			"	AND type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}%' or name_ LIKE '${varName}[%' or name_ LIKE '${varName}(%')")
+			"	AND type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}%' or name_ LIKE '${varName}[%' or name_ LIKE '${varName}(%')" + 
+			" order by name_ ")
 	@ResultType(Map.class)
 	@Options(flushCache=true)
 	public List<Map<String,Object>> findGunixObjectByNameAndExecutionId(@Param("executionId") String executionId, @Param("varName") String varName);
@@ -59,7 +61,8 @@ public interface VariableInstanceMapper {
 			"	WHERE"+
 			"	  EXECUTION_ID_ = #{executionId} and TASK_ID_ is null"+
 			"   AND rev_ >= (select rev_ from ACTIVITI.act_hi_varinst v2 where v2.EXECUTION_ID_ = #{executionId} and v2.TASK_ID_ is null and v2.var_type_='"+GunixObjectVariableType.GUNIX_OBJECT+"' and strpos(#{varName},v2.name_)=1)" +
-			"	AND var_type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}%' or name_ LIKE '${varName}[%'  or name_ LIKE '${varName}(%')")
+			"	AND var_type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}%' or name_ LIKE '${varName}[%'  or name_ LIKE '${varName}(%')" + 
+			" order by name_ ")
 	@ResultType(Map.class)
 	@Options(flushCache=true)
 	public List<Map<String,Object>> findHistoricGunixObjectByNameAndExecutionId(@Param("executionId") String executionId, @Param("varName") String varName);
@@ -75,7 +78,8 @@ public interface VariableInstanceMapper {
 			"	  ACTIVITI.act_hi_varinst"+
 			"	WHERE"+
 			"	  EXECUTION_ID_ = #{executionId} and TASK_ID_ is null"+
-			"	AND var_type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}%' or name_ LIKE '${varName}[%' or name_ LIKE '${varName}(%')")
+			"	AND var_type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}%' or name_ LIKE '${varName}[%' or name_ LIKE '${varName}(%')" + 
+			" order by name_ ")
 	@ResultType(Map.class)
 	@Options(flushCache=true)
 	public List<Map<String,Object>> findHistoricGunixObjectByNameAndExecutionIdAndRevision(@Param("executionId") String executionId, @Param("varName") String varName);
