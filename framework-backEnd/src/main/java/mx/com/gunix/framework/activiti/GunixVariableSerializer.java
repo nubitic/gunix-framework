@@ -257,15 +257,15 @@ public class GunixVariableSerializer {
 		}
 	}
 
-	public static Map<String, Object> serialize(String varName, Object object) {
+	public static Map<String, Object> serialize(String varName, Object object, boolean isNestedCyclingReferenceAware) {
 		Map<String, Object> stringifiedObject = new TreeMap<String, Object>();
-		List<String> processedObjectsHashes = new ArrayList<String>();
-		doAppend(object, stringifiedObject, varName, processedObjectsHashes);
+		List<String> processedObjectsHashes = isNestedCyclingReferenceAware ? new ArrayList<String>() : null;
+		doAppend(object, stringifiedObject, varName, processedObjectsHashes, isNestedCyclingReferenceAware);
 		return stringifiedObject;
 	}
 
 	@SuppressWarnings("rawtypes")
-	private static void doAppend(Object nestedObject, Map<String, Object> stringifiedObject, CharSequence currFieldStrBldr, List<String> processedObjectsHashes) {
+	private static void doAppend(Object nestedObject, Map<String, Object> stringifiedObject, CharSequence currFieldStrBldr, List<String> processedObjectsHashes, boolean isNestedCyclingReferenceAware) {
 		if (nestedObject != null) {
 			Class<?> clazz = nestedObject.getClass();
 			
@@ -291,18 +291,20 @@ public class GunixVariableSerializer {
 			if (BeanUtils.isSimpleProperty(clazz)) {
 				doPut(stringifiedObject, currFieldStrBldr, clazz, nestedObject);
 			} else {
-				String classHash = getClassHash(clazz, nestedObject);
-				if (!processedObjectsHashes.contains(classHash)) {
-					processedObjectsHashes.add(classHash);
+				String classHash = isNestedCyclingReferenceAware ? getClassHash(clazz, nestedObject) : null;
+				if (!isNestedCyclingReferenceAware || !processedObjectsHashes.contains(classHash)) {
+					if (isNestedCyclingReferenceAware) {
+						processedObjectsHashes.add(classHash);
+					}
 					if (Iterable.class.isAssignableFrom(clazz)) {
-						doIterable(((Iterable) nestedObject).iterator(), currFieldStrBldr, stringifiedObject, processedObjectsHashes);
+						doIterable(((Iterable) nestedObject).iterator(), currFieldStrBldr, stringifiedObject, processedObjectsHashes, isNestedCyclingReferenceAware);
 					} else {
 						if (Map.class.isAssignableFrom(clazz)) {
-							doMap((Map) nestedObject, currFieldStrBldr, stringifiedObject, processedObjectsHashes);
+							doMap((Map) nestedObject, currFieldStrBldr, stringifiedObject, processedObjectsHashes, isNestedCyclingReferenceAware);
 						} else {
 							BeanMap bm = new BeanMap(nestedObject);
 							bm.keyIterator().forEachRemaining(fieldName -> {
-								doAppend(bm.get(fieldName), stringifiedObject, new StringBuilder(currFieldStrBldr).append(".").append(fieldName), processedObjectsHashes);
+								doAppend(bm.get(fieldName), stringifiedObject, new StringBuilder(currFieldStrBldr).append(".").append(fieldName), processedObjectsHashes, isNestedCyclingReferenceAware);
 							});
 						}
 					}
@@ -319,28 +321,28 @@ public class GunixVariableSerializer {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private static void doMap(Map nestedMap, CharSequence currFieldStrBldr, Map<String, Object> stringifiedObject, List<String> processedObjectsHashes) {
+	private static void doMap(Map nestedMap, CharSequence currFieldStrBldr, Map<String, Object> stringifiedObject, List<String> processedObjectsHashes, boolean isNestedCyclingReferenceAware) {
 		for (Object key : nestedMap.keySet()) {
-			doPutOrAppendForIterableOrMapElement(nestedMap.get(key), new StringBuilder(currFieldStrBldr).append("(").append(key).append(")"), key.toString(), stringifiedObject, processedObjectsHashes);
+			doPutOrAppendForIterableOrMapElement(nestedMap.get(key), new StringBuilder(currFieldStrBldr).append("(").append(key).append(")"), key.toString(), stringifiedObject, processedObjectsHashes, isNestedCyclingReferenceAware);
 		}
 	}
 
 	@SuppressWarnings("rawtypes")
-	private static void doIterable(Iterator noIt, CharSequence currFieldStrBldr, Map<String, Object> stringifiedObject, List<String> processedObjectsHashes) {
+	private static void doIterable(Iterator noIt, CharSequence currFieldStrBldr, Map<String, Object> stringifiedObject, List<String> processedObjectsHashes, boolean isNestedCyclingReferenceAware) {
 		int i = 0;
 		while (noIt.hasNext()) {
-			doPutOrAppendForIterableOrMapElement(noIt.next(), new StringBuilder(currFieldStrBldr).append("[").append(i).append("]"), String.valueOf(i), stringifiedObject, processedObjectsHashes);
+			doPutOrAppendForIterableOrMapElement(noIt.next(), new StringBuilder(currFieldStrBldr).append("[").append(i).append("]"), String.valueOf(i), stringifiedObject, processedObjectsHashes, isNestedCyclingReferenceAware);
 			i++;
 		}
 	}
 
-	private static void doPutOrAppendForIterableOrMapElement(Object itObj, CharSequence indexedElement, String elementIndex, Map<String, Object> stringifiedObject, List<String> processedObjectsHashes) {
+	private static void doPutOrAppendForIterableOrMapElement(Object itObj, CharSequence indexedElement, String elementIndex, Map<String, Object> stringifiedObject, List<String> processedObjectsHashes, boolean isNestedCyclingReferenceAware) {
 		if (itObj != null) {
 			Class<?> clazzItObj = itObj.getClass();
 			if (BeanUtils.isSimpleProperty(clazzItObj)) {
 				doPut(stringifiedObject, indexedElement, clazzItObj, itObj);
 			} else {
-				doAppend(itObj, stringifiedObject, indexedElement, processedObjectsHashes);
+				doAppend(itObj, stringifiedObject, indexedElement, processedObjectsHashes, isNestedCyclingReferenceAware);
 			}
 		}
 	}

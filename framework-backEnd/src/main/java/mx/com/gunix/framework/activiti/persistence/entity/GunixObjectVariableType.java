@@ -87,7 +87,7 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 
 			if (value != null) {
 				Map<String, Object> variablesMap = new TreeMap<String, Object>();
-				variablesMap.putAll(GunixVariableSerializer.serialize(vie.getName(), value));
+				variablesMap.putAll(GunixVariableSerializer.serialize(vie.getName(), value, false));
 
 				vie.setTextValue(value.getClass().getName());
 				rs.setVariables(executionId, variablesMap);

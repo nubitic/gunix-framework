@@ -727,7 +727,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 				.filter(filtro->(filtro.getScope()==Variable.Scope.PROCESO))
 				.forEach(filtro->{
 					Map<String, Object> fvm = new TreeMap<String, Object>();
-					fvm.putAll(GunixVariableSerializer.serialize(filtro.getNombre(), filtro.getValor()));
+					fvm.putAll(GunixVariableSerializer.serialize(filtro.getNombre(), filtro.getValor(), false));
 					fvm.forEach((varName, varValue) -> {
 						switch (filtro.getlOp()) {
 						case IGUAL:
@@ -759,7 +759,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 				.filter(filtro->(filtro.getScope()==Variable.Scope.PROCESO))
 				.forEach(filtro->{
 					Map<String, Object> fvm = new TreeMap<String, Object>();
-					fvm.putAll(GunixVariableSerializer.serialize(filtro.getNombre(), filtro.getValor()));
+					fvm.putAll(GunixVariableSerializer.serialize(filtro.getNombre(), filtro.getValor(), false));
 					fvm.forEach((varName, varValue) -> {
 						switch (filtro.getlOp()) {
 						case IGUAL:
