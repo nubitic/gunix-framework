@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.activiti.engine.RepositoryService;
@@ -11,6 +12,7 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.activiti.engine.impl.persistence.deploy.DeploymentCache;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.apache.log4j.Logger;
 import org.openl.rules.activiti.spring.OpenLRulesHelper;
 import org.openl.rules.activiti.spring.result.ResultValue;
 import org.openl.rules.activiti.util.ResourceUtils;
@@ -29,6 +31,7 @@ import mx.com.gunix.framework.documents.DocumentService;
 import mx.com.gunix.framework.documents.domain.Documento;
 
 public class OpenLEngine extends org.openl.rules.activiti.spring.OpenLEngine implements ApplicationContextAware {
+	private static final Logger log = Logger.getLogger(OpenLEngine.class);
 	private ApplicationContext applicationContext;
 	private DocumentService ds;
 	private static Field oLRHCacheField;
@@ -107,6 +110,11 @@ public class OpenLEngine extends org.openl.rules.activiti.spring.OpenLEngine imp
 		}
 
 		rv = super.execute(execution, resource, methodName, args);
+		if (log.isDebugEnabled()) {
+			Object ans = rv.value();
+			String ansStr = ans != null ? ans.getClass().isArray() ? Arrays.toString((Object[]) ans) : ans.toString() : "null";
+			log.debug(new StringBuilder(execution.getProcessInstanceId()).append(": ").append(resource).append("/").append(methodName).append("(").append(Arrays.toString(args)).append(")").append("=").append(ansStr).toString());
+		}
 		return rv;
 	}
 
