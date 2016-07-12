@@ -13,6 +13,7 @@ import org.activiti.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.activiti.engine.impl.persistence.deploy.DeploymentCache;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.log4j.Logger;
+import org.openl.rules.activiti.ResourceCompileException;
 import org.openl.rules.activiti.spring.OpenLRulesHelper;
 import org.openl.rules.activiti.spring.result.ResultValue;
 import org.openl.rules.activiti.util.ResourceUtils;
@@ -35,11 +36,14 @@ public class OpenLEngine extends org.openl.rules.activiti.spring.OpenLEngine imp
 	private ApplicationContext applicationContext;
 	private DocumentService ds;
 	private static Field oLRHCacheField;
-
+	private static Field oLRHcacheInstance;
+	
 	static {
 		try {
 			oLRHCacheField = OpenLRulesHelper.class.getDeclaredField("cache");
 			oLRHCacheField.setAccessible(true);
+			oLRHcacheInstance = OpenLRulesHelper.class.getDeclaredField("cacheInstance");
+			oLRHcacheInstance.setAccessible(true);
 		} catch (NoSuchFieldException | SecurityException e) {
 			throw new RuntimeException(e);
 		}
@@ -109,13 +113,54 @@ public class OpenLEngine extends org.openl.rules.activiti.spring.OpenLEngine imp
 			}
 		}
 
-		rv = super.execute(execution, resource, methodName, args);
+		rv = doExecute(execution, resource, methodName, args);
 		if (log.isDebugEnabled()) {
 			Object ans = rv.value();
 			String ansStr = ans != null ? ans.getClass().isArray() ? Arrays.toString((Object[]) ans) : ans.toString() : "null";
 			log.debug(new StringBuilder(execution.getProcessInstanceId()).append(": ").append(resource).append("/").append(methodName).append("(").append(Arrays.toString(args)).append(")").append("=").append(ansStr).toString());
 		}
 		return rv;
+	}
+
+	private ResultValue doExecute(DelegateExecution execution, String resource, String methodName, Object[] args) throws Exception {
+		String processDefinitionId = execution.getProcessDefinitionId();
+		RepositoryService repositoryService = execution.getEngineServices().getRepositoryService();
+		ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
+
+		@SuppressWarnings("rawtypes")
+		ProjectEngineFactory projectEngineFactory = OpenLRulesHelper.getInstance().get(processDefinition.getDeploymentId(), resource);
+		Class<?> interfaceClass = projectEngineFactory.getInterfaceClass();
+		Object instance = doGetInstance(processDefinition.getDeploymentId(), resource);
+		if (interfaceClass == null) {
+			interfaceClass = instance.getClass();
+		}
+
+		Object result = org.openl.rules.activiti.spring.OpenLEngine.findAndInvokeMethod(methodName, instance, interfaceClass, args);
+
+		return new ResultValue(result);
+	}
+
+	@SuppressWarnings("unchecked")
+	private Object doGetInstance(String deploymentId, String resource) throws IllegalArgumentException, IllegalAccessException {
+		// First find in cache
+		Map<String, DeploymentCache<Object>> cacheInstance = (Map<String, DeploymentCache<Object>>)oLRHcacheInstance.get(OpenLRulesHelper.getInstance());
+		DeploymentCache<Object> deploymentCache = cacheInstance.get(deploymentId);
+		if (deploymentCache == null) {
+			deploymentCache = new DefaultDeploymentCache<Object>();
+			cacheInstance.put(deploymentId, deploymentCache);
+		}
+		Object instance = deploymentCache.get(resource);
+		if (instance == null) {
+			@SuppressWarnings("rawtypes")
+			ProjectEngineFactory projectEngineFactory = OpenLRulesHelper.getInstance().get(deploymentId, resource);
+			try {
+				instance = projectEngineFactory.newInstance();
+			} catch (Exception e) {
+				throw new ResourceCompileException("Resource with name '" + resource + "' in deployment with id '" + deploymentId + "' compile was fail!", e);
+			}
+			deploymentCache.add(resource, instance);
+		}
+		return instance;
 	}
 
 	@Override
