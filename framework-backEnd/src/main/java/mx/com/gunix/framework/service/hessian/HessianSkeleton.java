@@ -2,12 +2,12 @@ package mx.com.gunix.framework.service.hessian;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import mx.com.gunix.framework.service.UsuarioService;
 
+import org.apache.log4j.Logger;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,7 +18,7 @@ import com.caucho.hessian.io.AbstractHessianOutput;
 import com.caucho.services.server.ServiceContext;
 
 public class HessianSkeleton extends com.caucho.hessian.server.HessianSkeleton {
-	private static final Logger log = Logger.getLogger(HessianSkeleton.class.getName());
+	private static final Logger log = Logger.getLogger(HessianSkeleton.class);
 	private final String key = UUID.randomUUID().toString();
 	
 	public HessianSkeleton(Object service, Class<?> apiClass) {
@@ -102,9 +102,14 @@ public class HessianSkeleton extends com.caucho.hessian.server.HessianSkeleton {
 		Object result = null;
 
 		try {
+			if (log.isDebugEnabled()) {
+				if (SecurityContextHolder.getContext().getAuthentication() != null) {
+					log.debug("Invocando " + method.toGenericString() + " con: " + SecurityContextHolder.getContext().getAuthentication().getPrincipal() + ", "+Arrays.toString(values));
+				}
+			}
 			result = method.invoke(service, values);
 		} catch (Exception e) {
-			log.log(Level.SEVERE,"Error en invocación remota", e);
+			log.error("Error en invocación remota", e);
 			Throwable e1 = e;
 			if (e1 instanceof InvocationTargetException)
 				e1 = ((InvocationTargetException) e).getTargetException();

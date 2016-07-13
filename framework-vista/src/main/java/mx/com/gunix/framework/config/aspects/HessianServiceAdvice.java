@@ -3,10 +3,7 @@ package mx.com.gunix.framework.config.aspects;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-import mx.com.gunix.framework.security.PersistentTokenBasedRememberMeServices;
-import mx.com.gunix.framework.security.josso.JOSSOAuthenticationProvider;
-import mx.com.gunix.framework.service.UsuarioService;
-
+import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -21,9 +18,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.stereotype.Component;
 
+import mx.com.gunix.framework.security.PersistentTokenBasedRememberMeServices;
+import mx.com.gunix.framework.security.josso.JOSSOAuthenticationProvider;
+import mx.com.gunix.framework.service.UsuarioService;
+
 @Aspect
 @Component
 public class HessianServiceAdvice {
+	private static final Logger log = Logger.getLogger(HessianServiceAdvice.class);
+	
 	@Around("execution(* net.bytebuddy.renamed..*.*(..))")
 	public Object aroundAnyMethodInsideAClassGeneratedByByteBuddy(ProceedingJoinPoint pjp){
 		try {
@@ -74,6 +77,12 @@ public class HessianServiceAdvice {
 						){
 					generatedMethod=m;
 					break;
+				}
+			}
+			
+			if (log.isDebugEnabled()) {
+				if (newArgs[newArgs.length - 1] != null) {
+					log.debug("Invocando " + generatedMethod.toGenericString() + " con: " + Arrays.toString(newArgs));
 				}
 			}
 			

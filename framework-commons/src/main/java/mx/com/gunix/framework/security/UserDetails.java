@@ -97,6 +97,11 @@ public class UserDetails extends Usuario implements org.springframework.security
 		return selectedAuthority.getAuthority();
 	}
 
+	@Override
+	public String toString() {
+		return "UserDetails [usuario=" + super.toString() + ", autorities=" + autorities + ", selectedAuthority=" + selectedAuthority + "]";
+	}
+
 	public static final class GunixSimpleGrantedAuthority implements GrantedAuthority {
 		private static final long serialVersionUID = 1L;
 
