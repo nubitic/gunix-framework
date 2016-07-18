@@ -39,6 +39,9 @@ public class NestingBeanItem<BT> extends BeanItem<BT> {
 					// Enumerate all sub-properties
 					Map<String, ?> pds = getPropertyDescriptors(propertyType);
 					pds.keySet().forEach(key -> {
+						if (p.getType().equals(propertyType) && !propertyId.equals(key)) {
+							return;
+						}
 						String qualifiedPropertyId = propertyId + "." + key;
 						nestedProperties.add(qualifiedPropertyId);
 					});
