@@ -15,7 +15,9 @@ import com.vaadin.data.Property.ReadOnlyException;
 
 @SuppressWarnings("serial")
 public class NestingBeanItem<BT> extends BeanItem<BT> {
-
+	private static Boolean isGroovyPresent;
+	private static Class<?> groovyMetaClass;
+	
 	public NestingBeanItem(final BT nestedObject, Class<BT> beanClass) {
 		super(nestedObject, beanClass);
 		exploreProperties(getItemPropertyIds());
@@ -28,7 +30,7 @@ public class NestingBeanItem<BT> extends BeanItem<BT> {
 		for (final Object propertyId : propertyIds) {
 			Property p = getItemProperty(propertyId);
 			Class<?> propertyType = p.getType();
-			if (!BeanUtils.isSimpleProperty(propertyType) && !Iterable.class.isAssignableFrom(propertyType) && !Map.class.isAssignableFrom(propertyType)) {
+			if (!BeanUtils.isSimpleProperty(propertyType) && !Iterable.class.isAssignableFrom(propertyType) && !Map.class.isAssignableFrom(propertyType) && !isGroovyMetaClass(propertyType)) {
 				try {
 					if (p.getValue() == null) {
 						propertyType.getConstructor((Class<?>[]) null);
@@ -60,5 +62,24 @@ public class NestingBeanItem<BT> extends BeanItem<BT> {
 		if (!nestedProperties.isEmpty()) {
 			exploreProperties(nestedProperties);
 		}
+	}
+
+	private boolean isGroovyMetaClass(Class<?> propertyType) {
+		if (isGroovyPresent == null && propertyType != null) {
+			try {
+				groovyMetaClass = Class.forName("groovy.lang.MetaClass");
+				isGroovyPresent = Boolean.TRUE;
+			} catch (ClassNotFoundException ignorar) {
+				isGroovyPresent = Boolean.FALSE;
+			}
+		}
+
+		if (groovyMetaClass != null) {
+			if (groovyMetaClass.isAssignableFrom(propertyType)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
