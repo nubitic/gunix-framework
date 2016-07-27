@@ -2,6 +2,7 @@ package mx.com.gunix.framework.ui.vaadin.view;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -28,6 +29,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Window;
@@ -137,39 +139,7 @@ public class MainViewLayout extends VerticalLayout{
 		addComponent(hl);
 		setExpandRatio(hl, 0.0f);
 
-		if (u.getAplicaciones().size() > 1) {
-			aplicacionesTab = new TabSheet();
-			aplicacionesTab.setImmediate(true);
-
-			u.getAplicaciones().stream().forEach(aplicacion -> {
-				Header h = applicationContext.getBean(Header.class);
-				h.renderHeader(aplicacion);
-				aplicacionesTab.addTab(h, aplicacion.getDescripcion());
-				aplicacionesTab.addSelectedTabChangeListener(selectedTab -> {
-					Header iH = (Header) selectedTab.getTabSheet().getSelectedTab();
-					updateAppInfo(iH, appInfo);
-					UI.getCurrent().setNavigator(iH.getNavigator());
-				});
-			});
-
-			addComponent(aplicacionesTab);
-
-			Header iH = (Header) aplicacionesTab.getSelectedTab();
-			updateAppInfo(iH, appInfo);
-			UI.getCurrent().setNavigator(iH.getNavigator());
-			setExpandRatio(aplicacionesTab, 1.0f);
-		} else {
-			if (!u.getAplicaciones().isEmpty()) {
-				Header h = applicationContext.getBean(Header.class);
-				Aplicacion app = u.getAplicaciones().get(0);
-				h.renderHeader(app);
-				addComponent(h);
-				UI.getCurrent().setNavigator(h.getNavigator());
-				setExpandRatio(h, 1.0f);
-				setSpacing(true);
-				updateAppInfo(h, appInfo);
-			}
-		}
+		renderApps(u.getAplicaciones(), appInfo);
 		
 		downloadsManager = new Grid();
 		downloadsManager.addColumn("Archivo", String.class).setRenderer(new TextRenderer());
@@ -199,14 +169,53 @@ public class MainViewLayout extends VerticalLayout{
 		userDetailsLayout.addComponent(logoutButton);
 	}
 
+	protected void renderApps(List<Aplicacion> apps, HorizontalLayout appInfo) {
+		if (apps.size() > 1) {
+			aplicacionesTab = new TabSheet();
+			aplicacionesTab.setImmediate(true);
+
+			apps.stream().forEach(aplicacion -> {
+				Header h = applicationContext.getBean(Header.class);
+				h.renderHeader(aplicacion);
+				aplicacionesTab.addTab(h, aplicacion.getDescripcion());
+				aplicacionesTab.addSelectedTabChangeListener(selectedTab -> {
+					Header iH = (Header) selectedTab.getTabSheet().getSelectedTab();
+					updateAppInfo(iH, appInfo);
+					UI.getCurrent().setNavigator(iH.getNavigator());
+				});
+			});
+
+			addComponent(aplicacionesTab);
+
+			Header iH = (Header) aplicacionesTab.getSelectedTab();
+			updateAppInfo(iH, appInfo);
+			UI.getCurrent().setNavigator(iH.getNavigator());
+			setExpandRatio(aplicacionesTab, 1.0f);
+		} else {
+			if (!apps.isEmpty()) {
+				Header h = applicationContext.getBean(Header.class);
+				Aplicacion app = apps.get(0);
+				h.renderHeader(app);
+				addComponent(h);
+				UI.getCurrent().setNavigator(h.getNavigator());
+				setExpandRatio(h, 1.0f);
+				setSpacing(true);
+				updateAppInfo(h, appInfo);
+			}
+		}
+	}
+
 	private void updateAppInfo(Header iH, HorizontalLayout appInfo) {
-		Page.getCurrent().setTitle(iH.getAplicacion().getDescripcion());
-		appInfo.removeAllComponents();
-		appInfo.addComponent(new Image(null, new ThemeResource("img/" + iH.getAplicacion().getIcono())));
-		Label appTitle = new Label(iH.getAplicacion().getDescripcion());
-		appTitle.addStyleName("app-title");
-		appInfo.addComponent(appTitle);
-		appInfo.setComponentAlignment(appTitle, Alignment.MIDDLE_LEFT);
+		if (appInfo != null) {
+			Page.getCurrent().setTitle(iH.getAplicacion().getDescripcion());
+			JavaScript.getCurrent().execute(" window.parent.document.title = window.parent.document.getElementById('gnxVdnIF').contentDocument.title;");
+			appInfo.removeAllComponents();
+			appInfo.addComponent(new Image(null, new ThemeResource("img/" + iH.getAplicacion().getIcono())));
+			Label appTitle = new Label(iH.getAplicacion().getDescripcion());
+			appTitle.addStyleName("app-title");
+			appInfo.addComponent(appTitle);
+			appInfo.setComponentAlignment(appTitle, Alignment.MIDDLE_LEFT);
+		}
 	}
 
 	public void enter(ViewChangeEvent event) {
