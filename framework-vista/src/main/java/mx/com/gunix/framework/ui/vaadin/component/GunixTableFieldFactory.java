@@ -83,7 +83,11 @@ public class GunixTableFieldFactory extends DefaultFieldFactory {
 						});
 						field = cbField;
 					} else {
-						field = super.createField(container, itemId, propertyId, uiContext);
+						if (String.class.isAssignableFrom(fieldType)) {
+							field = new GunixLabelField();
+						} else {
+							field = super.createField(container, itemId, propertyId, uiContext);
+						}
 					}
 				}
 			} else {
