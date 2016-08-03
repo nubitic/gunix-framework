@@ -10,7 +10,7 @@ import com.vaadin.ui.TextField;
 
 public class GunixLabelField extends Label implements Field<String> {
 	private static final long serialVersionUID = 1L;
-	TextField innerField = new TextField();
+	private TextField innerField;
 
 	@Override
 	public void focus() {
@@ -135,6 +135,9 @@ public class GunixLabelField extends Label implements Field<String> {
 	@Override
 	public void setValue(String newStringValue) {
 		super.setValue(newStringValue);
+		if (innerField == null) {
+			innerField = new TextField();
+		}
 		innerField.setValue(newStringValue);
 	}
 

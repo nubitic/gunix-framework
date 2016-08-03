@@ -37,9 +37,9 @@ public class NestingBeanItem<BT> extends BeanItem<BT> {
 						p.setValue(propertyType.newInstance());
 					}
 					// Enumerate all sub-properties
-					Map<String, ?> pds = getPropertyDescriptors(propertyType);
+					Map<String, ?> pds = (Map<String, ?>) getPropertyDescriptors(propertyType);
 					pds.keySet().forEach(key -> {
-						if (p.getType().equals(propertyType) && !propertyId.equals(key)) {
+						if (((VaadinPropertyDescriptor) pds.get(key)).getPropertyType().equals(propertyType)) {
 							return;
 						}
 						String qualifiedPropertyId = propertyId + "." + key;
