@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
-
-import mx.com.gunix.framework.util.CustomLabelEnum;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
@@ -25,10 +25,13 @@ import com.vaadin.ui.DateField;
 import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
 
+import mx.com.gunix.framework.util.CustomLabelEnum;
+
 public class GunixTableFieldFactory extends DefaultFieldFactory {
 	private static final long serialVersionUID = 1L;
 	private Map<String,GunixFieldPropertyRel> previouslyCreatedFieldsMap = new HashMap<String,GunixFieldPropertyRel>();
 	private Map<String, FieldBuilder> customFieldBuilder = new HashMap<String, FieldBuilder>();
+	private Set<String> propiedadesROSet = new HashSet<String>();
 	
 	@SuppressWarnings("unchecked")
 	public Field<?> createField(Container container, Object itemId, Object propertyId, Component uiContext) {
@@ -38,56 +41,56 @@ public class GunixTableFieldFactory extends DefaultFieldFactory {
 			Field<?> field = null;
 			Class<?> fieldType = container.getContainerProperty(itemId, propertyId).getType();
 			FieldBuilder fb = customFieldBuilder.get(propertyId);
-			if(fb==null){
-				if (Date.class.isAssignableFrom(fieldType)) {
-					final DateField df = new DateField() {
-						private static final long serialVersionUID = 1L;
-	
-						@Override
-						protected Date handleUnparsableDateString(String dateString) throws ConversionException {
-							try {
-								return super.handleUnparsableDateString(dateString);
-							} catch (Converter.ConversionException reThrow) {
-								getErrorHandler().error(new ConnectorErrorEvent(this ,new Validator.InvalidValueException(reThrow.getMessage())));
-								throw reThrow;
-							}
-						}
-	
-						@Override
-						public ErrorMessage getErrorMessage() {
-							if (!(GunixViewErrorHandler.getCurrent().isInvalidValueComponent(this))) {
-								return super.getErrorMessage();
-							} else {
-								return getComponentError();
-							}
-						}
-					};
-					df.setResolution(Resolution.DAY);
-					df.setParseErrorMessage("Fecha inválida");
-					field = df;
+			if (fb == null) {
+				if (propiedadesROSet.contains(propertyId)) {
+					field = new GunixLabelField();
 				} else {
-					if (fieldType.isEnum()) {
-						ComboBox cbField = new ComboBox();
-						cbField.addContainerProperty("caption", String.class, "");
-						cbField.setItemCaptionPropertyId("caption");
-						boolean isCustomLabelEnum = CustomLabelEnum.class.isAssignableFrom(fieldType); 
-						Arrays.asList(fieldType.getEnumConstants()).forEach(enumConstant -> {
-							Item it = cbField.addItem(enumConstant);
-							String label = null;
-							if (isCustomLabelEnum) {
-								label = ((CustomLabelEnum) enumConstant).getLabel();
-							} else {
-								label = enumConstant.toString();
+					if (Date.class.isAssignableFrom(fieldType)) {
+						final DateField df = new DateField() {
+							private static final long serialVersionUID = 1L;
+
+							@Override
+							protected Date handleUnparsableDateString(String dateString) throws ConversionException {
+								try {
+									return super.handleUnparsableDateString(dateString);
+								} catch (Converter.ConversionException reThrow) {
+									getErrorHandler().error(new ConnectorErrorEvent(this, new Validator.InvalidValueException(reThrow.getMessage())));
+									throw reThrow;
+								}
 							}
-							it.getItemProperty("caption").setValue(label);
-						});
-						field = cbField;
+
+							@Override
+							public ErrorMessage getErrorMessage() {
+								if (!(GunixViewErrorHandler.getCurrent().isInvalidValueComponent(this))) {
+									return super.getErrorMessage();
+								} else {
+									return getComponentError();
+								}
+							}
+						};
+						df.setResolution(Resolution.DAY);
+						df.setParseErrorMessage("Fecha inválida");
+						field = df;
 					} else {
-						/*if (String.class.isAssignableFrom(fieldType)) {
-							field = new GunixLabelField();
-						} else {*/
+						if (fieldType.isEnum()) {
+							ComboBox cbField = new ComboBox();
+							cbField.addContainerProperty("caption", String.class, "");
+							cbField.setItemCaptionPropertyId("caption");
+							boolean isCustomLabelEnum = CustomLabelEnum.class.isAssignableFrom(fieldType);
+							Arrays.asList(fieldType.getEnumConstants()).forEach(enumConstant -> {
+								Item it = cbField.addItem(enumConstant);
+								String label = null;
+								if (isCustomLabelEnum) {
+									label = ((CustomLabelEnum) enumConstant).getLabel();
+								} else {
+									label = enumConstant.toString();
+								}
+								it.getItemProperty("caption").setValue(label);
+							});
+							field = cbField;
+						} else {
 							field = super.createField(container, itemId, propertyId, uiContext);
-						//}
+						}
 					}
 				}
 			} else {
@@ -182,5 +185,9 @@ public class GunixTableFieldFactory extends DefaultFieldFactory {
 			}
 			return field;
 		}
+	}
+
+	public void setReadOnlyProperties(String... propiedadesRO) {
+		propiedadesROSet.addAll(Arrays.asList(propiedadesRO));
 	}
 }
