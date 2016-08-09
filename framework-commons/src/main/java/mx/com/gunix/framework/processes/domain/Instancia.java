@@ -12,6 +12,7 @@ public class Instancia implements Serializable {
 	}
 	
 	private String processKey;
+	private String processDefinitionId;
 	private String id;
 	private List<Variable<?>> variables;
 	private String comentario;
@@ -118,6 +119,15 @@ public class Instancia implements Serializable {
 		this.volatil = volatil;
 	}
 
+	public String getProcessDefinitionId() {
+		return processDefinitionId;
+	}
+	
+
+	public void setProcessDefinitionId(String processDefinitionId) {
+		this.processDefinitionId = processDefinitionId;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

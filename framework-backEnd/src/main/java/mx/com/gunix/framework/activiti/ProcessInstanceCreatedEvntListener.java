@@ -20,6 +20,8 @@ public class ProcessInstanceCreatedEvntListener implements ActivitiEventListener
 				ProcessInstance pi = (ProcessInstance) entityEvnt.getEntity();
 				Instancia pIns = new Instancia();
 				pIns.setId(pi.getId());
+				pIns.setProcessDefinitionId(pi.getProcessDefinitionId());
+				pIns.setProcessKey(pi.getProcessDefinitionKey());
 				pIns.setVolatil(ActivitiService.VOLATIL.equals(Context.getProcessEngineConfiguration().getRepositoryService().getProcessDefinition(pi.getProcessDefinitionId()).getCategory()));
 				GunixObjectVariableType.setCurrentInstancia(pIns);
 			}

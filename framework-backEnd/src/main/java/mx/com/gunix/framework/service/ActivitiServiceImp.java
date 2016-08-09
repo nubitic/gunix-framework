@@ -186,6 +186,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			}
 			instancia = new Instancia();
 			instancia.setId(pi.getId());
+			instancia.setProcessDefinitionId(pi.getProcessDefinitionId());
 			instancia.setComentario(comentario);
 			instancia.setProcessKey(pi.getBusinessKey());
 			instancia.setUsuario(usuario.getIdUsuario());
@@ -377,6 +378,8 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		
 		Instancia instancia = new Instancia();
 		instancia.setId(processInstanceId);
+		instancia.setProcessDefinitionId(hpi.getProcessDefinitionId());
+		instancia.setProcessKey(hpi.getProcessDefinitionKey());
 		instancia.setInicio(hpi.getStartTime());
 		instancia.setTermino(hpi.getEndTime());
 		
@@ -596,6 +599,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 								Instancia inst = new Instancia();
 								HistoricProcessInstance hpi = getHpi(pid.getId(), historicosHolder.get());
 								inst.setId(pid.getId());
+								inst.setProcessDefinitionId(pid.getProcessDefinitionId());
 								inst.setInicio(hpi.getStartTime());
 								inst.setProcessKey(processKey);
 								inst.setTermino(hpi.getEndTime());
@@ -620,6 +624,8 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 							hpis.forEach(hpid -> {
 								Instancia inst = new Instancia();
 								inst.setId(hpid.getId());
+								inst.setProcessDefinitionId(hpid.getProcessDefinitionId());
+								inst.setProcessKey(hpid.getProcessDefinitionKey());
 								inst.setInicio(hpid.getStartTime());
 								inst.setProcessKey(processKey);
 								inst.setTermino(hpid.getEndTime());

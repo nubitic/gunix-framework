@@ -38,6 +38,7 @@ public class ExecuteAsyncSecuredRunnable extends ExecuteAsyncRunnable {
 			
 			Instancia instancia = new Instancia();
 			instancia.setId(job.getProcessInstanceId());
+			instancia.setProcessDefinitionId(job.getProcessDefinitionId());
 			instancia.setVolatil(ActivitiService.VOLATIL.equals(repos.getProcessDefinition(job.getProcessDefinitionId()).getCategory()));
 			GunixObjectVariableType.setCurrentInstancia(instancia);
 			super.run();

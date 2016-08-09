@@ -231,7 +231,7 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		UI.getCurrent().markAsDirtyRecursive();
 	}
 	
-	Tarea getTarea() {
+	protected Tarea getTarea() {
 		return tarea;
 	}
 	
