@@ -4,6 +4,8 @@ import java.util.Collection;
 
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.shared.ui.label.LabelState;
+import com.vaadin.shared.util.SharedUtil;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
@@ -134,7 +136,16 @@ public class GunixLabelField extends Label implements Field<String> {
 
 	@Override
 	public void setValue(String newStringValue) {
-		super.setValue(newStringValue);
+		try {
+			super.setValue(newStringValue);
+		} catch (IllegalStateException ignorar) {
+			LabelState state = getState(true);
+			String oldTextValue = state.text;
+			if (!SharedUtil.equals(oldTextValue, newStringValue)) {
+				getState().text = newStringValue;
+				fireValueChange();
+			}
+		}
 		if (innerField == null) {
 			innerField = new TextField();
 		}
