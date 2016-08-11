@@ -1,11 +1,12 @@
 package mx.com.gunix.framework.ui.vaadin.component;
 
 import java.util.Collection;
+import java.util.Locale;
 
+import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
-import com.vaadin.shared.ui.label.LabelState;
-import com.vaadin.shared.util.SharedUtil;
+import com.vaadin.data.util.converter.ConverterUtil;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
@@ -134,22 +135,32 @@ public class GunixLabelField extends Label implements Field<String> {
 		innerField.clear();
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void setValue(String newStringValue) {
 		try {
 			super.setValue(newStringValue);
 		} catch (IllegalStateException ignorar) {
-			LabelState state = getState(true);
-			String oldTextValue = state.text;
-			if (!SharedUtil.equals(oldTextValue, newStringValue)) {
-				getState().text = newStringValue;
-				fireValueChange();
+			Property prop = getPropertyDataSource();
+			if (prop != null) {
+				getPropertyDataSource().setValue(prop.getType().equals(String.class) ? 
+													newStringValue 
+												: getConverter() == null ? 
+														ConverterUtil.getConverter(String.class, prop.getType(), null).convertToModel(newStringValue, prop.getType(), Locale.getDefault()) 
+													: getConverter().convertToModel(newStringValue, prop.getType(), Locale.getDefault()));
 			}
 		}
 		if (innerField == null) {
 			innerField = new TextField();
 		}
 		innerField.setValue(newStringValue);
+		markAsDirty();
+	}
+
+	@Override
+	public String getValue() {
+		// TODO Auto-generated method stub
+		return super.getValue();
 	}
 
 }

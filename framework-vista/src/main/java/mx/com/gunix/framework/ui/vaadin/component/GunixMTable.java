@@ -149,6 +149,15 @@ public class GunixMTable<T extends Serializable> extends MTable<T> {
 								}
 							}
 						}
+
+						@Override
+						public void setValue(Object newValue) throws com.vaadin.data.Property.ReadOnlyException {
+							Object oldVal = getValue();
+							super.setValue(newValue);
+							if (oldVal != null ? !oldVal.equals(newValue) : oldVal != newValue) {
+								fireValueChange();
+							}
+						}
 					};
 				}
 
