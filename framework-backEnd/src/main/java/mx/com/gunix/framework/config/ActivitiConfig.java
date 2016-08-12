@@ -54,7 +54,6 @@ import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.activiti.spring.SpringRejectedJobsHandler;
 import org.activiti.spring.autodeployment.AutoDeploymentStrategy;
 import org.activiti.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
-import org.openl.rules.activiti.spring.OpenLEngine;
 import org.openl.rules.activiti.spring.OpenLResourcesHandleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +77,7 @@ import mx.com.gunix.framework.activiti.ExecuteAsyncSecuredRunnable;
 import mx.com.gunix.framework.activiti.FloatType;
 import mx.com.gunix.framework.activiti.ProcessInstanceCreatedEvntListener;
 import mx.com.gunix.framework.activiti.persistence.entity.GunixObjectVariableType;
+import mx.com.gunix.framework.openlrules.activiti.spring.OpenLEngine;
 import mx.com.gunix.framework.processes.domain.ProgressUpdate;
 import mx.com.gunix.framework.service.ActivitiService;
 
@@ -365,7 +365,7 @@ public class ActivitiConfig {
 	
 	@Bean
 	public OpenLEngine openLRules(){
-		return new mx.com.gunix.framework.openlrules.activiti.spring.OpenLEngine();
+		return new OpenLEngine();
 	}
 
 	static final class SpringAsyncSecuredExecutor extends SpringAsyncExecutor implements SpringRejectedJobsHandler {

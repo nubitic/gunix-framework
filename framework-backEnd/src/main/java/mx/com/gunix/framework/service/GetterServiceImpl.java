@@ -40,11 +40,26 @@ public class GetterServiceImpl implements GetterService, ApplicationContextAware
 		String serviceName = serviceNameAndMethod[0];
 		String methodName = serviceNameAndMethod[1];
 
+		Object[] argsWithOutPIDDIF = args;
+		if (args != null && args.length > 0 && args[0].equals(GetterService.INCLUDES_PID_PDID)) {
+			String[] pidPdidArr = new String[2];
+			if (args.length > 3) {
+				argsWithOutPIDDIF = new Object[args.length - 3];
+				System.arraycopy(args, 1, argsWithOutPIDDIF, 0, args.length - 3);
+				pidPdidArr[GetterService.PROCESS_INSTANCEID] = (String) args[args.length - 2];
+				pidPdidArr[GetterService.PROCESS_DEFINITIONID] = (String) args[args.length - 1];
+			} else {
+				argsWithOutPIDDIF = null;
+				pidPdidArr[GetterService.PROCESS_INSTANCEID] = (String) args[1];
+				pidPdidArr[GetterService.PROCESS_DEFINITIONID] = (String) args[2];
+			}
+			GetterService.pidPdid.set(pidPdidArr);
+		}
 		if (applicationContext.containsBean(serviceName)) {
 			Object service = getTargetObject(applicationContext.getBean(serviceName));
 			Class<?>[] argTypes = null;
-			Method m = findMethod(service.getClass(), methodName, args!=null?argTypes = Arrays
-																		.asList(args)
+			Method m = findMethod(service.getClass(), methodName, argsWithOutPIDDIF!=null?argTypes = Arrays
+																		.asList(argsWithOutPIDDIF)
 																		.stream()
 																		.map(s -> {
 																				return s != null ? s.getClass() : null;
@@ -54,7 +69,7 @@ public class GetterServiceImpl implements GetterService, ApplicationContextAware
 			if (m == null) {
 				throw new IllegalArgumentException("No se encontró el método " + methodName + " con argumentos: " + (argTypes != null ? Arrays.toString(argTypes) : "SIN ARGUMENTOS"));
 			}
-			return (Serializable) ReflectionUtils.invokeMethod(m, service, args);
+			return (Serializable) ReflectionUtils.invokeMethod(m, service, argsWithOutPIDDIF);
 		} else {
 			throw new IllegalArgumentException("No se encontró el servicio " + serviceName);
 		}

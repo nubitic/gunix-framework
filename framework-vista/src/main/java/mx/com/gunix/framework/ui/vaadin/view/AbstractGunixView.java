@@ -348,7 +348,21 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	}
 	
 	protected Serializable get(String uri, Object... args) {
-		return gs.get(uri, args);
+		Object[] argsWithPIDDIF = null;
+		if (args != null) {
+			argsWithPIDDIF = new Object[args.length + 3];
+			System.arraycopy(args, 0, argsWithPIDDIF, 1, args.length);
+			argsWithPIDDIF[0] = GetterService.INCLUDES_PID_PDID;
+			argsWithPIDDIF[args.length + 1] = getTarea().getInstancia().getId();
+			argsWithPIDDIF[args.length + 2] = getTarea().getInstancia().getProcessDefinitionId();
+		} else {
+			argsWithPIDDIF = new Object[3];
+			argsWithPIDDIF[0] = GetterService.INCLUDES_PID_PDID;
+			argsWithPIDDIF[1] = getTarea().getInstancia().getId();
+			argsWithPIDDIF[2] = getTarea().getInstancia().getProcessDefinitionId();
+		}
+
+		return gs.get(uri, argsWithPIDDIF);
 	}
 	
 	protected void bind(String propertyId, Field<?> field) {

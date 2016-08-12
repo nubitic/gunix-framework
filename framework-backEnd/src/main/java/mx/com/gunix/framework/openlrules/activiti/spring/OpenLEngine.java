@@ -7,11 +7,23 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.activiti.engine.DynamicBpmnService;
+import org.activiti.engine.EngineServices;
+import org.activiti.engine.FormService;
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.IdentityService;
+import org.activiti.engine.ManagementService;
+import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
+import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.activiti.engine.impl.persistence.deploy.DeploymentCache;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.apache.log4j.Logger;
 import org.openl.rules.activiti.ResourceCompileException;
 import org.openl.rules.activiti.spring.OpenLRulesHelper;
@@ -25,11 +37,14 @@ import org.openl.util.FileUtils;
 import org.openl.util.IOUtils;
 import org.openl.util.ZipUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Lazy;
 
 import mx.com.gunix.framework.documents.DocumentService;
 import mx.com.gunix.framework.documents.domain.Documento;
+import mx.com.gunix.framework.service.GetterService;
 
 public class OpenLEngine extends org.openl.rules.activiti.spring.OpenLEngine implements ApplicationContextAware {
 	private static final Logger log = Logger.getLogger(OpenLEngine.class);
@@ -38,6 +53,14 @@ public class OpenLEngine extends org.openl.rules.activiti.spring.OpenLEngine imp
 	private static Field oLRHCacheField;
 	private static Field oLRHcacheInstance;
 	
+	@Autowired
+	@Lazy
+	RepositoryService repositoryService;
+
+	@Autowired
+	@Lazy
+	SpringProcessEngineConfiguration spec;
+
 	static {
 		try {
 			oLRHCacheField = OpenLRulesHelper.class.getDeclaredField("cache");
@@ -46,6 +69,89 @@ public class OpenLEngine extends org.openl.rules.activiti.spring.OpenLEngine imp
 			oLRHcacheInstance.setAccessible(true);
 		} catch (NoSuchFieldException | SecurityException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	public ResultValue execute(String resource, String methodName, Object... args) throws Exception {
+		if (!Context.isExecutionContextActive()) {
+			ExecutionEntity ejec = new ExecutionEntity() {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public EngineServices getEngineServices() {
+					// TODO Auto-generated method stub
+					return new EngineServices() {
+
+						@Override
+						public RepositoryService getRepositoryService() {
+							return repositoryService;
+						}
+
+						@Override
+						public RuntimeService getRuntimeService() {
+							// TODO Auto-generated method stub
+							return null;
+						}
+
+						@Override
+						public FormService getFormService() {
+							// TODO Auto-generated method stub
+							return null;
+						}
+
+						@Override
+						public TaskService getTaskService() {
+							// TODO Auto-generated method stub
+							return null;
+						}
+
+						@Override
+						public HistoryService getHistoryService() {
+							// TODO Auto-generated method stub
+							return null;
+						}
+
+						@Override
+						public IdentityService getIdentityService() {
+							// TODO Auto-generated method stub
+							return null;
+						}
+
+						@Override
+						public ManagementService getManagementService() {
+							// TODO Auto-generated method stub
+							return null;
+						}
+
+						@Override
+						public DynamicBpmnService getDynamicBpmnService() {
+							// TODO Auto-generated method stub
+							return null;
+						}
+
+						@Override
+						public ProcessEngineConfiguration getProcessEngineConfiguration() {
+							// TODO Auto-generated method stub
+							return null;
+						}
+					};
+				}
+
+			};
+			String[] pidPdidArr = GetterService.pidPdid.get();
+			ejec.setProcessDefinitionId(pidPdidArr[GetterService.PROCESS_DEFINITIONID]);
+			ejec.setId(pidPdidArr[GetterService.PROCESS_INSTANCEID]);
+			ejec.setProcessInstance(ejec);
+			Context.setCommandContext(spec.getCommandContextFactory().createCommandContext(null));
+			Context.setProcessEngineConfiguration(spec);
+			try {
+				return execute(ejec,  resource,  methodName, args);
+			} finally {
+				Context.removeCommandContext();
+				Context.removeProcessEngineConfiguration();
+			}
+		}else{
+			return execute(Context.getExecutionContext().getExecution(),  resource,  methodName, args);
 		}
 	}
 
@@ -60,7 +166,7 @@ public class OpenLEngine extends org.openl.rules.activiti.spring.OpenLEngine imp
 			String processDefinitionId = execution.getProcessDefinitionId();
 			RepositoryService repositoryService = execution.getEngineServices().getRepositoryService();
 			ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
-			
+
 			if ((depCach = cache.get(processDefinition.getDeploymentId())) == null || depCach.get(resource) == null) {
 				if (ds == null) {
 					ds = applicationContext.getBean(DocumentService.class);
@@ -143,7 +249,7 @@ public class OpenLEngine extends org.openl.rules.activiti.spring.OpenLEngine imp
 	@SuppressWarnings("unchecked")
 	private Object doGetInstance(String deploymentId, String resource) throws IllegalArgumentException, IllegalAccessException {
 		// First find in cache
-		Map<String, DeploymentCache<Object>> cacheInstance = (Map<String, DeploymentCache<Object>>)oLRHcacheInstance.get(OpenLRulesHelper.getInstance());
+		Map<String, DeploymentCache<Object>> cacheInstance = (Map<String, DeploymentCache<Object>>) oLRHcacheInstance.get(OpenLRulesHelper.getInstance());
 		DeploymentCache<Object> deploymentCache = cacheInstance.get(deploymentId);
 		if (deploymentCache == null) {
 			deploymentCache = new DefaultDeploymentCache<Object>();

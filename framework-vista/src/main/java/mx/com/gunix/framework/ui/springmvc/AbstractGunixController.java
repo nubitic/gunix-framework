@@ -39,7 +39,7 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 	private Boolean parameterBindingEmptyStringIsNull = Boolean.TRUE;
 	private Map<String, Method> methodMap = new HashMap<String, Method>();
 	private static final Method NOT_FOUND_METHOD = ReflectionUtils.findMethod(AbstractGunixController.class, "notFoundMethod");
-
+	private Tarea tarea;
 	@Autowired
 	GunixVariableGetter vg;
 
@@ -132,6 +132,7 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 	}
 
 	void setTareaActual(Tarea tarea) {
+		this.tarea = tarea;
 		vg.setInstancia(tarea.getInstancia());
 	}
 
@@ -140,6 +141,19 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 	}
 
 	protected Serializable get(String uri, Object... args) {
+		Object[] argsWithPIDDIF = null;
+		if (args != null) {
+			argsWithPIDDIF = new Object[args.length + 3];
+			System.arraycopy(args, 0, argsWithPIDDIF, 1, args.length);
+			argsWithPIDDIF[0] = GetterService.INCLUDES_PID_PDID;
+			argsWithPIDDIF[args.length + 1] = tarea.getInstancia().getId();
+			argsWithPIDDIF[args.length + 2] = tarea.getInstancia().getProcessDefinitionId();
+		} else {
+			argsWithPIDDIF = new Object[3];
+			argsWithPIDDIF[0] = GetterService.INCLUDES_PID_PDID;
+			argsWithPIDDIF[1] = tarea.getInstancia().getId();
+			argsWithPIDDIF[2] = tarea.getInstancia().getProcessDefinitionId();
+		}
 		return gs.get(uri, args);
 	}
 	
