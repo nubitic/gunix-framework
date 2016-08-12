@@ -190,4 +190,22 @@ public class GunixTableFieldFactory extends DefaultFieldFactory {
 	public void setReadOnlyProperties(String... propiedadesRO) {
 		propiedadesROSet.addAll(Arrays.asList(propiedadesRO));
 	}
+	
+	public String getErrores() {
+		StringBuilder errores = new StringBuilder();
+		previouslyCreatedFieldsMap.values().forEach(gnxFldProp -> {
+			try {
+				gnxFldProp.getField().validate();
+			} catch (Validator.InvalidValueException errorVal) {
+				if (errorVal.getCauses() == null || errorVal.getCauses().length == 0) {
+					errores.append(errorVal.getMessage()).append("\n");
+				} else {
+					for (Validator.InvalidValueException error : errorVal.getCauses()) {
+						errores.append(error.getMessage()).append("\n");
+					}
+				}
+			}
+		});
+		return errores.toString();
+	}
 }

@@ -18,6 +18,7 @@ import org.vaadin.viritin.fields.MTable;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.TransactionalPropertyWrapper;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Field;
@@ -78,6 +79,16 @@ public class GunixMTable<T extends Serializable> extends MTable<T> {
 	@Override
 	protected ListContainer<T> createContainer(Collection<T> beans) {
 		return new GunixListContainer(beans);
+	}
+
+	@Override
+	protected void validate(Object fieldValue) throws InvalidValueException {
+		if (getTableFieldFactory() instanceof GunixTableFieldFactory) {
+			String errores = ((GunixTableFieldFactory) getTableFieldFactory()).getErrores();
+			if (!"".equals(errores)) {
+				throw new InvalidValueException(errores);
+			}
+		}
 	}
 
 	@SuppressWarnings("rawtypes")
