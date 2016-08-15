@@ -185,6 +185,10 @@ public class GunixTableFieldFactory extends DefaultFieldFactory {
 			}
 			return field;
 		}
+
+		public Object getItemId() {
+			return itemId;
+		}
 	}
 
 	public void setReadOnlyProperties(String... propiedadesRO) {
