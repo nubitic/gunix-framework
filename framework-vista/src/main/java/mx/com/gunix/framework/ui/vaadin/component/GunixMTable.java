@@ -4,9 +4,6 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
-import mx.com.gunix.framework.ui.vaadin.VaadinUtils;
-import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory.FieldBuilder;
-
 import org.apache.commons.beanutils.NestedNullException;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -18,10 +15,12 @@ import org.vaadin.viritin.fields.MTable;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
-import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.TransactionalPropertyWrapper;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Field;
+
+import mx.com.gunix.framework.ui.vaadin.VaadinUtils;
+import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory.FieldBuilder;
 
 public class GunixMTable<T extends Serializable> extends MTable<T> {
 	private static final long serialVersionUID = 1L;
@@ -79,16 +78,6 @@ public class GunixMTable<T extends Serializable> extends MTable<T> {
 	@Override
 	protected ListContainer<T> createContainer(Collection<T> beans) {
 		return new GunixListContainer(beans);
-	}
-
-	@Override
-	protected void validate(Object fieldValue) throws InvalidValueException {
-		if (getTableFieldFactory() instanceof GunixTableFieldFactory) {
-			String errores = ((GunixTableFieldFactory) getTableFieldFactory()).getErrores();
-			if (!"".equals(errores)) {
-				throw new InvalidValueException(errores);
-			}
-		}
 	}
 
 	@SuppressWarnings("rawtypes")
