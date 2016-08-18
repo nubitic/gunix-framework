@@ -103,6 +103,7 @@ public class GunixTableFieldFactory extends DefaultFieldFactory {
 			field.setErrorHandler(GunixViewErrorHandler.getCurrent());
 			gfpr = new GunixFieldPropertyRel();
 			gfpr.setField(field);
+			gfpr.setItemId(itemId);
 			gfpr.setPropertyId(propertyId);
 			previouslyCreatedFieldsMap.put(fieldId, gfpr);
 		}
@@ -143,6 +144,7 @@ public class GunixTableFieldFactory extends DefaultFieldFactory {
 
 		private Field<?> field;
 		private Object propertyId;
+		private Object itemId;
 
 		public Field<?> getField() {
 			return field;
@@ -158,6 +160,14 @@ public class GunixTableFieldFactory extends DefaultFieldFactory {
 
 		public void setPropertyId(Object propertyId) {
 			this.propertyId = propertyId;
+		}
+
+		public Object getItemId() {
+			return itemId;
+		}
+
+		public void setItemId(Object itemId) {
+			this.itemId = itemId;
 		}
 
 	}
@@ -212,4 +222,22 @@ public class GunixTableFieldFactory extends DefaultFieldFactory {
 		});
 		return errores.toString();
 	}
+	
+	
+	void clearPreviouslyCreatedFieldsMap() {
+		previouslyCreatedFieldsMap.clear();
+	}
+	
+	void removeItemId(Object itemId) {
+		List<String> fieldIdsToRemove = previouslyCreatedFieldsMap.keySet()
+										.stream()
+										.filter(key -> previouslyCreatedFieldsMap.get(key).getItemId().equals(itemId))
+										.collect(Collectors.toList());
+		if (fieldIdsToRemove != null) {
+			fieldIdsToRemove.forEach(fieldToRemove -> {
+				previouslyCreatedFieldsMap.remove(fieldToRemove);
+			});
+		}
+	}
+	
 }

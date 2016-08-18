@@ -93,6 +93,24 @@ public class GunixMTable<T extends Serializable> extends MTable<T> {
 		((GunixTableFieldFactory)getTableFieldFactory()).addCustomFieldBuilder(propertyId, builder);
 	}
 
+	@Override
+	public boolean removeAllItems() {
+		boolean ans = super.removeAllItems();
+		if(ans){
+			((GunixTableFieldFactory)getTableFieldFactory()).clearPreviouslyCreatedFieldsMap();
+		}
+		return ans;
+	}
+
+	@Override
+	public boolean removeItem(Object itemId) {
+		boolean ans = super.removeItem(itemId);
+		if(ans){
+			((GunixTableFieldFactory)getTableFieldFactory()).removeItemId(itemId);
+		}
+		return ans;
+	}
+
 	class GunixListContainer extends ListContainer<T> {
 		private static final long serialVersionUID = 1L;
 
