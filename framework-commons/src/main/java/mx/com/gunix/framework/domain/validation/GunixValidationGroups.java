@@ -8,4 +8,8 @@ public interface GunixValidationGroups {
 	public interface DatabaseValidation {
 
 	}
+	
+	public interface CapturaValidation {
+
+	}
 }

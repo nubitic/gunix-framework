@@ -211,10 +211,20 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		validaFieldGroup();
 		fieldGroup.commit();
 	}
+
+	protected final void commit(Class<?>... groups) throws CommitException {
+		validaFieldGroup();
+		fieldGroup.commit(groups);
+	}
 	
 	protected final void commit(OnBeanValidationErrorCallback<S> onBVECallback) throws CommitException {
 		validaFieldGroup();
 		fieldGroup.commit(onBVECallback);
+	}
+
+	protected final void commit(OnBeanValidationErrorCallback<S> onBVECallback, Class<?>... groups) throws CommitException {
+		validaFieldGroup();
+		fieldGroup.commit(onBVECallback, groups);
 	}
 
 	private void validaFieldGroup() {

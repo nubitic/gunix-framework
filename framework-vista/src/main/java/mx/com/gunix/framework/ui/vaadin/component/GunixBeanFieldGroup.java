@@ -67,10 +67,18 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 
 	@Override
 	public void commit() throws CommitException {
-		commit(null);
+		commit(null, null);
 	}
 
 	public void commit(OnBeanValidationErrorCallback<BT> onBVECallback) throws CommitException {
+		commit(onBVECallback, null);
+	}
+
+	public void commit(Class<?>... groups) throws CommitException {
+		commit(null, groups);
+	}
+
+	public void commit(OnBeanValidationErrorCallback<BT> onBVECallback, Class<?>... groups) throws CommitException {
 		Map<Field<?>, InvalidValueException> invalidValueExceptions = new HashMap<Field<?>, InvalidValueException>();
 		defaultValidators.keySet().forEach(field -> {
 			GunixViewErrorHandler errorHandler = GunixViewErrorHandler.getCurrent();
@@ -88,7 +96,7 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 		if (!invalidValueExceptions.isEmpty()) {
 			throw new CommitException("Commit Failed!", this, new FieldGroupInvalidValueException(invalidValueExceptions));
 		}
-		Set<ConstraintViolation<BT>> errores = getJavaxBeanValidator().validate(getItemDataSource().getBean(), BeanValidations.class);
+		Set<ConstraintViolation<BT>> errores = getJavaxBeanValidator().validate(getItemDataSource().getBean(), groups == null ? new Class<?>[] { BeanValidations.class } : groups);
 		if (errores != null && !errores.isEmpty()) {
 			if (onBVECallback == null && getFields().iterator().hasNext()) {
 				for (ConstraintViolation<BT> cv : errores) {
@@ -127,14 +135,8 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 	@Override
 	protected void configureField(Field<?> field) {
 		field.setBuffered(isBuffered());
-		field.setEnabled(isEnabled());
 		field.setErrorHandler(GunixViewErrorHandler.getCurrent());
 
-		if (field.getPropertyDataSource().isReadOnly()) {
-			field.setReadOnly(true);
-		} else {
-			field.setReadOnly(isReadOnly());
-		}
 		if (field instanceof AbstractField) {
 			((AbstractField<?>) field).setConversionError(VaadinUtils.getConversionError(field.getPropertyDataSource().getType()));
 		}
