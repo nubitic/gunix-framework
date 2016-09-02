@@ -71,8 +71,16 @@ public class OpenLEngine extends org.openl.rules.activiti.spring.OpenLEngine imp
 			throw new RuntimeException(e);
 		}
 	}
-
-	public ResultValue execute(String resource, String methodName, Object... args) throws Exception {
+	public ResultValue executeWithinProcessKey(String processKeyHolder, String resource, String methodName, Object... args) throws Exception {
+		String processDefinitionId = null;
+		if (processKeyHolder != null) {
+			ProcessDefinition pdef = repositoryService.createProcessDefinitionQuery().processDefinitionKey(processKeyHolder).active().latestVersion().singleResult();
+			if (pdef == null) {
+				throw new IllegalArgumentException("El proceso con key " + processKeyHolder + " no existe");
+			} else {
+				processDefinitionId = pdef.getId();
+			}
+		}
 		if (!Context.isExecutionContextActive()) {
 			ExecutionEntity ejec = new ExecutionEntity() {
 				private static final long serialVersionUID = 1L;
@@ -139,7 +147,7 @@ public class OpenLEngine extends org.openl.rules.activiti.spring.OpenLEngine imp
 
 			};
 			String[] pidPdidArr = GetterService.pidPdid.get();
-			ejec.setProcessDefinitionId(pidPdidArr[GetterService.PROCESS_DEFINITIONID]);
+			ejec.setProcessDefinitionId(processDefinitionId == null ? pidPdidArr[GetterService.PROCESS_DEFINITIONID] : processDefinitionId);
 			ejec.setId(pidPdidArr[GetterService.PROCESS_INSTANCEID]);
 			ejec.setProcessInstance(ejec);
 			Context.setCommandContext(spec.getCommandContextFactory().createCommandContext(null));
@@ -151,8 +159,20 @@ public class OpenLEngine extends org.openl.rules.activiti.spring.OpenLEngine imp
 				Context.removeProcessEngineConfiguration();
 			}
 		}else{
-			return execute(Context.getExecutionContext().getExecution(),  resource,  methodName, args);
+			String currProcessDefinitionId = Context.getExecutionContext().getExecution().getProcessDefinitionId();
+			try {
+				if (processDefinitionId != null) {
+					Context.getExecutionContext().getExecution().setProcessDefinitionId(processDefinitionId);
+				}
+				return execute(Context.getExecutionContext().getExecution(), resource, methodName, args);
+			} finally {
+				Context.getExecutionContext().getExecution().setProcessDefinitionId(currProcessDefinitionId);
+			}
 		}
+	}
+
+	public ResultValue execute(String resource, String methodName, Object... args) throws Exception {
+		return executeWithinProcessKey(null, resource, methodName, args);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
