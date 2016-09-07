@@ -737,7 +737,11 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 					fvm.forEach((varName, varValue) -> {
 						switch (filtro.getlOp()) {
 						case IGUAL:
-							hpiq.variableValueEquals(varName, varValue);
+							if (varName == Filtro.FILTRO_GLOBAL) {
+								hpiq.variableValueEquals(varValue);
+							} else {
+								hpiq.variableValueEquals(varName, varValue);
+							}
 							break;
 						case MAYOR_QUE:
 							hpiq.variableValueGreaterThan(varName, varValue);
@@ -769,7 +773,11 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 					fvm.forEach((varName, varValue) -> {
 						switch (filtro.getlOp()) {
 						case IGUAL:
-							piq.variableValueEquals(varName, varValue);
+							if (varName == Filtro.FILTRO_GLOBAL) {
+								piq.variableValueEquals(varValue);
+							} else {
+								piq.variableValueEquals(varName, varValue);
+							}
 							break;
 						case MAYOR_QUE:
 							piq.variableValueGreaterThan(varName, varValue);

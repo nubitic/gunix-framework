@@ -8,6 +8,7 @@ public final class Filtro<T extends Serializable> extends Variable<T> {
 	private static final long serialVersionUID = 1L;
 	public static final String FILTRO_ESTATUS = "FILTRO_ESTATUS_";
 	public static final String FILTRO_ENDED ="FILTRO_ENDED_";
+	public static final String FILTRO_GLOBAL ="FILTRO_GLOBAL_";
 
 	public static enum Operador {
 		IGUAL, MAYOR_QUE, MENOR_QUE, DIFERENTE, LIKE
@@ -60,7 +61,15 @@ public final class Filtro<T extends Serializable> extends Variable<T> {
 			filtros.add(filtro);
 			return this;
 		}
-		
+
+		public <S extends Serializable> Builder addGlobal(S valor) {
+			Filtro<S> filtro = new Filtro<S>();
+			filtro.setNombre(FILTRO_GLOBAL);
+			filtro.setValor(valor);
+			filtro.setlOp(Operador.IGUAL);
+			filtros.add(filtro);
+			return this;
+		}
 		public <S extends Serializable> Builder estatusEs(String estatus){
 			Filtro<String> filtro = new Filtro<String>();
 			filtro.setNombre(FILTRO_ESTATUS);
