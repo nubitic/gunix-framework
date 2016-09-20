@@ -146,13 +146,13 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 			argsWithPIDDIF = new Object[args.length + 3];
 			System.arraycopy(args, 0, argsWithPIDDIF, 1, args.length);
 			argsWithPIDDIF[0] = GetterService.INCLUDES_PID_PDID;
-			argsWithPIDDIF[args.length + 1] = tarea.getInstancia().getId();
-			argsWithPIDDIF[args.length + 2] = tarea.getInstancia().getProcessDefinitionId();
+			argsWithPIDDIF[args.length + 1] = tarea == null ? vg.getInstancia().getId() : tarea.getInstancia().getId();
+			argsWithPIDDIF[args.length + 2] = tarea == null ? vg.getInstancia().getProcessDefinitionId() : tarea.getInstancia().getProcessDefinitionId();
 		} else {
 			argsWithPIDDIF = new Object[3];
 			argsWithPIDDIF[0] = GetterService.INCLUDES_PID_PDID;
-			argsWithPIDDIF[1] = tarea.getInstancia().getId();
-			argsWithPIDDIF[2] = tarea.getInstancia().getProcessDefinitionId();
+			argsWithPIDDIF[1] = tarea == null ? vg.getInstancia().getId() : tarea.getInstancia().getId();
+			argsWithPIDDIF[2] = tarea == null ? vg.getInstancia().getProcessDefinitionId() : tarea.getInstancia().getProcessDefinitionId();
 		}
 		return gs.get(uri, args);
 	}

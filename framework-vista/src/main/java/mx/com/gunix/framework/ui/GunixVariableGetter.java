@@ -31,6 +31,10 @@ public final class GunixVariableGetter implements Serializable {
 	public void setInstancia(Instancia instancia) {
 		this.instancia = instancia;
 	}
+	
+	public Instancia getInstancia() {
+		return instancia;
+	}
 
 	public Serializable get(String nombreVariable) {
 
