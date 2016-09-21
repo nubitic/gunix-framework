@@ -176,32 +176,38 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			is.setAuthenticatedUserId(usuario.getIdUsuario());
 			
 			ProcessInstance pi = rs.startProcessInstanceByKey(processKey, toMap(variables)[Variable.Scope.PROCESO.ordinal()]);
-			UserDetails usuarioSimpl = new UserDetails(usuario);
-			usuarioSimpl.setAuthorities((List<GrantedAuthority>) usuario.getAuthorities());
-			usuarioSimpl.setSelectedAuthority(usuario.getSelectedAuthority());
-			usuarioSimpl.setAplicaciones(null);
-			rs.setVariable(pi.getProcessInstanceId(), CURRENT_AUTHENTICATION_USUARIO_VAR, usuarioSimpl);
-			if (ID_APLICACION != null) {
-				rs.setVariable(pi.getProcessInstanceId(), ID_APLICACION_VAR, ID_APLICACION);
-			}
-			instancia = new Instancia();
-			instancia.setId(pi.getId());
-			instancia.setProcessDefinitionId(pi.getProcessDefinitionId());
-			instancia.setComentario(comentario);
-			instancia.setProcessKey(pi.getBusinessKey());
-			instancia.setUsuario(usuario.getIdUsuario());
-			instancia.setVariables(Collections.unmodifiableList(variables));
-			instancia.setVolatil(VOLATIL.equals(repos.getProcessDefinition(pi.getProcessDefinitionId()).getCategory()));
-			
-			if (!pi.isEnded()) {
-				Optional.ofNullable(comentario).ifPresent(comment -> {
-					ts.addComment(null, pi.getProcessInstanceId(), PROCESS_CREATION_COMMENT, comment);
-				});
-				Tarea currTask = getCurrentTask(pi.getProcessInstanceId(), pi);
-				currTask.setInstancia(instancia);
-				instancia.setTareaActual(currTask);
+			if (pi != null) {
+				UserDetails usuarioSimpl = new UserDetails(usuario);
+				usuarioSimpl.setAuthorities((List<GrantedAuthority>) usuario.getAuthorities());
+				usuarioSimpl.setSelectedAuthority(usuario.getSelectedAuthority());
+				usuarioSimpl.setAplicaciones(null);
+				rs.setVariable(pi.getProcessInstanceId(), CURRENT_AUTHENTICATION_USUARIO_VAR, usuarioSimpl);
+				if (ID_APLICACION != null) {
+					rs.setVariable(pi.getProcessInstanceId(), ID_APLICACION_VAR, ID_APLICACION);
+				}
+				instancia = new Instancia();
+				instancia.setId(pi.getId());
+				instancia.setProcessDefinitionId(pi.getProcessDefinitionId());
+				instancia.setComentario(comentario);
+				instancia.setProcessKey(pi.getBusinessKey());
+				instancia.setUsuario(usuario.getIdUsuario());
+				instancia.setVariables(Collections.unmodifiableList(variables));
+				instancia.setVolatil(VOLATIL.equals(repos.getProcessDefinition(pi.getProcessDefinitionId()).getCategory()));
+
+				if (!pi.isEnded()) {
+					Optional.ofNullable(comentario).ifPresent(comment -> {
+						ts.addComment(null, pi.getProcessInstanceId(), PROCESS_CREATION_COMMENT, comment);
+					});
+					Tarea currTask = getCurrentTask(pi.getProcessInstanceId(), pi);
+					currTask.setInstancia(instancia);
+					instancia.setTareaActual(currTask);
+				} else {
+					instancia.setTareaActual(Tarea.DEFAULT_END_TASK);
+				}
 			} else {
-				instancia.setTareaActual(Tarea.DEFAULT_END_TASK);
+				if (Context.getCommandContext() != null && Context.getCommandContext().getException() != null) {
+					throw new RuntimeException("Error al intentar crear una nueva instancia del proceso " + processKey, Context.getCommandContext().getException());
+				}
 			}
 		} finally {
 			is.setAuthenticatedUserId(null);
