@@ -5,6 +5,7 @@ import java.util.Locale;
 import mx.com.gunix.framework.ui.vaadin.spring.SpringViewProvider;
 import mx.com.gunix.framework.ui.vaadin.view.AbstractGunixView;
 
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.navigator.Navigator;
@@ -24,6 +25,10 @@ public abstract class AbstractGunixUI extends UI {
 	@Autowired
 	private SpringViewProvider viewProvider;
 
+	static {
+		SLF4JBridgeHandler.install();
+	}
+	
 	@Override
 	protected void init(VaadinRequest request) {
 		Navigator navigator = new Navigator(this, this);
