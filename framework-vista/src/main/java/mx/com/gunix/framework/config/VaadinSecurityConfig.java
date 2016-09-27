@@ -106,6 +106,7 @@ public class VaadinSecurityConfig  extends AbstractSecurityConfig{
 				.antMatchers("/" + VaadinSecurityConfig.VAADIN_LOCATION + "UIDL/**").permitAll()
 				.antMatchers(STATIC_RESOURCES_PATTERN).permitAll()
 				.antMatchers("/" + VaadinSecurityConfig.VAADIN_LOCATION + "HEARTBEAT/**").authenticated()
+				.antMatchers("/" + VaadinSecurityConfig.VAADIN_LOCATION + "APP/**").authenticated()
 				.antMatchers("/**").authenticated()
 				.anyRequest().authenticated();
 		return "/" + VaadinSecurityConfig.VAADIN_LOCATION + "login";
