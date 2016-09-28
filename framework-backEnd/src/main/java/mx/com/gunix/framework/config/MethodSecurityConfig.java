@@ -1,14 +1,16 @@
 package mx.com.gunix.framework.config;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-
+import org.aopalliance.intercept.MethodInvocation;
 import org.apache.ibatis.cache.CacheException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -18,11 +20,16 @@ import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.Expression;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.access.PermissionCacheOptimizer;
 import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.access.expression.ExpressionUtils;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.access.intercept.AfterInvocationManager;
 import org.springframework.security.acls.AclPermissionEvaluator;
 import org.springframework.security.acls.domain.AclAuthorizationStrategy;
@@ -55,6 +62,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.Assert;
+
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
 
 @Configuration
 @Import(PersistenceConfig.class)
@@ -258,7 +268,100 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration impl
 
     @Override
     protected MethodSecurityExpressionHandler createExpressionHandler(){
-        DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+		DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler() {
+			private PermissionCacheOptimizer permissionCacheOptimizer = null;
+			private Field methodInvocationField;
+			@Override
+			public void setPermissionCacheOptimizer(PermissionCacheOptimizer permissionCacheOptimizer) {
+				this.permissionCacheOptimizer = permissionCacheOptimizer;
+			}
+
+			@SuppressWarnings({ "rawtypes", "unchecked" })
+			@Override
+			public Object filter(Object filterTarget, Expression filterExpression, EvaluationContext ctx) {
+				MethodSecurityExpressionOperations rootObject = (MethodSecurityExpressionOperations) ctx.getRootObject().getValue();
+				if(methodInvocationField==null){
+					try {
+						methodInvocationField = ctx.getClass().getDeclaredField("mi");
+						methodInvocationField.setAccessible(true);
+					} catch (NoSuchFieldException | SecurityException e) {
+						throw new RuntimeException(e);
+					}
+				}
+				
+				final boolean debug = logger.isDebugEnabled();
+				List retainList;
+
+				if (debug) {
+					logger.debug("Filtering with expression: " + filterExpression.getExpressionString());
+				}
+
+				if (filterTarget instanceof Collection) {
+					Collection collection = (Collection) filterTarget;
+
+					if (debug) {
+						logger.debug("Filtering collection with " + collection.size() + " elements");
+					}
+					
+					retainList = doFilter((Collection) filterTarget, rootObject, filterExpression, ctx);
+					
+					if (debug) {
+						logger.debug("Retaining elements: " + retainList);
+					}
+
+					collection.clear();
+					collection.addAll(retainList);
+
+					return filterTarget;
+				}
+
+				if (filterTarget.getClass().isArray()) {
+					Object[] array = (Object[]) filterTarget;
+
+					if (debug) {
+						logger.debug("Filtering array with " + array.length + " elements");
+					}
+
+					retainList = doFilter(Arrays.asList(array), rootObject, filterExpression, ctx);
+
+					if (debug) {
+						logger.debug("Retaining elements: " + retainList);
+					}
+
+					Object[] filtered = (Object[]) Array.newInstance(filterTarget.getClass().getComponentType(), retainList.size());
+					for (int i = 0; i < retainList.size(); i++) {
+						filtered[i] = retainList.get(i);
+					}
+
+					return filtered;
+				}
+
+				throw new IllegalArgumentException("Filter target must be a collection or array type, but was " + filterTarget);
+			}
+
+			@SuppressWarnings({ "rawtypes", "unchecked" })
+			private List doFilter(Collection filterTarget, MethodSecurityExpressionOperations rootObject, Expression filterExpression, EvaluationContext ctx) {
+				if (permissionCacheOptimizer != null) {
+					permissionCacheOptimizer.cachePermissionsFor(rootObject.getAuthentication(), filterTarget);
+				}
+				
+				return (List) ((Collection) filterTarget)
+										.parallelStream()
+										.filter(filterObject->{
+													EvaluationContext newCtx = null;
+													try {
+														MethodInvocation mi = (MethodInvocation) methodInvocationField.get(ctx);
+														newCtx = createEvaluationContext(rootObject.getAuthentication(), mi);
+														((MethodSecurityExpressionOperations) newCtx.getRootObject().getValue()).setFilterObject(filterObject);
+													} catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
+														throw new RuntimeException(e);
+													}
+													return ExpressionUtils.evaluateAsBoolean(filterExpression, newCtx);
+												})
+										.collect(Collectors.toList());
+			}
+
+		};
         expressionHandler.setDefaultRolePrefix("");
         try {
 			expressionHandler.setPermissionEvaluator(aclPermissionEvaluator());
