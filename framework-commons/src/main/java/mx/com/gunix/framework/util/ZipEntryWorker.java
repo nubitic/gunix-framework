@@ -10,6 +10,8 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 public final class ZipEntryWorker {
 	private static final class ZipInputStreamWrapper extends InputStream {
 		ZipInputStream innerZipIs;
@@ -73,7 +75,7 @@ public final class ZipEntryWorker {
 							}
 			});
 		} catch (Exception ex) {
-			throw new ZipException(ex.getMessage());
+			throw new ZipException("\n" + ExceptionUtils.getStackTrace(ex));
 		} finally {
 			if (outZF != null) {
 				outZF.close();
