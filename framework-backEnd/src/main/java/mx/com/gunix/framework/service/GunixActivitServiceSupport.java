@@ -41,7 +41,10 @@ public abstract class GunixActivitServiceSupport<T extends Serializable> {
 	private static final Map<Class<?>, Set<Field>> identificadoresCache = new Hashtable<Class<?>, Set<Field>>();
 	private static final Map<Class<?>, Set<Field>> validCache = new Hashtable<Class<?>, Set<Field>>();
 	private static final Set<Field> EMPTY_FIELD_SET = Collections.unmodifiableSet(new HashSet<Field>());
-		
+	
+	private static Boolean isGroovyPresent;
+	private static Class<?> groovyMetaClass;
+	
 	@Autowired
 	private Validator validator;
 	
@@ -205,6 +208,21 @@ public abstract class GunixActivitServiceSupport<T extends Serializable> {
 			procesados.add(original.hashCode());
 			Class<P> clazz = (Class<P>) original.getClass();
 
+			if (isGroovyPresent == null && clazz != null) {
+				try {
+					groovyMetaClass = Class.forName("groovy.lang.MetaClass");
+					isGroovyPresent = Boolean.TRUE;
+				} catch (ClassNotFoundException ignorar) {
+					isGroovyPresent = Boolean.FALSE;
+				}
+			}
+
+			if (groovyMetaClass != null) {
+				if (groovyMetaClass.isAssignableFrom(clazz)) {
+					return null;
+				}
+			}
+			
 			try {
 				cambios.setCambios(new HashMap<String, Serializable>());
 				BeanMap map = new BeanMap(original);
@@ -220,11 +238,20 @@ public abstract class GunixActivitServiceSupport<T extends Serializable> {
 					try {
 						List<Serializable> eliminaciones = null;
 						List<Serializable> inserciones = null;
+						Class<?> propClazz = propUtils.getPropertyType(original, propertyName);
+						if(propClazz==null){
+							propClazz = propUtils.getPropertyType(nuevo, propertyName);
+						}
+						if (groovyMetaClass != null) {
+							if (groovyMetaClass.isAssignableFrom(propClazz)) {
+								continue;
+							}
+						}
+						
 						property1 = (Serializable) propUtils.getProperty(original, propertyName);
 						Serializable property2 = (Serializable) propUtils.getProperty(nuevo, propertyName);
 						if (property1 != null && property2 != null) {
-							Class<?> propClazz = null;
-							if (BeanUtils.isSimpleProperty((propClazz = (Class<P>) property1.getClass()))) {
+							if (BeanUtils.isSimpleProperty(propClazz)) {
 								if (!property1.equals(property2)) {
 									cambios.getCambios().put(propertyName, property2);
 									hayCambios = true;
@@ -290,10 +317,9 @@ public abstract class GunixActivitServiceSupport<T extends Serializable> {
 								}
 							}
 						} else {
-							Class<?> propClazz = null;
 							if (property1 != null && property2 == null) {
 								hayCambios = true;
-								if (BeanUtils.isSimpleProperty((propClazz = (Class<P>) property1.getClass()))) {
+								if (BeanUtils.isSimpleProperty(propClazz)) {
 									cambios.getCambios().put(propertyName, null);
 								} else {
 									if (Iterable.class.isAssignableFrom(propClazz)) {
@@ -312,7 +338,7 @@ public abstract class GunixActivitServiceSupport<T extends Serializable> {
 							}else {
 								if (property1 == null && property2 != null) {
 									hayCambios = true;
-									if (BeanUtils.isSimpleProperty((propClazz = (Class<P>) property2.getClass()))) {
+									if (BeanUtils.isSimpleProperty(propClazz)) {
 										cambios.getCambios().put(propertyName, property2);
 									} else {
 										if (Iterable.class.isAssignableFrom(propClazz)) {

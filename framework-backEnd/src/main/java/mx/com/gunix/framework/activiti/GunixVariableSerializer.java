@@ -124,6 +124,9 @@ public class GunixVariableSerializer {
 								}
 								
 								Class<?> propType = isStandAloneItereableVar.get() ? value.getClass() : pub.getPropertyType(ans, prop);
+								if (propType == null) {
+									log.warn("No es posible determinar el tipo de la propiedad " + key + " [isStandAloneItereableVar = " + isStandAloneItereableVar + "; value = " + value + "] ");
+								}
 								if (value instanceof Double) {
 									if ((propType.isPrimitive() && propType.getName().equals("float")) || Float.class.isAssignableFrom(propType)) {
 										value = ((Double) value).floatValue();
