@@ -38,6 +38,9 @@
 				<bind name="idUsuarioLike" value="'%' + _parameter.getIdUsuario() + '%'" />
 				AND U.ID_USUARIO LIKE #{idUsuarioLike}
 			</if>
+			<if test="datosUsuario != null and datosUsuario.curp !=null ">
+				AND DU.CURP = #{datosUsuario.curp}
+			</if>
 		</where>
 	</select>
 	<select id="getRolAppUsuario" resultMap="rolAppUsuarioMap">
