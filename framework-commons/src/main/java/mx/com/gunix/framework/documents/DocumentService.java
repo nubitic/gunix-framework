@@ -208,6 +208,13 @@ public class DocumentService {
 			return doGetDocumento(sid, root, rutaDocumento);
 		});
 	}
+	
+	public void delete(long idDocumento) {
+		inSession((sid, root) -> {
+			ds.delete(sid, idDocumento);
+			return null;
+		});
+	}
 
 	public InputStream getContent(long idDocumento) {
 		return inSession((sid, root) -> {

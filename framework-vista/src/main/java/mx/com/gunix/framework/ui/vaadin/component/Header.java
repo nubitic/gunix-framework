@@ -140,7 +140,9 @@ public class Header extends CustomComponent {
 	public Header() {
 		buildMainLayout();
 		menuBar.setCaption("");
+		menuBar.setId("gx_menuBar");
 		rolCBox.setInputPrompt("Seleccione un Rol");
+		rolCBox.setId("gx_rol_cbx");
 		setCompositionRoot(mainLayout);
 		navigator = new TareaActualNavigator(UI.getCurrent(), panelContenido);
 		breadCrumbLayout.setSpacing(false);
@@ -260,7 +262,7 @@ public class Header extends CustomComponent {
 					Notification.show(funcion.getDescripcion());
 				});
 			}
-
+			padre.setStyleName("gx_" + rol.getAplicacion().getIdAplicacion() + "_" + rol.getIdRol() + "_" + funcion.getIdFuncion());
 			padre.setEnabled(true);
 			recorreFuncionesHijas(rol, padre, optHijas);
 		});
@@ -315,6 +317,7 @@ public class Header extends CustomComponent {
 							});
 						}
 						nvoPadre.setEnabled(true);
+						nvoPadre.setStyleName("gx_" + rol.getAplicacion().getIdAplicacion() + "_" + rol.getIdRol() + "_" + funcion.getIdFuncion());
 						recorreFuncionesHijas(rol, nvoPadre, optHijas2);
 					});
 		});

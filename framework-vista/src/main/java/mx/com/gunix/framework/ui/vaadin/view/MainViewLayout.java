@@ -36,6 +36,7 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.renderers.ButtonRenderer;
@@ -172,12 +173,15 @@ public class MainViewLayout extends VerticalLayout{
 	protected void renderApps(List<Aplicacion> apps, HorizontalLayout appInfo) {
 		if (apps.size() > 1) {
 			aplicacionesTab = new TabSheet();
+			aplicacionesTab.setId("gx_aplicaciones_tabsheet");
 			aplicacionesTab.setImmediate(true);
 
 			apps.stream().forEach(aplicacion -> {
 				Header h = applicationContext.getBean(Header.class);
 				h.renderHeader(aplicacion);
-				aplicacionesTab.addTab(h, aplicacion.getDescripcion());
+				h.setId("gx_"+aplicacion.getIdAplicacion()+"_header");
+				Tab appTab = aplicacionesTab.addTab(h, aplicacion.getDescripcion());
+				appTab.setId("gx_" + aplicacion.getIdAplicacion() + "_tab");
 				aplicacionesTab.addSelectedTabChangeListener(selectedTab -> {
 					Header iH = (Header) selectedTab.getTabSheet().getSelectedTab();
 					updateAppInfo(iH, appInfo);

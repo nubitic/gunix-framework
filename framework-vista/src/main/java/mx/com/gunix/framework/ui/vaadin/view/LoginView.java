@@ -65,13 +65,18 @@ public class LoginView extends VerticalLayout implements View {
 		fields.setSpacing(true);
 
 		username = new TextField("Usuario");
+		username.setId("usernameTxtFld");
+		username.setImmediate(true);
 		username.setIcon(FontAwesome.USER);
 
 		password = new PasswordField("Contraseña");
+		password.setId("passwordTxtFld");
+		password.setImmediate(true);
 		password.setIcon(FontAwesome.LOCK);
 
 		final Button signin = new Button("Identificarse");
-
+		
+		signin.setId("loginButton");
 		signin.setClickShortcut(KeyCode.ENTER);
 		signin.focus();
 
