@@ -1,6 +1,7 @@
 package org.vaadin.easyuploads;
 
 import java.io.File;
+import java.io.OutputStream;
 
 import org.vaadin.easyuploads.FileBuffer;
 import org.vaadin.easyuploads.FileFactory;
@@ -68,6 +69,15 @@ public class GunixFileBuffer extends FileBuffer {
 			}
 		}
 	};
+
+	@Override
+	public OutputStream receiveUpload(String filename, String MIMEType) {
+		OutputStream os = super.receiveUpload(filename, MIMEType);
+		value = new GunixFile(filename);
+		value.setFile(getFile());
+		value.setMimeType(MIMEType);
+		return os;
+	}
 
 	@Override
 	public void setFieldType(FieldType fieldType) {
