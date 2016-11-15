@@ -12,10 +12,6 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.MimetypesFileTypeMap;
 
-import mx.com.gunix.framework.documents.domain.Carpeta;
-import mx.com.gunix.framework.documents.domain.Documento;
-import mx.com.gunix.framework.security.UserDetails;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,6 +22,10 @@ import com.logicaldoc.webservice.auth.AuthService;
 import com.logicaldoc.webservice.document.WSDocument;
 import com.logicaldoc.webservice.folder.FolderService;
 import com.logicaldoc.webservice.folder.WSFolder;
+
+import mx.com.gunix.framework.documents.domain.Carpeta;
+import mx.com.gunix.framework.documents.domain.Documento;
+import mx.com.gunix.framework.security.UserDetails;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -188,24 +188,45 @@ public class DocumentService {
 		});
 	}
 
+	private Documento doGetDocumento(String sid, Carpeta root, long idDocumento) throws Exception {
+		WSDocument document = ds.getDocument(sid, idDocumento);
+		Documento doc = null;
+		if (document != null) {
+			doc = populateDocumento(sid, root, document);
+		}
+		return doc;
+	}
+	
 	private Documento doGetDocumento(String sid, Carpeta root, String rutaDocumento) throws Exception {
 		WSDocument document = ds.getDocumentByCustomId(sid, rutaDocumento.charAt(0) == '/' ? rutaDocumento : root.getPath() + "/" + rutaDocumento);
 		Documento doc = null;
 		if (document != null) {
-			doc = new Documento();
-			doc.setId(document.getId());
-			doc.setFileName(document.getFileName());
-			// doc.setAtributos(fromExtendedAttributes(document.getExtendedAttributes()));
-			Carpeta parentHolder = new Carpeta();
-			completaRuta(sid, root, parentHolder, document.getFolderId());
-			doc.setCarpeta(parentHolder.getPadre());
+			doc = populateDocumento(sid, root, document);
 		}
+		return doc;
+	}
+	
+	private Documento populateDocumento(String sid, Carpeta root, WSDocument document) throws Exception{
+		Documento doc = new Documento();
+		doc.setId(document.getId());
+		doc.setFileName(document.getFileName());
+		doc.setMimeType(MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType("archivo." + document.getType()));
+		// doc.setAtributos(fromExtendedAttributes(document.getExtendedAttributes()));
+		Carpeta parentHolder = new Carpeta();
+		completaRuta(sid, root, parentHolder, document.getFolderId());
+		doc.setCarpeta(parentHolder.getPadre());
 		return doc;
 	}
 
 	public Documento get(String rutaDocumento) {
 		return inSession((sid, root) -> {
 			return doGetDocumento(sid, root, rutaDocumento);
+		});
+	}
+	
+	public Documento get(long idDocumento) {
+		return inSession((sid, root) -> {
+			return doGetDocumento(sid, root, idDocumento);
 		});
 	}
 	
