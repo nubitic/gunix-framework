@@ -33,7 +33,7 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 		configClasses.add(AspectJConfig.class);
 		configClasses.add(REDISConfig.class);
 
-		if (Boolean.valueOf(System.getenv("STANDALONE_APP"))) {
+		if (Boolean.valueOf(System.getenv("STANDALONE_APP"))||Boolean.valueOf(System.getenv("ENABLE_ADMIN_APP_SERVICES"))) {
 			configClasses.add(AdminAppServicesConfig.class);
 		}
 		
