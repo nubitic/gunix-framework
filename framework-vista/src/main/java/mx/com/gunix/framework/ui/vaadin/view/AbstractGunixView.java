@@ -139,7 +139,6 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		doConstruct();
 		addComponent(flyt);
 		postInitFieldGroup();
-		UI.getCurrent().markAsDirtyRecursive();
 	}
 
 	@SuppressWarnings("unchecked")
