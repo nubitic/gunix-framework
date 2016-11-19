@@ -3,6 +3,7 @@ package mx.com.gunix.framework.service;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,7 +57,8 @@ public class GetterServiceImpl implements GetterService, ApplicationContextAware
 			GetterService.pidPdid.set(pidPdidArr);
 		}
 		if (applicationContext.containsBean(serviceName)) {
-			Object service = getTargetObject(applicationContext.getBean(serviceName));
+			Object proxyBean = applicationContext.getBean(serviceName);
+			Object service = getTargetObject(proxyBean);
 			Class<?>[] argTypes = null;
 			Method m = findMethod(service.getClass(), methodName, argsWithOutPIDDIF!=null?argTypes = Arrays
 																		.asList(argsWithOutPIDDIF)
@@ -69,7 +71,17 @@ public class GetterServiceImpl implements GetterService, ApplicationContextAware
 			if (m == null) {
 				throw new IllegalArgumentException("No se encontró el método " + methodName + " con argumentos: " + (argTypes != null ? Arrays.toString(argTypes) : "SIN ARGUMENTOS"));
 			}
-			return (Serializable) ReflectionUtils.invokeMethod(m, service, argsWithOutPIDDIF);
+			Serializable ans = null;
+			if (AopUtils.isJdkDynamicProxy(proxyBean)) {
+				try {
+					ans = (Serializable) Proxy.getInvocationHandler(proxyBean).invoke(proxyBean, m, argsWithOutPIDDIF);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}
+			} else {
+				ans = (Serializable) ReflectionUtils.invokeMethod(m, proxyBean, argsWithOutPIDDIF);
+			}
+			return ans;
 		} else {
 			throw new IllegalArgumentException("No se encontró el servicio " + serviceName);
 		}
