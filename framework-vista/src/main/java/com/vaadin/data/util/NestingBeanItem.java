@@ -3,6 +3,7 @@
  */
 package com.vaadin.data.util;
 
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class NestingBeanItem<BT> extends BeanItem<BT> {
 		for (final Object propertyId : propertyIds) {
 			Property p = getItemProperty(propertyId);
 			Class<?> propertyType = p.getType();
-			if (!BeanUtils.isSimpleProperty(propertyType) && !Iterable.class.isAssignableFrom(propertyType) && !Map.class.isAssignableFrom(propertyType) && !isGroovyMetaClass(propertyType)) {
+			if (!Modifier.isAbstract(propertyType.getModifiers()) && !BeanUtils.isSimpleProperty(propertyType) && !Iterable.class.isAssignableFrom(propertyType) && !Map.class.isAssignableFrom(propertyType) && !isGroovyMetaClass(propertyType)) {
 				try {
 					if (p.getValue() == null) {
 						propertyType.getConstructor((Class<?>[]) null);
@@ -47,7 +48,7 @@ public class NestingBeanItem<BT> extends BeanItem<BT> {
 					});
 					removedProperties.add((String) propertyId);
 				} catch (ReadOnlyException | InstantiationException | IllegalAccessException | SecurityException e) {
-					throw new RuntimeException(e);
+					throw new RuntimeException("No fue posible crear una nueva instancia para inicializar la propiedad \"" + propertyId+"\" de la clase "+ getBean().getClass(), e);
 				} catch (NoSuchMethodException noProcesar) {
 
 				}
