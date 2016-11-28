@@ -42,7 +42,7 @@ public interface VariableInstanceMapper {
 			"	  ACTIVITI.ACT_RU_VARIABLE "+
 			"	WHERE"+
 			"	  EXECUTION_ID_ = #{executionId} and TASK_ID_ is null"+
-			"   AND rev_ >= (select rev_ from ACTIVITI.ACT_RU_VARIABLE v2 where v2.EXECUTION_ID_ = #{executionId} and v2.TASK_ID_ is null and v2.type_='"+GunixObjectVariableType.GUNIX_OBJECT+"' and strpos(#{varName},v2.name_)=1)" +
+			"   AND rev_ >= (select rev_ from ACTIVITI.ACT_RU_VARIABLE v2 where v2.EXECUTION_ID_ = #{executionId} and v2.TASK_ID_ is null and v2.type_='"+GunixObjectVariableType.GUNIX_OBJECT+"' and strpos(v2.name_,#{varName})=1)" +
 			"	AND type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}%' or name_ LIKE '${varName}[%' or name_ LIKE '${varName}(%')" + 
 			" order by name_ ")
 	@ResultType(Map.class)
