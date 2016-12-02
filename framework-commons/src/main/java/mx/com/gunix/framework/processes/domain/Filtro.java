@@ -2,12 +2,15 @@ package mx.com.gunix.framework.processes.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public final class Filtro<T extends Serializable> extends Variable<T> {
 	private static final long serialVersionUID = 1L;
 	public static final String FILTRO_ESTATUS = "FILTRO_ESTATUS_";
 	public static final String FILTRO_ENDED ="FILTRO_ENDED_";
+	public static final String FILTRO_INICIO_BETWEEN ="FILTRO_INICIO_BETWEEN_";
+	public static final String FILTRO_FIN_BETWEEN ="FILTRO_FIN_BETWEEN_";
 	public static final String FILTRO_GLOBAL ="FILTRO_GLOBAL_";
 
 	public static enum Operador {
@@ -93,6 +96,44 @@ public final class Filtro<T extends Serializable> extends Variable<T> {
 			filtro.setNombre(FILTRO_ENDED);
 			filtro.setValor(Boolean.FALSE);
 			filtro.setlOp(Operador.IGUAL);
+			filtros.add(filtro);
+			return this;
+		}
+		
+		public <S extends Serializable> Builder registradoEntre(Date fechaInicial, Date fechaFinal){
+			if (fechaInicial == null && fechaFinal == null) {
+				throw new IllegalArgumentException("Al menos una de las fechas debe ser diferente a null");
+			}
+			
+			Filtro<Date> filtro = new Filtro<Date>();
+			filtro.setNombre(FILTRO_INICIO_BETWEEN);
+			filtro.setValor(fechaInicial);
+			filtro.setlOp(Operador.MAYOR_QUE);
+			filtros.add(filtro);
+			
+			filtro = new Filtro<Date>();
+			filtro.setNombre(FILTRO_INICIO_BETWEEN);
+			filtro.setValor(fechaFinal);
+			filtro.setlOp(Operador.MENOR_QUE);
+			filtros.add(filtro);
+			return this;
+		}
+		
+		public <S extends Serializable> Builder finalizadoEntre(Date fechaInicial, Date fechaFinal){
+			if (fechaInicial == null && fechaFinal == null) {
+				throw new IllegalArgumentException("Al menos una de las fechas debe ser diferente a null");
+			}
+			
+			Filtro<Date> filtro = new Filtro<Date>();
+			filtro.setNombre(FILTRO_FIN_BETWEEN);
+			filtro.setValor(fechaInicial);
+			filtro.setlOp(Operador.MAYOR_QUE);
+			filtros.add(filtro);
+			
+			filtro = new Filtro<Date>();
+			filtro.setNombre(FILTRO_FIN_BETWEEN);
+			filtro.setValor(fechaFinal);
+			filtro.setlOp(Operador.MENOR_QUE);
 			filtros.add(filtro);
 			return this;
 		}

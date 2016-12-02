@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -453,7 +454,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			List<Instancia> pidsEncontrados = new ArrayList<Instancia>();
 			Filtro<String> filtroEstatus = null;
 			Filtro<Boolean> filtroEnded = null;
-
+			boolean restringirPorFechasInicioTermino = false;
 			if (filtros != null && !filtros.isEmpty()) {
 				filtroEstatus = (Filtro<String>) filtros.stream().filter(f -> f.getNombre() == Filtro.FILTRO_ESTATUS).findFirst().orElse(null);
 				filtroEnded = (Filtro<Boolean>) filtros.stream().filter(f -> f.getNombre() == Filtro.FILTRO_ENDED).findFirst().orElse(null);
@@ -516,7 +517,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 				if (filtroEnded == null) {
 					ProcessInstanceQuery piq = rs.createProcessInstanceQuery();
 					piq.processDefinitionKey(processKey);
-					processFilters(filtros, piq);
+					restringirPorFechasInicioTermino = processFilters(filtros, piq);
 					
 					/*Si hay tareas pendientes la consulta se cerrara a unicamente las instancias de las tareas encontradas*/
 					if (tareas != null && !tareas.isEmpty()) {
@@ -547,8 +548,8 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 					}
 					
 					//Cuando la consulta no se cierra por las tareas de un perfil determinado entonces se incluyen las instancias historicas que cumplan con los filtros indicados 
-					if(!esParaPendientes && filtros != null && !filtros.isEmpty()){
-						processFilters(filtros, hpiq);
+					if((!esParaPendientes || restringirPorFechasInicioTermino) && filtros != null && !filtros.isEmpty()){
+						restringirPorFechasInicioTermino = processFilters(filtros, hpiq);
 					}
 					
 					if (filtroEnded != null) {
@@ -562,7 +563,16 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 					hpiq.orderByProcessInstanceId().asc();
 					List<HistoricProcessInstance> hpis = hpiq.list();
 					
-					/*Se consolidan los que siguen en ejecución como los historicos encontrados*/
+					/* Si se restringió la busqueda por fechas de inicio o termino entonces deberemos de limitar la busqueda a esos registros, por lo que limpiamos los que ya habiamos encontrado en ejecución
+					 * y de esa forma solo incluir los que resultaron de aplicar los filtros de fecha
+					 */
+					if (restringirPorFechasInicioTermino) {
+						pidsEncontradosSet.clear();
+					}
+
+					/*
+					 * Se consolidan los que siguen en ejecución como los historicos encontrados
+					 */
 					pidsEncontradosSet.addAll(hpis.stream().map(hpid -> {
 						return hpid.getId();
 					}).collect(Collectors.toCollection(() -> {
@@ -601,27 +611,34 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 						
 						//Primero procesamos los procesos que siguen en ejecución
 						if (pids != null) {
+							boolean finalRestringirPorFechasInicioTermino = restringirPorFechasInicioTermino;
 							pids.forEach(pid -> {
 								Instancia inst = new Instancia();
 								HistoricProcessInstance hpi = getHpi(pid.getId(), historicosHolder.get());
-								inst.setId(pid.getId());
-								inst.setProcessDefinitionId(pid.getProcessDefinitionId());
-								inst.setInicio(hpi.getStartTime());
-								inst.setProcessKey(processKey);
-								inst.setTermino(hpi.getEndTime());
-								inst.setUsuario(hpi.getStartUserId());
-								inst.setVolatil(false);
-								List<Comment> processComments = ts.getProcessInstanceComments(pid.getId(), PROCESS_CREATION_COMMENT);
-								if (processComments != null && !processComments.isEmpty()) {
-									inst.setComentario(processComments.get(0).getFullMessage());
+								if (hpi != null) {
+									inst.setId(pid.getId());
+									inst.setProcessDefinitionId(pid.getProcessDefinitionId());
+									inst.setInicio(hpi.getStartTime());
+									inst.setProcessKey(processKey);
+									inst.setTermino(hpi.getEndTime());
+									inst.setUsuario(hpi.getStartUserId());
+									inst.setVolatil(false);
+									List<Comment> processComments = ts.getProcessInstanceComments(pid.getId(), PROCESS_CREATION_COMMENT);
+									if (processComments != null && !processComments.isEmpty()) {
+										inst.setComentario(processComments.get(0).getFullMessage());
+									}
+									if (tareasHolder.get() != null) {
+										inst.setTareaActual(getTarea(inst, tareasHolder.get()));
+									}
+									
+									inst.setTareas(getTareas(inst,hTasks));
+									inst.setVariables(getVariables(inst, projectionVars));
+									pidsEncontrados.add(inst);
+								} else {
+									if (!finalRestringirPorFechasInicioTermino) {
+										throw new IllegalStateException("No fue posible encontrar la historia del process instance con id " + pid.getId());
+									}
 								}
-								if (tareasHolder.get() != null) {
-									inst.setTareaActual(getTarea(inst, tareasHolder.get()));
-								}
-								
-								inst.setTareas(getTareas(inst,hTasks));
-								inst.setVariables(getVariables(inst, projectionVars));
-								pidsEncontrados.add(inst);
 							});
 						}
 						
@@ -727,13 +744,41 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			if ((hpi = hpisIt.next()).getId().equals(pid)) {
 				hpisIt.remove();
 				break;
+			} else {
+				hpi = null;
 			}
 		}
 		return hpi;
 	}
 
-	private void processFilters(List<Filtro<?>> filtros, HistoricProcessInstanceQuery hpiq) {
+	private boolean processFilters(List<Filtro<?>> filtros, HistoricProcessInstanceQuery hpiq) {
+		boolean restringirPorFechasInicioTermino = false;
 		if (filtros != null && !filtros.isEmpty()) {
+			// Primero verificamos las fechas de inicio
+			List<Date> inicioTerminoBetween = processRegistroTerminoFilters(filtros, true);
+			if (!inicioTerminoBetween.isEmpty()) {
+				restringirPorFechasInicioTermino = true;
+				if (inicioTerminoBetween.get(0) != null) {
+					hpiq.startedAfter(inicioTerminoBetween.get(0));
+				}
+				if (inicioTerminoBetween.get(1) != null) {
+					hpiq.startedBefore(inicioTerminoBetween.get(1));
+				}
+			}
+
+			// Ahora verificamos las fechas de termino
+			inicioTerminoBetween = processRegistroTerminoFilters(filtros, false);
+			if (!inicioTerminoBetween.isEmpty()) {
+				restringirPorFechasInicioTermino = true;
+				if (inicioTerminoBetween.get(0) != null) {
+					hpiq.finishedAfter(inicioTerminoBetween.get(0));
+				}
+				if (inicioTerminoBetween.get(1) != null) {
+					hpiq.finishedBefore(inicioTerminoBetween.get(1));
+				}
+			}
+			
+			
 			filtros
 				.stream()
 				.filter(filtro->(filtro.getScope()==Variable.Scope.PROCESO))
@@ -766,42 +811,61 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 				});
 
 		}
+		return restringirPorFechasInicioTermino;
 	}
 	
-	private void processFilters(List<Filtro<?>> filtros, ProcessInstanceQuery piq) {
+	private List<Date> processRegistroTerminoFilters(List<Filtro<?>> filtros, boolean isInicio){
+		List<Date> registradoFinalizadoBetween = new ArrayList<Date>();
+		List<Filtro<?>> registroFinBetweenFilters = filtros.stream().filter(f -> f.getNombre() == (isInicio ? Filtro.FILTRO_INICIO_BETWEEN : Filtro.FILTRO_FIN_BETWEEN)).collect(Collectors.toList());
+		if (registroFinBetweenFilters != null && !registroFinBetweenFilters.isEmpty()) {
+			registroFinBetweenFilters.forEach(f -> {
+				registradoFinalizadoBetween.add((Date) f.getValor());
+				filtros.remove(f);
+			});
+		}
+		return registradoFinalizadoBetween;
+	}
+	
+	private boolean processFilters(List<Filtro<?>> filtros, ProcessInstanceQuery piq) {
+		AtomicBoolean restringirPorFechasInicioTermino = new AtomicBoolean();
 		if (filtros != null && !filtros.isEmpty()) {
 			filtros
 				.stream()
 				.filter(filtro->(filtro.getScope()==Variable.Scope.PROCESO))
 				.forEach(filtro->{
-					Map<String, Object> fvm = new TreeMap<String, Object>();
-					fvm.putAll(GunixVariableSerializer.serialize(filtro.getNombre(), filtro.getValor(), false));
-					fvm.forEach((varName, varValue) -> {
-						switch (filtro.getlOp()) {
-						case IGUAL:
-							if (varName == Filtro.FILTRO_GLOBAL) {
-								piq.variableValueEquals(varValue);
-							} else {
-								piq.variableValueEquals(varName, varValue);
+					if(filtro.getNombre() != Filtro.FILTRO_FIN_BETWEEN && filtro.getNombre() != Filtro.FILTRO_INICIO_BETWEEN){
+						Map<String, Object> fvm = new TreeMap<String, Object>();
+						fvm.putAll(GunixVariableSerializer.serialize(filtro.getNombre(), filtro.getValor(), false));
+						fvm.forEach((varName, varValue) -> {
+							switch (filtro.getlOp()) {
+							case IGUAL:
+								if (varName == Filtro.FILTRO_GLOBAL) {
+									piq.variableValueEquals(varValue);
+								} else {
+									piq.variableValueEquals(varName, varValue);
+								}
+								break;
+							case MAYOR_QUE:
+								piq.variableValueGreaterThan(varName, varValue);
+								break;
+							case MENOR_QUE:
+								piq.variableValueLessThanOrEqual(varName, varValue);
+								break;
+							case DIFERENTE:
+								piq.variableValueNotEquals(varName, varValue);
+								break;
+							case LIKE:
+								piq.variableValueLike(varName, (String) varValue);
+								break;
 							}
-							break;
-						case MAYOR_QUE:
-							piq.variableValueGreaterThan(varName, varValue);
-							break;
-						case MENOR_QUE:
-							piq.variableValueLessThanOrEqual(varName, varValue);
-							break;
-						case DIFERENTE:
-							piq.variableValueNotEquals(varName, varValue);
-							break;
-						case LIKE:
-							piq.variableValueLike(varName, (String) varValue);
-							break;
-						}
-					});
+						});
+					}else{
+						restringirPorFechasInicioTermino.set(true);
+					}
 				});
 
 		}
+		return restringirPorFechasInicioTermino.get();
 	}
 
 	@Override
