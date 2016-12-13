@@ -47,6 +47,13 @@ $(document).ajaxError(function(event, xhr, settings, exception) {
 	console.log("ajaxError.jqXHR", xhr);
 	console.log("ajaxError.ajaxSettings", settings);
 	console.log("ajaxError.thrownError", exception);
+	var errorMessage = $('<div/>').html(xhr.responseText).find("h1");
+	if(errorMessage == null || typeof(errorMessage) == 'undefined'  || errorMessage.text() == ''){
+		errorMessage = exception;
+	} else {
+		errorMessage = errorMessage.text();
+	}
+	alert("Se presentó un problema al procesar la información en el servidor: "+errorMessage);
 });
 
 $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
