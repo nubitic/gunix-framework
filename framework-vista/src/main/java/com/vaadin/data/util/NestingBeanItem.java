@@ -3,21 +3,37 @@
  */
 package com.vaadin.data.util;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.BeanUtils;
+import org.vaadin.easyuploads.UploadField;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ReadOnlyException;
+
+import mx.com.gunix.framework.domain.Transient;
 
 @SuppressWarnings("serial")
 public class NestingBeanItem<BT> extends BeanItem<BT> {
 	private static Boolean isGroovyPresent;
 	private static Class<?> groovyMetaClass;
+	private static Field methodPropertyGetMethodField;
+	
+	static{
+		try {
+			methodPropertyGetMethodField = MethodProperty.class.getDeclaredField("getMethod");
+			methodPropertyGetMethodField.setAccessible(true);
+		} catch (NoSuchFieldException | SecurityException e) {
+			throw new RuntimeException(e);
+		}
+	}
 	
 	public NestingBeanItem(final BT nestedObject, Class<BT> beanClass) {
 		super(nestedObject, beanClass);
@@ -30,8 +46,25 @@ public class NestingBeanItem<BT> extends BeanItem<BT> {
 		Set<String> nestedProperties = new HashSet<String>();
 		for (final Object propertyId : propertyIds) {
 			Property p = getItemProperty(propertyId);
+			Method getMethod = null;
+			if (p instanceof MethodProperty) {
+				try {
+					getMethod = (Method) methodPropertyGetMethodField.get(p);
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					throw new RuntimeException(e);
+				}
+			} else {
+				if (p instanceof NestedMethodProperty) {
+					List<Method> gets = ((NestedMethodProperty)p).getGetMethods();
+					if (gets != null && !gets.isEmpty()) {
+						getMethod = gets.get(gets.size() - 1);
+					} else {
+						throw new IllegalStateException("No fue posible obtener un método get para la propiedad: " + propertyId);
+					}
+				}
+			}
 			Class<?> propertyType = p.getType();
-			if (!Modifier.isAbstract(propertyType.getModifiers()) && !BeanUtils.isSimpleProperty(propertyType) && !Iterable.class.isAssignableFrom(propertyType) && !Map.class.isAssignableFrom(propertyType) && !isGroovyMetaClass(propertyType)) {
+			if (!getMethod.isAnnotationPresent(Transient.class) && !Modifier.isAbstract(propertyType.getModifiers()) && !BeanUtils.isSimpleProperty(propertyType) && !Iterable.class.isAssignableFrom(propertyType) && !Map.class.isAssignableFrom(propertyType) && !isGroovyMetaClass(propertyType)) {
 				try {
 					if (p.getValue() == null) {
 						propertyType.getConstructor((Class<?>[]) null);
