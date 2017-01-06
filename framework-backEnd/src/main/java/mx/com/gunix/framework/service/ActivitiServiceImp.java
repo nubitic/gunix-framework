@@ -441,8 +441,8 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 	
 	
 	@Override
-	public List<Instancia> getPendientesByMaxResults(String processKey, List<Filtro<?>> filtros, String... projectionVars, Integer maxResults) {
-		return doConsultaByMaxResults(processKey, filtros, true, projectionVars, maxResults);
+	public List<Instancia> getPendientesByMaxResults(String processKey, List<Filtro<?>> filtros, Integer maxResults, String... projectionVars) {
+		return doConsultaByMaxResults(processKey, filtros, true, maxResults, projectionVars);
 	}
 
 	@Override
@@ -683,7 +683,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 
 	
 	@SuppressWarnings("unchecked")
-	private List<Instancia> doConsultaByMaxResults(String processKey, List<Filtro<?>> filtros, boolean esParaPendientes, String... projectionVars, Integer maxResults) {
+	private List<Instancia> doConsultaByMaxResults(String processKey, List<Filtro<?>> filtros, boolean esParaPendientes, Integer maxResults, String... projectionVars) {
 		try{
 			Instancia instancia = new Instancia();
 			instancia.setVolatil(ActivitiService.VOLATIL.equals(repos.createProcessDefinitionQuery().processDefinitionKey(processKey).latestVersion().singleResult().getCategory()));

@@ -21,7 +21,7 @@ public interface BusinessProcessManager {
 
 	public List<Instancia> getPendientes(String processKey, List<Filtro<?>> filtros, String... projectionVars);
 	
-	public List<Instancia> getPendientesByMaxResults(String processKey, List<Filtro<?>> filtros, String... projectionVars, Integer maxResults);
+	public List<Instancia> getPendientesByMaxResults(String processKey, List<Filtro<?>> filtros, Integer maxResults, String... projectionVars);
 
 	public List<Instancia> consulta(String processKey, List<Filtro<?>> filtros, String... projectionVars);
 	
