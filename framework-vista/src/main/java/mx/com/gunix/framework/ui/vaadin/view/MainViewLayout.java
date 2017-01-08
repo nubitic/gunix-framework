@@ -7,10 +7,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import mx.com.gunix.framework.security.domain.Aplicacion;
-import mx.com.gunix.framework.security.domain.Usuario;
-import mx.com.gunix.framework.ui.vaadin.component.Header;
-
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
@@ -21,28 +18,33 @@ import com.vaadin.data.Container.Indexed;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.Page;
 import com.vaadin.server.Responsive;
-import com.vaadin.ui.Alignment;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.grid.HeightMode;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Component;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.PopupView;
+import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.renderers.ButtonRenderer;
 import com.vaadin.ui.renderers.ProgressBarRenderer;
 import com.vaadin.ui.renderers.TextRenderer;
 import com.vaadin.ui.themes.ValoTheme;
+
+import mx.com.gunix.framework.security.domain.Aplicacion;
+import mx.com.gunix.framework.security.domain.Usuario;
+import mx.com.gunix.framework.service.UsuarioService;
+import mx.com.gunix.framework.ui.vaadin.component.Header;
 
 public class MainViewLayout extends VerticalLayout{
 	@Autowired
@@ -51,15 +53,24 @@ public class MainViewLayout extends VerticalLayout{
 
 	@Autowired
 	private VaadinSecurity security;
+	
+	@Autowired
+	UsuarioService usuarioSrv;
 
 	private static final long serialVersionUID = 1;
 	private TabSheet aplicacionesTab;
-	private PopupView userIdLabel;
+	private Button userIdLabel;
 	private Button downloads;
 	private Grid downloadsManager;
 	private Map<String, DownloadProps> registeredDownloads = new HashMap<String, DownloadProps>();
 	String userId;
 	private VerticalLayout userDetailsLayout;
+	private FormLayout cambioContraseñaLyt;
+	private PasswordField nuevaContraseña;
+	private PasswordField confirmacionNuevaContraseña;
+	private PasswordField contraseñaActual;
+	Window userDetailsWindow;
+	Button cambiarContraseña;
 
 	@PostConstruct
 	private void postConstruct() {
@@ -72,7 +83,7 @@ public class MainViewLayout extends VerticalLayout{
 		StringBuilder userIdStrBldr = new StringBuilder(u.getIdUsuario());
 		if (u.getDatosUsuario() != null) {
 			userIdStrBldr
-				.append("<br/>")
+				.append(" - ")
 				.append(u.getDatosUsuario().getApPaterno())
 				.append(" ")
 				.append(u.getDatosUsuario().getApMaterno())
@@ -105,20 +116,26 @@ public class MainViewLayout extends VerticalLayout{
 		downloadsUserIdLayt.setSpacing(false);
 		downloadsUserIdLayt.setMargin(false);
 		
-		userIdLabel = new PopupView(new PopupView.Content() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public String getMinimizedValueAsHTML() {
-				return userId;
-			}
-
-			@Override
-			public Component getPopupComponent() {
-				return userDetailsLayout;
-			}
+		userIdLabel = new Button(userId);
+		userIdLabel.addStyleName(ValoTheme.BUTTON_LINK);
+		userIdLabel.addClickListener(clickEvnt->{
+			userDetailsWindow = new Window();
+			userDetailsWindow.setModal(true);
+			userDetailsWindow.setResizable(false);
+			userDetailsWindow.setClosable(true);
+			userDetailsWindow.setWidth("200px");
+			userDetailsWindow.setHeight("100px");
+			userDetailsWindow.setContent(userDetailsLayout);
+			userDetailsWindow.addCloseListener(closeEvnt->{
+				nuevaContraseña.setValue(null);
+				confirmacionNuevaContraseña.setValue(null);
+				contraseñaActual.setValue(null);
+				cambioContraseñaLyt.setVisible(false);
+				cambiarContraseña.setVisible(true);
+			});
+			UI.getCurrent().addWindow(userDetailsWindow);
 		});
-		userIdLabel.addStyleName("user-id-label");
+		
 		downloadsUserIdLayt.addComponent(userIdLabel);
 		downloadsUserIdLayt.setComponentAlignment(userIdLabel, Alignment.MIDDLE_RIGHT);		
 				
@@ -168,6 +185,77 @@ public class MainViewLayout extends VerticalLayout{
 			security.logout();
 		});
 		userDetailsLayout.addComponent(logoutButton);
+		userDetailsLayout.setExpandRatio(logoutButton, 0.0f);
+		userDetailsLayout.setComponentAlignment(logoutButton, Alignment.MIDDLE_CENTER);
+			
+		cambiarContraseña = new Button("Cambiar Contraseña");
+		cambiarContraseña.addClickListener(clcEvnt->{
+			cambioContraseñaLyt.setVisible(true);
+			userDetailsWindow.setWidth("500px");
+			userDetailsWindow.setHeight("300px");
+			userDetailsWindow.center();
+			userDetailsWindow.markAsDirtyRecursive();
+			cambiarContraseña.setVisible(false);
+		});
+		
+		userDetailsLayout.addComponent(cambiarContraseña);
+		userDetailsLayout.setComponentAlignment(cambiarContraseña, Alignment.MIDDLE_CENTER);
+		
+		cambioContraseñaLyt = new FormLayout();
+		cambioContraseñaLyt.setSizeFull();
+		cambioContraseñaLyt.setVisible(false);
+		
+		nuevaContraseña = new PasswordField("Nueva Contraseña");
+		nuevaContraseña.setNullRepresentation("");
+		nuevaContraseña.setRequired(true);
+		cambioContraseñaLyt.addComponent(nuevaContraseña);
+		confirmacionNuevaContraseña = new PasswordField("Confirmación de Nueva Contraseña");
+		confirmacionNuevaContraseña.setNullRepresentation("");
+		confirmacionNuevaContraseña.setRequired(true);
+		cambioContraseñaLyt.addComponent(confirmacionNuevaContraseña);
+		contraseñaActual = new PasswordField("Contraseña Actual");
+		contraseñaActual.setNullRepresentation("");
+		contraseñaActual.setRequired(true);
+		cambioContraseñaLyt.addComponent(contraseñaActual);
+		
+		Button cambiarContraseñaButton = new Button("Aceptar");
+		cambiarContraseñaButton.addClickListener(clicEvnt -> {
+			if (nuevaContraseña.getValue() != null && confirmacionNuevaContraseña.getValue() != null && contraseñaActual.getValue() != null &&
+					!"".equals(nuevaContraseña.getValue()) && !"".equals(confirmacionNuevaContraseña.getValue()) && !"".equals(contraseñaActual.getValue())) {
+				if (nuevaContraseña.getValue().equals(confirmacionNuevaContraseña.getValue())) {
+					u.setPassword(nuevaContraseña.getValue());
+					try {
+						usuarioSrv.updatePassword(u, contraseñaActual.getValue());
+						userDetailsLayout.addComponent(new Label("Cambio de contraseña realizado con éxito, de clic en el botón Continuar para cerrar la sesión actual e ingresar nuevamente con la nueva contraseña"));
+						Button continuarButton = new Button("Continuar", clickEvnt -> {
+							security.logout();
+						});
+						userDetailsLayout.addComponent(continuarButton);
+						userDetailsLayout.setComponentAlignment(continuarButton, Alignment.MIDDLE_CENTER);
+						userDetailsWindow.setClosable(false);
+						cambioContraseñaLyt.setVisible(false);
+						userDetailsWindow.setWidth("500px");
+						userDetailsWindow.setHeight("200px");
+						userDetailsWindow.center();
+						userDetailsWindow.markAsDirtyRecursive();
+					} catch (Exception e) {
+						Notification.show(ExceptionUtils.getRootCause(e).getMessage(), Type.ERROR_MESSAGE);
+					}
+				} else {
+					Notification.show("La nueva contraseña y la confirmación deben ser iguales", Type.ERROR_MESSAGE);
+				}
+			} else {
+				Notification.show("La nueva contraseña, la confirmación y la contraseña actual son requeridas", Type.ERROR_MESSAGE);
+			}
+		});
+		cambioContraseñaLyt.addComponent(cambiarContraseñaButton);
+
+		userDetailsLayout.addComponent(cambioContraseñaLyt);
+		userDetailsLayout.setExpandRatio(cambioContraseñaLyt, 1.0f);
+		userDetailsLayout.setComponentAlignment(cambioContraseñaLyt, Alignment.MIDDLE_CENTER);
+		
+		userDetailsLayout.setMargin(true);
+		userDetailsLayout.setSizeFull();		
 	}
 
 	protected void renderApps(List<Aplicacion> apps, HorizontalLayout appInfo) {

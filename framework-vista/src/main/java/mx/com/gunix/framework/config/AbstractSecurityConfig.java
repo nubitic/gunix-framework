@@ -148,7 +148,7 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
+		return new BCryptPasswordEncoder(16);
 	}
 
 	@Override

@@ -77,7 +77,7 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 	@Autowired
 	MutableAclService aclService;
 	
-	private PasswordEncoder pe = new BCryptPasswordEncoder();
+	private PasswordEncoder pe = new BCryptPasswordEncoder(16);
 	
 	private static Class<GetterService> securedACLGetterInterface;
 	private static Method getMethod;

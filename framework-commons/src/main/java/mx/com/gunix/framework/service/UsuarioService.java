@@ -16,4 +16,6 @@ public interface UsuarioService extends PersistentTokenRepository{
 	void createNewToken(PersistentRememberMeToken token);
 
 	public Usuario getAnonymous();
+	
+	public void updatePassword(Usuario usuario, String passwordActual);
 }

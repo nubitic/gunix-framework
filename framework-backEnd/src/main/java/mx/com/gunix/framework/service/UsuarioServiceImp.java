@@ -7,6 +7,8 @@ import mx.com.gunix.framework.security.domain.Usuario;
 import mx.com.gunix.framework.security.domain.persistence.UsuarioMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,8 @@ public class UsuarioServiceImp implements UsuarioService {
 	@Autowired
 	PersistentTokenRepository persistentTokenRepository;
 
+	private PasswordEncoder pe = new BCryptPasswordEncoder(16);
+	
 	@Override
 	public Usuario getUsuario(String idUsuario) {
 		Usuario usuarioSeg = um.getUsuario(idUsuario);
@@ -56,6 +60,17 @@ public class UsuarioServiceImp implements UsuarioService {
 	@Override
 	public Usuario getAnonymous() {
 		return um.getUsuario(ANONYMOUS);
+	}
+
+	@Override
+	public void updatePassword(Usuario usuario, String passwordActual) {
+		if(pe.matches(passwordActual, um.getPasswordActual(usuario.getIdUsuario()))){
+			String encodedPassword = pe.encode(usuario.getPassword());
+			usuario.setEncodePassword(encodedPassword);
+			um.updatePassword(usuario);	
+		} else {
+			throw new IllegalArgumentException("La contraseña indicada no corresponde con la contraseña almacenada en la base de datos");
+		}
 	}
 
 }
