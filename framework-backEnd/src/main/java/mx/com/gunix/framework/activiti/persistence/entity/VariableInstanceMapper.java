@@ -84,6 +84,6 @@ public interface VariableInstanceMapper {
 	@Options(flushCache=true)
 	public List<Map<String,Object>> findHistoricGunixObjectByNameAndExecutionIdAndRevision(@Param("executionId") String executionId, @Param("varName") String varName);
 	
-	@Delete("delete from ACTIVITI.ACT_RU_VARIABLE where ID_ = #{id,jdbcType=VARCHAR} and REV_ = #{revision}")
-	public void delete(@Param("id") String id, @Param("revision") int revision);
+	@Delete("delete from ACTIVITI.ACT_RU_VARIABLE where execution_id_ = #{executionId} and  name_ like '${varName}%' and REV_ = #{revision} and type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"'")
+	public void delete(@Param("executionId") String executionId,@Param("varName") String varName, @Param("revision") int revision);
 }

@@ -84,7 +84,9 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 		if (valueFields instanceof HasRevision) {
 			VariableInstanceEntity vie = (VariableInstanceEntity) valueFields;
 			String executionId = currentInstancia.get().peek().getId();
-
+			
+			vim.delete(executionId, vie.getName(), ((HasRevision) vie).getRevision());
+			
 			if (value != null) {
 				Map<String, Object> variablesMap = new TreeMap<String, Object>();
 				variablesMap.putAll(GunixVariableSerializer.serialize(vie.getName(), value, false));
