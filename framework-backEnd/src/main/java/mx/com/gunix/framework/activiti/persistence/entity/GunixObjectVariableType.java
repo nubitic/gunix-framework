@@ -1,7 +1,9 @@
 package mx.com.gunix.framework.activiti.persistence.entity;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -10,6 +12,7 @@ import java.util.TreeMap;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.impl.cmd.NeedsActiveExecutionCmd;
 import org.activiti.engine.impl.cmd.StartProcessInstanceCmd;
+import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.db.HasRevision;
 import org.activiti.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -28,6 +31,7 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 	public static final String GUNIX_OBJECT = "gunix-serializable";
 	private static final Field executionIdField;
 	private static final Field processDefinitionKeyField;
+	private static final Field deleteOperationsField;
 	static {
 		try {
 			executionIdField = NeedsActiveExecutionCmd.class.getDeclaredField("executionId");
@@ -35,6 +39,9 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 
 			processDefinitionKeyField = StartProcessInstanceCmd.class.getDeclaredField("processDefinitionKey");
 			processDefinitionKeyField.setAccessible(true);
+			
+			deleteOperationsField = DbSqlSession.class.getDeclaredField("deleteOperations");
+			deleteOperationsField.setAccessible(true);
 		} catch (NoSuchFieldException | SecurityException e) {
 			throw new RuntimeException(e);
 		}
@@ -85,9 +92,10 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 			VariableInstanceEntity vie = (VariableInstanceEntity) valueFields;
 			String executionId = currentInstancia.get().peek().getId();
 			
-			vim.delete(executionId, vie.getName(), ((HasRevision) vie).getRevision());
-			
 			if (value != null) {
+				if (!value.getClass().isArray() && !(value instanceof Collection)) {
+					vim.delete(executionId, vie.getName(), ((HasRevision) vie).getRevision());
+				}
 				Map<String, Object> variablesMap = new TreeMap<String, Object>();
 				variablesMap.putAll(GunixVariableSerializer.serialize(vie.getName(), value, false));
 
