@@ -1,9 +1,7 @@
 package mx.com.gunix.framework.activiti.persistence.entity;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -93,9 +91,6 @@ public class GunixObjectVariableType extends NullType implements VariableType {
 			String executionId = currentInstancia.get().peek().getId();
 			
 			if (value != null) {
-				if (!value.getClass().isArray() && !(value instanceof Collection)) {
-					vim.delete(executionId, vie.getName(), ((HasRevision) vie).getRevision());
-				}
 				Map<String, Object> variablesMap = new TreeMap<String, Object>();
 				variablesMap.putAll(GunixVariableSerializer.serialize(vie.getName(), value, false));
 
