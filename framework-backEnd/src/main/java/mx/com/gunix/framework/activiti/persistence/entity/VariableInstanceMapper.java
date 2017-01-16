@@ -60,8 +60,8 @@ public interface VariableInstanceMapper {
 			"	  ACTIVITI.act_hi_varinst"+
 			"	WHERE"+
 			"	  EXECUTION_ID_ = #{executionId} and TASK_ID_ is null"+
+			"	AND var_type_ in ('string','long','double','date','serializable','longString','boolean','integer') and (name_ LIKE '${varName}%' or name_ LIKE '${varName}[%'  or name_ LIKE '${varName}(%')" +
 			"   AND rev_ >= (select rev_ from ACTIVITI.act_hi_varinst v2 where v2.EXECUTION_ID_ = #{executionId} and v2.TASK_ID_ is null and v2.var_type_='"+GunixObjectVariableType.GUNIX_OBJECT+"' and strpos(#{varName},v2.name_)=1)" +
-			"	AND var_type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}%' or name_ LIKE '${varName}[%'  or name_ LIKE '${varName}(%')" + 
 			" order by name_ ")
 	@ResultType(Map.class)
 	@Options(flushCache=true)

@@ -13,11 +13,13 @@ import mx.com.gunix.framework.util.spreadsheetmlexporter.MetaDatos;
 import mx.com.gunix.framework.util.spreadsheetmlexporter.Progreso;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 
 public class SpreadsheetMLExporter {
 	private static final int MAX_REG_EXCEL_DEFAULT = 1048576;
 	private static final String EXTENSION = ".xls";
-
+	private static Logger log = Logger.getLogger(SpreadsheetMLExporter.class);
+	
 	public static void exportaArchivo(String nombreArchivo, OutputStream out, DatosExportar resultados, Progreso progreso) {
 		// Bloque de consulta y construcción de excel.
 		ZipOutputStream stream = null;
@@ -136,6 +138,7 @@ public class SpreadsheetMLExporter {
 
 			progreso.despliegaMensaje("Se presentó un error durante el proceso de exportación: " + thr.getMessage());
 			progreso.terminarProceso(Progreso.Estatus.ERROR);
+			log.error(thr);
 			throw new RuntimeException(thr);
 		} finally {
 			resultados.liberar();
