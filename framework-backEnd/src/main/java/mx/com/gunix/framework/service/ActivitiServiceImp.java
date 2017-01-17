@@ -433,25 +433,29 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		}
 		return instancia;
 	}
-
+	
 	@Override
 	public List<Instancia> getPendientes(String processKey, List<Filtro<?>> filtros, String... projectionVars) {
-		return doConsulta(processKey, filtros, true, projectionVars);
-	}
-	
-	
-	@Override
-	public List<Instancia> getPendientesByMaxResults(String processKey, List<Filtro<?>> filtros, Integer maxResults, String... projectionVars) {
-		return doConsultaByMaxResults(processKey, filtros, true, maxResults, projectionVars);
+		return doConsulta(processKey, filtros, true, BusinessProcessManager.NO_LIMIT, projectionVars);
 	}
 
 	@Override
 	public List<Instancia> consulta(String processKey, List<Filtro<?>> filtros, String... projectionVars) {
-		return doConsulta(processKey, filtros, false, projectionVars);
+		return doConsulta(processKey, filtros, false, BusinessProcessManager.NO_LIMIT, projectionVars);
+	}
+
+	@Override
+	public List<Instancia> getPendientes(String processKey, List<Filtro<?>> filtros, Integer maxResults, String... projectionVars) {
+		return doConsulta(processKey, filtros, true, maxResults, projectionVars);
+	}
+
+	@Override
+	public List<Instancia> consulta(String processKey, List<Filtro<?>> filtros, Integer maxResults, String... projectionVars) {
+		return doConsulta(processKey, filtros, false, maxResults, projectionVars);
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Instancia> doConsulta(String processKey, List<Filtro<?>> filtros, boolean esParaPendientes, String... projectionVars) {
+	private List<Instancia> doConsulta(String processKey, List<Filtro<?>> filtros, boolean esParaPendientes, Integer maxResults, String... projectionVars) {
 		try{
 			Instancia instancia = new Instancia();
 			instancia.setVolatil(ActivitiService.VOLATIL.equals(repos.createProcessDefinitionQuery().processDefinitionKey(processKey).latestVersion().singleResult().getCategory()));
@@ -467,7 +471,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			}
 			
 			if ((filtroEstatus != null && filtroEnded != null) || (esParaPendientes && (filtroEstatus != null || filtroEnded != null))) {
-				throw new IllegalArgumentException("Combinación de filtros mutuamente excluyentes: a) Por estatus y terminados ó b) Pendientes con estatatus específico o terminados");
+				throw new IllegalArgumentException("Combinación de filtros mutuamente excluyentes: a) Por estatus y terminados ó b) Pendientes con estatus específico o terminados");
 			} else {
 				if (filtroEstatus != null) {
 					filtros.remove(filtroEstatus);
@@ -533,8 +537,13 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 							return new HashSet<String>();
 						})));
 					}
+					
 					piq.orderByProcessInstanceId().asc();
-					pids = piq.list();
+					if (maxResults == BusinessProcessManager.NO_LIMIT) {
+						pids = piq.list();
+					} else {
+						pids = piq.listPage(1, maxResults);
+					}
 					
 					pidsEncontradosSet = pids.stream().map(pid -> {
 						return pid.getProcessInstanceId();
