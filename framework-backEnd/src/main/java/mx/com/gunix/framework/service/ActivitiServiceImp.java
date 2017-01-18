@@ -670,25 +670,28 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 							
 							pidsEncontrados.addAll(hpis.parallelStream()
 								.flatMap(hpid -> {
-								Stream.Builder<Instancia> instanciaStream = Stream.builder();
-								Instancia inst = new Instancia();
-								inst.setId(hpid.getId());
-								inst.setProcessDefinitionId(hpid.getProcessDefinitionId());
-								inst.setProcessKey(hpid.getProcessDefinitionKey());
-								inst.setInicio(hpid.getStartTime());
-								inst.setProcessKey(processKey);
-								inst.setTermino(hpid.getEndTime());
-								inst.setUsuario(hpid.getStartUserId());
-								inst.setVolatil(false);
-								List<Comment> processComments = ts.getProcessInstanceComments(hpid.getId(), PROCESS_CREATION_COMMENT);
-								if (processComments != null && !processComments.isEmpty()) {
-									inst.setComentario(processComments.get(0).getFullMessage());
-								}
-								
-								inst.setTareas(getTareas(inst,hTasks));
-								inst.setVariables(getVariables(inst, projectionVars));
-								instanciaStream.add(inst);
-								return instanciaStream.build();
+									Stream.Builder<Instancia> instanciaStream = Stream.builder();
+									if (pidsEncontrados.parallelStream().filter(inst -> inst.getId().equals(hpid.getId())).findFirst().orElse(null) == null) {
+										Instancia inst = new Instancia();
+										inst.setId(hpid.getId());
+										inst.setProcessDefinitionId(hpid.getProcessDefinitionId());
+										inst.setProcessKey(hpid.getProcessDefinitionKey());
+										inst.setInicio(hpid.getStartTime());
+										inst.setProcessKey(processKey);
+										inst.setTermino(hpid.getEndTime());
+										inst.setUsuario(hpid.getStartUserId());
+										inst.setVolatil(false);
+										List<Comment> processComments = ts.getProcessInstanceComments(hpid.getId(), PROCESS_CREATION_COMMENT);
+										
+										if (processComments != null && !processComments.isEmpty()) {
+											inst.setComentario(processComments.get(0).getFullMessage());
+										}
+	
+										inst.setTareas(getTareas(inst, hTasks));
+										inst.setVariables(getVariables(inst, projectionVars));
+										instanciaStream.add(inst);
+									}
+									return instanciaStream.build();
 							}).collect(Collectors.toList()));
 							
 						}
