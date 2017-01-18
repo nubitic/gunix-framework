@@ -278,6 +278,8 @@ public final class EmbeddedPostgreSQLManager {
 			cmd.add("log_rotation_age=1d");
 			cmd.add("-c");
 			cmd.add("log_rotation_size=0");
+			cmd.add("-c");
+			cmd.add("log_min_duration_statement=3000");
 
 			ProcessBuilder processBuilder = new ProcessBuilder(cmd);
 			processBuilder.redirectErrorStream(true);
