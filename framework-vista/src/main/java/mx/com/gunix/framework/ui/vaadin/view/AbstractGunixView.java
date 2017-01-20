@@ -175,19 +175,27 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	protected final void completaTarea() {
 		tarea.setVariables(getVariablesTarea());
 		tarea.setComentario(getComentarioTarea());
-
-		Instancia instancia = as.completaTarea(tarea);
-		String taskView = null;
-		Tarea tareaAct = instancia.getTareaActual();
-		if (tareaAct == null || (taskView = tareaAct.getVista()).equals(Tarea.DEFAULT_END_TASK_VIEW)) {
-			taskView = DefaultProcessEndView.class.getName();
-		}
-
+		
 		try {
-			taNav.setTareaActual(instancia.getTareaActual());
-			taNav.navigateTo(taskView);
-		} finally {
-			taNav.setTareaActual(null);
+			Instancia instancia = as.completaTarea(tarea);
+			String taskView = null;
+			Tarea tareaAct = instancia.getTareaActual();
+			if (tareaAct == null || (taskView = tareaAct.getVista()).equals(Tarea.DEFAULT_END_TASK_VIEW)) {
+				taskView = DefaultProcessEndView.class.getName();
+			}
+
+			try {
+				taNav.setTareaActual(instancia.getTareaActual());
+				taNav.navigateTo(taskView);
+			} finally {
+				taNav.setTareaActual(null);
+			}
+		} catch (Throwable exp) {
+			String mensajeError = exp.getMessage();
+			if (mensajeError != null && mensajeError.indexOf("GunixHessianServiceException") != -1) {
+				Notification.show("Se presentó un error al procesar su solicitud: " + mensajeError.split("GunixHessianServiceException")[1] ,Notification.Type.ERROR_MESSAGE);
+			}
+			throw exp;
 		}
 	}
 

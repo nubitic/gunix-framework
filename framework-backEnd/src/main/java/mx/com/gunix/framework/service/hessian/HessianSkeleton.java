@@ -113,8 +113,8 @@ public class HessianSkeleton extends com.caucho.hessian.server.HessianSkeleton {
 			Throwable e1 = e;
 			if (e1 instanceof InvocationTargetException)
 				e1 = ((InvocationTargetException) e).getTargetException();
-
-			out.writeFault("ServiceException", escapeMessage(e1.getMessage()), new GunixHessianServiceException(e1));
+			GunixHessianServiceException returnExcp = new GunixHessianServiceException(e1);
+			out.writeFault("ServiceException", escapeMessage(returnExcp.getMessage()), returnExcp);
 			out.close();
 			return;
 		} finally {
