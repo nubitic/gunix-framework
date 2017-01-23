@@ -456,7 +456,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 	}
 	
 	@Override
-	public List<Instancia> consulta(String processKey, List<Filtro<?>> filtros, Integer registroInicial, Integer tamañoPagina, String... projectionVars) {
+	public List<Instancia> consulta2(String processKey, List<Filtro<?>> filtros, Integer registroInicial, Integer tamañoPagina, String... projectionVars) {
 		return doConsulta(processKey, filtros, false, registroInicial, tamañoPagina, projectionVars);
 	}
 

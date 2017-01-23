@@ -31,5 +31,5 @@ public interface BusinessProcessManager {
 
 	public List<String> getEstadosProceso(String processKey);
 
-	public List<Instancia> consulta(String processKey, List<Filtro<?>> filtros, Integer registroInicial, Integer tamañoPagina, String... projectionVars);
+	public List<Instancia> consulta2(String processKey, List<Filtro<?>> filtros, Integer registroInicial, Integer tamañoPagina, String... projectionVars);
 }
