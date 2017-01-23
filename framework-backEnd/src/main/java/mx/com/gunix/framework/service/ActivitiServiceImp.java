@@ -437,26 +437,31 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 	
 	@Override
 	public List<Instancia> getPendientes(String processKey, List<Filtro<?>> filtros, String... projectionVars) {
-		return doConsulta(processKey, filtros, true, BusinessProcessManager.NO_LIMIT, projectionVars);
+		return doConsulta(processKey, filtros, true, null, BusinessProcessManager.NO_LIMIT, projectionVars);
 	}
 
 	@Override
 	public List<Instancia> consulta(String processKey, List<Filtro<?>> filtros, String... projectionVars) {
-		return doConsulta(processKey, filtros, false, BusinessProcessManager.NO_LIMIT, projectionVars);
+		return doConsulta(processKey, filtros, false, null, BusinessProcessManager.NO_LIMIT, projectionVars);
 	}
 
 	@Override
 	public List<Instancia> getPendientes(String processKey, List<Filtro<?>> filtros, Integer maxResults, String... projectionVars) {
-		return doConsulta(processKey, filtros, true, maxResults, projectionVars);
+		return doConsulta(processKey, filtros, true, null, maxResults, projectionVars);
 	}
 
 	@Override
 	public List<Instancia> consulta(String processKey, List<Filtro<?>> filtros, Integer maxResults, String... projectionVars) {
-		return doConsulta(processKey, filtros, false, maxResults, projectionVars);
+		return doConsulta(processKey, filtros, false, null, maxResults, projectionVars);
+	}
+	
+	@Override
+	public List<Instancia> consulta(String processKey, List<Filtro<?>> filtros, Integer registroInicial, Integer tamañoPagina, String... projectionVars) {
+		return doConsulta(processKey, filtros, false, registroInicial, tamañoPagina, projectionVars);
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Instancia> doConsulta(String processKey, List<Filtro<?>> filtros, boolean esParaPendientes, Integer maxResults, String... projectionVars) {
+	private List<Instancia> doConsulta(String processKey, List<Filtro<?>> filtros, boolean esParaPendientes, Integer registroInicial, Integer maxResults, String... projectionVars) {
 		try{
 			Instancia instancia = new Instancia();
 			instancia.setVolatil(ActivitiService.VOLATIL.equals(repos.createProcessDefinitionQuery().processDefinitionKey(processKey).latestVersion().singleResult().getCategory()));
@@ -543,7 +548,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 					if (maxResults == BusinessProcessManager.NO_LIMIT) {
 						pids = piq.list();
 					} else {
-						pids = piq.listPage(0, maxResults);
+						pids = piq.listPage(registroInicial != null ? registroInicial : 0, maxResults);
 					}
 					
 					pidsEncontradosSet = pids.stream().map(pid -> {
@@ -578,6 +583,11 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 					
 					hpiq.orderByProcessInstanceId().asc();
 					List<HistoricProcessInstance> hpis = hpiq.list();
+					if (maxResults == BusinessProcessManager.NO_LIMIT) {
+						hpis = hpiq.list();
+					} else {
+						hpis = hpiq.listPage(registroInicial != null ? registroInicial : 0, maxResults);
+					}
 					
 					/* Si se restringió la busqueda por fechas de inicio o termino entonces deberemos de limitar la busqueda a esos registros, por lo que limpiamos los que ya habiamos encontrado en ejecución
 					 * y de esa forma solo incluir los que resultaron de aplicar los filtros de fecha
