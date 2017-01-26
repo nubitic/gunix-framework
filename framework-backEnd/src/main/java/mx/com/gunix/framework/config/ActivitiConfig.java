@@ -5,8 +5,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.RejectedExecutionException;
 
 import javax.sql.DataSource;
@@ -211,6 +213,10 @@ public class ActivitiConfig {
 		eventListeners.put(ActivitiEventType.ENTITY_CREATED.toString(), entityCreatedEvntListners);
 
 		speConf.setTypedEventListeners(eventListeners);
+		
+		Set<String> customMybatisXMLMappers = new HashSet<String>();
+		customMybatisXMLMappers.add("mx/com/gunix/framework/activiti/domain/persistence/GunixVariableHistoricProcessInstance.xml");
+		speConf.setCustomMybatisXMLMappers(customMybatisXMLMappers);
 
 		return speConf;
 	}

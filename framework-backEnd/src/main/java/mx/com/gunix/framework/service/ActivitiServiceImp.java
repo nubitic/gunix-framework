@@ -27,21 +27,27 @@ import org.activiti.engine.ActivitiOptimisticLockingException;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
+import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.form.TaskFormData;
 import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.history.HistoricVariableInstance;
+import org.activiti.engine.impl.GunixVariableHistoricProcessInstanceQuery;
+import org.activiti.engine.impl.GunixVariableProcessInstanceQuery;
 import org.activiti.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.TerminateEndEventActivityBehavior;
+import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.PersistentObject;
+import org.activiti.engine.impl.interceptor.Command;
+import org.activiti.engine.impl.interceptor.CommandContext;
+import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
@@ -49,7 +55,6 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
@@ -102,6 +107,9 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 	@Autowired
 	@Lazy
 	VariableInstanceMapper vim;
+	
+	@Autowired
+	ProcessEngineConfiguration processEngineConfig;
 	
 	public static final String CURRENT_AUTHENTICATION_USUARIO_VAR = "CURRENT_AUTHENTICATION_USUARIO_VAR";
 	private final int MAX_UPDATES_PER_FETCH = 100;
@@ -525,13 +533,14 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 				}
 			}
 			
+			CommandExecutor commandExecutor = ((ProcessEngineConfigurationImpl) processEngineConfig).getCommandExecutor();
 			
 			if ((esParaPendientes && !tareas.isEmpty()) || !esParaPendientes) {
 				Set<String> pidsEncontradosSet = null;
 				List<ProcessInstance> pids = null;
 				
 				if (filtroEnded == null) {
-					ProcessInstanceQuery piq = rs.createProcessInstanceQuery();
+					GunixVariableProcessInstanceQuery piq = new GunixVariableProcessInstanceQuery(commandExecutor);
 					piq.processDefinitionKey(processKey);
 					restringirPorFechasInicioTermino = processFilters(filtros, piq);
 					
@@ -546,9 +555,23 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 					
 					piq.orderByProcessInstanceId().asc();
 					if (maxResults == BusinessProcessManager.NO_LIMIT) {
-						pids = piq.list();
+						pids = commandExecutor.execute(new Command<List<ProcessInstance>>() {
+							@Override
+							public List<ProcessInstance> execute(CommandContext commandContext) {
+								piq.inicializaVariables();
+								return commandContext.getDbSqlSession().selectList("selectProcessInstancesByQueryCriteriaGunix", piq);
+							}
+						});
 					} else {
-						pids = piq.listPage(registroInicial != null ? registroInicial : 0, maxResults);
+						pids = commandExecutor.execute(new Command<List<ProcessInstance>>() {
+							@Override
+							public List<ProcessInstance> execute(CommandContext commandContext) {
+								piq.inicializaVariables();
+								piq.setFirstResult(registroInicial != null ? registroInicial : 0);
+								piq.setMaxResults(maxResults);
+								return commandContext.getDbSqlSession().selectList("selectProcessInstancesByQueryCriteriaGunix", piq);
+							}
+						});
 					}
 					
 					pidsEncontradosSet = pids.stream().map(pid -> {
@@ -562,7 +585,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 				
 				if ((esParaPendientes && pidsEncontradosSet != null && !pidsEncontradosSet.isEmpty()) || !esParaPendientes) {
 					/*Historia del proceso encontrado y que sigue en ejecución*/
-					HistoricProcessInstanceQuery hpiq = hs.createHistoricProcessInstanceQuery();
+					GunixVariableHistoricProcessInstanceQuery hpiq = new GunixVariableHistoricProcessInstanceQuery(commandExecutor);
 					hpiq.processDefinitionKey(processKey);
 					if (esParaPendientes && pidsEncontradosSet != null && !pidsEncontradosSet.isEmpty()) {
 						hpiq.processInstanceIds(pidsEncontradosSet);
@@ -582,11 +605,26 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 					}
 					
 					hpiq.orderByProcessInstanceId().asc();
-					List<HistoricProcessInstance> hpis = hpiq.list();
+
+					List<HistoricProcessInstance> hpis = null;
 					if (maxResults == BusinessProcessManager.NO_LIMIT) {
-						hpis = hpiq.list();
+						hpis = commandExecutor.execute(new Command<List<HistoricProcessInstance>>() {
+									@Override
+									public List<HistoricProcessInstance> execute(CommandContext commandContext) {
+										hpiq.inicializaVariables();
+										return commandContext.getDbSqlSession().selectList("selectHistoricProcessInstancesByQueryCriteriaGunix", hpiq);
+									}
+								});
 					} else {
-						hpis = hpiq.listPage(registroInicial != null ? registroInicial : 0, maxResults);
+						hpis = commandExecutor.execute(new Command<List<HistoricProcessInstance>>() {
+							@Override
+							public List<HistoricProcessInstance> execute(CommandContext commandContext) {
+								hpiq.inicializaVariables();
+								hpiq.setFirstResult(registroInicial != null ? registroInicial : 0);
+								hpiq.setMaxResults(maxResults);
+								return commandContext.getDbSqlSession().selectList("selectHistoricProcessInstancesByQueryCriteriaGunix", hpiq);
+							}
+						});
 					}
 					
 					/* Si se restringió la busqueda por fechas de inicio o termino entonces deberemos de limitar la busqueda a esos registros, por lo que limpiamos los que ya habiamos encontrado en ejecución
@@ -789,7 +827,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		return hpi;
 	}
 
-	private boolean processFilters(List<Filtro<?>> filtros, HistoricProcessInstanceQuery hpiq) {
+	private boolean processFilters(List<Filtro<?>> filtros, GunixVariableHistoricProcessInstanceQuery hpiq) {
 		boolean restringirPorFechasInicioTermino = false;
 		if (filtros != null && !filtros.isEmpty()) {
 			// Primero verificamos las fechas de inicio
@@ -829,7 +867,11 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 							if (varName == Filtro.FILTRO_GLOBAL) {
 								hpiq.variableValueEquals(varValue);
 							} else {
-								hpiq.variableValueEquals(varName, varValue);
+								if(varName.indexOf("%")==-1){
+									hpiq.variableValueEquals(varName, varValue);
+								}else{
+									hpiq.variableNameLikeValueEquals(varName, varValue);
+								}
 							}
 							break;
 						case MAYOR_QUE:
@@ -842,7 +884,11 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 							hpiq.variableValueNotEquals(varName, varValue);
 							break;
 						case LIKE:
-							hpiq.variableValueLike(varName, (String) varValue);
+							if(varName.indexOf("%")==-1){
+								hpiq.variableValueLike(varName, (String) varValue);
+							}else{
+								hpiq.variableNameLikeValueLike(varName, (String) varValue);
+							}
 							break;
 						}
 					});
@@ -864,7 +910,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		return registradoFinalizadoBetween;
 	}
 	
-	private boolean processFilters(List<Filtro<?>> filtros, ProcessInstanceQuery piq) {
+	private boolean processFilters(List<Filtro<?>> filtros, GunixVariableProcessInstanceQuery piq) {
 		AtomicBoolean restringirPorFechasInicioTermino = new AtomicBoolean();
 		if (filtros != null && !filtros.isEmpty()) {
 			filtros
@@ -880,7 +926,11 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 								if (varName == Filtro.FILTRO_GLOBAL) {
 									piq.variableValueEquals(varValue);
 								} else {
-									piq.variableValueEquals(varName, varValue);
+									if(varName.indexOf("%")==-1){
+										piq.variableValueEquals(varName, varValue);
+									}else{
+										piq.variableNameLikeValueEquals(varName, varValue);
+									}
 								}
 								break;
 							case MAYOR_QUE:
@@ -893,7 +943,11 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 								piq.variableValueNotEquals(varName, varValue);
 								break;
 							case LIKE:
-								piq.variableValueLike(varName, (String) varValue);
+								if(varName.indexOf("%")==-1){
+									piq.variableValueLike(varName, (String) varValue);
+								}else{
+									piq.variableNameLikeValueLike(varName, (String) varValue);
+								}
 								break;
 							}
 						});
