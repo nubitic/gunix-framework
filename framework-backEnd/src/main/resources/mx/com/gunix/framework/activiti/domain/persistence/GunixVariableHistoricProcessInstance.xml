@@ -3,7 +3,7 @@
 <mapper
 	namespace="mx.com.gunix.framework.activiti.domain.persistence.GunixVariableHistoricProcessInstance">
 
-	<select id="selectProcessInstanceByQueryCriteria"
+	<select id="selectProcessInstancesByQueryCriteriaGunix"
 		parameterType="org.activiti.engine.impl.GunixVariableProcessInstanceQuery"
 		resultMap="org.activiti.engine.impl.persistence.entity.ExecutionEntity.processInstanceResultMap">
 		${limitBefore}
