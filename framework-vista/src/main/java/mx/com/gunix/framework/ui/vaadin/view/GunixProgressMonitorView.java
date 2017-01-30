@@ -56,8 +56,13 @@ public final class GunixProgressMonitorView<S extends Serializable> extends Abst
 
 		continuarButton = new Button("Continuar");
 		continuarButton.addClickListener(cliclEvnt -> {
-			completaTarea();
-			window.close();
+			try {
+				Thread.sleep(3000);
+				completaTarea();
+				window.close();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 		});
 		continuarButton.setVisible(false);
 		continuarButton.setDisableOnClick(true);
@@ -83,24 +88,26 @@ public final class GunixProgressMonitorView<S extends Serializable> extends Abst
 			      .flatMap(Observable::from)
 			      .distinct()
 			      .takeUntil(pu -> (pu.isCancelado() || pu.getProgreso() == 1f))
-			      .subscribe(pu -> {
-			    	  UI.getCurrent().accessSynchronously(() -> {
-				    	  if(pu.isCancelado()) {
-							  Notification.show("El proceso terminó abruptamente con el siguiente mensaje:\n" + pu.getMensaje(), Type.ERROR_MESSAGE);
-							  window.close();
-				    	  } else {
-					    	  if(!StringUtils.isEmpty(pu.getMensaje())) {
-					    		  StringBuilder nMss = new StringBuilder(sdf.format(new Date(pu.getTimeStamp())));
-						    	  nMss.append(pu.getMensaje());
-						    	  addLog(nMss.toString());
-					    	  }
-					    	  bar.setValue(pu.getProgreso());
-					    	  if(pu.getProgreso()==1f) {
-					    		  continuarButton.setVisible(true);
-					    	  }
-				    	  }
-			    	  });
-			    	 });
+				  .subscribe(pu -> {
+						UI.getCurrent().accessSynchronously(() -> {
+							if (pu.isCancelado()) {
+								Notification.show(
+										"El proceso terminó abruptamente con el siguiente mensaje:\n" + pu.getMensaje(),
+										Type.ERROR_MESSAGE);
+								window.close();
+							} else {
+								if (!StringUtils.isEmpty(pu.getMensaje())) {
+									StringBuilder nMss = new StringBuilder(sdf.format(new Date(pu.getTimeStamp())));
+									nMss.append(pu.getMensaje());
+									addLog(nMss.toString());
+								}
+								bar.setValue(pu.getProgreso());
+								if (pu.getProgreso() == 1f) {
+									continuarButton.setVisible(true);
+								}
+							}
+						});
+					});
 	}
 
 	private void addLog(String mensaje) {
