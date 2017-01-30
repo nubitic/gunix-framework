@@ -587,7 +587,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 					/*Historia del proceso encontrado y que sigue en ejecución*/
 					GunixVariableHistoricProcessInstanceQuery hpiq = new GunixVariableHistoricProcessInstanceQuery(commandExecutor);
 					hpiq.processDefinitionKey(processKey);
-					if (esParaPendientes && pidsEncontradosSet != null && !pidsEncontradosSet.isEmpty()) {
+					if ((esParaPendientes || maxResults != BusinessProcessManager.NO_LIMIT) && pidsEncontradosSet != null && !pidsEncontradosSet.isEmpty()) {
 						hpiq.processInstanceIds(pidsEncontradosSet);
 					}
 					
