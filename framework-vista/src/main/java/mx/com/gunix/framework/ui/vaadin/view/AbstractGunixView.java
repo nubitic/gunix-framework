@@ -12,23 +12,6 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-import mx.com.gunix.framework.processes.domain.Instancia;
-import mx.com.gunix.framework.processes.domain.Tarea;
-import mx.com.gunix.framework.processes.domain.Variable;
-import mx.com.gunix.framework.service.ActivitiService;
-import mx.com.gunix.framework.service.GetterService;
-import mx.com.gunix.framework.ui.GunixVariableGetter;
-import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup;
-import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup.OnBeanValidationErrorCallback;
-import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory;
-import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory.GunixFieldPropertyRel;
-import mx.com.gunix.framework.ui.vaadin.component.GunixTableBeanErrorGenerator;
-import mx.com.gunix.framework.ui.vaadin.component.GunixUploadField;
-import mx.com.gunix.framework.ui.vaadin.component.GunixViewErrorHandler;
-import mx.com.gunix.framework.ui.vaadin.component.Header.TareaActualNavigator;
-import mx.com.gunix.framework.util.ActivitiGunixFile;
-import mx.com.gunix.framework.util.GunixFile;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -52,6 +35,24 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
+import mx.com.gunix.framework.processes.domain.Instancia;
+import mx.com.gunix.framework.processes.domain.Tarea;
+import mx.com.gunix.framework.processes.domain.Variable;
+import mx.com.gunix.framework.service.ActivitiService;
+import mx.com.gunix.framework.service.GetterService;
+import mx.com.gunix.framework.service.TokenService;
+import mx.com.gunix.framework.ui.GunixVariableGetter;
+import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup;
+import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup.OnBeanValidationErrorCallback;
+import mx.com.gunix.framework.ui.vaadin.component.GunixTableBeanErrorGenerator;
+import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory;
+import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory.GunixFieldPropertyRel;
+import mx.com.gunix.framework.ui.vaadin.component.GunixUploadField;
+import mx.com.gunix.framework.ui.vaadin.component.GunixViewErrorHandler;
+import mx.com.gunix.framework.ui.vaadin.component.Header.TareaActualNavigator;
+import mx.com.gunix.framework.util.ActivitiGunixFile;
+import mx.com.gunix.framework.util.GunixFile;
+
 public abstract class AbstractGunixView<S extends Serializable> extends VerticalLayout implements View {
 	private static final ThreadLocal<Map<Notification.Type, Set<String>>> notificacionesMap = new ThreadLocal<Map<Notification.Type, Set<String>>>();
 	private Class<S> clazz;
@@ -74,6 +75,10 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	@Autowired
 	@Lazy
 	GetterService gs;
+	
+	@Autowired
+	@Lazy
+	TokenService ts;
 	
 	public static void appendNotification(Notification.Type type, String notificacion) {
 		Map<Notification.Type, Set<String>> notificaciones = notificacionesMap.get();
@@ -384,6 +389,22 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	
 	protected void bind(String propertyId, Field<?> field) {
 		fieldGroup.bind(field, propertyId);
+	}
+	
+	protected void registraTareaBG(String idTarea){
+		ts.registraToken(idTarea);
+	}
+	
+	protected void terminaTareaBG(String idTarea){
+		ts.liberaToken(idTarea);
+	}
+	
+	protected Boolean tareaBGTerminada(String idTarea){
+		return ts.tokenActivo(idTarea);
+	}
+	
+	protected void eliminaTareaBG(String idTarea){
+		ts.eliminaToken(idTarea);
 	}
 
 	protected abstract void doEnter(ViewChangeEvent event);

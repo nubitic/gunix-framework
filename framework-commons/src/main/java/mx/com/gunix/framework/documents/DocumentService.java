@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -182,6 +184,19 @@ public class DocumentService {
 		});
 	}
 
+	public List<Documento> get(Carpeta padre) {
+		return inSession((sid, root) -> {
+			WSDocument[] docs = ds.listDocuments(sid, padre.getId(), null);
+			List<Documento> docsEncontrados = new ArrayList<Documento>();
+			if (docs != null) {
+				for (WSDocument wsDoc : docs) {
+					docsEncontrados.add(populateDocumento(sid, root, wsDoc));
+				}
+			}
+			return docsEncontrados;
+		});
+	}
+	
 	public Documento get(Carpeta padre, String nombreDocumento) {
 		return inSession((sid, root) -> {
 			return doGetDocumento(sid, root, padre.getPath() + "/" + nombreDocumento);
