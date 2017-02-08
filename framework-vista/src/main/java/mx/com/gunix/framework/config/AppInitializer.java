@@ -10,6 +10,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 
 import mx.com.gunix.framework.documents.config.LogicalDocConfig;
+import mx.com.gunix.framework.mail.config.MailConfig;
 
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 import org.springframework.web.context.request.RequestContextListener;
@@ -57,6 +58,7 @@ public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
 		configClasses.add(SpringMVCConfig.class);
 
 		configClasses.add(AspectJConfig.class);
+		configClasses.add(MailConfig.class);
 
 		if (Boolean.parseBoolean(System.getenv("LOGICALDOC_ENABLED"))) {
 			configClasses.add(LogicalDocConfig.class);

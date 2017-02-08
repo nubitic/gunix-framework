@@ -3,9 +3,10 @@ package mx.com.gunix.framework.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import mx.com.gunix.framework.documents.config.LogicalDocConfig;
-
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+
+import mx.com.gunix.framework.documents.config.LogicalDocConfig;
+import mx.com.gunix.framework.mail.config.MailConfig;
 
 public class AppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
@@ -32,6 +33,7 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 		configClasses.add(ActivitiConfig.class);
 		configClasses.add(AspectJConfig.class);
 		configClasses.add(REDISConfig.class);
+		configClasses.add(MailConfig.class);
 
 		if (Boolean.valueOf(System.getenv("STANDALONE_APP"))||Boolean.valueOf(System.getenv("ENABLE_ADMIN_APP_SERVICES"))) {
 			configClasses.add(AdminAppServicesConfig.class);
