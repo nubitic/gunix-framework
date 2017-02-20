@@ -83,4 +83,14 @@ public class GunixFileBuffer extends FileBuffer {
 	public void setFieldType(FieldType fieldType) {
 		
 	}
+
+	@Override
+	public void setLastMimeType(String mimeType) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public void setLastFileName(String fileName) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 }

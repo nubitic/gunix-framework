@@ -6,7 +6,7 @@
 		<id property="modulo.aplicacion.idAplicacion" column="ID_APLICACION" />
 		<id property="modulo.idModulo" column="ID_MODULO" />
 		<id property="idFuncion" column="ID_FUNCION" />
-		<result property="acceso" column="NIV_ACC" typeHandler="org.apache.ibatis.type.EnumTypeHandler" />
+		<result property="acceso" column="NIV_ACC" />
 		<association property="padre" javaType="mx.com.gunix.framework.security.domain.Funcion">
 			<id property="modulo.aplicacion.idAplicacion" column="ID_APLICACION" />
 			<id property="modulo.idModulo" column="ID_MODULO" />

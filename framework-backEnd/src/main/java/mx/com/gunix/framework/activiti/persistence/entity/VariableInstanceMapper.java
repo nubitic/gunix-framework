@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Options.FlushCachePolicy;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.ResultType;
 import org.apache.ibatis.annotations.Select;
@@ -28,7 +29,7 @@ public interface VariableInstanceMapper {
 			"	AND type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}%' or name_ LIKE '${varName}[%' or name_ LIKE '${varName}(%')" + 
 			" order by name_ ")
 	@ResultType(Map.class)
-	@Options(flushCache=true)
+	@Options(flushCache=FlushCachePolicy.TRUE)
 	public List<Map<String,Object>> findGunixObjectByNameAndExecutionIdAndRevision(@Param("executionId") String executionId, @Param("varName") String varName, @Param("revision") Integer revision);
 
 	@Select("SELECT"+
@@ -46,7 +47,7 @@ public interface VariableInstanceMapper {
 			"	AND type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}%' or name_ LIKE '${varName}[%' or name_ LIKE '${varName}(%')" + 
 			" order by name_ ")
 	@ResultType(Map.class)
-	@Options(flushCache=true)
+	@Options(flushCache=FlushCachePolicy.TRUE)
 	public List<Map<String,Object>> findGunixObjectByNameAndExecutionId(@Param("executionId") String executionId, @Param("varName") String varName);
 	
 	@Select("SELECT"+
@@ -64,7 +65,7 @@ public interface VariableInstanceMapper {
 			"   AND rev_ >= (select rev_ from ACTIVITI.act_hi_varinst v2 where v2.EXECUTION_ID_ = #{executionId} and v2.TASK_ID_ is null and v2.var_type_='"+GunixObjectVariableType.GUNIX_OBJECT+"' and strpos(#{varName},v2.name_)=1)" +
 			" order by name_ ")
 	@ResultType(Map.class)
-	@Options(flushCache=true)
+	@Options(flushCache=FlushCachePolicy.TRUE)
 	public List<Map<String,Object>> findHistoricGunixObjectByNameAndExecutionId(@Param("executionId") String executionId, @Param("varName") String varName);
 	
 	@Select("SELECT"+
@@ -81,7 +82,7 @@ public interface VariableInstanceMapper {
 			"	AND var_type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"' and (name_ LIKE '${varName}%' or name_ LIKE '${varName}[%' or name_ LIKE '${varName}(%')" + 
 			" order by name_ ")
 	@ResultType(Map.class)
-	@Options(flushCache=true)
+	@Options(flushCache=FlushCachePolicy.TRUE)
 	public List<Map<String,Object>> findHistoricGunixObjectByNameAndExecutionIdAndRevision(@Param("executionId") String executionId, @Param("varName") String varName);
 	
 	@Delete("delete from ACTIVITI.ACT_RU_VARIABLE where execution_id_ = #{executionId} and  name_ like '${varName}%' and REV_ = #{revision} and type_ <> '"+GunixObjectVariableType.GUNIX_OBJECT+"'")

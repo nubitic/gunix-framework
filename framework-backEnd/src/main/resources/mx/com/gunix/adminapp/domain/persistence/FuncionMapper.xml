@@ -24,7 +24,7 @@
 		<result property="titulo" column="TITULO" />
 		<result property="processKey" column="PROCESS_KEY" />
 		<result property="descripcion" column="DESCRIPCION" />
-		<result property="viewEngine" column="VENGINE" typeHandler="org.apache.ibatis.type.EnumTypeHandler" />
+		<result property="viewEngine" column="VENGINE" />
 		<result property="orden" column="ORDEN" />
 		<association property="padre" column="{idAplicacion=ID_APLICACION,idModulo=ID_MODULO,idFuncion=ID_FUNCION_PADRE}" select="mx.com.gunix.adminapp.domain.persistence.FuncionMapper.getByIdFuncion" />
 	</resultMap>
