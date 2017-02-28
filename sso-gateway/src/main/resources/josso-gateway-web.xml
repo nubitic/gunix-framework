@@ -43,8 +43,8 @@
 
     <web-configuration id="josso-web-configuraiton"
                        rememberMeEnabled="true"
-                       sessionTokenOnClient="false"
-                       sessionTokenSecure="true"
+                       sessionTokenOnClient="true"
+                       sessionTokenSecure="false"
                        sendP3PHeader="false">
         
     </web-configuration>

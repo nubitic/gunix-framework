@@ -120,7 +120,7 @@
         <!-- Struts action used for remember me authentication scheme -->
         <action path="/signon/rememberMeLogin"
             type="org.josso.gateway.signon.RememberMeLoginAction"
-            name="remembermeAuthenticationLogin"
+            name="usernamePasswordLoginForm"
             validate="false">
             <!-- use a tile name defined in tiles-signon.xml instead of a .jsp file name -->
             <forward name="login-page" path="josso.signon.usernamePasswordLogin"/>
