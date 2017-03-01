@@ -52,6 +52,7 @@ import mx.com.gunix.framework.security.domain.Funcion.ViewEngine;
 import mx.com.gunix.framework.security.domain.Modulo;
 import mx.com.gunix.framework.security.domain.Rol;
 import mx.com.gunix.framework.service.ActivitiService;
+import mx.com.gunix.framework.ui.vaadin.VaadinUtils;
 import mx.com.gunix.framework.ui.vaadin.spring.SpringViewProvider;
 import mx.com.gunix.framework.ui.vaadin.view.DefaultProcessEndView;
 
@@ -152,9 +153,9 @@ public class Header extends CustomComponent {
 	public Header() {
 		buildMainLayout();
 		menuBar.setCaption("");
-		menuBar.setId("gx_menuBar");
+		menuBar.setId(VaadinUtils.MENU_BAR_COMPONENT_ID);
 		rolCBox.setInputPrompt("Seleccione un Rol");
-		rolCBox.setId("gx_rol_cbx");
+		rolCBox.setId(VaadinUtils.ROL_COMBO_COMPONENT_ID);
 		setCompositionRoot(mainLayout);
 		navigator = new TareaActualNavigator(UI.getCurrent(), panelContenido);
 		breadCrumbLayout.setSpacing(false);
@@ -186,7 +187,7 @@ public class Header extends CustomComponent {
 	}
 
 	public void renderHeader(Aplicacion aplicacion) {
-		this.aplicacion = aplicacion;
+		this.setAplicacion(aplicacion);
 		setId(new StringBuilder(getClass().getName()).append(":").append(aplicacion.getIdAplicacion()).toString());
 		navigator.addProvider(svp);
 
@@ -518,5 +519,9 @@ public class Header extends CustomComponent {
 
 	public Aplicacion getAplicacion() {
 		return aplicacion;
+	}
+
+	protected void setAplicacion(Aplicacion aplicacion) {
+		this.aplicacion = aplicacion;
 	}
 }

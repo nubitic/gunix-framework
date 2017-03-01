@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.StreamSupport;
 
 import javax.annotation.PostConstruct;
 
@@ -19,9 +20,11 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.Page;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinServletService;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
@@ -44,6 +47,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import mx.com.gunix.framework.security.domain.Aplicacion;
 import mx.com.gunix.framework.security.domain.Usuario;
 import mx.com.gunix.framework.service.UsuarioService;
+import mx.com.gunix.framework.ui.vaadin.VaadinUtils;
 import mx.com.gunix.framework.ui.vaadin.component.Header;
 
 public class MainViewLayout extends VerticalLayout{
@@ -261,7 +265,7 @@ public class MainViewLayout extends VerticalLayout{
 	protected void renderApps(List<Aplicacion> apps, HorizontalLayout appInfo) {
 		if (apps.size() > 1) {
 			aplicacionesTab = new TabSheet();
-			aplicacionesTab.setId("gx_aplicaciones_tabsheet");
+			aplicacionesTab.setId(VaadinUtils.SELECTED_APP_TAB_REQUEST_PARAMETER);
 			aplicacionesTab.setImmediate(true);
 
 			apps.stream().forEach(aplicacion -> {
@@ -270,18 +274,23 @@ public class MainViewLayout extends VerticalLayout{
 				h.setId("gx_"+aplicacion.getIdAplicacion()+"_header");
 				Tab appTab = aplicacionesTab.addTab(h, aplicacion.getDescripcion());
 				appTab.setId("gx_" + aplicacion.getIdAplicacion() + "_tab");
-				aplicacionesTab.addSelectedTabChangeListener(selectedTab -> {
-					Header iH = (Header) selectedTab.getTabSheet().getSelectedTab();
-					updateAppInfo(iH, appInfo);
-					UI.getCurrent().setNavigator(iH.getNavigator());
-				});
 			});
-
+			
+			aplicacionesTab.addSelectedTabChangeListener(selectedTab -> {
+				doAppTabChange((Header) selectedTab.getTabSheet().getSelectedTab(), appInfo);
+			});
 			addComponent(aplicacionesTab);
-
-			Header iH = (Header) aplicacionesTab.getSelectedTab();
-			updateAppInfo(iH, appInfo);
-			UI.getCurrent().setNavigator(iH.getNavigator());
+			
+			String selectedTabOnRequest = VaadinServletService.getCurrentServletRequest().getParameter(VaadinUtils.SELECTED_APP_TAB_REQUEST_PARAMETER);
+			if (selectedTabOnRequest != null) {
+				aplicacionesTab.setSelectedTab(StreamSupport
+													.stream(((Iterable<Component>)() -> aplicacionesTab.iterator()).spliterator(), false)
+													.filter(header -> ((Header)header).getAplicacion().getIdAplicacion().equals(selectedTabOnRequest))
+													.findFirst()
+													.orElse(null));
+			} /*else {
+				doAppTabChange((Header) aplicacionesTab.getSelectedTab(), appInfo);
+			}*/
 			setExpandRatio(aplicacionesTab, 1.0f);
 		} else {
 			if (!apps.isEmpty()) {
@@ -297,10 +306,15 @@ public class MainViewLayout extends VerticalLayout{
 		}
 	}
 
+	protected void doAppTabChange(Header iH, HorizontalLayout appInfo) {
+		updateAppInfo(iH, appInfo);
+		UI.getCurrent().setNavigator(iH.getNavigator());
+	}
+
 	private void updateAppInfo(Header iH, HorizontalLayout appInfo) {
 		if (appInfo != null) {
 			Page.getCurrent().setTitle(iH.getAplicacion().getDescripcion());
-			JavaScript.getCurrent().execute(" window.parent.document.title = window.parent.document.getElementById('gnxVdnIF').contentDocument.title;");
+			JavaScript.getCurrent().execute(" window.parent.document.title = window.parent.document.getElementById('" + VaadinUtils.GUNIX_VAADIN_IFRAME_ID + "').contentDocument.title;");
 			appInfo.removeAllComponents();
 			appInfo.addComponent(new Image(null, new ThemeResource("img/" + iH.getAplicacion().getIcono())));
 			Label appTitle = new Label(iH.getAplicacion().getDescripcion());

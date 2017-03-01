@@ -22,4 +22,10 @@ public abstract class VaadinUtils {
 
 		}
 	}
+	
+	public static final String SELECTED_APP_TAB_REQUEST_PARAMETER = "_selectedAppTab";
+	public static final String APLICACIONES_TABSHEET_COMPONENT_ID =  "gx_aplicaciones_tabsheet";
+	public static final String MENU_BAR_COMPONENT_ID =  "gx_menuBar";
+	public static final String ROL_COMBO_COMPONENT_ID =  "gx_rol_cbx";
+	public static final String GUNIX_VAADIN_IFRAME_ID = "gnxVdnIF";
 }
