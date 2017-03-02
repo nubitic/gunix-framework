@@ -1,6 +1,8 @@
 package mx.com.gunix.framework.security.josso;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +13,8 @@ import org.apache.log4j.Logger;
 import org.josso.gateway.signon.Constants;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import mx.com.gunix.framework.ui.vaadin.VaadinUtils;
 
 public class JOSSOUtils {
 	private static final String TIMESTAMP_PREFIX = "omx.com.gunix.framework.security.josso.";
@@ -48,6 +52,15 @@ public class JOSSOUtils {
 			}
 			rv.append((contextPath.endsWith("/") ? contextPath.substring(0, contextPath.length() - 1) : contextPath));
 			rv.append(uri);
+			
+			String selectedTab = request.getParameter(VaadinUtils.SELECTED_APP_TAB_REQUEST_PARAMETER);
+			if (selectedTab != null && !"".equals(selectedTab) && !"null".equalsIgnoreCase(selectedTab)) {
+				StringBuilder selectedTabParam = new StringBuilder("?");
+				selectedTabParam.append(VaadinUtils.SELECTED_APP_TAB_REQUEST_PARAMETER);
+				selectedTabParam.append("=");
+				selectedTabParam.append(selectedTab);
+				rv.append(encodeURIComponent(selectedTabParam.toString()));
+			}
 
 			rv = new StringBuilder("?").append(Constants.PARAM_JOSSO_BACK_TO).append('=').append(rv);
 			rv.append("&").append(Constants.PARAM_JOSSO_PARTNERAPP_CONTEXT).append("=").append(contextPath);
@@ -60,7 +73,25 @@ public class JOSSOUtils {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	static String encodeURIComponent(String s) {
+	    String result;
 
+	    try {
+	        result = URLEncoder.encode(s, "UTF-8")
+	                .replaceAll("\\+", "%20")
+	                .replaceAll("\\%21", "!")
+	                .replaceAll("\\%27", "'")
+	                .replaceAll("\\%28", "(")
+	                .replaceAll("\\%29", ")")
+	                .replaceAll("\\%7E", "~");
+	    } catch (UnsupportedEncodingException e) {
+	        result = s;
+	    }
+
+	    return result;
+	}
+	
 	/**
 	 * Locates the JOSSO_SESSION cookie in the request.
 	 * 

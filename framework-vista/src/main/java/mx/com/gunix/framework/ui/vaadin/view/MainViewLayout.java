@@ -282,15 +282,15 @@ public class MainViewLayout extends VerticalLayout{
 			addComponent(aplicacionesTab);
 			
 			String selectedTabOnRequest = VaadinServletService.getCurrentServletRequest().getParameter(VaadinUtils.SELECTED_APP_TAB_REQUEST_PARAMETER);
-			if (selectedTabOnRequest != null) {
+			if (selectedTabOnRequest != null && !"".equals(selectedTabOnRequest) && !"null".equalsIgnoreCase(selectedTabOnRequest)) {
 				aplicacionesTab.setSelectedTab(StreamSupport
 													.stream(((Iterable<Component>)() -> aplicacionesTab.iterator()).spliterator(), false)
 													.filter(header -> ((Header)header).getAplicacion().getIdAplicacion().equals(selectedTabOnRequest))
 													.findFirst()
 													.orElse(null));
-			} /*else {
+			} else {
 				doAppTabChange((Header) aplicacionesTab.getSelectedTab(), appInfo);
-			}*/
+			}
 			setExpandRatio(aplicacionesTab, 1.0f);
 		} else {
 			if (!apps.isEmpty()) {
@@ -316,7 +316,9 @@ public class MainViewLayout extends VerticalLayout{
 			Page.getCurrent().setTitle(iH.getAplicacion().getDescripcion());
 			JavaScript.getCurrent().execute(" window.parent.document.title = window.parent.document.getElementById('" + VaadinUtils.GUNIX_VAADIN_IFRAME_ID + "').contentDocument.title;");
 			appInfo.removeAllComponents();
-			appInfo.addComponent(new Image(null, new ThemeResource("img/" + iH.getAplicacion().getIcono())));
+			if(iH.getAplicacion().getIcono() != null){
+				appInfo.addComponent(new Image(null, new ThemeResource("img/" + iH.getAplicacion().getIcono())));
+			}
 			Label appTitle = new Label(iH.getAplicacion().getDescripcion());
 			appTitle.addStyleName("app-title");
 			appInfo.addComponent(appTitle);

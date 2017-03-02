@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.Filter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import mx.com.gunix.framework.security.PersistentTokenBasedRememberMeServices;
 import mx.com.gunix.framework.security.RolAccessDecisionVoter;
@@ -18,6 +20,7 @@ import mx.com.gunix.framework.security.josso.JOSSOProcessingFilterEntryPoint;
 import mx.com.gunix.framework.security.josso.JOSSOSessionCookieProcessingFilter;
 import mx.com.gunix.framework.security.josso.JOSSOSessionPingFilter;
 import mx.com.gunix.framework.service.UsuarioService;
+import mx.com.gunix.framework.ui.vaadin.VaadinUtils;
 
 import org.josso.gateway.GatewayServiceLocator;
 import org.josso.gateway.WebserviceGatewayServiceLocator;
@@ -47,6 +50,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
@@ -274,6 +278,24 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 			japf = new JOSSOAuthenticationProcessingFilter(System.getenv("VIEW_SSO_PARTNER_ID"));
 			japf.setAuthenticationManager(authenticationManagerBean());
 			japf.setGatewayServiceLocator(gatewayServiceLocator());	
+			japf.setAuthenticationSuccessHandler(new SavedRequestAwareAuthenticationSuccessHandler() {
+
+						@Override
+						protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response) {
+							String targetUrl = super.determineTargetUrl(request, response);
+							String selectedTab = request.getParameter(VaadinUtils.SELECTED_APP_TAB_REQUEST_PARAMETER);
+							if (selectedTab != null && !"".equals(selectedTab) && !"null".equalsIgnoreCase(selectedTab)) {
+								StringBuilder selectedTabParam = new StringBuilder(targetUrl);
+								selectedTabParam.append("?");
+								selectedTabParam.append(VaadinUtils.SELECTED_APP_TAB_REQUEST_PARAMETER);
+								selectedTabParam.append("=");
+								selectedTabParam.append(selectedTab);
+								targetUrl = selectedTabParam.toString();
+							}
+							return targetUrl;
+						}
+
+					});
 		}
 		return japf;
 	}
