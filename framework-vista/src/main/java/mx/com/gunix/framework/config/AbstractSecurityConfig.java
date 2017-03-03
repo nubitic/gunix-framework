@@ -22,6 +22,7 @@ import mx.com.gunix.framework.security.josso.JOSSOSessionPingFilter;
 import mx.com.gunix.framework.service.UsuarioService;
 import mx.com.gunix.framework.ui.vaadin.VaadinUtils;
 
+import org.apache.log4j.Logger;
 import org.josso.gateway.GatewayServiceLocator;
 import org.josso.gateway.WebserviceGatewayServiceLocator;
 import org.josso.selfservices.password.PasswordGenerator;
@@ -279,7 +280,7 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 			japf.setAuthenticationManager(authenticationManagerBean());
 			japf.setGatewayServiceLocator(gatewayServiceLocator());	
 			japf.setAuthenticationSuccessHandler(new SavedRequestAwareAuthenticationSuccessHandler() {
-
+						private final Logger log = Logger.getLogger("mx.com.gunix.framework.config.SavedRequestAwareAuthenticationSuccessHandler");
 						@Override
 						protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response) {
 							String targetUrl = super.determineTargetUrl(request, response);
@@ -291,6 +292,9 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 								selectedTabParam.append("=");
 								selectedTabParam.append(selectedTab);
 								targetUrl = selectedTabParam.toString();
+							}
+							if (log.isDebugEnabled()) {
+								log.debug("TargetURL: " + targetUrl);
 							}
 							return targetUrl;
 						}
