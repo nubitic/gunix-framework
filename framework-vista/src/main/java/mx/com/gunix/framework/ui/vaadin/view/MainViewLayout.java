@@ -283,11 +283,16 @@ public class MainViewLayout extends VerticalLayout{
 			
 			String selectedTabOnRequest = VaadinServletService.getCurrentServletRequest().getParameter(VaadinUtils.SELECTED_APP_TAB_REQUEST_PARAMETER);
 			if (selectedTabOnRequest != null && !"".equals(selectedTabOnRequest) && !"null".equalsIgnoreCase(selectedTabOnRequest)) {
-				aplicacionesTab.setSelectedTab(StreamSupport
-													.stream(((Iterable<Component>)() -> aplicacionesTab.iterator()).spliterator(), false)
-													.filter(header -> ((Header)header).getAplicacion().getIdAplicacion().equals(selectedTabOnRequest))
-													.findFirst()
-													.orElse(null));
+				Component currentSelectedTabOnRequest = StreamSupport
+															.stream(((Iterable<Component>)() -> aplicacionesTab.iterator()).spliterator(), false)
+															.filter(header -> ((Header)header).getAplicacion().getIdAplicacion().equals(selectedTabOnRequest))
+															.findFirst()
+															.orElse(null);
+				if (aplicacionesTab.getSelectedTab() != currentSelectedTabOnRequest) {
+					aplicacionesTab.setSelectedTab(currentSelectedTabOnRequest);
+				} else {
+					doAppTabChange((Header) aplicacionesTab.getSelectedTab(), appInfo);
+				}
 			} else {
 				doAppTabChange((Header) aplicacionesTab.getSelectedTab(), appInfo);
 			}
