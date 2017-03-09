@@ -7,17 +7,26 @@ import java.util.List;
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
 import mx.com.gunix.framework.documents.config.LogicalDocConfig;
 import mx.com.gunix.framework.mail.config.MailConfig;
 
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextListener;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.vaadin.spring.config.VaadinConfig;
+import org.vaadin.spring.servlet.SpringAwareUIProvider;
 import org.vaadin.spring.servlet.SpringAwareVaadinServlet;
+
+import com.vaadin.server.ServiceException;
+import com.vaadin.server.SessionInitEvent;
+import com.vaadin.server.SessionInitListener;
+import com.vaadin.server.UICreateEvent;
 
 public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
 
@@ -30,7 +39,32 @@ public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
 		RequestContextListener rcl = new RequestContextListener();
 		servletContext.addListener(rcl);
 
-		SpringAwareVaadinServlet savs = new SpringAwareVaadinServlet();
+		SpringAwareVaadinServlet savs = new SpringAwareVaadinServlet() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void servletInitialized() throws ServletException {
+				getService().addSessionInitListener(new SessionInitListener() {
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void sessionInit(SessionInitEvent sessionInitEvent) throws ServiceException {
+						WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+						SpringAwareUIProvider uiProvider = new SpringAwareUIProvider(webApplicationContext){
+							private static final long serialVersionUID = 1L;
+
+							@Override
+							public String getTheme(UICreateEvent event) {
+								String tema = System.getenv("VIEW_THEME");
+								return tema != null && !"".equals(tema) ? tema : "gunix";
+							}
+							
+						};
+						sessionInitEvent.getSession().addUIProvider(uiProvider);
+					}
+				});
+			}
+		};
 		ServletRegistration.Dynamic savsReg = servletContext.addServlet(SpringAwareVaadinServlet.class.getName(), savs);
 		savsReg.setAsyncSupported(true);
 		savsReg.setLoadOnStartup(2);
