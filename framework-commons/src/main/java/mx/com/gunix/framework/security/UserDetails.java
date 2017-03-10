@@ -94,7 +94,7 @@ public class UserDetails extends Usuario implements org.springframework.security
 	}
 
 	public String getSelectedAuthority() {
-		return selectedAuthority.getAuthority();
+		return selectedAuthority != null ? selectedAuthority.getAuthority() : null;
 	}
 
 	@Override

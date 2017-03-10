@@ -87,7 +87,7 @@ public class MainViewLayout extends VerticalLayout{
 		StringBuilder userIdStrBldr = new StringBuilder(u.getIdUsuario());
 		if (u.getDatosUsuario() != null) {
 			userIdStrBldr
-				.append(" - ")
+				.append(" ")
 				.append(u.getDatosUsuario().getApPaterno())
 				.append(" ")
 				.append(u.getDatosUsuario().getApMaterno())
@@ -122,6 +122,7 @@ public class MainViewLayout extends VerticalLayout{
 		
 		userIdLabel = new Button(userId);
 		userIdLabel.addStyleName(ValoTheme.BUTTON_LINK);
+		userIdLabel.addStyleName("user-id-label");
 		userIdLabel.addClickListener(clickEvnt->{
 			userDetailsWindow = new Window();
 			userDetailsWindow.setModal(true);

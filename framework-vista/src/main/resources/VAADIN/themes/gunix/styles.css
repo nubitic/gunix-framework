@@ -13045,3 +13045,11 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 0px;
 	font-weight: bold;
 }
+
+.gunix .user-id-label {
+	text-align: right;
+	width: 250px;
+	display: inline-flex;
+	white-space: normal;
+	margin-right: 15px;
+}

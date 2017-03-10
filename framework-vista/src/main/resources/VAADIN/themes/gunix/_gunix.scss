@@ -52,4 +52,12 @@ $v-line-height: 1.4;
     padding: 0px;
     font-weight: bold;
   }
+  
+  .user-id-label{
+    text-align: right;
+    width: 250px;
+    display: inline-flex;
+    white-space: normal;
+    margin-right: 15px;
+  }
 }
