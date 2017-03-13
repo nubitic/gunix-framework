@@ -192,4 +192,9 @@ public class GunixMTable<T extends Serializable> extends MTable<T> {
 		((GunixTableFieldFactory) getTableFieldFactory()).replaceField(newField, this, getContainerDataSource(), itemId, propertyId);
 		markAsDirty();
 	}
+	
+	public void replaceField(Field<?> oldField, Field<?> newField) {
+		((GunixTableFieldFactory) getTableFieldFactory()).replaceField(oldField, newField, this, getContainerDataSource());
+		markAsDirty();
+	}
 }

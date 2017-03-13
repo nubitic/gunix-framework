@@ -252,9 +252,20 @@ public class GunixTableFieldFactory extends DefaultFieldFactory {
 		}
 	}
 	
+	void replaceField(Field<?> oldField, Field<?> newField, Component uiContext, Container container) {
+		GunixFieldPropertyRel gfpr = previouslyCreatedFieldsMap.values()
+															.stream()
+															.filter(f -> f == oldField)
+															.findFirst()
+															.orElse(null);
+		if(gfpr == null){
+			throw new IllegalArgumentException("El field a reemplazar no se encuentra en la tabla!");
+		}
+		replaceField(newField,uiContext, container,  gfpr.getItemId(), gfpr.getPropertyId());
+	}
+	
 	void replaceField(Field<?> newField, Component uiContext, Container container, Object itemId, Object propertyId) {
-		String fieldId = generateId(uiContext, container, itemId, propertyId);
-		initField(newField, fieldId, itemId, propertyId);
+		initField(newField, generateId(uiContext, container, itemId, propertyId), itemId, propertyId);
 	}
 	
 }
