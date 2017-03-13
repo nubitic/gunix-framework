@@ -190,11 +190,11 @@ public class GunixMTable<T extends Serializable> extends MTable<T> {
 	
 	public void replaceField(Object itemId, Object propertyId, Field<?> newField) {
 		((GunixTableFieldFactory) getTableFieldFactory()).replaceField(newField, this, getContainerDataSource(), itemId, propertyId);
-		markAsDirty();
+		markAsDirtyRecursive();
 	}
 	
 	public void replaceField(Field<?> oldField, Field<?> newField) {
 		((GunixTableFieldFactory) getTableFieldFactory()).replaceField(oldField, newField, this, getContainerDataSource());
-		markAsDirty();
+		markAsDirtyRecursive();
 	}
 }
