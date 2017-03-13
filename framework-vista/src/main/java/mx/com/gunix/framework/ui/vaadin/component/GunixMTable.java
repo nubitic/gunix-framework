@@ -187,4 +187,9 @@ public class GunixMTable<T extends Serializable> extends MTable<T> {
 	public void setReadOnlyProperties(String... propiedadesRO) {
 		((GunixTableFieldFactory)getTableFieldFactory()).setReadOnlyProperties(propiedadesRO);
 	}
+	
+	public void replaceField(Object itemId, Object propertyId, Field<?> newField) {
+		((GunixTableFieldFactory) getTableFieldFactory()).replaceField(newField, this, getContainerDataSource(), itemId, propertyId);
+		markAsDirty();
+	}
 }

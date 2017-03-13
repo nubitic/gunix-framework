@@ -96,20 +96,32 @@ public class GunixTableFieldFactory extends DefaultFieldFactory {
 			} else {
 				field = fb.build(new SiblingFieldGetter(container, itemId, uiContext));
 			}
-			field.setInvalidAllowed(false);
-			if (field instanceof AbstractTextField) {
-				((AbstractTextField) field).setNullRepresentation("");
-			}
-			field.setErrorHandler(GunixViewErrorHandler.getCurrent());
-			gfpr = new GunixFieldPropertyRel();
-			gfpr.setField(field);
-			gfpr.setItemId(itemId);
-			gfpr.setPropertyId(propertyId);
-			previouslyCreatedFieldsMap.put(fieldId, gfpr);
+			
+			gfpr = initField(field, fieldId, itemId, propertyId);
 		}
 		return gfpr.getField();
 	}
 	
+	private GunixFieldPropertyRel initField(Field<?> field, String fieldId, Object itemId, Object propertyId) {
+		field.setInvalidAllowed(false);
+		if (field instanceof AbstractTextField) {
+			((AbstractTextField) field).setNullRepresentation("");
+		}
+		field.setErrorHandler(GunixViewErrorHandler.getCurrent());
+		GunixFieldPropertyRel gfpr = new GunixFieldPropertyRel();
+		gfpr.setField(field);
+		gfpr.setItemId(itemId);
+		gfpr.setPropertyId(propertyId);
+		GunixFieldPropertyRel gfprOld = previouslyCreatedFieldsMap.put(fieldId, gfpr);
+		if(gfprOld != null){
+			Field<?> f = gfprOld.getField();
+			f.setErrorHandler(null);
+			f.setParent(null);
+			f.detach();
+		}
+		return gfpr;
+	}
+
 	private String generateId(Component uiContext, Container container, Object itemId, Object propertyId){
 		return new StringBuilder(String.valueOf(System.identityHashCode(uiContext)))
 					.append("-")
@@ -238,6 +250,11 @@ public class GunixTableFieldFactory extends DefaultFieldFactory {
 				previouslyCreatedFieldsMap.remove(fieldToRemove);
 			});
 		}
+	}
+	
+	void replaceField(Field<?> newField, Component uiContext, Container container, Object itemId, Object propertyId) {
+		String fieldId = generateId(uiContext, container, itemId, propertyId);
+		initField(newField, fieldId, itemId, propertyId);
 	}
 	
 }
