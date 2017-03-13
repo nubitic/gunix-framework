@@ -255,7 +255,7 @@ public class GunixTableFieldFactory extends DefaultFieldFactory {
 	void replaceField(Field<?> oldField, Field<?> newField, Component uiContext, Container container) {
 		GunixFieldPropertyRel gfpr = previouslyCreatedFieldsMap.values()
 															.stream()
-															.filter(f -> f == oldField)
+															.filter(f -> f.getField() == oldField)
 															.findFirst()
 															.orElse(null);
 		if(gfpr == null){
