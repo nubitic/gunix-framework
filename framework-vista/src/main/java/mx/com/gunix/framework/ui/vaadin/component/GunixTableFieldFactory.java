@@ -117,7 +117,9 @@ public class GunixTableFieldFactory extends DefaultFieldFactory {
 			Field<?> f = gfprOld.getField();
 			f.setErrorHandler(null);
 			f.setParent(null);
-			f.detach();
+			try{
+				f.detach();
+			} catch(NullPointerException ignorar){}
 		}
 		return gfpr;
 	}
