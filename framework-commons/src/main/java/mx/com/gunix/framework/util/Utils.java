@@ -36,36 +36,52 @@ public abstract class Utils {
 	public static MessageSource buildMessageSource() {
 		ResourceBundleMessageSource messageSource = new GunixResourceBundleMessageSource();
 		messageSource.setBasename("messages");
+		Utils.ms = messageSource; 
 		return messageSource;
 	}
 
 	private static final Pattern MESSAGE_TOKENS = Pattern.compile("\\$\\{.+?\\}");
-	public static String procesaMensaje(MessageSource ms, Class<?> clase, String mKey, String defaultMessage, Object[] mArgs) {
+	private static MessageSource ms;
+	public static String procesaMensaje(MessageSource ms, Class<?> clase, String mKey, String defaultMessage, Object... mArgs) {
 		String mCKey = (clase != null ? (clase.getSimpleName() + ".") : "") + mKey;
+		String keyDef = null;
+		Matcher m = null;
 		try {
-			return ms.getMessage(mCKey, mArgs, defaultMessage, Locale.getDefault());
+			keyDef = ((GunixResourceBundleMessageSource) ms).getKeyDefinition(mCKey, Locale.getDefault());
+			m = MESSAGE_TOKENS.matcher(keyDef);
+			if (m.find()) {
+				m.reset();
+				return procesaAnidaciones(ms, clase, defaultMessage, keyDef, m, mArgs);
+			} else {
+				return ms.getMessage(mCKey, mArgs, defaultMessage, Locale.getDefault());
+			}
 		} catch (IllegalArgumentException ilArgEx) {
-			if(ms instanceof GunixResourceBundleMessageSource){
-				GunixResourceBundleMessageSource grbms = (GunixResourceBundleMessageSource) ms;
-				String keyDef = grbms.getKeyDefinition(mCKey, Locale.getDefault());
-				Matcher m = MESSAGE_TOKENS.matcher(keyDef);
-				Map<String, String> prevEvs = new HashMap<String, String>();
-				while(m.find()){
-					String nestedKey = m.group();
-					String orNestedKey = nestedKey;
-					if (nestedKey != null && nestedKey.length() > 3 && prevEvs.get(orNestedKey) == null) {
-						nestedKey = nestedKey.substring(2, nestedKey.length() - 1);
-						prevEvs.put(orNestedKey, procesaMensaje(ms, null, nestedKey, defaultMessage, mArgs));
-					}
-				}
-				AtomicReference<String> aRef = new AtomicReference<String>(keyDef); 
-				prevEvs.keySet().forEach(nKey->{
-					aRef.set(aRef.get().replace(nKey, prevEvs.get(nKey)));
-				});
-				return aRef.get();
+			return procesaAnidaciones(ms, clase, defaultMessage, keyDef, m, mArgs );
+		}
+	}
+
+	private static String procesaAnidaciones(MessageSource ms, Class<?> clase, String defaultMessage, String keyDef, Matcher m, Object... mArgs) {
+		Map<String, String> prevEvs = new HashMap<String, String>();
+		while(m.find()){
+			String nestedKey = m.group();
+			String orNestedKey = nestedKey;
+			if (nestedKey != null && nestedKey.length() > 3 && prevEvs.get(orNestedKey) == null) {
+				nestedKey = nestedKey.substring(2, nestedKey.length() - 1);
+				prevEvs.put(orNestedKey, procesaMensaje(ms, null, nestedKey, defaultMessage, mArgs));
 			}
 		}
-		return null;
+		AtomicReference<String> aRef = new AtomicReference<String>(keyDef); 
+		prevEvs.keySet().forEach(nKey->{
+			aRef.set(aRef.get().replace(nKey, prevEvs.get(nKey)));
+		});
+		return aRef.get();
+	}
+
+	public static String gMssg(Class<?> clase, String mKey, String defaultMessage, Object... mArgs) {
+		if (clase == null) {
+			throw new IllegalArgumentException("La clase no puede ser null");
+		}
+		return procesaMensaje(ms, clase, mKey, defaultMessage, mArgs);
 	}
 	
 	static private class GunixResourceBundleMessageSource extends ResourceBundleMessageSource{
