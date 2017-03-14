@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
@@ -53,6 +54,9 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 	@Autowired
 	RequestMappingHandlerAdapter rmha;
 
+	@Autowired
+	MessageSource ms;
+	
 	protected abstract String doConstruct(HttpSession session, Model uiModel);
 
 	protected abstract List<Variable<?>> getVariablesTarea(HttpServletRequest request);
@@ -159,5 +163,9 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 	
 	@SuppressWarnings("unused")
 	private final void notFoundMethod() {
+	}
+
+	protected String gMssg(String mKey, String defaultMessage, Object... mArgs) {
+		return mx.com.gunix.framework.util.Utils.procesaMensaje(ms, getClass(), mKey, defaultMessage, mArgs);
 	}
 }

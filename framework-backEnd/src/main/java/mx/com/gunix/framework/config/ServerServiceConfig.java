@@ -5,7 +5,9 @@ import mx.com.gunix.framework.service.ActivitiServiceImp;
 import mx.com.gunix.framework.service.UsuarioService;
 import mx.com.gunix.framework.service.UsuarioServiceImp;
 import mx.com.gunix.framework.service.hessian.spring.HessianServerScannerConfigurer;
+import mx.com.gunix.framework.util.Utils;
 
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -58,5 +60,10 @@ public class ServerServiceConfig extends WebMvcConfigurerAdapter {
 	@Bean
 	public javax.validation.Validator validator() {
 		return (javax.validation.Validator) new LocalValidatorFactoryBean();
+	}
+	
+	@Bean
+	public MessageSource messageSource() {
+		return Utils.buildMessageSource();
 	}
 }

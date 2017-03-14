@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 
 import com.vaadin.data.Container;
@@ -79,6 +80,9 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	@Autowired
 	@Lazy
 	TokenService ts;
+	
+	@Autowired
+	MessageSource ms;
 	
 	public static void appendNotification(Notification.Type type, String notificacion) {
 		Map<Notification.Type, Set<String>> notificaciones = notificacionesMap.get();
@@ -405,6 +409,10 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	
 	protected void eliminaTareaBG(String idTarea){
 		ts.eliminaToken(idTarea);
+	}
+	
+	protected String gMssg(String mKey, String defaultMessage, Object... mArgs) {
+		return mx.com.gunix.framework.util.Utils.procesaMensaje(ms, getClass(), mKey, defaultMessage, mArgs);
 	}
 
 	protected abstract void doEnter(ViewChangeEvent event);

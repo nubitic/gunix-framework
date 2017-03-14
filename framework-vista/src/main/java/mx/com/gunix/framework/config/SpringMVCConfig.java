@@ -32,6 +32,7 @@ import org.springframework.web.servlet.view.tiles3.TilesConfigurer;
 import mx.com.gunix.framework.ui.springmvc.MainController;
 import mx.com.gunix.framework.ui.springmvc.tiles3.AjaxTilesView;
 import mx.com.gunix.framework.util.GunixFile;
+import mx.com.gunix.framework.util.Utils;
 
 @EnableWebMvc
 @Configuration
@@ -123,9 +124,7 @@ public class SpringMVCConfig extends WebMvcConfigurerAdapter {
 	
 	@Bean
 	public MessageSource messageSource() {
-		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-		messageSource.setBasename("messages");
-		return messageSource;
+		return Utils.buildMessageSource();
 	}
 
 	@Bean

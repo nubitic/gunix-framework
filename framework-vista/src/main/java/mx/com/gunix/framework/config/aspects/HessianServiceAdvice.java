@@ -1,9 +1,11 @@
 package mx.com.gunix.framework.config.aspects;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -51,14 +53,7 @@ public class HessianServiceAdvice {
 							    )))?																				
 								null
 								:SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			newArgs[newArgs.length-1]=(principal instanceof UserDetails)?principal:null;
-			if (principal instanceof mx.com.gunix.framework.security.UserDetails && ((mx.com.gunix.framework.security.UserDetails) principal).getSelectedAuthority() != null) {
-				mx.com.gunix.framework.security.UserDetails gxud = (mx.com.gunix.framework.security.UserDetails) principal;
-				gxud.setAuthorities(gxud.getAuthorities()
-											.stream()
-											.filter(ga -> ga.getAuthority().equals(gxud.getSelectedAuthority()))
-											.collect(Collectors.toList()));
-			}
+			newArgs[newArgs.length-1]=(principal instanceof UserDetails)?genAuth((Serializable) principal):null;		
 			
 			Class<?>[] interfaces = ((Advised)pjp.getThis()).getProxiedInterfaces();
 			Class<?> generatedInterface = null;
@@ -98,6 +93,18 @@ public class HessianServiceAdvice {
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}		
+	}
+
+	private Object genAuth(Serializable principal) {
+		if (principal instanceof mx.com.gunix.framework.security.UserDetails && ((mx.com.gunix.framework.security.UserDetails) principal).getSelectedAuthority() != null) {
+			mx.com.gunix.framework.security.UserDetails gxud = (mx.com.gunix.framework.security.UserDetails) SerializationUtils.clone(principal);
+			gxud.setAuthorities(gxud.getAuthorities()
+										.stream()
+										.filter(ga -> ga.getAuthority().equals(gxud.getSelectedAuthority()))
+										.collect(Collectors.toList()));
+			principal = gxud;
+		}
+		return principal;
 	}
 
 	private boolean compatibles(Class<?>[] argTypes, Class<?>[] mArgTypes) {

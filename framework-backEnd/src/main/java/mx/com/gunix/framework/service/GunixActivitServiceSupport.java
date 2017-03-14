@@ -27,10 +27,12 @@ import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 
 import mx.com.gunix.framework.domain.Identificador;
 import mx.com.gunix.framework.persistence.DescriptorCambios;
 import mx.com.gunix.framework.processes.domain.ProgressUpdate;
+import mx.com.gunix.framework.util.Utils;
 
 public abstract class GunixActivitServiceSupport<T extends Serializable> {
 	private interface FoundAction {
@@ -50,6 +52,9 @@ public abstract class GunixActivitServiceSupport<T extends Serializable> {
 	
 	@Autowired
 	private ActivitiService activitiService;
+	
+	@Autowired
+	MessageSource ms;
 
 	protected final void actualizaVariable(Object var) {
 		ExecutionEntity ee = Context.getExecutionContext().getExecution();
@@ -460,5 +465,9 @@ public abstract class GunixActivitServiceSupport<T extends Serializable> {
 		pu.setTimeStamp(System.currentTimeMillis());
 		pu.setProcessId(Context.getExecutionContext().getExecution().getProcessInstanceId());
 		activitiService.addProgressUpdate(pu.getProcessId(), pu);
+	}
+	
+	protected String gMssg(String mKey, String defaultMessage, Object... mArgs) {
+		return Utils.procesaMensaje(ms, getClass(), mKey, defaultMessage, mArgs);
 	}
 }
