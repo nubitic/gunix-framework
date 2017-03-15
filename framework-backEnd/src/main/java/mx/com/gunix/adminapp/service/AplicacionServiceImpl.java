@@ -54,7 +54,7 @@ public class AplicacionServiceImpl extends ACLTypeServiceSupport<Aplicacion> {
 	AmbitoMapper ambm;
 
 	@Override
-	public Aplicacion getById(Long id) {
+	public Aplicacion getById(String id) {
 		return am.getById(id);
 	}
 

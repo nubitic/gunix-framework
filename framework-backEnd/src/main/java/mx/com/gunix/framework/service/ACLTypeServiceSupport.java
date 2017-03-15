@@ -48,6 +48,10 @@ public abstract class ACLTypeServiceSupport<T extends ACLType> extends GunixActi
 			Long newId = shm.nextVal("seguridad.acl_object_identity", "object_id_identity");
 			ObjectIdentity oi = new ObjectIdentityImpl(aclType.getClass(), newId);
 			MutableAcl mAcl = aclService.createAcl(oi);
+			mAcl.setEntriesInheriting(false);
+			if (aclType.getParent() != null) {
+				mAcl.setParent(aclService.readAclById(new ObjectIdentityImpl(aclType.getParent().getClass(), aclType.getParent().getId())));
+			}
 			Sid sid = new PrincipalSid(SecurityContextHolder.getContext().getAuthentication());
 			mAcl.insertAce(mAcl.getEntries().size(), new CumulativePermission().set(BasePermission.ADMINISTRATION).set(BasePermission.READ).set(BasePermission.WRITE).set(BasePermission.DELETE), sid, true);
 			aclService.updateAcl(mAcl);

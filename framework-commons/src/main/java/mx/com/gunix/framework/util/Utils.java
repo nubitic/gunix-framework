@@ -48,10 +48,14 @@ public abstract class Utils {
 		Matcher m = null;
 		try {
 			keyDef = ((GunixResourceBundleMessageSource) ms).getKeyDefinition(mCKey, Locale.getDefault());
-			m = MESSAGE_TOKENS.matcher(keyDef);
-			if (m.find()) {
-				m.reset();
-				return procesaAnidaciones(ms, clase, defaultMessage, keyDef, m, mArgs);
+			if (keyDef != null) {
+				m = MESSAGE_TOKENS.matcher(keyDef);
+				if (m.find()) {
+					m.reset();
+					return procesaAnidaciones(ms, clase, defaultMessage, keyDef, m, mArgs);
+				} else {
+					return ms.getMessage(mCKey, mArgs, defaultMessage, Locale.getDefault());
+				}
 			} else {
 				return ms.getMessage(mCKey, mArgs, defaultMessage, Locale.getDefault());
 			}

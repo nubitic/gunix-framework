@@ -12,7 +12,7 @@ import org.apache.ibatis.annotations.Select;
 public interface AplicacionMapper {
 	@Select("Select ACL_ID as ID,ID_APLICACION, DESCRIPCION, ICONO from SEGURIDAD.APLICACION where ACL_ID=#{id}")
 	@ResultMap("aplicacionMap")
-	public Aplicacion getById(Long id);
+	public Aplicacion getById(String id);
 
 	@Select("Select ACL_ID as ID,ID_APLICACION, DESCRIPCION, ICONO from SEGURIDAD.APLICACION where ID_APLICACION=#{idAplicacion}")
 	@ResultMap("aplicacionMap")
