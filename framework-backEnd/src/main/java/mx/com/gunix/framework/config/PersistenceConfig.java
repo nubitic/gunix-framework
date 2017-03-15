@@ -33,7 +33,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-@EnableTransactionManagement
+@EnableTransactionManagement(proxyTargetClass = true)
 @MapperScan({ "mx.com.gunix.domain.persistence", "mx.com.gunix.framework.security.domain.persistence", "mx.com.gunix.framework.activiti.persistence.entity", "mx.com.gunix.framework.token.persistence" })
 public class PersistenceConfig {
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();

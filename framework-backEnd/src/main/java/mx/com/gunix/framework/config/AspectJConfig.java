@@ -6,7 +6,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 @Configuration
 @ComponentScan({"mx.com.gunix.framework.config.aspects","mx.com.gunix.config.aspects"})
-@EnableAspectJAutoProxy
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 public class AspectJConfig {
 	
 }

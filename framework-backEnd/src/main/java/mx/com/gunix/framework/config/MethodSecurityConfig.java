@@ -68,7 +68,7 @@ import net.sf.ehcache.Ehcache;
 
 @Configuration
 @Import(PersistenceConfig.class)
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, proxyTargetClass = true)
 public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration implements BeanFactoryAware{
 	public static String ACL_CACHE_NAME = "aclCache";
 	public static final String ACL_ADMIN_ROLE = "ACL_ADMIN";
