@@ -14,10 +14,8 @@ import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.apache.log4j.Logger;
 import org.hibernate.validator.constraints.NotBlank;
-
-import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
-import mx.com.gunix.framework.ui.vaadin.VaadinUtils;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Validator.InvalidValueException;
@@ -29,7 +27,11 @@ import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.Field;
 
+import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
+import mx.com.gunix.framework.ui.vaadin.VaadinUtils;
+
 public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
+	private static final Logger log = Logger.getLogger(GunixBeanFieldGroup.class);
 	public interface OnBeanValidationErrorCallback<BT> {
 		void callback(ConstraintViolation<BT> cv);
 	}
@@ -48,6 +50,16 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 		setBuffered(false);
 		if (!isBeanValidationImplementationAvailable()) {
 			throw new IllegalStateException("No se encontró una implementación de JSR-303 bean validation");
+		}
+	}
+
+	@Override
+	protected Class<?> getPropertyType(Object propertyId) {
+		try {
+			return super.getPropertyType(propertyId);
+		} catch (BindException be) {
+			log.debug(be.getMessage());
+			throw be;
 		}
 	}
 
