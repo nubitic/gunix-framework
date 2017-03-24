@@ -18,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -37,9 +38,19 @@ public class JOSSOAuthenticationProcessingFilter extends AbstractAuthenticationP
 		super(JOSSO_SECURITY_CHECK_URI);
 		Assert.notNull(partnerId);
 		this.partnerId = partnerId;
-		if(BACKTO_HOST!=null) {
-			((SavedRequestAwareAuthenticationSuccessHandler) getSuccessHandler()).setAlwaysUseDefaultTargetUrl(true);
-			((SavedRequestAwareAuthenticationSuccessHandler) getSuccessHandler()).setDefaultTargetUrl(BACKTO_HOST + (BACKTO_CONTEXT != null ? BACKTO_CONTEXT : "") + "/");	
+		initAuthenticationSuccessHandler(getSuccessHandler());
+	}
+
+	@Override
+	public void setAuthenticationSuccessHandler(AuthenticationSuccessHandler successHandler) {
+		initAuthenticationSuccessHandler(successHandler);
+		super.setAuthenticationSuccessHandler(successHandler);
+	}
+
+	private void initAuthenticationSuccessHandler(AuthenticationSuccessHandler successHandler) {
+		if (successHandler != null && successHandler instanceof SavedRequestAwareAuthenticationSuccessHandler && BACKTO_HOST != null) {
+			((SavedRequestAwareAuthenticationSuccessHandler) successHandler).setAlwaysUseDefaultTargetUrl(true);
+			((SavedRequestAwareAuthenticationSuccessHandler) successHandler).setDefaultTargetUrl(BACKTO_HOST + (BACKTO_CONTEXT != null ? BACKTO_CONTEXT : "") + "/");
 		}
 	}
 
@@ -66,6 +77,7 @@ public class JOSSOAuthenticationProcessingFilter extends AbstractAuthenticationP
 		} catch (AssertionNotValidException e) {
 			throw new AuthenticationServiceException("Unable to authenticate user with assertionId " + assertionId, e);
 		} catch (IdentityProvisioningException e) {
+			e.printStackTrace();
 			throw new AuthenticationServiceException("Unable to authenticate user with assertionId " + assertionId, e);
 		}
 	}
