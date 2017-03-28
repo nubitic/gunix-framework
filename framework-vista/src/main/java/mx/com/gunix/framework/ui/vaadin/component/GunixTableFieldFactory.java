@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,9 +29,9 @@ import mx.com.gunix.framework.util.CustomLabelEnum;
 
 public class GunixTableFieldFactory extends DefaultFieldFactory {
 	private static final long serialVersionUID = 1L;
-	private Map<String,GunixFieldPropertyRel> previouslyCreatedFieldsMap = new HashMap<String,GunixFieldPropertyRel>();
-	private Map<String, FieldBuilder> customFieldBuilder = new HashMap<String, FieldBuilder>();
-	private Set<String> propiedadesROSet = new HashSet<String>();
+	private Map<String,GunixFieldPropertyRel> previouslyCreatedFieldsMap = new LinkedHashMap<String,GunixFieldPropertyRel>();
+	private Map<String, FieldBuilder> customFieldBuilder = new LinkedHashMap<String, FieldBuilder>();
+	private Set<String> propiedadesROSet = new LinkedHashSet<String>();
 	
 	@SuppressWarnings("unchecked")
 	public Field<?> createField(Container container, Object itemId, Object propertyId, Component uiContext) {
