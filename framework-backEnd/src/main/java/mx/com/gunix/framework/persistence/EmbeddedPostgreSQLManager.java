@@ -25,12 +25,16 @@ public final class EmbeddedPostgreSQLManager {
 	private static Logger log = Logger.getLogger(EmbeddedPostgreSQLManager.class);
 	private static ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 	
-	public static void start(String pgsqlHome, String usuario, String password, String database, ClassLoader classLoader) {
+	public static void start(String pgsqlHome, String usuario, String password, String database, String puerto, ClassLoader classLoader) {
 		log.warn("Iniciando servidor local PostgreSQL (no se recomienda el uso de este servidor para un ambiente diferente a DESARROLLO)");
 		// Validando si en el home indicado ya existe una instalación de postgreSQL
 		File pgsqlHomeFile = null;
 		String os = null;
 		String esMXLocale=null;
+		
+		if (puerto == null || "".equals(puerto)) {
+			puerto = "5432";
+		}
 
 		pgsqlHomeFile = new File(pgsqlHome);
 
@@ -95,34 +99,34 @@ public final class EmbeddedPostgreSQLManager {
 			isNewServer = true;
 		}
 
-		if (!started(pgsqlHomeFile, usuario, passwordFile.getAbsolutePath())) {
+		if (!started(pgsqlHomeFile, usuario, passwordFile.getAbsolutePath(), puerto)) {
 			log.info("Inicializando Servidor");
 			// Iniciando el servidor
-			start(pgsqlHomeFile, dataDir.getAbsolutePath(), usuario, passwordFile.getAbsolutePath());
+			start(pgsqlHomeFile, dataDir.getAbsolutePath(), usuario, passwordFile.getAbsolutePath(), puerto);
 		}
 		if (isNewServer) {
 			log.info("Creando Base de Datos");
-			crearBD(pgsqlHomeFile, usuario, passwordFile.getAbsolutePath(), database);
+			crearBD(pgsqlHomeFile, usuario, passwordFile.getAbsolutePath(), database, puerto);
 		}
 
-		if (!EmbeddedServerUtils.existeEsquema(pgsqlHomeFile, usuario, database,"seguridad")) {
+		if (!EmbeddedServerUtils.existeEsquema(pgsqlHomeFile, usuario, database, puerto,"seguridad")) {
 			log.info("Creando Tablas, Secuencias...");
-			initDB(pgsqlHomeFile, usuario, database, classLoader);
+			initDB(pgsqlHomeFile, usuario, database, puerto, classLoader);
 		}
 		
-		ejecutaAppScripts(pgsqlHomeFile, usuario, database);
+		ejecutaAppScripts(pgsqlHomeFile, usuario, database, puerto);
 
 		passwordFile.delete();
 
 		log.info("PostgreSQL iniciado!");
 		log.info("host: localhost");
-		log.info("puerto: 5432");
+		log.info("puerto: " + puerto);
 		log.info("usuario: " + usuario);
 		log.info("contraseña: " + password);
 		log.info("base de datos: " + database);
 	}
 
-	private static void ejecutaAppScripts(File pgsqlHomeFile, String usuario, String database) {
+	private static void ejecutaAppScripts(File pgsqlHomeFile, String usuario, String database, String puerto) {
 		try {			
 			Resource[] appScriptsResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/domain/persistence/scripts/**/*.sql");
 			Resource[] appZippedScriptsResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/domain/persistence/scripts/**/*.zip");
@@ -172,10 +176,10 @@ public final class EmbeddedPostgreSQLManager {
 					BufferedWriter writer = new BufferedWriter(new FileWriter(new File(prevExecutedScripts, appSchemaName + "_" + appScriptResource.getFilename() + ".log")));
 					if (appScriptResource.getFilename().toLowerCase().endsWith(".zip")) {
 						ZipEntryWorker.withAllZipEntries(appScriptResource.getInputStream(), (sqlFileName, sqlIs)->{
-							ejecutaScript(sqlIs, pgsqlHomeFile, usuario, database, appScriptResource.getFilename(), writer);
+							ejecutaScript(sqlIs, pgsqlHomeFile, usuario, database, puerto, appScriptResource.getFilename(), writer);
 						});
 					} else {
-						ejecutaScript(appScriptResource.getInputStream(), pgsqlHomeFile, usuario, database, appScriptResource.getFilename(), writer);
+						ejecutaScript(appScriptResource.getInputStream(), pgsqlHomeFile, usuario, database, puerto, appScriptResource.getFilename(), writer);
 					}
 					writer.close();
 				}
@@ -185,8 +189,8 @@ public final class EmbeddedPostgreSQLManager {
 		}
 	}
 
-	private static void ejecutaScript(InputStream scriptIS, File pgsqlHomeFile, String usuario, String database, String fileName, BufferedWriter writer) {
-		EmbeddedServerUtils.ejecutaScript(scriptIS, pgsqlHomeFile, usuario, database, new Logger(fileName) {
+	private static void ejecutaScript(InputStream scriptIS, File pgsqlHomeFile, String usuario, String database, String puerto, String fileName, BufferedWriter writer) {
+		EmbeddedServerUtils.ejecutaScript(scriptIS, pgsqlHomeFile, usuario, database, puerto, new Logger(fileName) {
 			@Override
 			public void info(Object message) {
 				try {
@@ -201,10 +205,10 @@ public final class EmbeddedPostgreSQLManager {
 		});
 	}
 
-	private static void initDB(File pgsqlHomeFile, String usuario, String database, ClassLoader classLoader) {
-		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/01_SEGURIDAD_ACL_ROL_FUNCION.sql"), pgsqlHomeFile, usuario, database, log);
-		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/02_ACTIVITI.sql"), pgsqlHomeFile, usuario, database, log);
-		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/03_ADMON_SEG.sql"), pgsqlHomeFile, usuario, database, log);
+	private static void initDB(File pgsqlHomeFile, String usuario, String database, String puerto, ClassLoader classLoader) {
+		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/01_SEGURIDAD_ACL_ROL_FUNCION.sql"), pgsqlHomeFile, usuario, database, puerto, log);
+		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/02_ACTIVITI.sql"), pgsqlHomeFile, usuario, database, puerto, log);
+		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/03_ADMON_SEG.sql"), pgsqlHomeFile, usuario, database, puerto, log);
 	}
 
 	private static void initServer(File pgsqlHomeFile, String usuario, String password, String database, String dataDir, String esMXLocale) {
@@ -233,10 +237,12 @@ public final class EmbeddedPostgreSQLManager {
 		}
 	}
 
-	private static void crearBD(File pgsqlHomeFile, String usuario, String password, String database) {
+	private static void crearBD(File pgsqlHomeFile, String usuario, String password, String database, String port) {
 		try {
 			List<String> cmd = new ArrayList<String>();
 			cmd.add(getCommandPath(pgsqlHomeFile, "createdb"));
+			cmd.add("-p");
+			cmd.add(port);
 			cmd.add("-U");
 			cmd.add(usuario);
 			cmd.add(database);
@@ -256,13 +262,16 @@ public final class EmbeddedPostgreSQLManager {
 		return EmbeddedServerUtils.getCommandPath(new File(pgsqlHomeFile, "bin"), command);
 	}
 
-	private static void start(File pgsqlHomeFile, String dataDir, String usuario, String contraseña) {
+	private static void start(File pgsqlHomeFile, String dataDir, String usuario, String contraseña, String puerto) {
 		try {
 			List<String> cmd = new ArrayList<String>();
 			cmd.add(getCommandPath(pgsqlHomeFile, "postgres"));
 
 			cmd.add("-D");
 			cmd.add(dataDir);
+
+			cmd.add("-p");
+			cmd.add(puerto);
 			
 			cmd.add("-c");
 			cmd.add("log_destination=stderr");
@@ -288,11 +297,11 @@ public final class EmbeddedPostgreSQLManager {
 			EmbeddedServerUtils.log(log, process, "pg_log");
 			
 			if (process.isAlive()) {
-				while (!started(pgsqlHomeFile, usuario, contraseña)) {
+				while (!started(pgsqlHomeFile, usuario, contraseña, puerto)) {
 					Thread.sleep(3000);
 				}
 			} else {
-				if (!started(pgsqlHomeFile, usuario, contraseña)) {
+				if (!started(pgsqlHomeFile, usuario, contraseña, puerto)) {
 					throw new RuntimeException("No fue posible iniciar la base de datos");
 				}
 			}
@@ -302,13 +311,15 @@ public final class EmbeddedPostgreSQLManager {
 
 	}
 
-	private static boolean started(File pgsqlHomeFile, String usuario, String contraseña) {
+	private static boolean started(File pgsqlHomeFile, String usuario, String contraseña, String port) {
 		try {
 			List<String> cmd = new ArrayList<String>();
 			cmd.add(getCommandPath(pgsqlHomeFile, "psql"));
 			cmd.add("-l");
 			cmd.add("-U");
 			cmd.add(usuario);
+			cmd.add("-p");
+			cmd.add(port);
 
 			ProcessBuilder processBuilder = new ProcessBuilder(cmd);
 			processBuilder.redirectErrorStream(true);

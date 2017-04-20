@@ -192,7 +192,7 @@ public final class EmbeddedServerUtils {
 		return new File(baseDir, command).getAbsolutePath();
 	}
 
-	public static void ejecutaScript(InputStream scriptStream, File pgsqlHomeFile, String usuario, String database, Logger log) {
+	public static void ejecutaScript(InputStream scriptStream, File pgsqlHomeFile, String usuario, String database, String puerto, Logger log) {
 		try {
 			File scriptFile = File.createTempFile("script", ".sql");
 
@@ -205,6 +205,8 @@ public final class EmbeddedServerUtils {
 			cmd.add(scriptFile.getAbsolutePath());
 			cmd.add("-U");
 			cmd.add(usuario);
+			cmd.add("-p");
+			cmd.add(puerto);
 			cmd.add("-d");
 			cmd.add(database);
 
@@ -224,7 +226,7 @@ public final class EmbeddedServerUtils {
 		}
 	}
 
-	public static boolean existeEsquema(File pgsqlHomeFile, String usuario, String database, String esquema) {
+	public static boolean existeEsquema(File pgsqlHomeFile, String usuario, String database, String puerto, String esquema) {
 		try {
 			List<String> cmd = new ArrayList<String>();
 			cmd.add(getCommandPath(new File(pgsqlHomeFile, "bin"), "psql"));
@@ -232,6 +234,8 @@ public final class EmbeddedServerUtils {
 			cmd.add("select count(*) as existe from information_schema.schemata where schema_name='"+esquema+"';");
 			cmd.add("-U");
 			cmd.add(usuario);
+			cmd.add("-p");
+			cmd.add(puerto);
 			cmd.add("-d");
 			cmd.add(database);
 

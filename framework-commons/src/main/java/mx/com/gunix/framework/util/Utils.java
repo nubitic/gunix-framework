@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.web.context.ContextCleanupListener;
 
 public abstract class Utils {
 	/**
@@ -34,6 +35,8 @@ public abstract class Utils {
 	}
 	
 	public static MessageSource buildMessageSource() {
+		ContextCleanupListener dummy =  new ContextCleanupListener();
+		
 		ResourceBundleMessageSource messageSource = new GunixResourceBundleMessageSource();
 		messageSource.setBasename("messages");
 		Utils.ms = messageSource; 

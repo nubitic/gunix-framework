@@ -29,19 +29,23 @@ public final class EmbeddedLogicalDocManager {
 		pgsqlHomeFile = "pgsql".equalsIgnoreCase(pgsqlHomeFile.getName()) ? pgsqlHomeFile : new File(pgsqlHomeFile, "pgsql");
 		String usuario = System.getenv("DB_USER");
 		String baseDatos = System.getenv("DB_NAME");
+		String puerto = System.getenv("DB_PORT");
+		if (puerto == null || "".equals(puerto)) {
+			puerto = "5432";
+		}
 
 		if (logicalDocHomeFile.exists()) {
 			if (!logicalDocHomeFile.isDirectory()) {
 				throw new IllegalArgumentException(String.format("'%s' no es un directorio.", logicalDocHome));
 			} 
-			if (!EmbeddedServerUtils.existeEsquema(pgsqlHomeFile, usuario, baseDatos, "logicaldoc")) {
+			if (!EmbeddedServerUtils.existeEsquema(pgsqlHomeFile, usuario, baseDatos, puerto, "logicaldoc")) {
 				//Puede ser que el directorio exista pero el esquema de bd no si se ha eliminado la base de datos para iniciar con una nueva
-				EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/documents/persistence/logicaldoc-core.sql"), pgsqlHomeFile, usuario, baseDatos, log);
+				EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/documents/persistence/logicaldoc-core.sql"), pgsqlHomeFile, usuario, baseDatos, puerto, log);
 			}
 		} else {
 			log.info("Instalando LogicalDoc");
 			logicalDocHomeFile.mkdirs();
-			doInstall(logicalDocHomeFile, pgsqlHomeFile, usuario, baseDatos, classLoader);
+			doInstall(logicalDocHomeFile, pgsqlHomeFile, usuario, baseDatos, puerto, classLoader);
 		}
 		log.info("Iniciando LogicalDoc");
 		doStart(logicalDocHomeFile, false);
@@ -50,7 +54,7 @@ public final class EmbeddedLogicalDocManager {
 		log.info("Pass: admin");
 	}
 
-	private static void doInstall(File logicalDocHomeFile, File pgsqlHomeFile, String usuario, String baseDatos, ClassLoader classLoader) throws IOException, InterruptedException {
+	private static void doInstall(File logicalDocHomeFile, File pgsqlHomeFile, String usuario, String baseDatos, String puerto, ClassLoader classLoader) throws IOException, InterruptedException {
 		File webAppRunner = new File(logicalDocHomeFile, "webapp-runner.jar");
 		if (!webAppRunner.exists()) {
 			webAppRunner = EmbeddedServerUtils.descargaArchivo("http://central.maven.org/maven2/com/github/jsimone/webapp-runner/7.0.57.2/webapp-runner-7.0.57.2.jar", webAppRunner, log);
@@ -63,7 +67,7 @@ public final class EmbeddedLogicalDocManager {
 			EmbeddedServerUtils.extractZip(logicalDocWar, logicalDocHomeFile + File.separator + "logicalDoc" + File.separator, log);
 		}
 		
-		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/documents/persistence/logicaldoc-core.sql"), pgsqlHomeFile, usuario, baseDatos, log);
+		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/documents/persistence/logicaldoc-core.sql"), pgsqlHomeFile, usuario, baseDatos, puerto, log);
 
 		String webInfClasses = "WEB-INF" + File.separator + "classes" + File.separator;
 

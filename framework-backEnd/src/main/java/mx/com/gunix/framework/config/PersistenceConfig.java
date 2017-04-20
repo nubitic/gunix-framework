@@ -42,7 +42,7 @@ public class PersistenceConfig {
 	public synchronized DataSource dataSource() {
 		String host = null;
 		if (Boolean.valueOf(System.getenv("DB_USE_EMBEDDED"))) {
-			EmbeddedPostgreSQLManager.start(System.getenv("DB_EMBEDDED_HOME"), System.getenv("DB_USER"), System.getenv("DB_PASSWORD"), System.getenv("DB_NAME"), getClass().getClassLoader());
+			EmbeddedPostgreSQLManager.start(System.getenv("DB_EMBEDDED_HOME"), System.getenv("DB_USER"), System.getenv("DB_PASSWORD"), System.getenv("DB_NAME"), System.getenv("DB_PORT"), getClass().getClassLoader());
 			host = "localhost";
 		} else {
 			host = System.getenv("DB_SERVER_NAME");
@@ -63,6 +63,9 @@ public class PersistenceConfig {
 		config.addDataSourceProperty("user", System.getenv("DB_USER"));
 		config.addDataSourceProperty("databaseName", System.getenv("DB_NAME"));
 		config.addDataSourceProperty("serverName", host);
+		if (System.getenv("DB_PORT") != null) {
+			config.addDataSourceProperty("portNumber", System.getenv("DB_PORT"));
+		}
 		config.addDataSourceProperty("currentSchema", System.getenv("DB_APP_SCHEMA"));
 		config.addDataSourceProperty("prepareThreshold", "1");
 		if (Boolean.valueOf(System.getenv("DB_ENABLE_LOG"))) {

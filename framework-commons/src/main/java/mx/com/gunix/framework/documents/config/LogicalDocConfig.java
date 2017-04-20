@@ -32,8 +32,12 @@ public class LogicalDocConfig {
 			authService.logout(authService.login(System.getenv("LOGICALDOC_USER") == null ? "admin" : System.getenv("LOGICALDOC_USER"), System.getenv("LOGICALDOC_PASSWORD") == null ? "admin" : System.getenv("LOGICALDOC_PASSWORD")));
 		} catch (Fault ignorar) {
 			if (ExceptionUtils.getRootCause(ignorar) instanceof ConnectException) {
+				String installHome = System.getenv("LOGICALDOC_EMBEDDED_HOME");
+				if (installHome == null || "".equals(installHome)) {
+					installHome = ".logicalDocRepo";
+				}
 				// Si la conexión no se pudo establecer entonces iniciamos/instalamos logicaldoc
-				EmbeddedLogicalDocManager.start(System.getProperty("user.home") + File.separator + ".logicalDocRepo", getClass().getClassLoader());
+				EmbeddedLogicalDocManager.start(System.getProperty("user.home") + File.separator + installHome, getClass().getClassLoader());
 			}
 		}
 		return authService;
