@@ -122,7 +122,7 @@ public final class EmbeddedLogicalDocManager {
 		bfWrt.newLine();
 		bfWrt.write("jdbc.password=" + System.getenv("DB_PASSWORD"));
 		bfWrt.newLine();
-		bfWrt.write("jdbc.url=jdbc\\:postgresql\\://localhost/" + System.getenv("DB_NAME") + "?currentSchema\\=logicaldoc");
+		bfWrt.write("jdbc.url=jdbc\\:postgresql\\://localhost:" + puerto + "/" + System.getenv("DB_NAME") + "?currentSchema\\=logicaldoc");
 		bfWrt.newLine();
 		bfWrt.write("jdbc.username=" + System.getenv("DB_USER"));
 		bfWrt.newLine();
