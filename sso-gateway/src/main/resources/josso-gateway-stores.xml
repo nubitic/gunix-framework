@@ -51,6 +51,7 @@
 	            <s:prop key="password">${DB_PASSWORD}</s:prop>
 	            <s:prop key="databaseName">${DB_NAME}</s:prop>
 	            <s:prop key="serverName">${DB_SERVER_NAME}</s:prop>
+	            <s:prop key="portNumber">${DB_PORT}</s:prop>
 	            <s:prop key="currentSchema">SEGURIDAD</s:prop>
 	            <s:prop key="prepareThreshold">1</s:prop>
 	            <s:prop key="preparedStatementCacheQueries">1024</s:prop>
