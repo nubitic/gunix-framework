@@ -767,30 +767,20 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 	private List<Tarea> getTareas(Instancia inst, List<HistoricTaskInstance> hTasks) {
 		Iterator<HistoricTaskInstance> hTasksIt = hTasks.iterator();
 		List<Tarea> tareas = new ArrayList<Tarea>();
-		boolean found = false;
 		HistoricTaskInstance currTask = null;
 		while (hTasksIt.hasNext()) {
 			if ((currTask = hTasksIt.next()).getProcessInstanceId().equals(inst.getId())) {
-				if (!found) {
-					// Solo obtenemos la primer tarea histórica para simplificar la consulta, si se requieren todas se deberá utilizar el método getInstancia por cada instancia de la que se requiera
-					// su detalle
-					Tarea hT = new Tarea();
-					hT.setInicio(currTask.getCreateTime());
-					hT.setTermino(currTask.getEndTime());
-					hT.setNombre(currTask.getName());
-					hT.setUsuario(currTask.getOwner() == null ? currTask.getAssignee() : currTask.getOwner());
-					hT.setInstancia(inst);
-					List<Comment> taskComments = ts.getTaskComments(currTask.getId(), TASK_COMMENT);
-					if (taskComments != null && !taskComments.isEmpty()) {
-						hT.setComentario(taskComments.get(0).getFullMessage());
-					}
-					found = true;
-					tareas.add(hT);
+				Tarea hT = new Tarea();
+				hT.setInicio(currTask.getCreateTime());
+				hT.setTermino(currTask.getEndTime());
+				hT.setNombre(currTask.getName());
+				hT.setUsuario(currTask.getOwner() == null ? currTask.getAssignee() : currTask.getOwner());
+				hT.setInstancia(inst);
+				List<Comment> taskComments = ts.getTaskComments(currTask.getId(), TASK_COMMENT);
+				if (taskComments != null && !taskComments.isEmpty()) {
+					hT.setComentario(taskComments.get(0).getFullMessage());
 				}
-			} else {
-				if (found) {// Ya no hay más tareas para la instancia
-					break;
-				}
+				tareas.add(hT);
 			}
 		}
 		return tareas;
