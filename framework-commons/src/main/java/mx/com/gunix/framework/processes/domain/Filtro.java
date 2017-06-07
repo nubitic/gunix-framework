@@ -2,6 +2,7 @@ package mx.com.gunix.framework.processes.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -53,6 +54,7 @@ public final class Filtro<T extends Serializable> extends Variable<T> {
 	public String toString() {
 		return "Filtro [" + getNombre() + " " + lOp + " " + getValor() + "]";
 	}
+	
 	public static class Builder {
 		List<Filtro<?>> filtros = new ArrayList<Filtro<?>>();
 
@@ -99,7 +101,14 @@ public final class Filtro<T extends Serializable> extends Variable<T> {
 			filtros.add(filtro);
 			return this;
 		}
-		
+		/**
+		 * Establece un filtro para buscar instancias registradas entre la fecha inicial dada y la fecha final, si no se proporciona una fecha final entonces el filtro 
+		 * buscará todas aquellas instancias registradas posteriores a la fecha inicial, por el contrario, si no se establece una fecha inicial entonces el filtro
+		 * buscará todas aquellas instancias registradas hasta la fecha final.
+		 * @param fechaInicial Se ajustan las horas, minutos, segundos y milisegundos a cero
+		 * @param fechaFinal Se ajustan las horas, minutos, segundos y milisegundos a 23, 59, 59 y 9999 respectivamente
+		 * @return El Builder para continuar agregando filtros
+		 */
 		public <S extends Serializable> Builder registradoEntre(Date fechaInicial, Date fechaFinal){
 			if (fechaInicial == null && fechaFinal == null) {
 				throw new IllegalArgumentException("Al menos una de las fechas debe ser diferente a null");
@@ -107,18 +116,25 @@ public final class Filtro<T extends Serializable> extends Variable<T> {
 			
 			Filtro<Date> filtro = new Filtro<Date>();
 			filtro.setNombre(FILTRO_INICIO_BETWEEN);
-			filtro.setValor(fechaInicial);
+			filtro.setValor(ajustaHoraMinutoSegundo(fechaInicial, true));
 			filtro.setlOp(Operador.MAYOR_QUE);
 			filtros.add(filtro);
 			
 			filtro = new Filtro<Date>();
 			filtro.setNombre(FILTRO_INICIO_BETWEEN);
-			filtro.setValor(fechaFinal);
+			filtro.setValor(ajustaHoraMinutoSegundo(fechaFinal, false));
 			filtro.setlOp(Operador.MENOR_QUE);
 			filtros.add(filtro);
 			return this;
 		}
-		
+		/**
+		 * Establece un filtro para buscar instancias finalizadas entre la fecha inicial dada y la fecha final, si no se proporciona una fecha final entonces el filtro 
+		 * buscará todas aquellas instancias finalizadas posteriormente a la fecha inicial, por el contrario, si no se establece una fecha inicial entonces el filtro
+		 * buscará todas aquellas instancias finalizadas hasta la fecha final.
+		 * @param fechaInicial Se ajustan las horas, minutos, segundos y milisegundos a cero
+		 * @param fechaFinal Se ajustan las horas, minutos, segundos y milisegundos a 23, 59, 59 y 9999 respectivamente
+		 * @return El Builder para continuar agregando filtros
+		 */
 		public <S extends Serializable> Builder finalizadoEntre(Date fechaInicial, Date fechaFinal){
 			if (fechaInicial == null && fechaFinal == null) {
 				throw new IllegalArgumentException("Al menos una de las fechas debe ser diferente a null");
@@ -126,16 +142,30 @@ public final class Filtro<T extends Serializable> extends Variable<T> {
 			
 			Filtro<Date> filtro = new Filtro<Date>();
 			filtro.setNombre(FILTRO_FIN_BETWEEN);
-			filtro.setValor(fechaInicial);
+			filtro.setValor(ajustaHoraMinutoSegundo(fechaInicial, true));
 			filtro.setlOp(Operador.MAYOR_QUE);
 			filtros.add(filtro);
 			
 			filtro = new Filtro<Date>();
 			filtro.setNombre(FILTRO_FIN_BETWEEN);
-			filtro.setValor(fechaFinal);
+			filtro.setValor(ajustaHoraMinutoSegundo(fechaFinal, false));
 			filtro.setlOp(Operador.MENOR_QUE);
 			filtros.add(filtro);
 			return this;
+		}
+		
+		private Date ajustaHoraMinutoSegundo(Date date, boolean isACero) {
+			if (date != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(date);
+				cal.set(Calendar.HOUR_OF_DAY, isACero ? 0 : 23);
+				cal.set(Calendar.MINUTE, isACero ? 0 : 59);
+				cal.set(Calendar.SECOND, isACero ? 0 : 59);
+				cal.set(Calendar.MILLISECOND, isACero ? 0 : 9999);
+				return cal.getTime();
+			} else {
+				return null;
+			}
 		}
 
 		public List<Filtro<?>> build() {
