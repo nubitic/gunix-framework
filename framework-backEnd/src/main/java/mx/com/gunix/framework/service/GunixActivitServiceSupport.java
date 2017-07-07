@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
@@ -25,6 +26,7 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.apache.log4j.Level;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -32,6 +34,7 @@ import org.springframework.context.MessageSource;
 import mx.com.gunix.framework.domain.Identificador;
 import mx.com.gunix.framework.persistence.DescriptorCambios;
 import mx.com.gunix.framework.processes.domain.ProgressUpdate;
+import mx.com.gunix.framework.util.GunixLogger;
 import mx.com.gunix.framework.util.Utils;
 
 public abstract class GunixActivitServiceSupport<T extends Serializable> {
@@ -43,6 +46,7 @@ public abstract class GunixActivitServiceSupport<T extends Serializable> {
 	private static final Map<Class<?>, Set<Field>> identificadoresCache = new Hashtable<Class<?>, Set<Field>>();
 	private static final Map<Class<?>, Set<Field>> validCache = new Hashtable<Class<?>, Set<Field>>();
 	private static final Set<Field> EMPTY_FIELD_SET = Collections.unmodifiableSet(new HashSet<Field>());
+	private static GunixLogger log;
 	
 	private static Boolean isGroovyPresent;
 	private static Class<?> groovyMetaClass;
@@ -469,5 +473,12 @@ public abstract class GunixActivitServiceSupport<T extends Serializable> {
 	
 	protected String gMssg(String mKey, String defaultMessage, Object... mArgs) {
 		return Utils.procesaMensaje(ms, getClass(), mKey, defaultMessage, mArgs);
+	}
+	
+	protected void log(Level nivel, Supplier<String> mensajeSupplier, Supplier<Throwable> throwableSupplier) {
+		if (log == null) {
+			log = GunixLogger.getLogger(getClass());
+		}
+		log.log(nivel, mensajeSupplier, throwableSupplier);
 	}
 }

@@ -9,9 +9,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.log4j.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -53,11 +55,13 @@ import mx.com.gunix.framework.ui.vaadin.component.GunixViewErrorHandler;
 import mx.com.gunix.framework.ui.vaadin.component.Header.TareaActualNavigator;
 import mx.com.gunix.framework.util.ActivitiGunixFile;
 import mx.com.gunix.framework.util.GunixFile;
+import mx.com.gunix.framework.util.GunixLogger;
 
 public abstract class AbstractGunixView<S extends Serializable> extends VerticalLayout implements View {
 	private static final ThreadLocal<Map<Notification.Type, Set<String>>> notificacionesMap = new ThreadLocal<Map<Notification.Type, Set<String>>>();
 	private Class<S> clazz;
 	private static final long serialVersionUID = 1L;
+	private static GunixLogger log;
 	
 	TareaActualNavigator taNav;
 	private Tarea tarea;
@@ -389,6 +393,13 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		}
 
 		return gs.get(uri, argsWithPIDDIF);
+	}
+	
+	protected void log(Level nivel, Supplier<String> mensajeSupplier, Supplier<Throwable> throwableSupplier) {
+		if (log == null) {
+			log = GunixLogger.getLogger(getClass());
+		}
+		log.log(nivel, mensajeSupplier, throwableSupplier);
 	}
 	
 	protected void bind(String propertyId, Field<?> field) {

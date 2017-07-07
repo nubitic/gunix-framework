@@ -7,11 +7,13 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.context.MessageSource;
@@ -33,6 +35,7 @@ import mx.com.gunix.framework.processes.domain.Tarea;
 import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.service.GetterService;
 import mx.com.gunix.framework.ui.GunixVariableGetter;
+import mx.com.gunix.framework.util.GunixLogger;
 
 public abstract class AbstractGunixController<S extends Serializable> implements Controller {
 	private static final ThreadLocal<ServletRequestDataBinder> binder = new ThreadLocal<ServletRequestDataBinder>();
@@ -41,6 +44,7 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 	private Map<String, Method> methodMap = new HashMap<String, Method>();
 	private static final Method NOT_FOUND_METHOD = ReflectionUtils.findMethod(AbstractGunixController.class, "notFoundMethod");
 	private Tarea tarea;
+	private static GunixLogger log;
 	@Autowired
 	GunixVariableGetter vg;
 
@@ -167,5 +171,12 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 
 	protected String gMssg(String mKey, String defaultMessage, Object... mArgs) {
 		return mx.com.gunix.framework.util.Utils.procesaMensaje(ms, getClass(), mKey, defaultMessage, mArgs);
+	}
+	
+	protected void log(Level nivel, Supplier<String> mensajeSupplier, Supplier<Throwable> throwableSupplier) {
+		if (log == null) {
+			log = GunixLogger.getLogger(getClass());
+		}
+		log.log(nivel, mensajeSupplier, throwableSupplier);
 	}
 }
