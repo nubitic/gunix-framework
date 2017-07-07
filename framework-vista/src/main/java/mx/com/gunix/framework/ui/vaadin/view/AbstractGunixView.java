@@ -395,10 +395,29 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		return gs.get(uri, argsWithPIDDIF);
 	}
 	
-	protected void log(Level nivel, Supplier<String> mensajeSupplier, Supplier<Throwable> throwableSupplier) {
+	private void aseguraLogInicializado(){
 		if (log == null) {
 			log = GunixLogger.getLogger(getClass());
 		}
+	}
+	
+	protected void logD(Supplier<String> mensajeSupplier) {
+		aseguraLogInicializado();
+		log.log(Level.DEBUG, mensajeSupplier, null);
+	}
+
+	protected void logE(Supplier<Throwable> throwableSupplier) {
+		aseguraLogInicializado();
+		log.log(Level.ERROR, null, throwableSupplier);
+	}
+
+	protected void logE(Supplier<String> mensajeSupplier, Supplier<Throwable> throwableSupplier) {
+		aseguraLogInicializado();
+		log.log(Level.ERROR, mensajeSupplier, throwableSupplier);
+	}
+	
+	protected void log(Level nivel, Supplier<String> mensajeSupplier, Supplier<Throwable> throwableSupplier) {
+		aseguraLogInicializado();
 		log.log(nivel, mensajeSupplier, throwableSupplier);
 	}
 	
