@@ -58,6 +58,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.BoundListOperations;
@@ -84,6 +85,9 @@ import mx.com.gunix.framework.security.domain.Usuario;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class ActivitiServiceImp implements ActivitiService, BusinessProcessManager {
+	
+	
+	
 	@Autowired
 	TaskService ts;
 
@@ -121,6 +125,8 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 
 	private static final String PROCESS_CREATION_COMMENT = "PROCESS_CREATION_COMMENT";
 	private static final String TASK_COMMENT = "TASK_COMMENT";
+	
+	private static final Logger log = Logger.getLogger(ActivitiServiceImp.class) ;
 
 	private final String ID_APLICACION = System.getenv(ID_APLICACION_VAR);
 
@@ -344,8 +350,11 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			
 			gvpm.obtainVolatileProcessDefinitionIds().forEach(processDefinitionId->{
 
-				System.out.println("Id de definición de proceso: " + processDefinitionId);
-				System.out.println("Número de procesos: " + gvpm.obtainProcessInstanceIdsByProcessDefinitionId(processDefinitionId, hace30Minutos).size());
+				if(log.isDebugEnabled()){
+					log.debug("Id de definición de proceso: " + processDefinitionId);
+					log.debug("Número de procesos: " + gvpm.obtainProcessInstanceIdsByProcessDefinitionId(processDefinitionId, hace30Minutos).size());
+				}
+
 				if(gvpm.obtainProcessInstanceIdsByProcessDefinitionId(processDefinitionId,hace30Minutos).size() > 0){
 					gvpm.obtainProcessInstanceIdsByProcessDefinitionId(processDefinitionId,hace30Minutos).forEach(processInstanceId->{
 
@@ -363,13 +372,24 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 						gvpm.deleteFromActHiVarinstByProcessInstanceId(processInstanceId);
 						gvpm.deleteFromActRuExecutionByProcessInstanceId(processInstanceId);
 						gvpm.deleteFromActHiProcInstByProcessInstanceId(processInstanceId);
-						System.out.println("Proceso " + processInstanceId + " eliminado.");
+						if(log.isDebugEnabled()){
+							log.debug("Proceso " + processInstanceId + " eliminado.");
+						}
+						
 					});
 
-					System.out.println("Se han eliminado los procesos volátiles de " + processDefinitionId);
+					if(log.isDebugEnabled()){
+						log.debug("Se han eliminado los procesos volátiles de " + processDefinitionId);
+					}
+					
 				}
 				else{
-					System.out.println("El proceso volátil" + processDefinitionId + " no tiene información :)");
+					if(log.isDebugEnabled()){
+						log.debug("El proceso volátil" + processDefinitionId + " no tiene información :)");
+						
+					}
+					
+					
 				}
 
 
