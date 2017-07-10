@@ -191,16 +191,16 @@ public class GunixMTable<T extends Serializable> extends MTable<T> {
 		this.clazz = clazz;
 	}
 	
-	protected List<T> getBeans() {
+	public List<T> getBeans() {
 		return GunixTableHelper.getBeans(this);
 	}
 
-	protected boolean isValido(T bean) {
+	public boolean isValido(T bean) {
 		assertClazzNotNull();
 		return GunixTableHelper.isValido(this, bean, clazz);
 	}
 
-	protected boolean isValida(boolean vacioEsError) {
+	public boolean isValida(boolean vacioEsError) {
 		assertClazzNotNull();
 		return GunixTableHelper.isValida(this, vacioEsError, clazz);
 	}
