@@ -2,15 +2,14 @@ package mx.com.gunix.framework.ui.vaadin.component;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.beanutils.NestedNullException;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.vaadin.viritin.LazyList.CountProvider;
-import org.vaadin.viritin.LazyList.PagingProvider;
 import org.vaadin.viritin.ListContainer;
-import org.vaadin.viritin.SortableLazyList.SortablePagingProvider;
 import org.vaadin.viritin.fields.MTable;
 
 import com.vaadin.data.Item;
@@ -24,46 +23,36 @@ import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory.FieldBu
 
 public class GunixMTable<T extends Serializable> extends MTable<T> {
 	private static final long serialVersionUID = 1L;
-
-	public GunixMTable() {
-		super();
-		init();
-	}
+	
+	private Class<T> clazz;
 
 	public GunixMTable(Class<T> type) {
 		super(type);
+		clazz = type;
 		init();
 	}
 
 	public GunixMTable(Collection<T> beans) {
 		super(beans);
-		init();
-	}
-
-	public GunixMTable(PagingProvider<T> pageProvider, CountProvider countProvider, int pageSize) {
-		super(pageProvider, countProvider, pageSize);
-		init();
-	}
-
-	public GunixMTable(PagingProvider<T> pageProvider, CountProvider countProvider) {
-		super(pageProvider, countProvider);
-		init();
-	}
-
-	public GunixMTable(SortablePagingProvider<T> pageProvider, CountProvider countProvider, int pageSize) {
-		super(pageProvider, countProvider, pageSize);
-		init();
-	}
-
-	public GunixMTable(SortablePagingProvider<T> pageProvider, CountProvider countProvider) {
-		super(pageProvider, countProvider);
+		initClazzFromCollection(beans);
 		init();
 	}
 
 	@SafeVarargs
 	public GunixMTable(T... beans) {
 		super(beans);
+		initClazzFromCollection(Arrays.asList(beans));
 		init();
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void initClazzFromCollection(Collection<T> beans) {
+		if (beans != null && beans.isEmpty()) {
+			T bean = beans.stream().filter(b -> true).findFirst().orElse(null);
+			if (bean != null) {
+				clazz = (Class<T>) bean.getClass();
+			}
+		}
 	}
 	
 	private void init(){
@@ -196,5 +185,29 @@ public class GunixMTable<T extends Serializable> extends MTable<T> {
 	public void replaceField(Field<?> oldField, Field<?> newField) {
 		((GunixTableFieldFactory) getTableFieldFactory()).replaceField(oldField, newField, this, getContainerDataSource());
 		markAsDirtyRecursive();
+	}
+	
+	public void setClaseBeans(Class<T> clazz) {
+		this.clazz = clazz;
+	}
+	
+	protected List<T> getBeans() {
+		return GunixTableHelper.getBeans(this);
+	}
+
+	protected boolean isValido(T bean) {
+		assertClazzNotNull();
+		return GunixTableHelper.isValido(this, bean, clazz);
+	}
+
+	protected boolean isValida(boolean vacioEsError) {
+		assertClazzNotNull();
+		return GunixTableHelper.isValida(this, vacioEsError, clazz);
+	}
+	
+	private void assertClazzNotNull() {
+		if(clazz == null){
+			throw new IllegalStateException("Se intento validar la tabla sin haber agregado elementos a validar o indicar el tipo (clase) de los elementos a contener en la tabla");
+		}
 	}
 }

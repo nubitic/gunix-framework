@@ -3,7 +3,6 @@ package mx.com.gunix.framework.ui.vaadin.view;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -22,14 +21,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 
-import com.vaadin.data.Container;
-import com.vaadin.data.Property;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.Responsive;
-import com.vaadin.server.UserError;
-import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.FormLayout;
@@ -47,9 +42,7 @@ import mx.com.gunix.framework.service.TokenService;
 import mx.com.gunix.framework.ui.GunixVariableGetter;
 import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup;
 import mx.com.gunix.framework.ui.vaadin.component.GunixBeanFieldGroup.OnBeanValidationErrorCallback;
-import mx.com.gunix.framework.ui.vaadin.component.GunixTableBeanErrorGenerator;
-import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory;
-import mx.com.gunix.framework.ui.vaadin.component.GunixTableFieldFactory.GunixFieldPropertyRel;
+import mx.com.gunix.framework.ui.vaadin.component.GunixTableHelper;
 import mx.com.gunix.framework.ui.vaadin.component.GunixUploadField;
 import mx.com.gunix.framework.ui.vaadin.component.GunixViewErrorHandler;
 import mx.com.gunix.framework.ui.vaadin.component.Header.TareaActualNavigator;
@@ -265,108 +258,20 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		return tarea;
 	}
 	
-	@SuppressWarnings("unchecked")
 	protected List<S> getBeans(Table tabla) {
-		List<S> beans = new ArrayList<S>();
-		if (tabla.getContainerDataSource() == null) {
-			throw new IllegalArgumentException("Se requiere que el ContainerDataSource sea diferente a null");
-		}
-		tabla.getContainerDataSource().getItemIds().forEach(beanId -> {
-			beans.add((S) beanId);
-		});
-		return beans;
-	}
-	
-	protected <R extends Serializable> boolean isValido(Table tabla, R bean, Class<R> clase) {
-		return isValid(tabla, false, bean, clase);
-	}
-	
-	protected boolean isValido(Table tabla, S bean) {
-		return isValid(tabla, false, bean, clazz);
-	}
-	
-	@SuppressWarnings("unchecked")
-	private <R extends Serializable> boolean isValid(Table tabla, boolean vacioEsError, R bean, Class<R> clase){
-		Map<String, Boolean> hayErroresHolder = new HashMap<String, Boolean>();
-		hayErroresHolder.put("hayErrores", false);
-		Container container = tabla.getContainerDataSource();
-		if (bean == null && vacioEsError && container.size() == 0) {
-			hayErroresHolder.put("hayErrores", true);
-			tabla.setComponentError(new UserError("La tabla debe contener al menos un registro"));
-		}
-		if (bean != null && !container.getItemIds().contains(bean)) {
-			throw new IllegalArgumentException("El bean especificado no se encuentra en la tabla");
-		}
-		tabla.setComponentError(null);
-		GunixTableBeanErrorGenerator<R> bErrGen = initTableBeanErrorGenerator(tabla);
-		bErrGen.clearBeanErrors();
-		Map<Field<?>, Property<?>> prevPropDS = new HashMap<Field<?>, Property<?>>();
-		GunixBeanFieldGroup<R> bfgf = new GunixBeanFieldGroup<R>(clase);
-		GunixTableFieldFactory grff = (GunixTableFieldFactory) tabla.getTableFieldFactory();
-		if (bean == null) {
-			container.getItemIds().forEach(beanId -> {
-				validaBean(bfgf, (R) beanId, grff, tabla, container, prevPropDS, hayErroresHolder);
-			});
-		} else {
-			validaBean(bfgf, bean, grff, tabla, container, prevPropDS, hayErroresHolder);
-		}
-		if (hayErroresHolder.get("hayErrores") && tabla.getComponentError() == null) {
-			tabla.setComponentError(new UserError("La tabla tiene errores"));
-		}
-		tabla.markAsDirtyRecursive();
-		return !hayErroresHolder.get("hayErrores");
-	}
-	
-	private <R extends Serializable> void validaBean(GunixBeanFieldGroup<R> bfgf, R beanId, GunixTableFieldFactory grff, Table tabla, Container container, Map<Field<?>, Property<?>> prevPropDS, Map<String, Boolean> hayErroresHolder) {
-		bfgf.setItemDataSource(beanId);
-		GunixTableBeanErrorGenerator<R> bErrGen = initTableBeanErrorGenerator(tabla);
-		List<GunixFieldPropertyRel> fieldProps = grff.getFieldsBy(tabla, container, beanId);
-		fieldProps.forEach(fieldProp -> {
-			if (!(GunixViewErrorHandler.getCurrent().isInvalidValueComponent(fieldProp.getField()))) {
-				prevPropDS.put(fieldProp.getField(), fieldProp.getField().getPropertyDataSource());
-				((AbstractComponent) fieldProp.getField()).setComponentError(null);
-				bfgf.bind(fieldProp.getField(), fieldProp.getPropertyId());
-			} else {
-				hayErroresHolder.put("hayErrores", true);
-			}
-		});
-		try {
-			bfgf.commit(ibve -> {
-				bErrGen.addBeanError((R) ibve.getRootBean(), ibve.getMessage());
-			});
-		} catch (CommitException e) {
-			hayErroresHolder.put("hayErrores", true);
-			for (Field<?> f : e.getInvalidFields().keySet()) {
-				((AbstractComponent) f).setComponentError(new UserError(e.getInvalidFields().get(f).getCauses()[0].getMessage()));
-			}
-		} finally {
-			for (Field<?> f : prevPropDS.keySet()) {
-				bfgf.unbind(f);
-				f.setPropertyDataSource(prevPropDS.get(f));
-				f.setBuffered(false);
-				f.setInvalidAllowed(false);
-			}
-			prevPropDS.clear();
-		}
+		return GunixTableHelper.getBeans(tabla);
 	}
 
-	@SuppressWarnings("unchecked")
-	private <R extends Serializable> GunixTableBeanErrorGenerator<R> initTableBeanErrorGenerator(Table tabla) {
-		GunixTableBeanErrorGenerator<R> gtbeg = null;
-		if (tabla.getItemDescriptionGenerator() == null && tabla.getCellStyleGenerator() == null) {
-			gtbeg = new GunixTableBeanErrorGenerator<R>();
-			tabla.setItemDescriptionGenerator(gtbeg);
-			tabla.setCellStyleGenerator(gtbeg);
-		} else {
-			if (tabla.getItemDescriptionGenerator() instanceof GunixTableBeanErrorGenerator) {
-				gtbeg = (GunixTableBeanErrorGenerator<R>) tabla.getItemDescriptionGenerator();
-			}
-		}
-		return gtbeg;
+	protected <R extends Serializable> boolean isValido(Table tabla, R bean, Class<R> clase) {
+		return GunixTableHelper.isValido(tabla, bean, clase);
+	}
+
+	protected boolean isValido(Table tabla, S bean) {
+		return GunixTableHelper.isValido(tabla, bean, clazz);
 	}
 
 	protected boolean isValida(Table tabla, boolean vacioEsError) {
-		return isValid(tabla, vacioEsError, null, clazz);
+		return GunixTableHelper.isValida(tabla, vacioEsError, clazz);
 	}
 	
 	protected Variable<ActivitiGunixFile> buildGunixFileVariable(String nombreVariable, GunixUploadField uploadField) {
