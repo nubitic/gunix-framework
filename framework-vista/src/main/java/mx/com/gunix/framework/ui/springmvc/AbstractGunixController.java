@@ -36,6 +36,7 @@ import mx.com.gunix.framework.processes.domain.Variable;
 import mx.com.gunix.framework.service.GetterService;
 import mx.com.gunix.framework.ui.GunixVariableGetter;
 import mx.com.gunix.framework.util.GunixLogger;
+import mx.com.gunix.framework.util.SystemConfigurationParameter;
 
 public abstract class AbstractGunixController<S extends Serializable> implements Controller {
 	private static final ThreadLocal<ServletRequestDataBinder> binder = new ThreadLocal<ServletRequestDataBinder>();
@@ -197,5 +198,13 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 	protected void log(Level nivel, Supplier<String> mensajeSupplier, Supplier<Throwable> throwableSupplier) {
 		aseguraLogInicializado();
 		log.log(nivel, mensajeSupplier, throwableSupplier);
+	}
+	
+	protected SystemConfigurationParameter getParametro(String llave){
+		return (SystemConfigurationParameter)gs.get("systemConfigParameterService/getParameterByKey", llave);
+	}
+	
+	protected List<SystemConfigurationParameter> getAllParametros(){
+		return (List<SystemConfigurationParameter>)gs.get("systemConfigParameterService/getAllParameters");
 	}
 }

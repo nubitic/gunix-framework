@@ -35,6 +35,7 @@ import mx.com.gunix.framework.domain.Identificador;
 import mx.com.gunix.framework.persistence.DescriptorCambios;
 import mx.com.gunix.framework.processes.domain.ProgressUpdate;
 import mx.com.gunix.framework.util.GunixLogger;
+import mx.com.gunix.framework.util.SystemConfigurationParameter;
 import mx.com.gunix.framework.util.Utils;
 
 public abstract class GunixActivitServiceSupport<T extends Serializable> {
@@ -59,6 +60,10 @@ public abstract class GunixActivitServiceSupport<T extends Serializable> {
 	
 	@Autowired
 	MessageSource ms;
+	
+	
+	@Autowired
+	SystemConfigParameterService scps;
 
 	protected final void actualizaVariable(Object var) {
 		ExecutionEntity ee = Context.getExecutionContext().getExecution();
@@ -500,4 +505,13 @@ public abstract class GunixActivitServiceSupport<T extends Serializable> {
 		aseguraLogInicializado();
 		log.log(nivel, mensajeSupplier, throwableSupplier);
 	}
+	
+	protected SystemConfigurationParameter getParametro(String clave){
+		return scps.getParameterByKey(clave);
+	}
+	
+	protected List<SystemConfigurationParameter> getAllParametros(){
+		return scps.getAllParameters();
+	}
+	
 }

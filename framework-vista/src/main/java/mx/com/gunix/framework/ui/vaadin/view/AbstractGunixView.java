@@ -49,6 +49,7 @@ import mx.com.gunix.framework.ui.vaadin.component.Header.TareaActualNavigator;
 import mx.com.gunix.framework.util.ActivitiGunixFile;
 import mx.com.gunix.framework.util.GunixFile;
 import mx.com.gunix.framework.util.GunixLogger;
+import mx.com.gunix.framework.util.SystemConfigurationParameter;
 
 public abstract class AbstractGunixView<S extends Serializable> extends VerticalLayout implements View {
 	private static final ThreadLocal<Map<Notification.Type, Set<String>>> notificacionesMap = new ThreadLocal<Map<Notification.Type, Set<String>>>();
@@ -348,6 +349,14 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 	
 	protected String gMssg(String mKey, String defaultMessage, Object... mArgs) {
 		return mx.com.gunix.framework.util.Utils.procesaMensaje(ms, getClass(), mKey, defaultMessage, mArgs);
+	}
+	
+	protected SystemConfigurationParameter getParametro(String llave){
+		return (SystemConfigurationParameter)gs.get("systemConfigParameterService/getParameterByKey", llave);
+	}
+	
+	protected List<SystemConfigurationParameter> getAllParametros(){
+		return (List<SystemConfigurationParameter>)gs.get("systemConfigParameterService/getAllParameters");
 	}
 
 	protected abstract void doEnter(ViewChangeEvent event);

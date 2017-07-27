@@ -131,6 +131,7 @@ public final class EmbeddedPostgreSQLManager {
 			Resource[] appScriptsResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/domain/persistence/scripts/**/*.sql");
 			Resource[] appZippedScriptsResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/domain/persistence/scripts/**/*.zip");
 			Resource[] unifiedScriptResources = new Resource[(appScriptsResources != null ? appScriptsResources.length : 0) + (appZippedScriptsResources != null ? appZippedScriptsResources.length : 0)];
+			
 			if (appScriptsResources != null) {
 				System.arraycopy(appScriptsResources, 0, unifiedScriptResources, 0, appScriptsResources.length);
 			}
@@ -209,6 +210,8 @@ public final class EmbeddedPostgreSQLManager {
 		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/01_SEGURIDAD_ACL_ROL_FUNCION.sql"), pgsqlHomeFile, usuario, database, puerto, log);
 		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/02_ACTIVITI.sql"), pgsqlHomeFile, usuario, database, puerto, log);
 		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/03_ADMON_SEG.sql"), pgsqlHomeFile, usuario, database, puerto, log);
+		EmbeddedServerUtils.ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/04_JOB_TOKENIZER.sql"), pgsqlHomeFile, usuario, database, puerto, log);
+
 	}
 
 	private static void initServer(File pgsqlHomeFile, String usuario, String password, String database, String dataDir, String esMXLocale) {
