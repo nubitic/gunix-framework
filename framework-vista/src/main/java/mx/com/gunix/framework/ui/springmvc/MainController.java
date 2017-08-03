@@ -182,7 +182,9 @@ public class MainController {
 				break;
 			} else {
 				if (f.getHijas() != null) {
-					funcion = seekFuncion(f.getHijas(), idHija);
+					if ((funcion = seekFuncion(f.getHijas(), idHija)) != null) {
+						break;
+					}
 				}
 			}
 		}
