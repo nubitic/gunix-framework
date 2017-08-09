@@ -171,4 +171,19 @@ public class GunixUploadField extends UploadField {
 		sb.append("</em>");
 		return sb.toString();
 	}
+
+	@Override
+	public void setEnabled(boolean enabled) {
+		try {
+			Upload currUpload = (Upload) uploadField.get(this);
+			if (currUpload != null) {
+				currUpload.setEnabled(enabled);
+				markAsDirtyRecursive();
+				super.setEnabled(enabled);
+			}
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 }
