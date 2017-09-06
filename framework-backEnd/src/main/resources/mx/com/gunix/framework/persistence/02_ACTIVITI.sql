@@ -503,3 +503,5 @@ create index ACT_IDX_HI_IDENT_LNK_TASK on ACT_HI_IDENTITYLINK(TASK_ID_);
 create index ACT_IDX_HI_IDENT_LNK_PROCINST on ACT_HI_IDENTITYLINK(PROC_INST_ID_);
 create index ACT_IDX_HI_TASK_INST_PROCINST on ACT_HI_TASKINST(PROC_INST_ID_);
 
+create index busca_var_act_gunix_idx on act_hi_varinst(task_id_, execution_id_, name_, rev_) where TASK_ID_ is null and var_type_='gunix-serializable';
+create index busca_var_act_gunix_idx2 on act_hi_varinst(task_id_, execution_id_, name_, rev_) where TASK_ID_ is null and var_type_ in ('string','long','double','date','serializable','longString','boolean','integer');
