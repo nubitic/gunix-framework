@@ -9,16 +9,48 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.log4j.Logger;
 
 public final class EmbeddedServerUtils {
+	private static Logger log = Logger.getLogger(EmbeddedServerUtils.class);
+	
+	static {
+
+		try {
+			SSLContext sc = SSLContext.getInstance("TLS");
+			sc.init(null, new TrustManager[] { 
+												new X509TrustManager() {
+													public X509Certificate[] getAcceptedIssuers() {
+														return null;
+													}
+							
+													public void checkClientTrusted(X509Certificate[] certs, String authType) {
+													}
+							
+													public void checkServerTrusted(X509Certificate[] certs, String authType) {
+													}
+												}
+											}
+			, new SecureRandom());
+			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+		} catch (Exception e) {
+			log.error("No se pudo inicializar el protocolo https para descargar archivos desde cualquier servidor HTTPS...", e);
+		}
+	}
 
 	public static void log(Logger log, Process process, String controlString) throws IOException, InterruptedException {
 		Boolean hasControlString = controlString != null && !"".equals(controlString);
