@@ -163,7 +163,7 @@ public abstract class AbstractGunixController<S extends Serializable> implements
 			argsWithPIDDIF[1] = tarea == null ? vg.getInstancia().getId() : tarea.getInstancia().getId();
 			argsWithPIDDIF[2] = tarea == null ? vg.getInstancia().getProcessDefinitionId() : tarea.getInstancia().getProcessDefinitionId();
 		}
-		return gs.get(uri, args);
+		return gs.get(uri, argsWithPIDDIF);
 	}
 	
 	@SuppressWarnings("unused")
