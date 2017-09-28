@@ -168,12 +168,17 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 
 	@Override
 	public void setItemDataSource(BT bean) {
+		doSetItemDataSource(bean, false);
+	}
+	
+	private void doSetItemDataSource(BT bean, boolean bindTopLevelPropsOnly) {
 		if (bean == null) {
 			setItemDataSource((Item) null);
 		} else {
-			setItemDataSource(new NestingBeanItem<BT>(bean, beanType));
+			setItemDataSource(new NestingBeanItem<BT>(bean, beanType, bindTopLevelPropsOnly));
 		}
 	}
+	
 	public boolean isRequiredEnabled() {
 		return requiredEnabled;
 	}
@@ -214,5 +219,8 @@ public class GunixBeanFieldGroup<BT> extends BeanFieldGroup<BT> {
 				}
 			}
 		}
+	}
+	public void setItemDataSource(BT bean, boolean bindTopLevelPropsOnly) {
+		doSetItemDataSource(bean, bindTopLevelPropsOnly);
 	}
 }

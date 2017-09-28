@@ -158,7 +158,11 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 					clazz = ((Class<S>) typeArguments[0]);
 					fieldGroup = new GunixBeanFieldGroup<S>(clazz);
 					try {
-						fieldGroup.setItemDataSource(clazz.newInstance());
+						if(!bindTopLevelPropsOnly()) {
+							fieldGroup.setItemDataSource(clazz.newInstance());	
+						} else {
+							fieldGroup.setItemDataSource(clazz.newInstance(), true);	
+						}
 					} catch (InstantiationException | IllegalAccessException e) {
 						throw new IllegalArgumentException("No fue posible inicializar el ItemDataSource para el fieldGroup con una nueva instancia de " + clazz.getName(), e);
 					}	
@@ -355,8 +359,27 @@ public abstract class AbstractGunixView<S extends Serializable> extends Vertical
 		return (SystemConfigurationParameter)gs.get("systemConfigParameterService/getParameterByKey", llave);
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected List<SystemConfigurationParameter> getAllParametros(){
 		return (List<SystemConfigurationParameter>)gs.get("systemConfigParameterService/getAllParameters");
+	}
+	
+	/** Si se desea que solo se indicen las propiedades del Bean 'S' que se encuentren en el primer nivel (i.e. no 'desmenuzar' las propiedades) entonces se puede sobrecargar éste método 
+	 *  para regresar true en vez de false.
+	 *  <pre>
+	 *  Ex.
+	 *  
+	 *  Con false:
+	 *  
+	 *  se indizarían todas las subpropiedades del Bean S: prop1.subprop1.subpropA, prop1.subprop1.subpropB 
+	 *  
+	 *  Con true:
+	 *  
+	 *  se indizarían solo las propiedades de primer nivel del Bean S: prop1
+	 *  </pre>
+	 *  */
+	protected boolean bindTopLevelPropsOnly() {
+		return false;
 	}
 
 	protected abstract void doEnter(ViewChangeEvent event);

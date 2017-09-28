@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.BeanUtils;
-import org.vaadin.easyuploads.UploadField;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ReadOnlyException;
@@ -35,9 +34,11 @@ public class NestingBeanItem<BT> extends BeanItem<BT> {
 		}
 	}
 	
-	public NestingBeanItem(final BT nestedObject, Class<BT> beanClass) {
+	public NestingBeanItem(final BT nestedObject, Class<BT> beanClass, boolean bindTopLevelPropsOnly) {
 		super(nestedObject, beanClass);
-		exploreProperties(getItemPropertyIds());
+		if (!bindTopLevelPropsOnly) {
+			exploreProperties(getItemPropertyIds());
+		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
