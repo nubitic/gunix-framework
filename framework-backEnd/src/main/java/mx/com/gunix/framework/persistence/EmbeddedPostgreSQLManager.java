@@ -130,7 +130,8 @@ public final class EmbeddedPostgreSQLManager {
 		try {			
 			Resource[] appScriptsResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/domain/persistence/scripts/**/*.sql");
 			Resource[] appZippedScriptsResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/domain/persistence/scripts/**/*.zip");
-			Resource[] unifiedScriptResources = new Resource[(appScriptsResources != null ? appScriptsResources.length : 0) + (appZippedScriptsResources != null ? appZippedScriptsResources.length : 0)];
+			Resource[] unifiedScriptResources = new Resource[(appScriptsResources != null ? appScriptsResources.length : 0) + 
+			                                                 (appZippedScriptsResources != null ? appZippedScriptsResources.length : 0)];
 			
 			if (appScriptsResources != null) {
 				System.arraycopy(appScriptsResources, 0, unifiedScriptResources, 0, appScriptsResources.length);
@@ -138,10 +139,18 @@ public final class EmbeddedPostgreSQLManager {
 			if (appZippedScriptsResources != null) {
 				System.arraycopy(appZippedScriptsResources, 0, unifiedScriptResources, (appScriptsResources != null ? appScriptsResources.length : 0), appZippedScriptsResources.length);
 			}
+
+			
 			appScriptsResources = unifiedScriptResources;
 			if (appScriptsResources != null) {
-				List<Resource> appScriptsResourcesList = Arrays.asList(appScriptsResources);				
+				List<Resource> appScriptsResourcesList = new ArrayList<Resource>(Arrays.asList(appScriptsResources));
 				Collections.sort(appScriptsResourcesList, Comparator.comparing(Resource::getFilename));
+				
+				//Los scripts para las funciones se agregan al final para que siempre se ejecuten al último, planchanco cualquier versión definida previamente en los SQLs normales.
+				Resource[] appFunctionScriptsResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/domain/persistence/db_functions/**/*.sql");
+				if (appFunctionScriptsResources != null) {
+					appScriptsResourcesList.addAll(Arrays.asList(appFunctionScriptsResources));
+				}
 				
 				List<Resource> currentAppScriptsResourcesList = new ArrayList<Resource>();
 				String appSchemaName = System.getenv("DB_APP_SCHEMA").toUpperCase();
@@ -158,14 +167,19 @@ public final class EmbeddedPostgreSQLManager {
 						while (appScriptIt.hasNext()) {
 							boolean found = false;
 							Resource currRes = appScriptIt.next();
+
 							String possiblyExecutedScript = appSchemaName + "_" + currRes.getFilename() + ".log";
 							for (File executedScript : executedScripts) {
 								if (possiblyExecutedScript.equals(executedScript.getName())) {
-									found = true;
+									if (!(currRes.getURL().getPath().contains("db_functions") && currRes.getFilename().startsWith("FUN_"))) {
+										found = true;
+									} else {
+										executedScript.delete();
+									}
 									break;
 								}
 							}
-							if(!found){
+							if (!found) {
 								currentAppScriptsResourcesList.add(currRes);
 							}
 						}
@@ -174,7 +188,7 @@ public final class EmbeddedPostgreSQLManager {
 				
 				for (Resource appScriptResource : currentAppScriptsResourcesList) {
 					log.info("<<<<<<<<<<<<<<<<<<< "+ appScriptResource.getFilename() +" >>>>>>>>>>>>>>>>>>>");
-					BufferedWriter writer = new BufferedWriter(new FileWriter(new File(prevExecutedScripts, appSchemaName + "_" + appScriptResource.getFilename() + ".log")));
+					BufferedWriter writer = new BufferedWriter(new FileWriter(new File(prevExecutedScripts, appSchemaName + "_" + appScriptResource.getFilename() + ".log"), false));
 					if (appScriptResource.getFilename().toLowerCase().endsWith(".zip")) {
 						ZipEntryWorker.withAllZipEntries(appScriptResource.getInputStream(), (sqlFileName, sqlIs)->{
 							ejecutaScript(sqlIs, pgsqlHomeFile, usuario, database, puerto, appScriptResource.getFilename(), writer);
