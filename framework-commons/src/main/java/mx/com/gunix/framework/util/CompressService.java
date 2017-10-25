@@ -1,4 +1,4 @@
-package mx.com.gunix.framework.service;
+package mx.com.gunix.framework.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,11 +8,10 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.springframework.stereotype.Service;
 import org.tukaani.xz.LZMA2Options;
 import org.tukaani.xz.XZOutputStream;
 
-@Service
+
 public class CompressService {
 	
 	
@@ -21,13 +20,13 @@ public class CompressService {
 	
 	
 	
-	public File compress(File fileToCompress, CompressionType ct) throws IOException {
+	public static File  compress(File fileToCompress, CompressionType ct) throws IOException {
 		InputStream is = new FileInputStream(fileToCompress);
 		return compress(fileToCompress.getName(), is ,ct);
 	}
 	
 	
-	public File compress(String fileToCompress, InputStream is, CompressionType ct) throws IOException {
+	public static  File compress(String fileToCompress, InputStream is, CompressionType ct) throws IOException {
 		File fileCompressed = null;
 		
 		
@@ -56,7 +55,8 @@ public class CompressService {
 	 * @param	file	Objeto file que hace referencia al archivo que se comprimirá
 	 * @return	File	Objecto file que hace referencia al archivo xz 
 	 * */
-	public File compressToXZ(File file) throws IOException{
+	@SuppressWarnings("unused")
+	private  static  File compressToXZ(File file) throws IOException{
 		InputStream inputStream = new FileInputStream(file);
 		return compressToXZ(inputStream);			
 	}
@@ -70,7 +70,7 @@ public class CompressService {
 	 * @return	File		Objecto file que hace referencia al archivo xz
 	 * @throws IOException 
 	 * */
-	public File compressToXZ(InputStream inputStream) throws IOException{
+	private static  File compressToXZ(InputStream inputStream) throws IOException{
 		
 
 		XZOutputStream xzout = null;
@@ -105,7 +105,7 @@ public class CompressService {
 	
 	}
 	
-	public File compressToZip(String fileName, InputStream inputStream) throws IOException {
+	private static File compressToZip(String fileName, InputStream inputStream) throws IOException {
 		
 		File fileOutput = null;
 		ZipOutputStream zos = null;
