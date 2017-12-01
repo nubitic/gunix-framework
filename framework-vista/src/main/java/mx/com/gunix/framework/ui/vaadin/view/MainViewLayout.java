@@ -303,11 +303,11 @@ public class MainViewLayout extends VerticalLayout{
 				Header h = applicationContext.getBean(Header.class);
 				Aplicacion app = apps.get(0);
 				h.renderHeader(app);
+				h.setId("gx_"+app.getIdAplicacion()+"_header");
 				addComponent(h);
-				UI.getCurrent().setNavigator(h.getNavigator());
 				setExpandRatio(h, 1.0f);
 				setSpacing(true);
-				updateAppInfo(h, appInfo);
+				doAppTabChange(h, appInfo);
 			}
 		}
 	}
