@@ -12,6 +12,7 @@
 		<dozer.version>5.5.1</dozer.version>
 		<logicaldoc.version>7.4.2</logicaldoc.version>
 		<cxf.version>2.7.11</cxf.version>
+		<stagemonitor.version>0.85.0</stagemonitor.version>
 	</properties>
 	<artifactId>framework-commons</artifactId>
 	<repositories>
@@ -119,7 +120,7 @@
 		<dependency>
 			<groupId>net.bytebuddy</groupId>
 			<artifactId>byte-buddy</artifactId>
-			<version>1.1.0</version>
+			<version>1.7.9</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -347,6 +348,16 @@
 		    <artifactId>xz</artifactId>
 		    <version>1.6</version>
 		</dependency>
+		<dependency>
+	      <groupId>org.stagemonitor</groupId>
+	      <artifactId>stagemonitor-web-servlet</artifactId>
+	      <version>${stagemonitor.version}</version>
+    	</dependency>
+    	 <dependency>
+		      <groupId>org.stagemonitor</groupId>
+		      <artifactId>stagemonitor-tracing-elasticsearch</artifactId>
+		      <version>${stagemonitor.version}</version>
+    	 </dependency>    	
 	</dependencies>
 	<distributionManagement>
 		<repository>
