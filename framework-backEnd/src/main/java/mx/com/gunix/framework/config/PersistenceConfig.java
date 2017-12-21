@@ -63,6 +63,7 @@ public class PersistenceConfig {
 		config.addDataSourceProperty("user", System.getenv("DB_USER"));
 		config.addDataSourceProperty("databaseName", System.getenv("DB_NAME"));
 		config.addDataSourceProperty("serverName", host);
+		config.addDataSourceProperty("ApplicationName", System.getenv("DB_USER").toUpperCase());
 		if (System.getenv("DB_PORT") != null) {
 			config.addDataSourceProperty("portNumber", System.getenv("DB_PORT"));
 		}

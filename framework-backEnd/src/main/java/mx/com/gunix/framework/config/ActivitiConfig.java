@@ -395,6 +395,7 @@ public class ActivitiConfig {
 			try {
 				taskExecutor.execute(new ExecuteAsyncSecuredRunnable(job, commandExecutor, rs, repos));
 			} catch (RejectedExecutionException e) {
+				log.error("Failed to execute rejected job " + job.getId(), e);
 				rejectedJobsHandler.jobRejected(this, job);
 				return false;
 			}

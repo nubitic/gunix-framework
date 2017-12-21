@@ -297,7 +297,7 @@ public final class EmbeddedPostgreSQLManager {
 			cmd.add("-c");
 			cmd.add("log_directory=pg_log");
 			cmd.add("-c");
-			cmd.add("log_filename=postgresql-%a.log");
+			cmd.add("log_filename=postgresql.log");
 			cmd.add("-c");
 			cmd.add("log_truncate_on_rotation=on");
 			cmd.add("-c");
@@ -306,6 +306,8 @@ public final class EmbeddedPostgreSQLManager {
 			cmd.add("log_rotation_size=0");
 			cmd.add("-c");
 			cmd.add("log_min_duration_statement=3000");
+			cmd.add("-c");
+			cmd.add("log_line_prefix=[%t][%a-%i|%p:%l]");
 
 			ProcessBuilder processBuilder = new ProcessBuilder(cmd);
 			processBuilder.redirectErrorStream(true);

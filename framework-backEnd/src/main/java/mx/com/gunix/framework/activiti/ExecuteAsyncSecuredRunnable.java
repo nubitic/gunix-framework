@@ -5,6 +5,8 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.impl.asyncexecutor.ExecuteAsyncRunnable;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +18,7 @@ import mx.com.gunix.framework.service.ActivitiService;
 import mx.com.gunix.framework.service.ActivitiServiceImp;
 
 public class ExecuteAsyncSecuredRunnable extends ExecuteAsyncRunnable {
+	private static Logger log = LoggerFactory.getLogger(ExecuteAsyncSecuredRunnable.class);
 	private RuntimeService rs;
 	private RepositoryService repos;
 
@@ -42,7 +45,11 @@ public class ExecuteAsyncSecuredRunnable extends ExecuteAsyncRunnable {
 			instancia.setVolatil(ActivitiService.VOLATIL.equals(repos.getProcessDefinition(job.getProcessDefinitionId()).getCategory()));
 			GunixObjectVariableType.setCurrentInstancia(instancia);
 			super.run();
-		} finally {
+		} catch(Exception e) {
+			log.error("Failed to execute job " + job.getId(), e);
+			throw new RuntimeException(e);
+		}
+		finally {
 			SecurityContextHolder.clearContext();
 			GunixObjectVariableType.removeCurrentInstancia();
 		}
