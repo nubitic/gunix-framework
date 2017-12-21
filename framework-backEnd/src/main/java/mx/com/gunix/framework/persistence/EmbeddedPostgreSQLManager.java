@@ -291,6 +291,11 @@ public final class EmbeddedPostgreSQLManager {
 			cmd.add(puerto);
 			
 			cmd.add("-c");
+			cmd.add("checkpoint_segments=2025");
+			cmd.add("-c");
+			cmd.add("checkpoint_timeout=600");
+			
+			cmd.add("-c");
 			cmd.add("log_destination=stderr");
 			cmd.add("-c");
 			cmd.add("logging_collector=on");
