@@ -70,7 +70,7 @@ public class PersistenceConfig {
 		config.addDataSourceProperty("currentSchema", System.getenv("DB_APP_SCHEMA"));
 		config.addDataSourceProperty("prepareThreshold", "1");
 		if (Boolean.valueOf(System.getenv("DB_ENABLE_LOG"))) {
-			config.addDataSourceProperty("loglevel", org.postgresql.Driver.INFO);
+			config.addDataSourceProperty("loglevel", org.postgresql.Driver.DEBUG);
 		}
 		config.addDataSourceProperty("preparedStatementCacheQueries", "1024");
 		config.addDataSourceProperty("preparedStatementCacheSizeMiB", "20");

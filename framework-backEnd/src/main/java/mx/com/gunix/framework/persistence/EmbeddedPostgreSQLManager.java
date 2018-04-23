@@ -306,11 +306,13 @@ public final class EmbeddedPostgreSQLManager {
 			cmd.add("-c");
 			cmd.add("log_truncate_on_rotation=on");
 			cmd.add("-c");
-			cmd.add("log_rotation_age=1d");
+			cmd.add("log_rotation_age=1440"); //24 Hrs
 			cmd.add("-c");
-			cmd.add("log_rotation_size=0");
+			cmd.add("log_rotation_size=10240"); //10 MB
 			cmd.add("-c");
 			cmd.add("log_min_duration_statement=3000");
+			cmd.add("-c");
+			cmd.add("log_min_messages=NOTICE");
 			cmd.add("-c");
 			cmd.add("log_line_prefix=[%t][%a-%i|%p:%l]");
 
