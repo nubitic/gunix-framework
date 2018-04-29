@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.server.UserError;
 import com.vaadin.ui.AbstractComponent;
@@ -86,7 +87,18 @@ public abstract class GunixTableHelper {
 		} catch (CommitException e) {
 			hayErroresHolder.put("hayErrores", true);
 			for (Field<?> f : e.getInvalidFields().keySet()) {
-				((AbstractComponent) f).setComponentError(new UserError(e.getInvalidFields().get(f).getCauses()[0].getMessage()));
+				Throwable causa = null;
+				InvalidValueException[] causasField = e.getInvalidFields().get(f).getCauses();
+				if (causasField != null && causasField.length > 0) {
+					causa = causasField[0];
+				} else {
+					if (e.getCause() != null) {
+						causa = e.getCause();
+					} else {
+						causa = new Throwable("Error en el field " + f.getCaption() + ":" + e.getMessage());
+					}
+				}
+				((AbstractComponent) f).setComponentError(new UserError(causa.getMessage()));
 			}
 		} finally {
 			for (Field<?> f : prevPropDS.keySet()) {
