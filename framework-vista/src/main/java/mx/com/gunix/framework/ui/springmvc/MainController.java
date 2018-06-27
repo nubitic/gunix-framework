@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -63,8 +64,15 @@ public class MainController {
 
 	@RequestMapping(value = "/startProcess", method = RequestMethod.GET)
 	public String main(Model uiModel, HttpServletRequest request) throws BeansException, ClassNotFoundException {
-		Funcion funcion = determinaFuncion(request);
-		Instancia instancia = as.iniciaProceso(funcion.getProcessKey(), Variable.fromParametros(funcion.getParametros()), "");
+		Instancia instancia = null;
+		
+		if (Funcion.ViewEngine.SPRINGMVC.name().equals(System.getenv("VIEW_ENGINE"))) {
+			instancia = as.iniciaProceso("index", new ArrayList<Variable<?>>(), "");
+		} else {
+			Funcion funcion = determinaFuncion(request);
+			instancia = as.iniciaProceso(funcion.getProcessKey(), Variable.fromParametros(funcion.getParametros()), "");
+		}
+		
 		doControl(request, instancia, uiModel, false, false);
 		return "index";
 	}

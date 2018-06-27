@@ -103,7 +103,7 @@ function onCompleteTask(idAplicacion, preCompleteTask, boton) {
 			return false;
 		}
 	}
-	jQuery.ajax(
+	$.ajax(
 			getAjaxOptions(showFragment + "content&idAplicacion=" + idAplicacion + "&isCompleteTask=true", $("#gunixMainForm").serialize()))
 				.done(
 				function(newContent) {

@@ -6,7 +6,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.MethodParameter;
 import org.springframework.js.ajax.AjaxUrlBasedViewResolver;
 import org.springframework.ui.context.ThemeSource;
@@ -102,7 +101,7 @@ public class SpringMVCConfig extends WebMvcConfigurerAdapter {
 	@Bean
 	public TilesConfigurer tilesConfigurer() {
 		TilesConfigurer tc = new TilesConfigurer();
-		tc.setDefinitions("/WEB-INF/mx/com/gunix/ui/springmvc/framework/tiles-defs.xml");
+		tc.setDefinitions("/WEB-INF/mx/com/gunix/ui/springmvc/framework/tiles-defs.xml");	
 		return tc;
 	}
 	

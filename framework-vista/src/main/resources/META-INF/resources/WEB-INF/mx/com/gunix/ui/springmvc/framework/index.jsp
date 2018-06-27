@@ -23,6 +23,7 @@
 			var showFragment= "ajaxFragment?fragments=";
 		</script>
 		<script src="${gunix_js_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
+		<tiles:insertAttribute name="headerExtras" ignore="true" />
 	</head>
 	<body>
 		<div id="content">
