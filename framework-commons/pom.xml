@@ -11,8 +11,8 @@
 		<super-csv.version>2.4.0</super-csv.version>
 		<dozer.version>5.5.1</dozer.version>
 		<logicaldoc.version>7.4.2</logicaldoc.version>
-		<cxf.version>2.7.11</cxf.version>
-		<stagemonitor.version>0.85.0</stagemonitor.version>
+		<cxf.version>2.7.18</cxf.version>
+		<stagemonitor.version>0.85.1</stagemonitor.version>
 	</properties>
 	<artifactId>framework-commons</artifactId>
 	<repositories>
@@ -106,12 +106,12 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
-			<version>1.10</version>
+			<version>1.17</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
-			<version>1.9.2</version>
+			<version>1.9.3</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-collections</groupId>
@@ -120,7 +120,7 @@
 		<dependency>
 			<groupId>net.bytebuddy</groupId>
 			<artifactId>byte-buddy</artifactId>
-			<version>1.7.9</version>
+			<version>1.7.11</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -346,7 +346,7 @@
 		<dependency>
 		    <groupId>org.tukaani</groupId>
 		    <artifactId>xz</artifactId>
-		    <version>1.6</version>
+		    <version>1.8</version>
 		</dependency>
 		<dependency>
 	      <groupId>org.stagemonitor</groupId>
