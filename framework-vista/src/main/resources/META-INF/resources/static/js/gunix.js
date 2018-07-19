@@ -104,10 +104,10 @@ function onCompleteTask(idAplicacion, preCompleteTask, boton) {
 		}
 	}
 	$.ajax(
-			getAjaxOptions(showFragment + "content&idAplicacion=" + idAplicacion + "&isCompleteTask=true", $("#gunixMainForm").serialize()))
+			getAjaxOptions(showFragment + fragmentToUpdate + "&idAplicacion=" + idAplicacion + "&isCompleteTask=true", $("#gunixMainForm").serialize()))
 				.done(
 				function(newContent) {
-					$("#content").html(newContent);
+					$("#"+fragmentToUpdate).html(newContent);
 				});
 }
 

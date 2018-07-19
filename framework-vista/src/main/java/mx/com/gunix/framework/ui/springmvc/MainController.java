@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping;
 
+import com.hunteron.core.Context;
+
 import mx.com.gunix.framework.processes.domain.Instancia;
 import mx.com.gunix.framework.processes.domain.Tarea;
 import mx.com.gunix.framework.processes.domain.Variable;
@@ -74,15 +76,15 @@ public class MainController {
 		}
 		
 		doControl(request, instancia, uiModel, false, false);
-		return "index";
+		return Context.VIEW_INDEX_TILE_DEF.get();
 	}
 
 	@RequestMapping(value = "/ajaxFragment", method = { RequestMethod.POST })
 	public String ajaxFragment(Model uiModel, HttpServletRequest request) throws BeansException, ClassNotFoundException {
-		if ("content".equals(request.getParameter("fragments"))) {		 
+		if (Context.VIEW_ENGINE.get().equals(Funcion.ViewEngine.SPRINGMVC.name())&&!Context.VIEW_INDEX_TILE_DEF.get().equals("gunix.index")&&"formContent".equals(request.getParameter("fragments"))||"content".equals(request.getParameter("fragments"))) {		 
 			doControl(request, null, uiModel, true, false);
 		}
-		return "index";
+		return Context.VIEW_INDEX_TILE_DEF.get();
 	}
 
 	@RequestMapping(value = "/uploadFile", method = RequestMethod.POST)

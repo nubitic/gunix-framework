@@ -2,24 +2,30 @@ package com.hunteron.core;
 
 import javax.naming.InitialContext;
 
+import mx.com.gunix.framework.security.domain.Funcion;
+
 /**
- * hessian
+ * hessian, gunix
  * 
- * @author rocca.peng@hunteron.com
+ * @author rocca.peng@hunteron.com, jesus.agv@nubitic.mx
  * @Description
- * @Date 2015
+ * @Date 2015, 2018
  */
 public enum Context {
-	HOST("BACKEND_HOST");
-	private String backEndHost;
+	HOST("BACKEND_HOST", "http://localhost:8081/backEnd"), 
+	VIEW_INDEX_TILE_DEF("VIEW_INDEX_TILE_DEF", "gunix.index"), 
+	VIEW_ENGINE("VIEW_ENGINE", Funcion.ViewEngine.VAADIN.name());
 
-	private Context(String backEndHost) {
-		this.backEndHost = backEndHost;
+	private String envVar;
+	private String defaultValue;
+
+	private Context(String envVar, String defaultValue) {
+		this.envVar = envVar;
 	}
 
-	public String getRemoteUrl() {
-		String remoteURL = getFromEnvironment(backEndHost);
-		return remoteURL != null ? remoteURL : "http://localhost:8081/backEnd";
+	public String get() {
+		String value = getFromEnvironment(envVar);
+		return value != null ? value : defaultValue;
 	}
 
 	String getFromEnvironment(final String name) {
@@ -29,7 +35,8 @@ public enum Context {
 		if (envVar == null) {
 
 			try {
-				final Object object = ((javax.naming.Context) (new InitialContext().lookup("java:comp/env"))).lookup(name);
+				final Object object = ((javax.naming.Context) (new InitialContext().lookup("java:comp/env")))
+						.lookup(name);
 				if (object != null)
 					envVar = object.toString();
 			} catch (final Exception ignore) {

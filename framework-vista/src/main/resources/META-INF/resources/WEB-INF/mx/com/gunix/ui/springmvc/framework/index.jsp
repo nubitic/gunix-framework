@@ -1,5 +1,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
+<%@ page import="com.hunteron.core.Context" %>
+<%@ page import="mx.com.gunix.framework.security.domain.Funcion" %>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -21,6 +23,7 @@
 		<script src="${jquery_showLoading_min_js_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
 		<script type="text/javascript">
 			var showFragment= "ajaxFragment?fragments=";
+			var fragmentToUpdate = "<%=Context.VIEW_ENGINE.get().equals(Funcion.ViewEngine.SPRINGMVC.name())&&!Context.VIEW_INDEX_TILE_DEF.get().equals("gunix.index")?"formContent":"content"%>";
 		</script>
 		<script src="${gunix_js_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
 		<tiles:insertAttribute name="headerExtras" ignore="true" />

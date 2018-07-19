@@ -17,14 +17,12 @@ import org.vaadin.spring.security.VaadinSecurity;
 
 import com.vaadin.data.Container.Indexed;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Page;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinServletService;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.Alignment;
-import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
@@ -47,9 +45,6 @@ import com.vaadin.ui.renderers.TextRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
 import mx.com.gunix.framework.security.domain.Aplicacion;
-import mx.com.gunix.framework.security.domain.Funcion;
-import mx.com.gunix.framework.security.domain.Modulo;
-import mx.com.gunix.framework.security.domain.Rol;
 import mx.com.gunix.framework.security.domain.Usuario;
 import mx.com.gunix.framework.service.UsuarioService;
 import mx.com.gunix.framework.ui.vaadin.VaadinUtils;
@@ -86,202 +81,187 @@ public class MainViewLayout extends VerticalLayout{
 		Usuario u = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		setSizeUndefined();
 		setWidth("100.0%");
+
+		setSpacing(false);
+		setMargin(true);
+		addStyleName("MainViewLayout");
+		StringBuilder userIdStrBldr = new StringBuilder(u.getIdUsuario());
+		if (u.getDatosUsuario() != null) {
+			userIdStrBldr
+				.append(" ")
+				.append(u.getDatosUsuario().getApPaterno())
+				.append(" ")
+				.append(u.getDatosUsuario().getApMaterno())
+				.append(u.getDatosUsuario().getApMaterno() != null && !"".equals(u.getDatosUsuario().getApMaterno().trim()) ? " " : "")
+				.append(u.getDatosUsuario().getNombre());
+		}
+		userId = userIdStrBldr.toString();
+
+		HorizontalLayout hl = new HorizontalLayout();
+		hl.addStyleName("padding-top-header");
+		hl.setMargin(false);
+		hl.setSpacing(true);
+		hl.setWidth("100%");
+
+		Image logoInstitucional = new Image(null, new ThemeResource("img/logo-institucional.png"));
+		hl.addComponent(logoInstitucional);
+		hl.setComponentAlignment(logoInstitucional, Alignment.MIDDLE_LEFT);
+		hl.setExpandRatio(logoInstitucional, 0.25f);
+
+		HorizontalLayout appInfo = new HorizontalLayout();
+		appInfo.setMargin(false);
+		appInfo.setSpacing(false);
+		appInfo.setSizeUndefined();
+		hl.addComponent(appInfo);
+		hl.setComponentAlignment(appInfo, Alignment.MIDDLE_CENTER);
+		hl.setExpandRatio(appInfo, 0.50f);
 		
-		if (Funcion.ViewEngine.SPRINGMVC.name().equals(System.getenv("VIEW_ENGINE"))) {
-			setMargin(false);
-			Rol rol = u.getAplicaciones()
-						.stream()
-						.map(app -> app.getRoles()
-											.stream()
-											.findFirst()
-											.orElse(null))
-						.findFirst()
-						.orElse(null);
-			Modulo modulo = rol.getModulos().stream().findFirst().orElse(null);
-			
-			Page.getCurrent().getJavaScript().execute("window.location='../startProcess?idAplicacion="+rol.getAplicacion().getIdAplicacion() + "&idRol=" + rol.getIdRol() + "&idModulo=" + modulo.getIdModulo() + "&idFuncion=index';");
-		} else {
-			setSpacing(false);
-			setMargin(true);
-			addStyleName("MainViewLayout");
-			StringBuilder userIdStrBldr = new StringBuilder(u.getIdUsuario());
-			if (u.getDatosUsuario() != null) {
-				userIdStrBldr
-					.append(" ")
-					.append(u.getDatosUsuario().getApPaterno())
-					.append(" ")
-					.append(u.getDatosUsuario().getApMaterno())
-					.append(u.getDatosUsuario().getApMaterno() != null && !"".equals(u.getDatosUsuario().getApMaterno().trim()) ? " " : "")
-					.append(u.getDatosUsuario().getNombre());
-			}
-			userId = userIdStrBldr.toString();
-	
-			HorizontalLayout hl = new HorizontalLayout();
-			hl.addStyleName("padding-top-header");
-			hl.setMargin(false);
-			hl.setSpacing(true);
-			hl.setWidth("100%");
-	
-			Image logoInstitucional = new Image(null, new ThemeResource("img/logo-institucional.png"));
-			hl.addComponent(logoInstitucional);
-			hl.setComponentAlignment(logoInstitucional, Alignment.MIDDLE_LEFT);
-			hl.setExpandRatio(logoInstitucional, 0.25f);
-	
-			HorizontalLayout appInfo = new HorizontalLayout();
-			appInfo.setMargin(false);
-			appInfo.setSpacing(false);
-			appInfo.setSizeUndefined();
-			hl.addComponent(appInfo);
-			hl.setComponentAlignment(appInfo, Alignment.MIDDLE_CENTER);
-			hl.setExpandRatio(appInfo, 0.50f);
-			
-			final VerticalLayout downloadsUserIdLayt = new VerticalLayout();
-			downloadsUserIdLayt.setSizeFull();
-			downloadsUserIdLayt.setSpacing(false);
-			downloadsUserIdLayt.setMargin(false);
-			
-			userIdLabel = new Button(userId);
-			userIdLabel.addStyleName(ValoTheme.BUTTON_LINK);
-			userIdLabel.addStyleName("user-id-label");
-			userIdLabel.addClickListener(clickEvnt->{
-				userDetailsWindow = new Window();
-				userDetailsWindow.setModal(true);
-				userDetailsWindow.setResizable(false);
-				userDetailsWindow.setClosable(true);
-				userDetailsWindow.setWidth("200px");
-				userDetailsWindow.setHeight("100px");
-				userDetailsWindow.setContent(userDetailsLayout);
-				userDetailsWindow.addCloseListener(closeEvnt->{
-					nuevaContraseña.setValue(null);
-					confirmacionNuevaContraseña.setValue(null);
-					contraseñaActual.setValue(null);
-					cambioContraseñaLyt.setVisible(false);
-					cambiarContraseña.setVisible(true);
-				});
-				UI.getCurrent().addWindow(userDetailsWindow);
+		final VerticalLayout downloadsUserIdLayt = new VerticalLayout();
+		downloadsUserIdLayt.setSizeFull();
+		downloadsUserIdLayt.setSpacing(false);
+		downloadsUserIdLayt.setMargin(false);
+		
+		userIdLabel = new Button(userId);
+		userIdLabel.addStyleName(ValoTheme.BUTTON_LINK);
+		userIdLabel.addStyleName("user-id-label");
+		userIdLabel.addClickListener(clickEvnt->{
+			userDetailsWindow = new Window();
+			userDetailsWindow.setModal(true);
+			userDetailsWindow.setResizable(false);
+			userDetailsWindow.setClosable(true);
+			userDetailsWindow.setWidth("200px");
+			userDetailsWindow.setHeight("100px");
+			userDetailsWindow.setContent(userDetailsLayout);
+			userDetailsWindow.addCloseListener(closeEvnt->{
+				nuevaContraseña.setValue(null);
+				confirmacionNuevaContraseña.setValue(null);
+				contraseñaActual.setValue(null);
+				cambioContraseñaLyt.setVisible(false);
+				cambiarContraseña.setVisible(true);
 			});
-			
-			downloadsUserIdLayt.addComponent(userIdLabel);
-			downloadsUserIdLayt.setComponentAlignment(userIdLabel, Alignment.MIDDLE_RIGHT);		
-					
-			downloads = new Button("Descargas...");
-			downloads.addStyleName(ValoTheme.BUTTON_LINK);
-			downloads.addStyleName("descargas-button");
-			downloads.addClickListener(clickEvnt -> {
-				showDownloads();
-			});
-			downloads.setVisible(false);
-			
-			downloadsUserIdLayt.addComponent(downloads);
-			downloadsUserIdLayt.setComponentAlignment(downloads, Alignment.BOTTOM_RIGHT);
-			
-			hl.addComponent(downloadsUserIdLayt);
-			hl.setComponentAlignment(downloadsUserIdLayt, Alignment.MIDDLE_RIGHT);
-			hl.setExpandRatio(downloadsUserIdLayt, 0.25f);
-	
-			addComponent(hl);
-			setExpandRatio(hl, 0.0f);
-	
-			renderApps(u.getAplicaciones(), appInfo);
-			
-			downloadsManager = new Grid();
-			downloadsManager.addColumn("Archivo", String.class).setRenderer(new TextRenderer());
-			downloadsManager.addColumn("Progreso", Double.class).setRenderer(new ProgressBarRenderer());
-			downloadsManager.addColumn("", String.class).setRenderer(new ButtonRenderer(clickEvnt -> {
-				DownloadProps downloadProps = null;
-				for (String buttonID : registeredDownloads.keySet()) {
-					if (clickEvnt.getItemId().equals((downloadProps = registeredDownloads.get(buttonID)).id)) {
-						if (downloadProps.progreso >= 1.0) {
-							Page.getCurrent().getJavaScript().execute(new StringBuilder("document.getElementById('").append(buttonID).append("').click();").toString());
-						} else {
-							Notification.show("El archivo sigue en proceso de construcción", Type.WARNING_MESSAGE);
-						}
-						break;
-					}
-				}
-			}, "Generando Archivo..."));
-			downloadsManager.setHeightMode(HeightMode.ROW);
-			downloadsManager.setWidth("750px");
-			downloadsManager.setHeightByRows(5.0);
-			
-			userDetailsLayout = new VerticalLayout();
-			Button logoutButton = new Button("Cerrar Sesión");
-			logoutButton.addClickListener(clckEvnt -> {
-				security.logout();
-			});
-			userDetailsLayout.addComponent(logoutButton);
-			userDetailsLayout.setExpandRatio(logoutButton, 0.0f);
-			userDetailsLayout.setComponentAlignment(logoutButton, Alignment.MIDDLE_CENTER);
+			UI.getCurrent().addWindow(userDetailsWindow);
+		});
+		
+		downloadsUserIdLayt.addComponent(userIdLabel);
+		downloadsUserIdLayt.setComponentAlignment(userIdLabel, Alignment.MIDDLE_RIGHT);		
 				
-			cambiarContraseña = new Button("Cambiar Contraseña");
-			cambiarContraseña.addClickListener(clcEvnt->{
-				cambioContraseñaLyt.setVisible(true);
-				userDetailsWindow.setWidth("500px");
-				userDetailsWindow.setHeight("300px");
-				userDetailsWindow.center();
-				userDetailsWindow.markAsDirtyRecursive();
-				cambiarContraseña.setVisible(false);
-			});
-			
-			userDetailsLayout.addComponent(cambiarContraseña);
-			userDetailsLayout.setComponentAlignment(cambiarContraseña, Alignment.MIDDLE_CENTER);
-			
-			cambioContraseñaLyt = new FormLayout();
-			cambioContraseñaLyt.setSizeFull();
-			cambioContraseñaLyt.setVisible(false);
-			
-			nuevaContraseña = new PasswordField("Nueva Contraseña");
-			nuevaContraseña.setNullRepresentation("");
-			nuevaContraseña.setRequired(true);
-			cambioContraseñaLyt.addComponent(nuevaContraseña);
-			confirmacionNuevaContraseña = new PasswordField("Confirmación de Nueva Contraseña");
-			confirmacionNuevaContraseña.setNullRepresentation("");
-			confirmacionNuevaContraseña.setRequired(true);
-			cambioContraseñaLyt.addComponent(confirmacionNuevaContraseña);
-			contraseñaActual = new PasswordField("Contraseña Actual");
-			contraseñaActual.setNullRepresentation("");
-			contraseñaActual.setRequired(true);
-			cambioContraseñaLyt.addComponent(contraseñaActual);
-			
-			Button cambiarContraseñaButton = new Button("Aceptar");
-			cambiarContraseñaButton.addClickListener(clicEvnt -> {
-				if (nuevaContraseña.getValue() != null && confirmacionNuevaContraseña.getValue() != null && contraseñaActual.getValue() != null &&
-						!"".equals(nuevaContraseña.getValue()) && !"".equals(confirmacionNuevaContraseña.getValue()) && !"".equals(contraseñaActual.getValue())) {
-					if (nuevaContraseña.getValue().equals(confirmacionNuevaContraseña.getValue())) {
-						u.setPassword(nuevaContraseña.getValue());
-						try {
-							usuarioSrv.updatePassword(u, contraseñaActual.getValue());
-							userDetailsLayout.addComponent(new Label("Cambio de contraseña realizado con éxito, de clic en el botón Continuar para cerrar la sesión actual e ingresar nuevamente con la nueva contraseña"));
-							Button continuarButton = new Button("Continuar", clickEvnt -> {
-								security.logout();
-							});
-							userDetailsLayout.addComponent(continuarButton);
-							userDetailsLayout.setComponentAlignment(continuarButton, Alignment.MIDDLE_CENTER);
-							userDetailsWindow.setClosable(false);
-							cambioContraseñaLyt.setVisible(false);
-							userDetailsWindow.setWidth("500px");
-							userDetailsWindow.setHeight("200px");
-							userDetailsWindow.center();
-							userDetailsWindow.markAsDirtyRecursive();
-						} catch (Exception e) {
-							Notification.show(ExceptionUtils.getRootCause(e).getMessage(), Type.ERROR_MESSAGE);
-						}
+		downloads = new Button("Descargas...");
+		downloads.addStyleName(ValoTheme.BUTTON_LINK);
+		downloads.addStyleName("descargas-button");
+		downloads.addClickListener(clickEvnt -> {
+			showDownloads();
+		});
+		downloads.setVisible(false);
+		
+		downloadsUserIdLayt.addComponent(downloads);
+		downloadsUserIdLayt.setComponentAlignment(downloads, Alignment.BOTTOM_RIGHT);
+		
+		hl.addComponent(downloadsUserIdLayt);
+		hl.setComponentAlignment(downloadsUserIdLayt, Alignment.MIDDLE_RIGHT);
+		hl.setExpandRatio(downloadsUserIdLayt, 0.25f);
+
+		addComponent(hl);
+		setExpandRatio(hl, 0.0f);
+
+		renderApps(u.getAplicaciones(), appInfo);
+		
+		downloadsManager = new Grid();
+		downloadsManager.addColumn("Archivo", String.class).setRenderer(new TextRenderer());
+		downloadsManager.addColumn("Progreso", Double.class).setRenderer(new ProgressBarRenderer());
+		downloadsManager.addColumn("", String.class).setRenderer(new ButtonRenderer(clickEvnt -> {
+			DownloadProps downloadProps = null;
+			for (String buttonID : registeredDownloads.keySet()) {
+				if (clickEvnt.getItemId().equals((downloadProps = registeredDownloads.get(buttonID)).id)) {
+					if (downloadProps.progreso >= 1.0) {
+						Page.getCurrent().getJavaScript().execute(new StringBuilder("document.getElementById('").append(buttonID).append("').click();").toString());
 					} else {
-						Notification.show("La nueva contraseña y la confirmación deben ser iguales", Type.ERROR_MESSAGE);
+						Notification.show("El archivo sigue en proceso de construcción", Type.WARNING_MESSAGE);
+					}
+					break;
+				}
+			}
+		}, "Generando Archivo..."));
+		downloadsManager.setHeightMode(HeightMode.ROW);
+		downloadsManager.setWidth("750px");
+		downloadsManager.setHeightByRows(5.0);
+		
+		userDetailsLayout = new VerticalLayout();
+		Button logoutButton = new Button("Cerrar Sesión");
+		logoutButton.addClickListener(clckEvnt -> {
+			security.logout();
+		});
+		userDetailsLayout.addComponent(logoutButton);
+		userDetailsLayout.setExpandRatio(logoutButton, 0.0f);
+		userDetailsLayout.setComponentAlignment(logoutButton, Alignment.MIDDLE_CENTER);
+			
+		cambiarContraseña = new Button("Cambiar Contraseña");
+		cambiarContraseña.addClickListener(clcEvnt->{
+			cambioContraseñaLyt.setVisible(true);
+			userDetailsWindow.setWidth("500px");
+			userDetailsWindow.setHeight("300px");
+			userDetailsWindow.center();
+			userDetailsWindow.markAsDirtyRecursive();
+			cambiarContraseña.setVisible(false);
+		});
+		
+		userDetailsLayout.addComponent(cambiarContraseña);
+		userDetailsLayout.setComponentAlignment(cambiarContraseña, Alignment.MIDDLE_CENTER);
+		
+		cambioContraseñaLyt = new FormLayout();
+		cambioContraseñaLyt.setSizeFull();
+		cambioContraseñaLyt.setVisible(false);
+		
+		nuevaContraseña = new PasswordField("Nueva Contraseña");
+		nuevaContraseña.setNullRepresentation("");
+		nuevaContraseña.setRequired(true);
+		cambioContraseñaLyt.addComponent(nuevaContraseña);
+		confirmacionNuevaContraseña = new PasswordField("Confirmación de Nueva Contraseña");
+		confirmacionNuevaContraseña.setNullRepresentation("");
+		confirmacionNuevaContraseña.setRequired(true);
+		cambioContraseñaLyt.addComponent(confirmacionNuevaContraseña);
+		contraseñaActual = new PasswordField("Contraseña Actual");
+		contraseñaActual.setNullRepresentation("");
+		contraseñaActual.setRequired(true);
+		cambioContraseñaLyt.addComponent(contraseñaActual);
+		
+		Button cambiarContraseñaButton = new Button("Aceptar");
+		cambiarContraseñaButton.addClickListener(clicEvnt -> {
+			if (nuevaContraseña.getValue() != null && confirmacionNuevaContraseña.getValue() != null && contraseñaActual.getValue() != null &&
+					!"".equals(nuevaContraseña.getValue()) && !"".equals(confirmacionNuevaContraseña.getValue()) && !"".equals(contraseñaActual.getValue())) {
+				if (nuevaContraseña.getValue().equals(confirmacionNuevaContraseña.getValue())) {
+					u.setPassword(nuevaContraseña.getValue());
+					try {
+						usuarioSrv.updatePassword(u, contraseñaActual.getValue());
+						userDetailsLayout.addComponent(new Label("Cambio de contraseña realizado con éxito, de clic en el botón Continuar para cerrar la sesión actual e ingresar nuevamente con la nueva contraseña"));
+						Button continuarButton = new Button("Continuar", clickEvnt -> {
+							security.logout();
+						});
+						userDetailsLayout.addComponent(continuarButton);
+						userDetailsLayout.setComponentAlignment(continuarButton, Alignment.MIDDLE_CENTER);
+						userDetailsWindow.setClosable(false);
+						cambioContraseñaLyt.setVisible(false);
+						userDetailsWindow.setWidth("500px");
+						userDetailsWindow.setHeight("200px");
+						userDetailsWindow.center();
+						userDetailsWindow.markAsDirtyRecursive();
+					} catch (Exception e) {
+						Notification.show(ExceptionUtils.getRootCause(e).getMessage(), Type.ERROR_MESSAGE);
 					}
 				} else {
-					Notification.show("La nueva contraseña, la confirmación y la contraseña actual son requeridas", Type.ERROR_MESSAGE);
+					Notification.show("La nueva contraseña y la confirmación deben ser iguales", Type.ERROR_MESSAGE);
 				}
-			});
-			cambioContraseñaLyt.addComponent(cambiarContraseñaButton);
-	
-			userDetailsLayout.addComponent(cambioContraseñaLyt);
-			userDetailsLayout.setExpandRatio(cambioContraseñaLyt, 1.0f);
-			userDetailsLayout.setComponentAlignment(cambioContraseñaLyt, Alignment.MIDDLE_CENTER);
-			
-			userDetailsLayout.setMargin(true);
-			userDetailsLayout.setSizeFull();
-		}
+			} else {
+				Notification.show("La nueva contraseña, la confirmación y la contraseña actual son requeridas", Type.ERROR_MESSAGE);
+			}
+		});
+		cambioContraseñaLyt.addComponent(cambiarContraseñaButton);
+
+		userDetailsLayout.addComponent(cambioContraseñaLyt);
+		userDetailsLayout.setExpandRatio(cambioContraseñaLyt, 1.0f);
+		userDetailsLayout.setComponentAlignment(cambioContraseñaLyt, Alignment.MIDDLE_CENTER);
+		
+		userDetailsLayout.setMargin(true);
+		userDetailsLayout.setSizeFull();
 	}
 
 	protected void renderApps(List<Aplicacion> apps, HorizontalLayout appInfo) {

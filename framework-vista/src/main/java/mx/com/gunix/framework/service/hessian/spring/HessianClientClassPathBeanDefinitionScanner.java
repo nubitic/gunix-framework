@@ -27,7 +27,7 @@ public class HessianClientClassPathBeanDefinitionScanner extends ClassPathBeanDe
 		Context host = (Context) annotationAttributes.get("host");
 		String uri = (String) annotationAttributes.get("value");
 		
-		definition.getPropertyValues().add("serviceUrl", host.getRemoteUrl() + uri);
+		definition.getPropertyValues().add("serviceUrl", host.get() + uri);
 		definition.getPropertyValues().add("serviceInterface", ByteBuddyUtils.appendUsuario(getClass().getClassLoader(), definition.getBeanClassName()));
 		definition.setBeanClass(HessianProxyFactoryBean.class);
 	}

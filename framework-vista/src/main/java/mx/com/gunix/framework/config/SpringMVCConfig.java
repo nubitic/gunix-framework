@@ -28,6 +28,7 @@ import org.springframework.web.servlet.theme.FixedThemeResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.tiles3.TilesConfigurer;
 
+import mx.com.gunix.framework.security.domain.Funcion;
 import mx.com.gunix.framework.ui.springmvc.MainController;
 import mx.com.gunix.framework.ui.springmvc.tiles3.AjaxTilesView;
 import mx.com.gunix.framework.util.GunixFile;
@@ -101,7 +102,7 @@ public class SpringMVCConfig extends WebMvcConfigurerAdapter {
 	@Bean
 	public TilesConfigurer tilesConfigurer() {
 		TilesConfigurer tc = new TilesConfigurer();
-		tc.setDefinitions("/WEB-INF/mx/com/gunix/ui/springmvc/framework/tiles-defs.xml");	
+		tc.setDefinitions("/WEB-INF/mx/com/gunix/ui/springmvc/framework/tiles-defs-gunix.xml", "/WEB-INF/mx/com/gunix/ui/springmvc/**/tiles-defs-*.xml");	
 		return tc;
 	}
 	
@@ -135,6 +136,7 @@ public class SpringMVCConfig extends WebMvcConfigurerAdapter {
 	
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
-		registry.addViewController("/").setViewName("forward:/WEB-INF/mx/com/gunix/ui/springmvc/framework/home.jsp");
+		registry.addViewController("/").setViewName(Funcion.ViewEngine.SPRINGMVC.name().equals(System.getenv("VIEW_ENGINE"))?"forward:startProcess/":"forward:/WEB-INF/mx/com/gunix/ui/springmvc/framework/home.jsp");
+		
 	}
 }

@@ -12,11 +12,11 @@ final class Utils {
 	private static final String APP_TAREA_ACTUAL_MAP = "APP_TAREA_ACTUAL_MAP";
 
 	static Tarea getTareaActual(HttpServletRequest request) {
-		return getAppTareaActualMap(request).get(request.getParameter("idAplicacion"));
+		return getAppTareaActualMap(request).get(request.getParameter("idAplicacion")==null?"":request.getParameter("idAplicacion"));
 	}
 
 	static void setTareaActual(HttpServletRequest request, Tarea tarea) {
-		getAppTareaActualMap(request).put(request.getParameter("idAplicacion"), tarea);
+		getAppTareaActualMap(request).put(request.getParameter("idAplicacion")==null?"":request.getParameter("idAplicacion"), tarea);
 	}
 
 	@SuppressWarnings("unchecked")
