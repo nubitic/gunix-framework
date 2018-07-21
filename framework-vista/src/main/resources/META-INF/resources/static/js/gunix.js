@@ -79,10 +79,10 @@ function addParamToData(originalOptions, options, paramName, paramValue){
 		options.data.append(paramName, paramValue);
 	} else {
 		if(typeof(originalOptions.data) == 'string' && options.data.indexOf('&'+paramName+'=') < 0){
-			options.data = originalOptions.data + '&'+paramName+'='+paramValue;
+			options.data = options.data + '&'+paramName+'='+paramValue;
 		}else{
 			if(eval('typeof(options.data.'+paramName+')') == 'undefined')
-				options.data = $.param($.extend(originalOptions.data, eval('{'+ paramName + ' : ' + paramValue + '}')));	
+				options.data = $.param($.extend(options.data, eval('{'+ paramName + ' : ' + paramValue + '}')));	
 		}
 	}
 }
