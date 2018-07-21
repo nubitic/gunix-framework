@@ -39,6 +39,7 @@ public abstract class Utils {
 		
 		ResourceBundleMessageSource messageSource = new GunixResourceBundleMessageSource();
 		messageSource.setBasename("messages");
+		messageSource.addBasenames("ValidationMessages");
 		Utils.ms = messageSource; 
 		return messageSource;
 	}
