@@ -68,34 +68,24 @@ $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
 				}
 			}
 		}
-			
-		if (originalOptions.data instanceof FormData) {
-			options.data.append('idAplicacion', cIdAplicacion);
-		} else {
-			if(typeof(originalOptions.data) == 'string' && options.data.indexOf('&idAplicacion=') < 0){
-				options.data = originalOptions.data + '&idAplicacion='+cIdAplicacion;
-			}else{
-				if(typeof(options.data.idAplicacion) == 'undefined')
-				options.data = $.param($.extend(originalOptions.data, {
-					idAplicacion : cIdAplicacion
-				}));	
-			}
-		}
-
-		if (originalOptions.data instanceof FormData) {
-			options.data.append('cgCommandName', cgCommandName);
-		} else {
-			if(typeof(originalOptions.data) == 'string' && options.data.indexOf('&cgCommandName=') < 0){
-				options.data = originalOptions.data + '&cgCommandName='+cgCommandName;
-			}else{
-				if(typeof(options.data.cgCommandName) == 'undefined')
-				options.data = $.param($.extend(originalOptions.data, {
-					cgCommandName : cgCommandName
-				}));	
-			}
-		}
+		
+		addParamToData(originalOptions, options, 'idAplicacion', cIdAplicacion);
+		addParamToData(originalOptions, options, 'cgCommandName', cgCommandName);
 	}
 });
+
+function addParamToData(originalOptions, options, paramName, paramValue){
+	if (originalOptions.data instanceof FormData) {
+		options.data.append(paramName, paramValue);
+	} else {
+		if(typeof(originalOptions.data) == 'string' && options.data.indexOf('&'+paramName+'=') < 0){
+			options.data = originalOptions.data + '&'+paramName+'='+paramValue;
+		}else{
+			if(eval('typeof(options.data.'+paramName+')') == 'undefined')
+				options.data = $.param($.extend(originalOptions.data, eval('{'+ paramName + ' : ' + paramValue + '}')));	
+		}
+	}
+}
 
 function onCompleteTask(idAplicacion, preCompleteTask, boton) {
 	if (typeof (preCompleteTask) == 'function') {

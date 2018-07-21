@@ -22,8 +22,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.activiti.bpmn.model.UserTask;
-import org.activiti.engine.ActivitiObjectNotFoundException;
-import org.activiti.engine.ActivitiOptimisticLockingException;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
@@ -53,7 +51,6 @@ import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
@@ -330,22 +327,15 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		});
 	}
 
-	
+	// A las 00:00 todos los días
 	@Scheduled(cron = "0 0 0 * * *")
-	public void EliminaInstanciasVolatilesActiviti(){
-		
+	public void eliminaTodasLasInstanciasVolatilesTerminadasOIniciadasHaceMasDe35Minutos(){
 		eliminaInstanciasVolatiles();
 		eliminaInstanciasVolatiles(); //<---------- Se ejecuta por segunda vez por si han quedado registros.
 	}
-
-	
-	
-	
 	
 	public synchronized  void eliminaInstanciasVolatiles(){
-
 		if(Boolean.valueOf(System.getenv("ACTIVITI_MANAGER"))) {
-
 			Date hace30Minutos = Date.from(Instant.now().minus(30, ChronoUnit.MINUTES));
 			
 			gvpm.obtainVolatileProcessDefinitionIds().forEach(processDefinitionId->{
@@ -388,61 +378,10 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 						log.debug("El proceso volátil" + processDefinitionId + " no tiene información :)");
 						
 					}
-					
-					
 				}
-
-
 			});
 
 		}
-
-	}
-
-	// A las 00:00 todos los días
-	//@Scheduled(cron = "0 0 0 * * *")
-	//TODO Se comenta para posteriores referencias
-	public void eliminaTodasLasInstanciasVolatilesTerminadasOIniciadasHaceMasDe35Minutos() {
-		if(Boolean.valueOf(System.getenv("ACTIVITI_MASTER"))) {
-			doDelete();
-			doDelete();// <---- Para eliminar lo que la primera no pudo debido a problemas de concurrencia.
-		}
-	}
-
-	private void doDelete() {
-		List<ProcessDefinition> pDefsVolatiles = repos.createProcessDefinitionQuery().processDefinitionCategory(VOLATIL).latestVersion().list();
-		Date hace35Minutos = Date.from(Instant.now().minus(35, ChronoUnit.MINUTES));
-		pDefsVolatiles.parallelStream().forEach(
-				pd -> {
-					List<HistoricProcessInstance> hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).startedBefore(hace35Minutos).list();
-
-					if (ID_APLICACION != null) {
-						if (hpis != null && !hpis.isEmpty()) {
-							rs.createProcessInstanceQuery()
-							.processInstanceIds(hpis.stream().map(hpi -> hpi.getId()).collect(Collectors.toSet()))
-							.variableValueEquals(ID_APLICACION_VAR, ID_APLICACION)
-							.list()
-							.forEach(pi -> {
-								try{
-									rs.deleteProcessInstance(pi.getId(), "");
-								}catch(ActivitiObjectNotFoundException | ActivitiOptimisticLockingException ignorar){}
-							});
-						}
-						hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).finished().variableValueEquals(ID_APLICACION_VAR, ID_APLICACION).list();
-					} else {
-						hpis.forEach(hpi -> {
-							try{
-								rs.deleteProcessInstance(hpi.getId(), "");
-							}catch(ActivitiObjectNotFoundException | ActivitiOptimisticLockingException ignorar){}
-						});
-						hpis = hs.createHistoricProcessInstanceQuery().processDefinitionKey(pd.getKey()).finished().list();
-					}
-					hpis.parallelStream().forEach(hpi -> {
-						try{
-							hs.deleteHistoricProcessInstance(hpi.getId());
-						}catch(ActivitiObjectNotFoundException | ActivitiOptimisticLockingException ignorar){}
-					});
-				});
 	}
 
 	@Override
