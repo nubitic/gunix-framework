@@ -59,6 +59,7 @@ public class MainController {
 	ControllerClassNameHandlerMapping ccnhm;
 	
 	@Autowired
+	@Lazy
 	GunixVariableGetter vg;
 	
 	private static final Method generatePathMappings = ReflectionUtils.findMethod(ControllerClassNameHandlerMapping.class, "generatePathMappings", new Class[] { Class.class });
