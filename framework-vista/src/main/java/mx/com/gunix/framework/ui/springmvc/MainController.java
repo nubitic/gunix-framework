@@ -38,6 +38,7 @@ import mx.com.gunix.framework.security.domain.Modulo;
 import mx.com.gunix.framework.security.domain.Rol;
 import mx.com.gunix.framework.security.domain.Usuario;
 import mx.com.gunix.framework.service.ActivitiService;
+import mx.com.gunix.framework.ui.GunixVariableGetter;
 import mx.com.gunix.framework.ui.springmvc.spring.GunixSpringMVCView;
 import mx.com.gunix.framework.util.GunixFile;
 
@@ -56,6 +57,9 @@ public class MainController {
 	
 	@Autowired
 	ControllerClassNameHandlerMapping ccnhm;
+	
+	@Autowired
+	GunixVariableGetter vg;
 	
 	private static final Method generatePathMappings = ReflectionUtils.findMethod(ControllerClassNameHandlerMapping.class, "generatePathMappings", new Class[] { Class.class });
 
@@ -112,6 +116,7 @@ public class MainController {
 
 		try {
 			if (isCompleteTask) {
+				vg.setInstancia(tareaActual.getInstancia());
 				agc = getAgc(request, tareaActual.getVista(), uiModel);
 				tareaActual.setVariables(agc.getVariablesTarea(request));
 				tareaActual.setComentario(agc.getComentarioTarea(request));
