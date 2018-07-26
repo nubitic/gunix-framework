@@ -15,7 +15,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @Component
 @Scope(WebApplicationContext.SCOPE_REQUEST)
-public final class GunixVariableGetter implements Serializable {
+public class GunixVariableGetter implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Map<String, Serializable> varCache = new HashMap<String, Serializable>();
 	private static final Serializable NULL_OBJECT = new Serializable() {
