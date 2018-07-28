@@ -73,7 +73,7 @@ public class MainController {
 	public String main(Model uiModel, HttpServletRequest request) throws BeansException, ClassNotFoundException {
 		Instancia instancia = null;
 		
-		if (Funcion.ViewEngine.SPRINGMVC.name().equals(System.getenv("VIEW_ENGINE"))) {
+		if (Funcion.ViewEngine.SPRINGMVC.name().equals(Context.VIEW_ENGINE.get())) {
 			instancia = as.iniciaProceso("index", new ArrayList<Variable<?>>(), "");
 		} else {
 			Funcion funcion = determinaFuncion(request);

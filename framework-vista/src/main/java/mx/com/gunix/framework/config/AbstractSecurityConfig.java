@@ -62,6 +62,8 @@ import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.RequestCacheAwareFilter;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
+import com.hunteron.core.Context;
+
 @Configuration
 @ComponentScan({"mx.com.gunix.framework.security" })
 @EnableWebSecurity
@@ -158,7 +160,7 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		if (!Boolean.parseBoolean(System.getenv("VIEW_ENABLE_SSO"))) {
+		if (!Boolean.parseBoolean(Context.VIEW_ENABLE_SSO.get())) {
 			auth.userDetailsService(userDetailsService()).passwordEncoder(passwordEncoder());
 		} else {
 			auth.authenticationProvider(jossoAuthenticationProvider(gatewayServiceLocator()));
@@ -168,8 +170,8 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 	@Bean
 	public AuthenticationProvider jossoAuthenticationProvider(GatewayServiceLocator gatewayServiceLocator) throws Exception {
 		JOSSOAuthenticationProvider jap = null;
-		if (Boolean.parseBoolean(System.getenv("VIEW_ENABLE_SSO"))) {
-			jap = new JOSSOAuthenticationProvider(System.getenv("VIEW_SSO_PARTNER_ID"));
+		if (Boolean.parseBoolean(Context.VIEW_ENABLE_SSO.get())) {
+			jap = new JOSSOAuthenticationProvider(Context.VIEW_SSO_PARTNER_ID.get());
 			jap.setGatewayServiceLocator(gatewayServiceLocator);
 			jap.setUserDetailsService(userDetailsService());
 		}
@@ -179,7 +181,7 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 	@Bean
 	public AuthenticationEntryPoint jossoProcessingFilterEntryPoint() {
 		JOSSOProcessingFilterEntryPoint jpfep = null;
-		if (Boolean.parseBoolean(System.getenv("VIEW_ENABLE_SSO"))) {
+		if (Boolean.parseBoolean(Context.VIEW_ENABLE_SSO.get())) {
 			GatewayServiceLocator gsl = gatewayServiceLocator();
 			jpfep = new JOSSOProcessingFilterEntryPoint();
 			jpfep.setGatewayLoginUrl(new StringBuilder(gsl.getEndpointBase()).append(gsl.getServicesWebContext()).append((gsl.getServicesWebContext() == null || "".equals(gsl.getServicesWebContext())) ? "" : "/").append("signon/login.do").toString());
@@ -213,7 +215,7 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 		
 		SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
 		
-		if(!Boolean.parseBoolean(System.getenv("VIEW_ENABLE_SSO"))) {
+		if(!Boolean.parseBoolean(Context.VIEW_ENABLE_SSO.get())) {
 			http
 				.rememberMe()
 					.rememberMeServices(rememberMeService())
@@ -240,8 +242,8 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 	@Bean
 	public Filter jossoSessionPingFilter() throws Exception {
 		JOSSOSessionPingFilter jspf = null;
-		if (Boolean.parseBoolean(System.getenv("VIEW_ENABLE_SSO"))) {
-			jspf = new JOSSOSessionPingFilter(System.getenv("VIEW_SSO_PARTNER_ID"));
+		if (Boolean.parseBoolean(Context.VIEW_ENABLE_SSO.get())) {
+			jspf = new JOSSOSessionPingFilter(Context.VIEW_SSO_PARTNER_ID.get());
 			jspf.setGatewayServiceLocator(gatewayServiceLocator());
 			jspf.setLogoutUrl("/logout");
 		}
@@ -251,7 +253,7 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 	@Bean
 	public Filter jossoSessionCookieProcessingFilter() throws Exception {
 		JOSSOSessionCookieProcessingFilter jscpf = null;
-		if (Boolean.parseBoolean(System.getenv("VIEW_ENABLE_SSO"))) {
+		if (Boolean.parseBoolean(Context.VIEW_ENABLE_SSO.get())) {
 			jscpf = new JOSSOSessionCookieProcessingFilter();
 			jscpf.setAuthenticationManager(authenticationManagerBean());
 		}
@@ -261,13 +263,13 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 	@Bean
 	public GatewayServiceLocator gatewayServiceLocator() {
 		GatewayServiceLocator gsl = null;
-		if (Boolean.parseBoolean(System.getenv("VIEW_ENABLE_SSO"))) {
+		if (Boolean.parseBoolean(Context.VIEW_ENABLE_SSO.get())) {
 			gsl = new WebserviceGatewayServiceLocator();
-			gsl.setTransportSecurity("https".equalsIgnoreCase(System.getenv("VIEW_SSO_GATEWAY_ENDPOINT_TRANSPORT_PROTOCOL")) ? "confidential" : "none");
-			gsl.setEndpoint(System.getenv("VIEW_SSO_GATEWAY_ENDPOINT_HOST_PORT"));
-			gsl.setServicesWebContext(System.getenv("VIEW_SSO_GATEWAY_ENDPOINT_WEB_CONTEXT"));
+			gsl.setTransportSecurity("https".equalsIgnoreCase(Context.VIEW_SSO_GATEWAY_ENDPOINT_TRANSPORT_PROTOCOL.get()) ? "confidential" : "none");
+			gsl.setEndpoint(Context.VIEW_SSO_GATEWAY_ENDPOINT_HOST_PORT.get());
+			gsl.setServicesWebContext(Context.VIEW_SSO_GATEWAY_ENDPOINT_WEB_CONTEXT.get());
 			gsl.setUsername("wsclient");
-			gsl.setPassword(System.getenv("VIEW_SSO_GATEWAY_ENDPOINT_PASSWORD"));
+			gsl.setPassword(Context.VIEW_SSO_GATEWAY_ENDPOINT_PASSWORD.get());
 		}
 		return gsl;
 	}
@@ -275,8 +277,8 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 	@Bean
 	public Filter jossoAuthenticationProcessingFilter() throws Exception {
 		JOSSOAuthenticationProcessingFilter japf = null;
-		if(Boolean.parseBoolean(System.getenv("VIEW_ENABLE_SSO"))) {
-			japf = new JOSSOAuthenticationProcessingFilter(System.getenv("VIEW_SSO_PARTNER_ID"));
+		if(Boolean.parseBoolean(Context.VIEW_ENABLE_SSO.get())) {
+			japf = new JOSSOAuthenticationProcessingFilter(Context.VIEW_SSO_PARTNER_ID.get());
 			japf.setAuthenticationManager(authenticationManagerBean());
 			japf.setGatewayServiceLocator(gatewayServiceLocator());	
 			japf.setAuthenticationSuccessHandler(new SavedRequestAwareAuthenticationSuccessHandler() {

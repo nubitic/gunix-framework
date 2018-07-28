@@ -23,12 +23,14 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import com.hunteron.core.Context;
+
 public class JOSSOAuthenticationProcessingFilter extends AbstractAuthenticationProcessingFilter {
 
 	private static final Logger logger = Logger.getLogger(JOSSOAuthenticationProcessingFilter.class);
 	public static final String JOSSO_SECURITY_CHECK_URI = "/josso_security_check";
-	private static final String BACKTO_HOST = System.getenv("VIEW_SSO_BACKTO_HOST");
-	private static final String BACKTO_CONTEXT = System.getenv("VIEW_SSO_BACKTO_CONTEXT");
+	private static final String BACKTO_HOST = Context.VIEW_SSO_BACKTO_HOST.get();
+	private static final String BACKTO_CONTEXT = Context.VIEW_SSO_BACKTO_CONTEXT.get();
 
 
 	private SSOIdentityProviderService ip;

@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
+import com.hunteron.core.Context;
+
 import mx.com.gunix.framework.documents.config.LogicalDocConfig;
 import mx.com.gunix.framework.mail.config.MailConfig;
 
@@ -35,15 +37,15 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 		configClasses.add(REDISConfig.class);
 		configClasses.add(MailConfig.class);
 
-		if (Boolean.valueOf(System.getenv("STANDALONE_APP"))||Boolean.valueOf(System.getenv("ENABLE_ADMIN_APP_SERVICES"))) {
+		if (Boolean.valueOf(Context.STANDALONE_APP.get())||Boolean.valueOf(Context.ENABLE_ADMIN_APP_SERVICES.get())) {
 			configClasses.add(AdminAppServicesConfig.class);
 		}
 		
-		if (System.getenv("MONGO_DB_NAME") != null) {
+		if (Context.MONGO_DB_NAME.get() != null) {
 			configClasses.add(MongoDBConfig.class);
 		}
 		
-		if (Boolean.parseBoolean(System.getenv("LOGICALDOC_ENABLED"))) {
+		if (Boolean.parseBoolean(Context.LOGICALDOC_ENABLED.get())) {
 			configClasses.add(LogicalDocConfig.class);
 		}
 

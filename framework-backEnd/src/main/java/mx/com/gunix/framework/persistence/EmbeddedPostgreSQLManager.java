@@ -18,6 +18,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
+import com.hunteron.core.Context;
+
 import mx.com.gunix.framework.util.EmbeddedServerUtils;
 import mx.com.gunix.framework.util.ZipEntryWorker;
 
@@ -153,7 +155,7 @@ public final class EmbeddedPostgreSQLManager {
 				}
 				
 				List<Resource> currentAppScriptsResourcesList = new ArrayList<Resource>();
-				String appSchemaName = System.getenv("DB_APP_SCHEMA").toUpperCase();
+				String appSchemaName = Context.DB_APP_SCHEMA.get().toUpperCase();
 				
 				File prevExecutedScripts = new File(pgsqlHomeFile, "gunixPrevExecutedScripts");
 				if (!prevExecutedScripts.exists()) {

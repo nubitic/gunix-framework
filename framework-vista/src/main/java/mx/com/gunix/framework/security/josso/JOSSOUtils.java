@@ -14,13 +14,15 @@ import org.josso.gateway.signon.Constants;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import com.hunteron.core.Context;
+
 import mx.com.gunix.framework.ui.vaadin.VaadinUtils;
 
 public class JOSSOUtils {
 	private static final String TIMESTAMP_PREFIX = "omx.com.gunix.framework.security.josso.";
 	private static final Logger logger = Logger.getLogger(JOSSOUtils.class);
-	private static final String BACKTO_HOST = System.getenv("VIEW_SSO_BACKTO_HOST");
-	private static final String BACKTO_CONTEXT = System.getenv("VIEW_SSO_BACKTO_CONTEXT");
+	private static final String BACKTO_HOST = Context.VIEW_SSO_BACKTO_HOST.get();
+	private static final String BACKTO_CONTEXT = Context.VIEW_SSO_BACKTO_CONTEXT.get();
 
 	/**
 	 * This method builds the back_to URL value pointing to the given URI.

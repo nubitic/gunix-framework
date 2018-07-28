@@ -134,7 +134,7 @@ public class ActivitiConfig {
 		speConf.setBatchSizeTasks(1000);
 		speConf.setEnableSafeBpmnXml(true);
 
-		if (Boolean.valueOf(System.getenv("ACTIVITI_MASTER"))) {
+		if (Boolean.valueOf(com.hunteron.core.Context.ACTIVITI_MASTER.get())) {
 			speConf.setAsyncExecutor(asyncExecutor());
 			speConf.setAsyncExecutorEnabled(true);
 			speConf.setAsyncExecutorActivate(true);
@@ -150,7 +150,7 @@ public class ActivitiConfig {
 			System.arraycopy(appPackedBPMNResources, 0, resources, 0, appPackedBPMNResources.length);
 		}
 
-		if (Boolean.valueOf(System.getenv("STANDALONE_APP"))) {
+		if (Boolean.valueOf(com.hunteron.core.Context.STANDALONE_APP.get())) {
 			Resource[] adminAppResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/adminapp/procesos/*.bpmn");
 
 			if (resources != null && resources.length > 0) {

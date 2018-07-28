@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+import com.hunteron.core.Context;
 import com.logicaldoc.webservice.auth.AuthClient;
 import com.logicaldoc.webservice.auth.AuthService;
 import com.logicaldoc.webservice.document.DocumentClient;
@@ -29,13 +30,10 @@ public class LogicalDocConfig {
 	public AuthService ldAuthService() throws Exception {
 		AuthService authService = new AuthClient(EmbeddedLogicalDocManager.getLogicalDocURL() + "/services/Auth");
 		try {
-			authService.logout(authService.login(System.getenv("LOGICALDOC_USER") == null ? "admin" : System.getenv("LOGICALDOC_USER"), System.getenv("LOGICALDOC_PASSWORD") == null ? "admin" : System.getenv("LOGICALDOC_PASSWORD")));
+			authService.logout(authService.login(Context.LOGICALDOC_USER.get(), Context.LOGICALDOC_PASSWORD.get()));
 		} catch (Fault ignorar) {
 			if (ExceptionUtils.getRootCause(ignorar) instanceof ConnectException) {
-				String installHome = System.getenv("LOGICALDOC_EMBEDDED_HOME");
-				if (installHome == null || "".equals(installHome)) {
-					installHome = ".logicalDocRepo";
-				}
+				String installHome = Context.LOGICALDOC_EMBEDDED_HOME.get();
 				// Si la conexión no se pudo establecer entonces iniciamos/instalamos logicaldoc
 				EmbeddedLogicalDocManager.start(System.getProperty("user.home") + File.separator + installHome, getClass().getClassLoader());
 			}

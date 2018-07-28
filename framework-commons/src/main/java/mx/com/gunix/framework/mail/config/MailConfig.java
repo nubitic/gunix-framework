@@ -15,6 +15,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
+import com.hunteron.core.Context;
+
 @Configuration
 public class MailConfig {
 	static final Logger log = Logger.getLogger(MailConfig.class);
@@ -22,15 +24,15 @@ public class MailConfig {
 	public JavaMailSender mailSender() {
 		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
-		mailSender.setHost(System.getenv("MAIL_SERVER"));
+		mailSender.setHost(Context.MAIL_SERVER.get());
 		try {
-			mailSender.setPort(Integer.parseInt(System.getenv("MAIL_PORT")));
+			mailSender.setPort(Integer.parseInt(Context.MAIL_PORT.get()));
 		} catch (NumberFormatException nfe) {
 			log.error("Error al inicializar MailSender, si no utilizas MailSender en tu aplicación entonces no hay problema :D");
 		}
-		mailSender.setUsername(System.getenv("MAIL_USERNAME"));
-		mailSender.setPassword(System.getenv("MAIL_PASSWORD"));
-		String mailProperties = System.getenv("MAIL_PROPERTIES");
+		mailSender.setUsername(Context.MAIL_USERNAME.get());
+		mailSender.setPassword(Context.MAIL_PASSWORD.get());
+		String mailProperties = Context.MAIL_PROPERTIES.get();
 		if (mailProperties != null && !"".equals(mailProperties)) {
 			Properties mailProps = new Properties();
 			String[] props = mailProperties.split("&");
@@ -47,7 +49,7 @@ public class MailConfig {
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public SimpleMailMessage mailMessageTemplate() {
 		SimpleMailMessage smm = new SimpleMailMessage();
-		smm.setFrom(System.getenv("MAIL_FROM"));
+		smm.setFrom(Context.MAIL_FROM.get());
 		return smm;
 	}
 	
@@ -57,7 +59,7 @@ public class MailConfig {
 		MimeMessage message = ((JavaMailSender) mailSender()).createMimeMessage();
 		try {
 			MimeMessageHelper helper = new MimeMessageHelper(message, true);
-			helper.setFrom(System.getenv("MAIL_FROM"));
+			helper.setFrom(Context.MAIL_FROM.get());
 			return helper;
 		} catch (MessagingException e) {
 			throw new RuntimeException("No fue posible inicializar MimeMessageHelper", e);

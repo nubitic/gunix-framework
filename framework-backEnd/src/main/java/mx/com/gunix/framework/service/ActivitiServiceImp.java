@@ -125,7 +125,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 	
 	private static final Logger log = Logger.getLogger(ActivitiServiceImp.class) ;
 
-	private final String ID_APLICACION = System.getenv(ID_APLICACION_VAR);
+	private final String ID_APLICACION = com.hunteron.core.Context.ID_APLICACION.get();
 
 	@Override
 	public Instancia completaTarea(Tarea tarea) {
@@ -335,7 +335,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 	}
 	
 	public synchronized  void eliminaInstanciasVolatiles(){
-		if(Boolean.valueOf(System.getenv("ACTIVITI_MANAGER"))) {
+		if(Boolean.valueOf(com.hunteron.core.Context.ACTIVITI_MASTER.get())) {
 			Date hace30Minutos = Date.from(Instant.now().minus(30, ChronoUnit.MINUTES));
 			
 			gvpm.obtainVolatileProcessDefinitionIds().forEach(processDefinitionId->{

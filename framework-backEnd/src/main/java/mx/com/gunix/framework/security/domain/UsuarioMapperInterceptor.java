@@ -13,9 +13,11 @@ import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.plugin.Signature;
 
+import com.hunteron.core.Context;
+
 @Intercepts({ @Signature(type = ResultSetHandler.class, method = "handleResultSets", args = { Statement.class }) })
 public class UsuarioMapperInterceptor implements Interceptor {
-	private final String ID_APLICACION = System.getenv("ID_APLICACION");
+	private final String ID_APLICACION = Context.ID_APLICACION.get();
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override

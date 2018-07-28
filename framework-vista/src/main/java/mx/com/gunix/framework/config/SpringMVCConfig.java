@@ -28,6 +28,8 @@ import org.springframework.web.servlet.theme.FixedThemeResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.tiles3.TilesConfigurer;
 
+import com.hunteron.core.Context;
+
 import mx.com.gunix.framework.security.domain.Funcion;
 import mx.com.gunix.framework.ui.springmvc.MainController;
 import mx.com.gunix.framework.ui.springmvc.tiles3.AjaxTilesView;
@@ -136,7 +138,7 @@ public class SpringMVCConfig extends WebMvcConfigurerAdapter {
 	
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
-		registry.addViewController("/").setViewName(Funcion.ViewEngine.SPRINGMVC.name().equals(System.getenv("VIEW_ENGINE"))?"forward:startProcess/":"forward:/WEB-INF/mx/com/gunix/ui/springmvc/framework/home.jsp");
+		registry.addViewController("/").setViewName(Funcion.ViewEngine.SPRINGMVC.name().equals(Context.VIEW_ENGINE.get())?"forward:startProcess/":"forward:/WEB-INF/mx/com/gunix/ui/springmvc/framework/home.jsp");
 		
 	}
 }

@@ -17,6 +17,8 @@ import mx.com.gunix.framework.util.EmbeddedServerUtils;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.log4j.Logger;
 
+import com.hunteron.core.Context;
+
 public final class EmbeddedLogicalDocManager {
 	private static Logger log = Logger.getLogger(EmbeddedLogicalDocManager.class);
 
@@ -25,11 +27,11 @@ public final class EmbeddedLogicalDocManager {
 
 		File logicalDocHomeFile = new File(logicalDocHome);
 
-		File pgsqlHomeFile = new File(System.getenv("DB_EMBEDDED_HOME"));
+		File pgsqlHomeFile = new File(Context.DB_EMBEDDED_HOME.get());
 		pgsqlHomeFile = "pgsql".equalsIgnoreCase(pgsqlHomeFile.getName()) ? pgsqlHomeFile : new File(pgsqlHomeFile, "pgsql");
-		String usuario = System.getenv("DB_USER");
-		String baseDatos = System.getenv("DB_NAME");
-		String puerto = System.getenv("DB_PORT");
+		String usuario = Context.DB_USER.get();
+		String baseDatos = Context.DB_NAME.get();
+		String puerto = Context.DB_PORT.get();
 		if (puerto == null || "".equals(puerto)) {
 			puerto = "5432";
 		}
@@ -120,11 +122,11 @@ public final class EmbeddedLogicalDocManager {
 		bfWrt.newLine();
 		bfWrt.write("jdbc.driver=org.postgresql.Driver");
 		bfWrt.newLine();
-		bfWrt.write("jdbc.password=" + System.getenv("DB_PASSWORD"));
+		bfWrt.write("jdbc.password=" + Context.DB_PASSWORD.get());
 		bfWrt.newLine();
-		bfWrt.write("jdbc.url=jdbc\\:postgresql\\://localhost:" + puerto + "/" + System.getenv("DB_NAME") + "?currentSchema\\=logicaldoc");
+		bfWrt.write("jdbc.url=jdbc\\:postgresql\\://localhost:" + puerto + "/" + Context.DB_NAME.get() + "?currentSchema\\=logicaldoc");
 		bfWrt.newLine();
-		bfWrt.write("jdbc.username=" + System.getenv("DB_USER"));
+		bfWrt.write("jdbc.username=" + Context.DB_USER.get());
 		bfWrt.newLine();
 		bfWrt.write("jdbc.validationQuery=SELECT 1");
 		bfWrt.newLine();
@@ -146,11 +148,11 @@ public final class EmbeddedLogicalDocManager {
 		cmd.add(logicalDocHomeFile.getAbsolutePath() + File.separator + "webapp-runner.jar");
 
 		cmd.add("--port");
-		cmd.add((System.getenv("LOGICALDOC_PORT") != null ? System.getenv("LOGICALDOC_PORT") : "7080"));
+		cmd.add((Context.LOGICALDOC_PORT.get()));
 		cmd.add("--temp-directory");
 		cmd.add(logicalDocHomeFile.getAbsolutePath() + File.separator + "tomcat");
 		cmd.add("--path");
-		cmd.add(System.getenv("LOGICALDOC_CONTEXT") != null ? System.getenv("LOGICALDOC_CONTEXT") : "/logicaldoc");
+		cmd.add(Context.LOGICALDOC_CONTEXT.get());
 
 		cmd.add(logicalDocHomeFile.getAbsolutePath() + File.separator + "logicalDoc");
 
@@ -173,6 +175,6 @@ public final class EmbeddedLogicalDocManager {
 	}
 
 	public static String getLogicalDocURL() {
-		return (System.getenv("LOGICALDOC_HOSTNAME") != null ? System.getenv("LOGICALDOC_HOSTNAME") : "http://localhost:") + (System.getenv("LOGICALDOC_PORT") != null ? System.getenv("LOGICALDOC_PORT") : "7080") + (System.getenv("LOGICALDOC_CONTEXT") != null ? System.getenv("LOGICALDOC_CONTEXT") : "/logicaldoc");
+		return (Context.LOGICALDOC_HOSTNAME.get() + Context.LOGICALDOC_PORT.get() + Context.LOGICALDOC_CONTEXT.get());
 	}
 }

@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+import com.hunteron.core.Context;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
 import com.mongodb.MongoTimeoutException;
@@ -56,12 +57,12 @@ public class MongoDBConfig {
 	public @Bean MongoDbFactory mongoDbFactory() throws Exception {
 		MongoClient mongoClient = null;
 
-		int mongoPort = (System.getenv("MONGO_PORT") != null && !System.getenv("MONGO_PORT").isEmpty() ? Integer.parseInt(System.getenv("MONGO_PORT")) : 27017);
-		String mongoDB = System.getenv("MONGO_DB_NAME");
+		int mongoPort = (Context.MONGO_PORT.get()!= null && !Context.MONGO_PORT.get().isEmpty() ? Integer.parseInt(Context.MONGO_PORT.get()) : 27017);
+		String mongoDB = Context.MONGO_DB_NAME.get();
 		
-		String mongoServer = (System.getenv("MONGO_HOSTNAME") != null && !System.getenv("MONGO_HOSTNAME").isEmpty() ? System.getenv("MONGO_HOSTNAME") : "localhost");
-		String mongoUser = System.getenv("MONGO_USER");
-		String mongoPassword = System.getenv("MONGO_PASSWORD");
+		String mongoServer = (Context.MONGO_HOSTNAME.get() != null && !Context.MONGO_HOSTNAME.get().isEmpty() ? Context.MONGO_HOSTNAME.get() : "localhost");
+		String mongoUser = Context.MONGO_USER.get();
+		String mongoPassword = Context.MONGO_PASSWORD.get();
 				
 		try {
 			mongoClient = getMongoClient(mongoServer, mongoPort, mongoUser, mongoPassword, mongoDB);
@@ -96,7 +97,7 @@ public class MongoDBConfig {
     
     private void startMongoDB(int mongoPort) throws Exception{
     	Command command = Command.MongoD;
-    	String mongoInstallationDir = System.getenv("MONGO_INSTALL_PATH") != null ? System.getenv("MONGO_INSTALL_PATH") : System.getProperty("user.home") + File.separatorChar + ".embeddedMongodb";
+    	String mongoInstallationDir = Context.MONGO_INSTALL_PATH.get()!= null ? Context.MONGO_INSTALL_PATH.get() : System.getProperty("user.home") + File.separatorChar + ".embeddedMongodb";
 		
 		ITempNaming executableNaming = new UserTempNaming();
 		Distribution distribution= Distribution.detectFor(Version.Main.PRODUCTION);	

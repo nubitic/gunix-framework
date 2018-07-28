@@ -23,6 +23,7 @@ import org.vaadin.spring.config.VaadinConfig;
 import org.vaadin.spring.servlet.SpringAwareUIProvider;
 import org.vaadin.spring.servlet.SpringAwareVaadinServlet;
 
+import com.hunteron.core.Context;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionInitEvent;
 import com.vaadin.server.SessionInitListener;
@@ -55,8 +56,7 @@ public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
 
 							@Override
 							public String getTheme(UICreateEvent event) {
-								String tema = System.getenv("VIEW_THEME");
-								return tema != null && !"".equals(tema) ? tema : "gunix";
+								return Context.VIEW_THEME.get();
 							}
 							
 						};
@@ -94,7 +94,7 @@ public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
 		configClasses.add(AspectJConfig.class);
 		configClasses.add(MailConfig.class);
 
-		if (Boolean.parseBoolean(System.getenv("LOGICALDOC_ENABLED"))) {
+		if (Boolean.parseBoolean(Context.LOGICALDOC_ENABLED.get())) {
 			configClasses.add(LogicalDocConfig.class);
 		}
 		try {

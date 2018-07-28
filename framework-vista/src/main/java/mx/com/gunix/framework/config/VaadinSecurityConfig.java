@@ -68,7 +68,9 @@ public class VaadinSecurityConfig  extends AbstractSecurityConfig{
 	 */
 	@Bean
 	public VaadinRedirectStrategy vaadinRedirectStrategy() {
-		return new VaadinDefaultRedirectStrategy();
+		VaadinDefaultRedirectStrategy redirectStr = new VaadinDefaultRedirectStrategy();
+		redirectStr.setContextRelative(true);
+		return redirectStr;
 	}
 
 	@Bean

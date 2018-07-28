@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hunteron.core.Context;
 import com.logicaldoc.webservice.WSAttribute;
 import com.logicaldoc.webservice.auth.AuthService;
 import com.logicaldoc.webservice.document.WSDocument;
@@ -49,8 +50,8 @@ public class DocumentService {
 	static String DEFAULT_WORKSPACE_NAME;
 
 	static {
-		usuarioLD = System.getenv("LOGICALDOC_USER") == null ? "admin" : System.getenv("LOGICALDOC_USER");
-		passwordLD = System.getenv("LOGICALDOC_PASSWORD") == null ? "admin" : System.getenv("LOGICALDOC_PASSWORD");
+		usuarioLD = Context.LOGICALDOC_USER.get();
+		passwordLD = Context.LOGICALDOC_PASSWORD.get();
 	}
 
 	/**
