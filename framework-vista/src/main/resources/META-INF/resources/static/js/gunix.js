@@ -81,8 +81,17 @@ function addParamToData(originalOptions, options, paramName, paramValue){
 		if(typeof(originalOptions.data) == 'string' && options.data.indexOf('&'+paramName+'=') < 0){
 			options.data = options.data + '&'+paramName+'='+paramValue;
 		}else{
-			if(eval('typeof(options.data.'+paramName+')') == 'undefined')
-				options.data = $.param($.extend(options.data, eval('{'+ paramName + ' : ' + paramValue + '}')));	
+			if(options.data==null || 
+			   options.data=='' || 
+			   typeof(options.data)=='undefined' || 
+			   eval('typeof(options.data.'+paramName+')') == 'undefined')
+				options.data = $.param($.extend(
+												(options.data==null||
+												 options.data==''||
+												 typeof(options.data)=='undefined')?{}:options.data, 
+													eval('{'+ paramName + ' : \'' + paramValue + '\'}')
+												)
+									  );	
 		}
 	}
 }
