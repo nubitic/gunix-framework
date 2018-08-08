@@ -64,6 +64,6 @@ public class ServerServiceConfig extends WebMvcConfigurerAdapter {
 	
 	@Bean
 	public MessageSource messageSource() {
-		return Utils.buildMessageSource();
+		return Utils.buildMessageSource(getClass().getClassLoader());
 	}
 }

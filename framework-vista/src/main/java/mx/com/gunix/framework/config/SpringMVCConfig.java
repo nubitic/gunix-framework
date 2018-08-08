@@ -126,7 +126,7 @@ public class SpringMVCConfig extends WebMvcConfigurerAdapter {
 	
 	@Bean
 	public MessageSource messageSource() {
-		return Utils.buildMessageSource();
+		return Utils.buildMessageSource(getClass().getClassLoader());
 	}
 
 	@Bean
@@ -139,6 +139,5 @@ public class SpringMVCConfig extends WebMvcConfigurerAdapter {
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
 		registry.addViewController("/").setViewName(Funcion.ViewEngine.SPRINGMVC.name().equals(Context.VIEW_ENGINE.get())?"forward:startProcess/":"forward:/WEB-INF/mx/com/gunix/ui/springmvc/framework/home.jsp");
-		
 	}
 }

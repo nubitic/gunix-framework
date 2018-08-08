@@ -34,12 +34,13 @@ public abstract class Utils {
 		return Number.class.isAssignableFrom(fieldType) || primitiveNumbers.contains(fieldType);
 	}
 	
-	public static MessageSource buildMessageSource() {
+	public static MessageSource buildMessageSource(ClassLoader classLoader) {
 		ContextCleanupListener dummy =  new ContextCleanupListener();
 		
 		ResourceBundleMessageSource messageSource = new GunixResourceBundleMessageSource();
 		messageSource.setBasename("messages");
 		messageSource.addBasenames("ValidationMessages");
+		messageSource.setBundleClassLoader(classLoader);
 		Utils.ms = messageSource; 
 		return messageSource;
 	}
