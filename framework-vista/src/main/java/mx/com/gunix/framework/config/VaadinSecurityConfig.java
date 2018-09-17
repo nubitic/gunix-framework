@@ -69,18 +69,13 @@ public class VaadinSecurityConfig  extends AbstractSecurityConfig{
 	@Bean
 	public VaadinRedirectStrategy vaadinRedirectStrategy() {
 		VaadinDefaultRedirectStrategy redirectStr = new VaadinDefaultRedirectStrategy();
-		redirectStr.setContextRelative(true);
 		return redirectStr;
 	}
 
 	@Bean
 	public VaadinAuthenticationSuccessHandler redirectSaveHandler() {
 		SavedRequestAwareVaadinAuthenticationSuccessHandler handler = new SavedRequestAwareVaadinAuthenticationSuccessHandler();
-
 		handler.setRedirectStrategy(vaadinRedirectStrategy());
-		handler.setDefaultTargetUrl("/");
-		handler.setAlwaysUseDefaultTargetUrl(true);
-		handler.setTargetUrlParameter("r");
 		return handler;
 	}
 
