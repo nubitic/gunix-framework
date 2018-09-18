@@ -86,7 +86,7 @@ public class MainController {
 
 	@RequestMapping(value = "/ajaxFragment", method = { RequestMethod.POST })
 	public String ajaxFragment(Model uiModel, HttpServletRequest request) throws BeansException, ClassNotFoundException {
-		if (Context.VIEW_ENGINE.get().equals(Funcion.ViewEngine.SPRINGMVC.name())&&!Context.VIEW_INDEX_TILE_DEF.get().equals("gunix.index")&&"formContent".equals(request.getParameter("fragments"))||"content".equals(request.getParameter("fragments"))) {		 
+		if ("content".equals(request.getParameter("fragments"))) {
 			doControl(request, null, uiModel, true, false);
 		}
 		return Context.VIEW_INDEX_TILE_DEF.get();
