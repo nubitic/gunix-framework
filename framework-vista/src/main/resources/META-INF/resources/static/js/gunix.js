@@ -1,4 +1,4 @@
-var urlExceptions = ['uploadFile','ajaxFragment'];
+var urlExceptions = ['uploadFile','ajaxFragment','startProcess'];
 
 function getAjaxOptions(url,data){
 	return {
@@ -75,16 +75,16 @@ $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
 });
 
 function addParamToData(originalOptions, options, paramName, paramValue){
-	if (originalOptions.data instanceof FormData) {
+	if (options.data instanceof FormData) {
 		options.data.append(paramName, paramValue);
 	} else {
-		if(typeof(originalOptions.data) == 'string' && options.data.indexOf('&'+paramName+'=') < 0){
+		if(typeof(options.data) == 'string' && options.data.indexOf('&'+paramName+'=') < 0 && options.data.indexOf(paramName+'=') < 0){
 			options.data = options.data + '&'+paramName+'='+paramValue;
 		}else{
 			if(options.data==null || 
 			   options.data=='' || 
 			   typeof(options.data)=='undefined' || 
-			   eval('typeof(options.data.'+paramName+')') == 'undefined')
+			   (typeof(options.data)=='object' && eval('typeof(options.data.'+paramName+')') == 'undefined'))
 				options.data = $.param($.extend(
 												(options.data==null||
 												 options.data==''||
@@ -104,6 +104,15 @@ function onCompleteTask(idAplicacion, preCompleteTask, boton) {
 	}
 	$.ajax(
 			getAjaxOptions(showFragment + fragmentToUpdate + "&idAplicacion=" + idAplicacion + "&isCompleteTask=true", $("#gunixMainForm").serialize()))
+				.done(
+				function(newContent) {
+					$("#"+fragmentToUpdate).html(newContent);
+				});
+}
+
+function startProcess(idAplicacion, idRol, idModulo, idFuncion) {
+	$.ajax(
+			getAjaxOptions("startProcess", {fragments:fragmentToUpdate,idAplicacion:idAplicacion, idRol:idRol, idModulo:idModulo, idFuncion, idFuncion}))
 				.done(
 				function(newContent) {
 					$("#"+fragmentToUpdate).html(newContent);

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -69,22 +68,18 @@ public class MainController {
 		ReflectionUtils.makeAccessible(generatePathMappings);
 	}
 
-	@RequestMapping(value = "/startProcess", method = RequestMethod.GET)
+	@RequestMapping(value = "/startProcess", method = {RequestMethod.GET, RequestMethod.POST})
 	public String main(Model uiModel, HttpServletRequest request) throws BeansException, ClassNotFoundException {
 		Instancia instancia = null;
 		
-		if (Funcion.ViewEngine.SPRINGMVC.name().equals(Context.VIEW_ENGINE.get())) {
-			instancia = as.iniciaProceso("index", new ArrayList<Variable<?>>(), "");
-		} else {
-			Funcion funcion = determinaFuncion(request);
-			instancia = as.iniciaProceso(funcion.getProcessKey(), Variable.fromParametros(funcion.getParametros()), "");
-		}
+		Funcion funcion = determinaFuncion(request);
+		instancia = as.iniciaProceso(funcion.getProcessKey(), Variable.fromParametros(funcion.getParametros()), "");
 		
 		doControl(request, instancia, uiModel, false, false);
 		return Context.VIEW_INDEX_TILE_DEF.get();
 	}
 
-	@RequestMapping(value = "/ajaxFragment", method = { RequestMethod.POST })
+	@RequestMapping(value = "/ajaxFragment", method = RequestMethod.POST)
 	public String ajaxFragment(Model uiModel, HttpServletRequest request) throws BeansException, ClassNotFoundException {
 		if ("content".equals(request.getParameter("fragments"))) {
 			doControl(request, null, uiModel, true, false);
@@ -124,7 +119,7 @@ public class MainController {
 				instancia = as.completaTarea(tareaActual);
 				Utils.setTareaActual(request, instancia.getTareaActual());
 			}
-			
+			vg.clearCache();
 			String newJspView = null;
 			if ((instancia.getTareaActual() == null || instancia.getTareaActual().getVista().equals(Tarea.DEFAULT_END_TASK_VIEW))) {
 				newJspView = DEFAULT_END_TASK_SPRINGMVC_VIEW;

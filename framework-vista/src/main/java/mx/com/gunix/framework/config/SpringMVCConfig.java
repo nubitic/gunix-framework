@@ -138,6 +138,6 @@ public class SpringMVCConfig extends WebMvcConfigurerAdapter {
 	
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
-		registry.addViewController("/").setViewName(Funcion.ViewEngine.SPRINGMVC.name().equals(Context.VIEW_ENGINE.get())?"forward:startProcess/":"forward:/WEB-INF/mx/com/gunix/ui/springmvc/framework/home.jsp");
+		registry.addViewController("/").setViewName(Funcion.ViewEngine.SPRINGMVC.name().equals(Context.VIEW_ENGINE.get())?Context.VIEW_INDEX_TILE_DEF.get():"forward:/WEB-INF/mx/com/gunix/ui/springmvc/framework/home.jsp");
 	}
 }

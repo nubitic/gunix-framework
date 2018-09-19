@@ -40,7 +40,7 @@ public class GunixVariableGetter implements Serializable {
 
 		Serializable s = varCache.get(nombreVariable);
 		if (s == null) {
-			s = as.getVar(instancia, nombreVariable);
+			s = instancia != null ? as.getVar(instancia, nombreVariable) : null;
 			if (s == null) {
 				varCache.put(nombreVariable, NULL_OBJECT);
 			} else {
@@ -52,5 +52,9 @@ public class GunixVariableGetter implements Serializable {
 			}
 		}
 		return s;
+	}
+
+	public void clearCache() {
+		varCache.clear();
 	}
 }

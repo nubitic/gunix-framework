@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Update;
 import mx.com.gunix.framework.security.domain.Usuario;
 
 public interface UsuarioMapper {
-	@Select("select u.*, DU.curp, DU.rfc, DU.ap_paterno, DU.ap_materno, DU.nombre, DU.correo_electronico, DU.telefono from SEGURIDAD.menu_usuario(#{idUsuario}) u LEFT JOIN SEGURIDAD.DATOS_USUARIO DU ON (U.ID_USUARIO = DU.ID_USUARIO)")
+	@Select("select u.*, DU.curp, DU.rfc, DU.ap_paterno, DU.ap_materno, DU.nombre, DU.correo_electronico, DU.telefono from SEGURIDAD.menu_usuario(#{idUsuario}) u LEFT JOIN SEGURIDAD.DATOS_USUARIO DU ON (U.ID_USUARIO = DU.ID_USUARIO) order by u.id_aplicacion,u.id_rol,u.id_modulo,u.orden")
 	@ResultMap("usuarioResultMap")
 	public Usuario getUsuario(String idUsuario);
 
