@@ -2,6 +2,7 @@ package mx.com.gunix.framework.security.domain;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -37,6 +38,8 @@ public class Usuario implements Serializable {
 	private boolean activo;
 	
 	private String encodePassword;
+	
+	private Map<String, Object> extraAttribs;
 	
 	public List<Aplicacion> getAplicaciones() {
 		return aplicaciones;
@@ -115,6 +118,12 @@ public class Usuario implements Serializable {
 	}
 	public void setEncodePassword(String encodePassword) {
 		this.encodePassword = encodePassword;
+	}
+	public Map<String, Object> getExtraAttribs() {
+		return extraAttribs;
+	}
+	public void setExtraAttribs(Map<String, Object> extraAttribs) {
+		this.extraAttribs = extraAttribs;
 	}
 	
 }
