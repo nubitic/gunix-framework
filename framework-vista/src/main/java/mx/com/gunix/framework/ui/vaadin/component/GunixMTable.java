@@ -11,6 +11,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.vaadin.viritin.ListContainer;
 import org.vaadin.viritin.fields.MTable;
+import org.vaadin.viritin.fields.MValueChangeEventImpl;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -210,4 +211,14 @@ public class GunixMTable<T extends Serializable> extends MTable<T> {
 			throw new IllegalStateException("Se intento validar la tabla sin haber agregado elementos a validar o indicar el tipo (clase) de los elementos a contener en la tabla");
 		}
 	}
+
+	@Override
+	protected void fireValueChange(boolean repaintIsNotNeeded) {
+		fireEvent(new MValueChangeEventImpl<T>(this));
+        if (!repaintIsNotNeeded) {
+            markAsDirty();
+        }
+	}
+	
+	
 }

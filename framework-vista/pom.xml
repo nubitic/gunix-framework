@@ -258,6 +258,11 @@
 			<artifactId>josso-default-passwordgenerator</artifactId>
 			<version>${josso.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>dcharts-widget</artifactId>
+			<version>1.7.0</version>
+		</dependency>
 	</dependencies>
 
 	<distributionManagement>
