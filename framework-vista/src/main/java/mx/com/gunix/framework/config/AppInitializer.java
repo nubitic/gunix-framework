@@ -69,7 +69,7 @@ public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
 		savsReg.setAsyncSupported(true);
 		savsReg.setLoadOnStartup(2);
 		savsReg.setInitParameter("widgetset", "mx.com.gunix.framework.ui.vaadin.GunixWidgetset");
-		savsReg.setInitParameter("productionMode", "true");
+		savsReg.setInitParameter("productionMode", "true".equals(Context.VIEW_VAADIN_ENABLE_DEBUG_MODE.get()) ? "false" : "true");
 		savsReg.addMapping("/VAADIN/*", "/" + VaadinSecurityConfig.VAADIN_LOCATION + "*");
 
 		DispatcherServlet ds = new DispatcherServlet();
