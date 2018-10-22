@@ -65,7 +65,7 @@ public final class EmbeddedLogicalDocManager {
 
 		File logicalDocDir = new File(logicalDocHomeFile + File.separator + "logicalDoc");
 		if (!logicalDocDir.exists()) {
-			File logicalDocWar = EmbeddedServerUtils.descargaArchivo("https://svwh.dl.sourceforge.net/project/logicaldoc/distribution/LogicalDOC%20CE%207.4/logicaldoc-webapp-7.4.2.war", "logicalDoc", ".war", log);
+			File logicalDocWar = EmbeddedServerUtils.descargaArchivo("https://ayera.dl.sourceforge.net/project/logicaldoc/distribution/LogicalDOC%20CE%207.4/logicaldoc-webapp-7.4.2.war", "logicalDoc", ".war", log);
 			EmbeddedServerUtils.extractZip(logicalDocWar, logicalDocHomeFile + File.separator + "logicalDoc" + File.separator, log);
 		}
 		
