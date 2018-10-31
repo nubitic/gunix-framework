@@ -15,6 +15,7 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -36,8 +37,9 @@ import mx.com.gunix.framework.security.domain.persistence.GunixPersistentTokenRe
 @MapperScan({ "mx.com.gunix.domain.persistence", "mx.com.gunix.framework.security.domain.persistence", "mx.com.gunix.framework.activiti.persistence.entity", "mx.com.gunix.framework.token.persistence" })
 public class PersistenceConfig {
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-
+	
 	@Bean
+	@Primary
 	public synchronized DataSource dataSource() {
 		String host = null;
 		if (Boolean.valueOf(Context.DB_USE_EMBEDDED.get())) {
@@ -80,11 +82,13 @@ public class PersistenceConfig {
 	}
 
 	@Bean
+	@Primary
 	public PlatformTransactionManager transactionManager() {
 		return new DataSourceTransactionManager(dataSource());
 	}
 
 	@Bean
+	@Primary
 	public SqlSessionFactoryBean sqlSessionFactory() throws Exception {
 		SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
 		sessionFactory.setDataSource(dataSource());
