@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mx.com.gunix.adminapp.domain.persistence.RolMapper">
+	<resultMap type="mx.com.gunix.framework.security.domain.Funcion" id="funcionesRolMap">
+		<id property="modulo.aplicacion.idAplicacion" column="ID_APLICACION" />
+		<id property="modulo.idModulo" column="ID_MODULO" />
+		<id property="idFuncion" column="ID_FUNCION" />
+		<result property="acceso" column="NIV_ACC" />
+		<association property="padre" javaType="mx.com.gunix.framework.security.domain.Funcion">
+			<id property="modulo.aplicacion.idAplicacion" column="ID_APLICACION" />
+			<id property="modulo.idModulo" column="ID_MODULO" />
+			<id property="idFuncion" column="ID_FUNCION_PADRE" />
+		</association>
+	</resultMap>
+	<update id="update">
+		UPDATE SEGURIDAD.ROL
+		SET
+		<foreach collection="cambios" index="key" item="value" open="" separator=" , " close="">
+			<if test="key == 'descripcion' || key == 'habilitado'">
+				${key}=#{value}
+			</if>
+		</foreach>
+		<where>
+			<foreach collection="idMap" index="key" item="value" open="" separator=" AND " close="">
+				<choose>
+					<when test="key == 'aplicacion'">
+						<bind name="idAplicacion" value="value.idAplicacion" />
+						ID_APLICACION=#{idAplicacion}
+					</when>
+					<when test="key == 'idRol'">
+						ID_ROL=#{value}
+					</when>
+				</choose>
+			</foreach>
+		</where>
+	</update>
+	
+	<update id="updateFuncion">
+		UPDATE SEGURIDAD.ROL_FUNCION
+		SET
+		<foreach collection="dcFuncionRol.cambios" index="key" item="value" open="" separator=" , " close="">
+			<if test="key == 'acceso'">
+				NIV_ACC=#{value}::seguridad.nivel_acceso
+			</if>
+		</foreach>
+		<where>
+			<foreach collection="idRolMap" index="key" item="value" open="" separator=" AND " close="">
+				<choose>
+					<when test="key == 'aplicacion'">
+						<bind name="idAplicacion" value="value.idAplicacion" />
+						ID_APLICACION=#{idAplicacion}
+					</when>
+					<when test="key == 'idRol'">
+						ID_ROL=#{value}
+					</when>
+				</choose>
+			</foreach>
+			<foreach collection="dcFuncionRol.idMap" index="key" item="value" open=" AND " separator=" AND " close="">
+				<choose>
+					<when test="key == 'modulo'">
+						<bind name="idModulo" value="value.idModulo" />
+						ID_MODULO=#{idModulo}
+					</when>
+					<when test="key == 'idFuncion'">
+						ID_FUNCION=#{value}
+					</when>
+				</choose>
+			</foreach>
+		</where>
+	</update>
+	<select id="getByIdAplicacion" resultMap="toRol">
+		Select ID_APLICACION, ID_ROL, DESCRIPCION from SEGURIDAD.ROL where ID_APLICACION=#{idAplicacion}
+	</select>
+	<resultMap type="mx.com.gunix.framework.security.domain.Rol" id="toRol">
+		<id column="ID_APLICACION" property="aplicacion.idAplicacion"/>
+		<id column="ID_ROL" property="idRol"/>
+		<result column="DESCRIPCION" property="descripcion"/>
+	</resultMap>
+	<select id="getFuncionesByIdRol" resultMap="funcionesRolMap">
+		select ID_APLICACION, ID_MODULO, ID_FUNCION, ID_FUNCION_PADRE from ADMON_SEG.FUNCIONES_ROL(#{idAplicacion},#{idRol})
+	</select>
+	<insert id="inserta">
+		INSERT INTO SEGURIDAD.ROL VALUES(#{aplicacion.idAplicacion},#{idRol},#{descripcion})
+	</insert>
+	<insert id="insertaFuncion">
+		INSERT INTO SEGURIDAD.ROL_FUNCION VALUES(#{funcion.modulo.aplicacion.idAplicacion},#{idRol},#{funcion.modulo.idModulo},#{funcion.idFuncion},#{funcion.acceso}::seguridad.nivel_acceso)
+	</insert>
+	<delete id="deleteFuncion">
+		DELETE FROM SEGURIDAD.ROL_FUNCION WHERE ID_APLICACION = #{funcion.modulo.aplicacion.idAplicacion} AND ID_ROL = #{idRol} AND ID_MODULO = #{funcion.modulo.idModulo} AND ID_FUNCION = #{funcion.idFuncion}
+	</delete>
+</mapper>

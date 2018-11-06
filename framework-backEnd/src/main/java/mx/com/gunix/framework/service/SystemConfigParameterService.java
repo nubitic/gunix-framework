@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import mx.com.gunix.framework.activiti.persistence.entity.SystemConfigParameterMapper;
+import mx.com.gunix.framework.util.SystemConfigParameterMapper;
 import mx.com.gunix.framework.util.SystemConfigurationParameter;
 
 

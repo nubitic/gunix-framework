@@ -8,8 +8,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.sql.DataSource;
-
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.ibatis.cache.CacheException;
 import org.springframework.beans.BeansException;
@@ -38,13 +36,10 @@ import org.springframework.security.acls.domain.AuditLogger;
 import org.springframework.security.acls.domain.ConsoleAuditLogger;
 import org.springframework.security.acls.domain.DefaultPermissionFactory;
 import org.springframework.security.acls.domain.EhCacheBasedAclCache;
-import org.springframework.security.acls.jdbc.BasicLookupStrategy;
-import org.springframework.security.acls.jdbc.JdbcMutableAclService;
-import org.springframework.security.acls.jdbc.LookupStrategy;
 import org.springframework.security.acls.model.AccessControlEntry;
 import org.springframework.security.acls.model.Acl;
 import org.springframework.security.acls.model.AclCache;
-import org.springframework.security.acls.model.MutableAclService;
+import org.springframework.security.acls.model.AclService;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.PermissionGrantingStrategy;
@@ -207,62 +202,10 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration impl
     public DefaultPermissionFactory aclPermissionFactory() {
         return new DefaultPermissionFactory();
     }
-	
+		
 	@Bean
-    public LookupStrategy aclLookupStrategy() throws CacheException, IOException {
-        BasicLookupStrategy lookupStrategy = new BasicLookupStrategy(beanFactory.getBean(DataSource.class), aclCache(), aclAuthorizationStrategy(), aclPermissionGrantingStrategy());
-        lookupStrategy.setSelectClause("select acl_object_identity.object_id_identity, "
-						    			+ "acl_entry.ace_order,  "
-						    			+ "acl_object_identity.id as acl_id, "
-						    			+ "acl_object_identity.parent_object, "
-						    			+ "acl_object_identity.entries_inheriting, "
-						    			+ "acl_entry.id as ace_id, "
-						    			+ "acl_entry.mask,  "
-						    			+ "acl_entry.granting,  "
-						    			+ "acl_entry.audit_success, "
-						    			+ "acl_entry.audit_failure,  "
-						    			+ "acl_sid.principal as ace_principal, "
-						    			+ "acl_sid.sid as ace_sid,  "
-						    			+ "acli_sid.principal as acl_principal, "
-						    			+ "acli_sid.sid as acl_sid, "
-						    			+ "acl_class.class "
-						    			+ "from seguridad.acl_object_identity "
-						    			+ "left join seguridad.acl_sid acli_sid on acli_sid.id = acl_object_identity.owner_sid "
-						    			+ "left join seguridad.acl_class on acl_class.id = acl_object_identity.object_id_class   "
-						    			+ "left join seguridad.acl_entry on acl_object_identity.id = acl_entry.acl_object_identity "
-						    			+ "left join seguridad.acl_sid on acl_entry.sid = acl_sid.id  " + "where ( ");
-        lookupStrategy.setPermissionFactory(aclPermissionFactory());
-        return lookupStrategy;
-    }
-	
-	@Bean
-	public MutableAclService aclService() throws CacheException, IOException {
-
-		JdbcMutableAclService aclService = new JdbcMutableAclService(beanFactory.getBean(DataSource.class), aclLookupStrategy(), aclCache());
-		aclService.setClassIdentityQuery("select currval(pg_get_serial_sequence('seguridad.acl_class', 'id'))");
-		aclService.setSidIdentityQuery("select currval(pg_get_serial_sequence('seguridad.acl_sid', 'id'))");
-
-		aclService.setDeleteEntryByObjectIdentityForeignKeySql("delete from seguridad.acl_entry where acl_object_identity=?");
-		aclService.setDeleteObjectIdentityByPrimaryKeySql("delete from seguridad.acl_object_identity where id=?");
-		aclService.setInsertClassSql("insert into seguridad.acl_class (class) values (?)");
-		aclService.setInsertEntrySql("insert into seguridad.acl_entry (acl_object_identity, ace_order, sid, mask, granting, audit_success, audit_failure) values (?, ?, ?, ?, ?, ?, ?)");
-		aclService.setInsertObjectIdentitySql("insert into seguridad.acl_object_identity (object_id_class, object_id_identity, owner_sid, entries_inheriting) values (?, ?, ?, ?)");
-		aclService.setInsertSidSql("insert into seguridad.acl_sid (principal, sid) values (?, ?)");
-		aclService.setClassPrimaryKeyQuery("select id from seguridad.acl_class where class=?");
-		aclService.setObjectIdentityPrimaryKeyQuery("select acl_object_identity.id from seguridad.acl_object_identity, seguridad.acl_class where acl_object_identity.object_id_class = acl_class.id and acl_class.class=? and acl_object_identity.object_id_identity = ?");
-		aclService.setSidPrimaryKeyQuery("select id from seguridad.acl_sid where principal=? and sid=?");
-		aclService.setUpdateObjectIdentity("update seguridad.acl_object_identity set parent_object = ?, owner_sid = ?, entries_inheriting = ? where id = ?");
-		aclService.setFindChildrenQuery("select obj.object_id_identity as obj_id, class.class as class "
-										+ "from seguridad.acl_object_identity obj, seguridad.acl_object_identity parent, seguridad.acl_class class "
-										+ "where obj.parent_object = parent.id and obj.object_id_class = class.id "
-										+ "and parent.object_id_identity = ? and parent.object_id_class = ("
-										+ "select id FROM seguridad.acl_class where acl_class.class = ?)");
-		return aclService;
-	}
-	
-	@Bean
-    public PermissionEvaluator aclPermissionEvaluator() throws CacheException, IOException {
-        return new AclPermissionEvaluator(aclService());
+    public PermissionEvaluator aclPermissionEvaluator(AclService aclService) throws CacheException, IOException {
+        return new AclPermissionEvaluator(aclService);
     }
 	
 
@@ -364,7 +307,7 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration impl
 		};
         expressionHandler.setDefaultRolePrefix("");
         try {
-			expressionHandler.setPermissionEvaluator(aclPermissionEvaluator());
+			expressionHandler.setPermissionEvaluator(aclPermissionEvaluator(beanFactory.getBean(AclService.class)));
 		} catch (CacheException | IOException e) {
 			throw new RuntimeException(e);
 		}

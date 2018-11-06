@@ -1,0 +1,3 @@
+mx\com\gunix\framework\config\PersistenceCustomizationDefinition.class
+mx\com\gunix\framework\security\domain\persistence\JdbcGunixPersistentTokenRepository$1.class
+mx\com\gunix\framework\security\domain\persistence\JdbcGunixPersistentTokenRepository.class

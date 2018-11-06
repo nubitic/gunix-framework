@@ -29,7 +29,6 @@ import org.activiti.engine.delegate.event.ActivitiExceptionEvent;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
 import org.activiti.engine.impl.bpmn.data.ItemInstance;
 import org.activiti.engine.impl.cfg.IdGenerator;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.el.ReadOnlyMapELResolver;
@@ -124,7 +123,6 @@ public class ActivitiConfig {
 			}
 		};
 		speConf.setDataSource(dataSource);
-		speConf.setDatabaseType(ProcessEngineConfigurationImpl.DATABASE_TYPE_POSTGRES);
 		speConf.setTransactionManager(transactionManager);
 		speConf.setTablePrefixIsSchema(true);
 		speConf.setDatabaseTablePrefix("activiti.");
@@ -215,7 +213,7 @@ public class ActivitiConfig {
 		speConf.setTypedEventListeners(eventListeners);
 		
 		Set<String> customMybatisXMLMappers = new HashSet<String>();
-		customMybatisXMLMappers.add("mx/com/gunix/framework/activiti/domain/persistence/GunixVariableHistoricProcessInstance.xml");
+		customMybatisXMLMappers.add("mx/com/gunix/framework/activiti/persistence/entity/GunixVariableHistoricProcessInstance.xml");
 		speConf.setCustomMybatisXMLMappers(customMybatisXMLMappers);
 
 		return speConf;

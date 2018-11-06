@@ -50,6 +50,7 @@ public enum Context {
 	DB_NAME("DB_NAME",null),
 	DB_PORT("DB_PORT",null),
 	DB_SERVER_NAME("DB_SERVER_NAME",null),
+	DB_JNDI_NAME("DB_JNDI_NAME",null),
 	
 	REDIS_HOST("REDIS_HOST",null),
 	EMBEDDED_REDIS_HOME("EMBEDDED_REDIS_HOME",null),

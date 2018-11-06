@@ -15,83 +15,37 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.hunteron.core.Context;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 
-import mx.com.gunix.framework.persistence.EmbeddedPostgreSQLManager;
-import mx.com.gunix.framework.security.domain.UsuarioMapperInterceptor;
-import mx.com.gunix.framework.security.domain.persistence.GunixPersistentTokenRepository;
+import mx.com.gunix.framework.security.domain.persistence.UsuarioMapperInterceptor;
 
 @Configuration
 @EnableTransactionManagement(proxyTargetClass = true)
 @MapperScan({ "mx.com.gunix.domain.persistence", "mx.com.gunix.framework.security.domain.persistence", "mx.com.gunix.framework.activiti.persistence.entity", "mx.com.gunix.framework.token.persistence" })
+@Import(PersistenceCustomization.class)
 public class PersistenceConfig {
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 	
 	@Bean
 	@Primary
-	public synchronized DataSource dataSource() {
-		String host = null;
-		if (Boolean.valueOf(Context.DB_USE_EMBEDDED.get())) {
-			EmbeddedPostgreSQLManager.start(Context.DB_EMBEDDED_HOME.get(), 
-											Context.DB_USER.get(), 
-											Context.DB_PASSWORD.get(), 
-											Context.DB_NAME.get(),
-											Context.DB_PORT.get(),
-											getClass().getClassLoader());
-			host = "localhost";
-		} else {
-			host = Context.DB_SERVER_NAME.get();
-		}
-
-		HikariConfig config = new HikariConfig();
-
-		config.setAutoCommit(false);
-		config.setMaximumPoolSize(Integer.valueOf(Context.DB_MAX_POOL_SIZE.get()));
-		config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
-
-		if (!"localhost".equals(host) && Boolean.valueOf(Context.DB_USE_SSL.get())) {
-			config.addDataSourceProperty("ssl", "true");
-			config.addDataSourceProperty("sslfactory", "org.postgresql.ssl.NonValidatingFactory");
-		}
-
-		config.addDataSourceProperty("password", Context.DB_PASSWORD.get());
-		config.addDataSourceProperty("user", Context.DB_USER.get());
-		config.addDataSourceProperty("databaseName", Context.DB_NAME.get());
-		config.addDataSourceProperty("serverName", host);
-		config.addDataSourceProperty("ApplicationName", Context.DB_USER.get().toUpperCase());
-		if (Context.DB_PORT.get() != null) {
-			config.addDataSourceProperty("portNumber", Context.DB_PORT.get());
-		}
-		config.addDataSourceProperty("currentSchema", Context.DB_APP_SCHEMA.get());
-		config.addDataSourceProperty("prepareThreshold", "1");
-		config.addDataSourceProperty("preparedStatementCacheQueries", "1024");
-		config.addDataSourceProperty("preparedStatementCacheSizeMiB", "20");
-
-		return new HikariDataSource(config);
+	public PlatformTransactionManager transactionManager(DataSource dataSource) {
+		return new DataSourceTransactionManager(dataSource);
 	}
 
 	@Bean
 	@Primary
-	public PlatformTransactionManager transactionManager() {
-		return new DataSourceTransactionManager(dataSource());
-	}
-
-	@Bean
-	@Primary
-	public SqlSessionFactoryBean sqlSessionFactory() throws Exception {
+	public SqlSessionFactoryBean sqlSessionFactory(DataSource dataSource) throws Exception {
 		SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
-		sessionFactory.setDataSource(dataSource());
+		sessionFactory.setDataSource(dataSource);
 		sessionFactory.setDatabaseIdProvider(new VendorDatabaseIdProvider());
 		sessionFactory.setPlugins(new Interceptor[] { new UsuarioMapperInterceptor() });
 
@@ -125,13 +79,6 @@ public class PersistenceConfig {
 		sessionFactory.setTypeHandlers(new TypeHandler[] { new ByteArrayRefTypeHandlerAlias(), new IbatisVariableTypeHandler() });
 		
 		return sessionFactory;
-	}
-
-	@Bean
-	public PersistentTokenRepository persistentTokenRepository() {
-		GunixPersistentTokenRepository ptr = new GunixPersistentTokenRepository();
-		ptr.setDataSource(dataSource());
-		return ptr;
 	}
 	
 	@Alias("ByteArrayRefTypeHandler")

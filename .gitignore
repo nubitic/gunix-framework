@@ -1,3 +1,7 @@
 /.project
 /.settings/
 /target/
+framework-backEnd-persistence/.classpath
+framework-backEnd-persistence/.project
+framework-backEnd-persistence/.settings/
+framework-backEnd-persistence/target/

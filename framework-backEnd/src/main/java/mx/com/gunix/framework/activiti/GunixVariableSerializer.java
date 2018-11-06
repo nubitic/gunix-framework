@@ -20,7 +20,6 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 
-import mx.com.gunix.framework.activiti.persistence.entity.VariableInstanceMapper;
 import mx.com.gunix.framework.service.hessian.GunixFileInputStream;
 
 public class GunixVariableSerializer {
@@ -32,6 +31,10 @@ public class GunixVariableSerializer {
 	private static Pattern mapPattern = Pattern.compile("\\(.+\\)");
 	private static Boolean isGroovyPresent;
 	private static Class<?> groovyMetaClass;
+	
+	private static String DOUBLE_KEY = "double_";
+	private static String LONG_KEY = "long_";
+	private static String TEXT_KEY = "text_";
 	
 	private static Logger log = Logger.getLogger(GunixVariableSerializer.class);
 	
@@ -204,12 +207,12 @@ public class GunixVariableSerializer {
 	
 	public static Object getValue(Map<String, Object> map) {
 		Object ans = null;
-		ans = map.get(VariableInstanceMapper.LONG_KEY);
+		ans = map.get(LONG_KEY);
 		if (ans == null) {
-			ans = map.get(VariableInstanceMapper.DOUBLE_KEY);
+			ans = map.get(DOUBLE_KEY);
 		}
 		if (ans == null) {
-			ans = map.get(VariableInstanceMapper.TEXT_KEY);
+			ans = map.get(TEXT_KEY);
 		}
 		return ans;
 	}

@@ -125,7 +125,7 @@ public final class EmbeddedRedisManager {
 		}
 	}
 
-	private static String getCommandPath(File pgsqlHomeFile, String command) {
-		return new File(pgsqlHomeFile, command).getAbsolutePath();
+	private static String getCommandPath(File redisHomeFile, String command) {
+		return new File(redisHomeFile, command).getAbsolutePath();
 	}
 }

@@ -1,7 +1,7 @@
 package mx.com.gunix.framework.service;
 
 import mx.com.gunix.framework.security.domain.ACLType;
-import mx.com.gunix.framework.security.domain.persistence.SequenceHelperMapper;
+import mx.com.gunix.framework.util.SequenceHelperMapper;
 
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.support.AopUtils;
