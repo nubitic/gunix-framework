@@ -30,7 +30,7 @@ import mx.com.gunix.framework.security.domain.persistence.UsuarioMapperIntercept
 
 @Configuration
 @EnableTransactionManagement(proxyTargetClass = true)
-@MapperScan({ "mx.com.gunix.domain.persistence", "mx.com.gunix.framework.security.domain.persistence", "mx.com.gunix.framework.activiti.persistence.entity", "mx.com.gunix.framework.token.persistence" })
+@MapperScan({ "mx.com.gunix.domain.persistence", "mx.com.gunix.framework.security.domain.persistence", "mx.com.gunix.framework.activiti.persistence.entity", "mx.com.gunix.framework.token.persistence", "mx.com.gunix.framework.util" })
 @Import(PersistenceCustomization.class)
 public class PersistenceConfig {
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
