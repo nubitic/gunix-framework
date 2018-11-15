@@ -20,8 +20,6 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
 
 import com.hunteron.core.Context;
 
-import mx.com.gunix.framework.documents.EmbeddedLogicalDocManager;
-import mx.com.gunix.framework.persistence.EmbeddedLogicalDocManagerOracle11g;
 import mx.com.gunix.framework.security.domain.persistence.JdbcGunixPersistentTokenRepository;
 
 public class PersistenceCustomization implements PersistenceCustomizationDefinition{
@@ -48,18 +46,8 @@ public class PersistenceCustomization implements PersistenceCustomizationDefinit
 	
 	@Bean
 	@Override
-	public EmbeddedLogicalDocManager embeddedLogicalDocManager() {
-		if (Boolean.parseBoolean(Context.LOGICALDOC_ENABLED.get())) {
-			return new EmbeddedLogicalDocManagerOracle11g();
-		} else {
-			return null;
-		}
-	}
-	
-	@Bean
-	@Override
-    public LookupStrategy aclLookupStrategy(AclCache aclCache, AclAuthorizationStrategy aclAuthorizationStrategy, PermissionGrantingStrategy aclPermissionGrantingStrategy, PermissionFactory aclPermissionFactory) throws CacheException, IOException {
-        BasicLookupStrategy lookupStrategy = new BasicLookupStrategy(dataSource(), aclCache, aclAuthorizationStrategy, aclPermissionGrantingStrategy);
+    public LookupStrategy aclLookupStrategy(DataSource dataSource,AclCache aclCache, AclAuthorizationStrategy aclAuthorizationStrategy, PermissionGrantingStrategy aclPermissionGrantingStrategy, PermissionFactory aclPermissionFactory) throws CacheException, IOException {
+        BasicLookupStrategy lookupStrategy = new BasicLookupStrategy(dataSource, aclCache, aclAuthorizationStrategy, aclPermissionGrantingStrategy);
         lookupStrategy.setSelectClause("select acl_object_identity.object_id_identity, "
 						    			+ "acl_entry.ace_order,  "
 						    			+ "acl_object_identity.id as acl_id, "

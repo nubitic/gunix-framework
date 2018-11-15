@@ -16,6 +16,7 @@
 		<module>archetype</module>
 		<module>sso-gateway</module>
 		<module>framework-backEnd-persistence-oracle11g</module>
+		<module>framework-commons-logicaldoc</module>
 	</modules>
 
 	<properties>
@@ -75,6 +76,11 @@
 			<dependency>
 				<groupId>mx.com.gunix</groupId>
 				<artifactId>framework-backEnd-persistence-shared</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>mx.com.gunix</groupId>
+				<artifactId>framework-commons-logicaldoc</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

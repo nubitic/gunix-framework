@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
@@ -330,34 +331,34 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-		    <groupId>javax.mail</groupId>
-		    <artifactId>mail</artifactId>
-		    <version>1.4.7</version>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.7</version>
 		</dependency>
 		<dependency>
-		    <groupId>javax.activation</groupId>
-		    <artifactId>activation</artifactId>
-		    <version>1.1.1</version>
+			<groupId>javax.activation</groupId>
+			<artifactId>activation</artifactId>
+			<version>1.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>org.tukaani</groupId>
-		    <artifactId>xz</artifactId>
-		    <version>1.8</version>
+			<groupId>org.tukaani</groupId>
+			<artifactId>xz</artifactId>
+			<version>1.8</version>
 		</dependency>
 		<dependency>
-	      <groupId>org.stagemonitor</groupId>
-	      <artifactId>stagemonitor-web-servlet</artifactId>
-	      <version>${stagemonitor.version}</version>
-    	</dependency>
-    	 <dependency>
-		      <groupId>org.stagemonitor</groupId>
-		      <artifactId>stagemonitor-tracing-elasticsearch</artifactId>
-		      <version>${stagemonitor.version}</version>
-    	 </dependency>    	
+			<groupId>org.stagemonitor</groupId>
+			<artifactId>stagemonitor-web-servlet</artifactId>
+			<version>${stagemonitor.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.stagemonitor</groupId>
+			<artifactId>stagemonitor-tracing-elasticsearch</artifactId>
+			<version>${stagemonitor.version}</version>
+		</dependency>
 	</dependencies>
 	<distributionManagement>
 		<repository>

@@ -1,7 +1,7 @@
-package mx.com.gunix.framework.persistence;
+package mx.com.gunix.framework.documents;
 
-import static mx.com.gunix.framework.persistence.EmbeddedServerUtils.existeEsquema;
-import static mx.com.gunix.framework.persistence.EmbeddedServerUtils.ejecutaScript;
+import static mx.com.gunix.framework.documents.EmbeddedServerUtils.ejecutaScript;
+import static mx.com.gunix.framework.documents.EmbeddedServerUtils.existeEsquema;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -17,14 +17,15 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import com.hunteron.core.Context;
 
-import mx.com.gunix.framework.documents.EmbeddedLogicalDocManager;
 import mx.com.gunix.framework.util.EmbeddedServerUtils;
 
-public final class EmbeddedLogicalDocManagerOracle11g implements EmbeddedLogicalDocManager {
-	private static Logger log = Logger.getLogger(EmbeddedLogicalDocManagerOracle11g.class);
+@Component
+public final class EmbeddedLogicalDocManagerPostgreSQL implements EmbeddedLogicalDocManager {
+	private static Logger log = Logger.getLogger(EmbeddedLogicalDocManager.class);
 
 	@Override
 	public void start(String logicalDocHome, ClassLoader classLoader) throws InterruptedException, IOException {
@@ -178,5 +179,4 @@ public final class EmbeddedLogicalDocManagerOracle11g implements EmbeddedLogical
 			process.destroy();
 		}
 	}
-
 }

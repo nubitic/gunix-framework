@@ -1,4 +1,4 @@
-package mx.com.gunix.framework.persistence;
+package mx.com.gunix.framework.documents;
 
 import static mx.com.gunix.framework.util.EmbeddedServerUtils.getCommandPath;
 import static mx.com.gunix.framework.util.EmbeddedServerUtils.log;

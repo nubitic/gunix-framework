@@ -10,12 +10,9 @@ import org.springframework.security.acls.model.AclService;
 import org.springframework.security.acls.model.PermissionGrantingStrategy;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
-import mx.com.gunix.framework.documents.EmbeddedLogicalDocManager;
-
 public interface PersistenceCustomizationDefinition {
-	public LookupStrategy aclLookupStrategy(AclCache aclCache, AclAuthorizationStrategy aclAuthorizationStrategy, PermissionGrantingStrategy aclPermissionGrantingStrategy, PermissionFactory aclPermissionFactory) throws Exception;
+	public LookupStrategy aclLookupStrategy(DataSource dataSource, AclCache aclCache, AclAuthorizationStrategy aclAuthorizationStrategy, PermissionGrantingStrategy aclPermissionGrantingStrategy, PermissionFactory aclPermissionFactory) throws Exception;
 	public AclService aclService(DataSource dataSource, LookupStrategy aclLookupStrategy, AclCache aclCache) throws Exception;
 	public DataSource dataSource();
-	public EmbeddedLogicalDocManager embeddedLogicalDocManager();
 	public PersistentTokenRepository persistentTokenRepository(DataSource dataSource);
 }
