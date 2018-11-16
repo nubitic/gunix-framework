@@ -1,1 +1,1 @@
-mvn clean deploy -pl framework-commons,framework-backEnd-persistence-shared,framework-backEnd,framework-backEnd-persistence,framework-vista -am
+mvn clean deploy -pl framework-commons,framework-commons-logicaldoc,framework-backEnd-persistence-shared,framework-backEnd,framework-backEnd-persistence,framework-backEnd-persistence-oracle11g,framework-vista -am
