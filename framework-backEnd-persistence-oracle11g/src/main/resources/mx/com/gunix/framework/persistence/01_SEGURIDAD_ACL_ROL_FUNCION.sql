@@ -432,7 +432,7 @@ BEGIN
 									F.ID_FUNCION_PADRE
 								from
 									SEGURIDAD.FUNCION F  LEFT JOIN
-									SEGURIDAD.ROL_FUNCION RF ON (F.ID_APLICACION=RF.ID_APLICACION AND F.ID_MODULO = RF.ID_MODULO AND F.ID_FUNCION=RF.ID_FUNCION AND RF.ID_APLICACION='ADMIN_APP' AND RF.ID_ROL='ADMINISTRADOR')
+									SEGURIDAD.ROL_FUNCION RF ON (F.ID_APLICACION=RF.ID_APLICACION AND F.ID_MODULO = RF.ID_MODULO AND F.ID_FUNCION=RF.ID_FUNCION AND RF.ID_APLICACION=appRol.id_aplicacion AND RF.ID_ROL=appRol.id_rol)
 							), 
 							q(ID_APLICACION,ID_MODULO,ID_FUNCION,ORDEN,ACCESO_COMPLETO,ID_FUNCION_PADRE,"LEVEL",breadcrumb) AS(
 								SELECT
@@ -562,12 +562,32 @@ BEGIN
 							ORDER BY
 							        FR.breadcrumb DESC,
 							        FR.orden) LOOP
-				PIPE ROW(t_menu_usr_row(usuario.ID_USUARIO,usuario.PASSWORD,usuario.ELIMINADO,usuario.bloqueado,usuario.activo,appRol.id_aplicacion,
-											appRol.descripcion_aplicacion,appRol.icono_aplicacion,appRol.id_rol,appRol.descripcion_rol,appRol.habilitado_rol,
-											funcion.id_modulo,funcion.descripcion_modulo,funcion.icono_modulo,funcion.id_funcion,funcion.titulo,
-											funcion.descripcion_funcion,funcion.process_key,funcion.orden,funcion.horario,funcion.vengine,funcion.id_param,
-											funcion.valor,funcion.id_funcion_padre,funcion.titulo_padre,funcion.descripcion_padre,funcion.process_key_padre,
-											funcion.orden_padre,funcion.id_param_padre,funcion.valor_padre));  
+				PIPE ROW(t_menu_usr_row(usuario.ID_USUARIO,
+										usuario.PASSWORD,
+										usuario.ELIMINADO,
+										usuario.bloqueado,
+										usuario.activo,
+										appRol.id_aplicacion,
+										appRol.descripcion_aplicacion,
+										funcion.id_modulo,
+										funcion.descripcion_modulo,
+										funcion.icono_modulo,
+										funcion.id_funcion,
+										funcion.titulo,
+										funcion.descripcion_funcion,
+										funcion.process_key,
+										funcion.orden,
+										funcion.horario,
+										funcion.vengine,
+										funcion.id_param,
+										funcion.valor,
+										funcion.id_funcion_padre,
+										funcion.titulo_padre,
+										funcion.descripcion_padre,
+										funcion.process_key_padre,
+										funcion.orden_padre,
+										funcion.id_param_padre,
+										funcion.valor_padre));  
 			END LOOP funcion;
 		END LOOP appRol;
 	END LOOP usuario;

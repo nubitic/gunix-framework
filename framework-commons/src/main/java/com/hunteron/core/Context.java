@@ -7,8 +7,8 @@ import mx.com.gunix.framework.security.domain.Funcion;
 
 /**
  * 
- * Clase de utileria para obtener valores de tres posibles fuentes: 1) System.getEnv(), 2) tags <Environment> en META-INF/context.xml, 
- *  o 3) un valor default. El potencial de esta clase es que puede obtener/especificar 
+ * Clase de utileria para obtener valores de tres posibles fuentes: 1) System.getEnv(), 2) System.getProperty() , 3) Atributos JNDI de java:comp/env, 
+ *  o 4) un valor default. El potencial de esta clase es que puede obtener/especificar 
  * valores default hasta para parámetros de anotaciones (p. ej. com.hunteron.core.@Hessian(host default Context.HOST))
  * 
  * #hessian, #gunix
@@ -33,6 +33,8 @@ public enum Context {
 	VIEW_SSO_GATEWAY_ENDPOINT_PASSWORD("VIEW_SSO_GATEWAY_ENDPOINT_PASSWORD",null),
 	VIEW_SSO_BACKTO_HOST("VIEW_SSO_BACKTO_HOST",null),
 	VIEW_SSO_BACKTO_CONTEXT("VIEW_SSO_BACKTO_CONTEXT",null),
+	
+	VIEW_ENABLE_ANONYMOUS("VIEW_ENABLE_ANONYMOUS","false"),
 	
 	ACTIVITI_MASTER("ACTIVITI_MASTER","false"),
 	
@@ -77,7 +79,8 @@ public enum Context {
 	MAIL_USERNAME("MAIL_USERNAME",null),
 	MAIL_PASSWORD("MAIL_PASSWORD",null),
 	MAIL_PROPERTIES("MAIL_PROPERTIES",null),
-	MAIL_FROM("MAIL_FROM",null);	
+	MAIL_FROM("MAIL_FROM",null), 
+	REDIS_ENABLED("REDIS_ENABLED","true");
 	
 	private String envVar;
 	private String defaultValue;
@@ -102,19 +105,22 @@ public enum Context {
 		if(cachedValue == null) {
 			value = System.getenv(envVar);
 			if (value == null) {
-				try {
-					Object object = getIc().lookup(envVar);
-					if (object != null) {
-						value = object.toString();
-						cachedValue = value;
-					} else {
+				value = System.getProperty(envVar);
+				if (value == null) {
+					try {
+						Object object = getIc().lookup(envVar);
+						if (object != null) {
+							value = object.toString();
+							cachedValue = value;
+						} else {
+							cachedValue = NULL_OBJECT;
+						}
+					} catch (Throwable logE) {
 						cachedValue = NULL_OBJECT;
 					}
-				} catch (Throwable logE) {
-					cachedValue = NULL_OBJECT;
 				}
-			}	
-		}else {
+			}
+		} else {
 			value = cachedValue == NULL_OBJECT ? null : cachedValue.toString();
 		}
 		

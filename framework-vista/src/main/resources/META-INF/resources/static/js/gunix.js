@@ -1,4 +1,5 @@
-var urlExceptions = ['uploadFile','ajaxFragment','startProcess'];
+var cGunixContextPath="";
+var urlExceptions = [];
 
 function getAjaxOptions(url,data){
 	return {
@@ -60,11 +61,11 @@ $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
 	if(!(/^http/i.test(originalOptions.url))){
 		options.type = "POST";
 		if($.inArray(originalOptions.url.split('?')[0], urlExceptions) < 0){
-			if (originalOptions.url.indexOf(cGunixViewPath) < 0) {
+			if (originalOptions.url.indexOf(cCurrentGunixViewPath) < 0) {
 				if (originalOptions.url.charAt(0) == '/') {
-					options.url = cGunixViewPath + originalOptions.url;
+					options.url = cCurrentGunixViewPath + originalOptions.url.substring(1);
 				} else {
-					options.url = cGunixViewPath + "/" + originalOptions.url;
+					options.url = cCurrentGunixViewPath + originalOptions.url;
 				}
 			}
 		}
@@ -103,7 +104,7 @@ function onCompleteTask(idAplicacion, preCompleteTask, boton) {
 		}
 	}
 	$.ajax(
-			getAjaxOptions(showFragment + fragmentToUpdate + "&idAplicacion=" + idAplicacion + "&isCompleteTask=true", $("#gunixMainForm").serialize()))
+			getAjaxOptions(cGunixContextPath + showFragment + fragmentToUpdate + "&idAplicacion=" + idAplicacion + "&isCompleteTask=true", $("#gunixMainForm").serialize()))
 				.done(
 				function(newContent) {
 					$("#"+fragmentToUpdate).html(newContent);
@@ -112,7 +113,7 @@ function onCompleteTask(idAplicacion, preCompleteTask, boton) {
 
 function startProcess(idAplicacion, idRol, idModulo, idFuncion) {
 	$.ajax(
-			getAjaxOptions("startProcess", {fragments:fragmentToUpdate,idAplicacion:idAplicacion, idRol:idRol, idModulo:idModulo, idFuncion, idFuncion}))
+			getAjaxOptions(cGunixContextPath + "startProcess", {fragments:fragmentToUpdate,idAplicacion:idAplicacion, idRol:idRol, idModulo:idModulo, idFuncion, idFuncion}))
 				.done(
 				function(newContent) {
 					$("#"+fragmentToUpdate).html(newContent);
@@ -120,5 +121,5 @@ function startProcess(idAplicacion, idRol, idModulo, idFuncion) {
 }
 
 function buildHrefGet(uri, params) {
-	return cGunixViewPath + "/" + uri + "?idAplicacion=" + cIdAplicacion + "&" + (params != null && params != undefined ? $.param(params):'');
+	return cCurrentGunixViewPath + uri + "?idAplicacion=" + cIdAplicacion + "&" + (params != null && params != undefined ? $.param(params):'');
 }

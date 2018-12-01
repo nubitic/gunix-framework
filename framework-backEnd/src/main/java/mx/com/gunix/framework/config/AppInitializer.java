@@ -2,12 +2,12 @@ package mx.com.gunix.framework.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.MissingResourceException;
 
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 import com.hunteron.core.Context;
 
-import mx.com.gunix.framework.documents.config.LogicalDocConfig;
 import mx.com.gunix.framework.mail.config.MailConfig;
 
 public class AppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
@@ -34,7 +34,9 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 		configClasses.add(ServerServiceConfig.class);
 		configClasses.add(ActivitiConfig.class);
 		configClasses.add(AspectJConfig.class);
-		configClasses.add(REDISConfig.class);
+		if (Boolean.parseBoolean(Context.REDIS_ENABLED.get())) {
+			configClasses.add(REDISConfig.class);
+		}
 		configClasses.add(MailConfig.class);
 
 		if (Boolean.valueOf(Context.STANDALONE_APP.get())||Boolean.valueOf(Context.ENABLE_ADMIN_APP_SERVICES.get())) {
@@ -46,7 +48,11 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 		}
 		
 		if (Boolean.parseBoolean(Context.LOGICALDOC_ENABLED.get())) {
-			configClasses.add(LogicalDocConfig.class);
+			try {
+				configClasses.add(AppInitializer.class.getClassLoader().loadClass("mx.com.gunix.framework.documents.config.LogicalDocConfig"));
+			} catch (ClassNotFoundException e) {
+				throw new MissingResourceException("No fue posible cargar la clase porque no existe","mx.com.gunix.framework.documents.config.LogicalDocConfig","");
+			}
 		}
 
 		try {

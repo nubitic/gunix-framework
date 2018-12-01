@@ -196,11 +196,13 @@ public abstract class AbstractSecurityConfig extends WebSecurityConfigurerAdapte
 		utf8Filter.setForceEncoding(true);
 		http.addFilterBefore(utf8Filter, CsrfFilter.class);
 		
-		Usuario anonymous = usuarioService.getAnonymous();
-		
-		if(anonymous!=null) {
-			http.anonymous()
-				.principal(new UserDetails(anonymous));
+		if(Boolean.parseBoolean(Context.VIEW_ENABLE_ANONYMOUS.get())) {
+			Usuario anonymous = usuarioService.getAnonymous();
+			
+			if(anonymous!=null) {
+				http.anonymous()
+					.principal(new UserDetails(anonymous));
+			}
 		}
 		
 		http.sessionManagement()

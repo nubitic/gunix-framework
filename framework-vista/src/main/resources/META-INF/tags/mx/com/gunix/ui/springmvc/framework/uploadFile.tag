@@ -29,11 +29,11 @@ $(function () {
 	}).on('fileuploadsubmit',function (e, data) {
 			${not empty beforeUpload?'if ('.concat(beforeUpload).concat('(e,data) == false) return false;'):''}
 			var fTo = '${to}';
-			if (fTo.indexOf(cGunixViewPath) < 0) {
+			if (fTo.indexOf(cCurrentGunixViewPath) < 0) {
 				if (fTo.charAt(0) == '/') {
-					fTo = cGunixViewPath + fTo;
+					fTo = cCurrentGunixViewPath + fTo;
 				} else {
-					fTo = cGunixViewPath + "/" + fTo;
+					fTo = cCurrentGunixViewPath + fTo;
 				}
 			}
 			data.formData = $.extend(data.formData, {forwardFileTo: fTo});

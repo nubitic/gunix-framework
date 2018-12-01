@@ -3,7 +3,11 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <form:form commandName="${commandName}" id="gunixMainForm" action="#">
 	<script type="text/javascript">
-		var cGunixViewPath = "<spring:url value="${cGunixViewPath}"/>";
+		var cCurrentGunixViewPath = "<spring:url value="${cCurrentGunixViewPath}"/>";
+		cGunixContextPath = "${gunixContextPath}";
+		urlExceptions = [cGunixContextPath + 'uploadFile',
+						 cGunixContextPath + 'ajaxFragment',
+						 cGunixContextPath + 'startProcess'];
 		var cIdAplicacion = "${param.idAplicacion}";
 		var cgCommandName = "${commandName}";
 	</script>

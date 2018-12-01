@@ -54,10 +54,6 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-acl</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>mx.com.gunix</groupId>
-			<artifactId>framework-commons-logicaldoc</artifactId>
-		</dependency>
 	</dependencies>
 	<distributionManagement>
 		<repository>

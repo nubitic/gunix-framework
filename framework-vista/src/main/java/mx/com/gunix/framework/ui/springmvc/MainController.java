@@ -44,7 +44,6 @@ import mx.com.gunix.framework.util.GunixFile;
 @Controller
 @Secured(AuthenticatedVoter.IS_AUTHENTICATED_REMEMBERED)
 public class MainController {
-	public static final String GUNIX_FILE_UPLOAD_ATTR ="gunixFile";
 
 	@Autowired
 	@Lazy
@@ -55,15 +54,16 @@ public class MainController {
 	ApplicationContext applicationContext;
 	
 	@Autowired
-	ControllerClassNameHandlerMapping ccnhm;
-	
-	@Autowired
 	@Lazy
 	GunixVariableGetter vg;
 	
-	private static final Method generatePathMappings = ReflectionUtils.findMethod(ControllerClassNameHandlerMapping.class, "generatePathMappings", new Class[] { Class.class });
-
+	@Autowired
+	ControllerClassNameHandlerMapping ccnhm;
+	
 	public static final String DEFAULT_END_TASK_SPRINGMVC_VIEW = "framework/defaultProcessEndView";
+	public static final String GUNIX_FILE_UPLOAD_ATTR ="gunixFile";
+	
+	private static final Method generatePathMappings = ReflectionUtils.findMethod(ControllerClassNameHandlerMapping.class, "generatePathMappings", new Class[] { Class.class });
 	static{
 		ReflectionUtils.makeAccessible(generatePathMappings);
 	}
@@ -126,9 +126,11 @@ public class MainController {
 				agc.setTareaActual(instancia.getTareaActual());
 				newJspView = (isCommitFailed ? agc.doEnter(request, uiModel) :agc.doConstruct(request.getSession(), uiModel)).replace(".", "/");
 			}
+			
 			String[] urls = (String[]) ReflectionUtils.invokeMethod(generatePathMappings, ccnhm, new Object[] { agc.getClass() });
+
 			uiModel.addAttribute("jspView", newJspView);
-			uiModel.addAttribute("cGunixViewPath", urls[0]);
+			uiModel.addAttribute("cCurrentGunixViewPath", urls[0]+"/");
 		} catch (BindException e) {
 			if (isCompleteTask) {
 				uiModel.addAllAttributes(e.getBindingResult().getModel());

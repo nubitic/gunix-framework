@@ -5,7 +5,7 @@
 	<head>
 		<title>Gunix</title>
 		<spring:theme code="styleSheet" var="gunix_css" />
-		<spring:url value="/" var="home_url" />
+		<spring:url value="/" var="gunixContextPath" scope="session"/>
 		<spring:url value="/${gunix_css}" var="gunix_css_url" />
 		<spring:url value="/static/css/showLoading.css" var="showLoading_css_url" />
 		<spring:url value="/static/js/gunix.js" var="gunix_js_url" />

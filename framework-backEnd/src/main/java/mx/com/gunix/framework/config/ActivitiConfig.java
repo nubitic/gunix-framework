@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.RejectedExecutionException;
 
@@ -72,6 +73,8 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
 import mx.com.gunix.framework.activiti.ExecuteAsyncSecuredRunnable;
@@ -93,7 +96,7 @@ public class ActivitiConfig {
 	}
 
 	@Bean
-	public SpringProcessEngineConfiguration springProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager) throws IOException {
+	public SpringProcessEngineConfiguration springProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager, Optional<ProcessEngineConfigurationCustomizator> customConfig) throws IOException {
 		SpringProcessEngineConfiguration speConf = new SpringProcessEngineConfiguration() {
 			private AutoDeploymentStrategy autoDS = new ResourceParentFolderAutoDeploymentStrategy() {
 				@Override
@@ -125,8 +128,14 @@ public class ActivitiConfig {
 		speConf.setDataSource(dataSource);
 		speConf.setTransactionManager(transactionManager);
 		speConf.setTablePrefixIsSchema(true);
-		speConf.setDatabaseTablePrefix("activiti.");
-		speConf.setDatabaseSchema("activiti");
+		speConf.setDatabaseTablePrefix("ACTIVITI.");
+		
+		if (customConfig != null && customConfig.isPresent()) {
+			customConfig.get().doConfigure(speConf);
+		} else {
+			speConf.setDatabaseSchema("activiti");
+		}
+		
 		speConf.setDatabaseSchemaUpdate("false");
 		speConf.setDbIdentityUsed(false);
 		speConf.setBatchSizeTasks(1000);
@@ -371,8 +380,9 @@ public class ActivitiConfig {
 	public OpenLEngine openLRules(){
 		return new OpenLEngine();
 	}
-
-	static final class SpringAsyncSecuredExecutor extends SpringAsyncExecutor implements SpringRejectedJobsHandler {
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	static class SpringAsyncSecuredExecutor extends SpringAsyncExecutor implements SpringRejectedJobsHandler {
 		private static Logger log = LoggerFactory.getLogger(SpringAsyncSecuredExecutor.class);
 
 		@Autowired
@@ -412,6 +422,8 @@ public class ActivitiConfig {
 	}
 
 	static final class JobExecutionFailureEvntListener implements ActivitiEventListener {
+		private static Logger log = LoggerFactory.getLogger(JobExecutionFailureEvntListener.class);
+		
 		@Autowired
 		@Lazy
 		private ActivitiService activitiService;
@@ -424,15 +436,28 @@ public class ActivitiConfig {
 		public void onEvent(ActivitiEvent event) {
 			if (event instanceof ActivitiExceptionEvent) {
 				JobEntity job = (JobEntity) ((ActivitiEntityEvent) event).getEntity();
+				Throwable error = ((ActivitiExceptionEvent) event).getCause() != null?((ActivitiExceptionEvent) event).getCause():null;
+				
 				ProgressUpdate pu = new ProgressUpdate();
 				pu.setCancelado(true);
-				pu.setMensaje("El proceso ha sido cancelado debido a un error inesperado. " + (((ActivitiExceptionEvent) event).getCause() != null ? ((ActivitiExceptionEvent) event).getCause().getMessage() : ""));
+				pu.setMensaje("El proceso ha sido cancelado debido a un error inesperado. " + (error != null ? error.getMessage() : ""));
 				pu.setProcessId(job.getProcessInstanceId());
 				pu.setProgreso(0f);
 				pu.setTimeStamp(System.currentTimeMillis());
 				activitiService.addProgressUpdate(job.getProcessInstanceId(), pu);
+				
 				job.setRetries(0);
 				ms.setJobRetries(job.getId(), 0);
+				
+				StringBuilder errorMsg = new StringBuilder("Error en ejecución asíncrona (job de activiti). ");
+				errorMsg.append("Job PersistentState: ");
+				errorMsg.append(job.getPersistentState());
+
+				if (error != null) {
+					log.error(errorMsg.toString(), error);
+				} else {
+					log.error(errorMsg.toString());
+				}
 			}
 		}
 

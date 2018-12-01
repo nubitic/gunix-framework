@@ -1,7 +1,7 @@
 package mx.com.gunix.framework.documents;
 
-import static mx.com.gunix.framework.documents.EmbeddedServerUtils.ejecutaScript;
-import static mx.com.gunix.framework.documents.EmbeddedServerUtils.existeEsquema;
+import static mx.com.gunix.framework.persistence.EmbeddedServerUtils.ejecutaScript;
+import static mx.com.gunix.framework.persistence.EmbeddedServerUtils.existeEsquema;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

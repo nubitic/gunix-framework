@@ -104,7 +104,7 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 	RepositoryService repos;
 
 	@Autowired
-	RedisTemplate<String, ProgressUpdate> redisProgressUpdateTemplate;
+	Optional<RedisTemplate<String, ProgressUpdate>> redisProgressUpdateTemplate;
 
 	@Autowired
 	@Lazy
@@ -388,19 +388,23 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 	public List<ProgressUpdate> getRecentProgressUpdates(String processId) {
 		List<ProgressUpdate> pu = new ArrayList<ProgressUpdate>();
 
-		ProgressUpdate cpud = null;
-		int updatesFetched = 0;
-		while ((cpud = redisProgressUpdateTemplate.boundListOps(processId).rightPop()) != null && updatesFetched < MAX_UPDATES_PER_FETCH) {
-			pu.add(cpud);
-			updatesFetched++;
+		if (redisProgressUpdateTemplate != null && redisProgressUpdateTemplate.isPresent()) {
+			ProgressUpdate cpud = null;
+			int updatesFetched = 0;
+			while ((cpud = redisProgressUpdateTemplate.get().boundListOps(processId).rightPop()) != null && updatesFetched < MAX_UPDATES_PER_FETCH) {
+				pu.add(cpud);
+				updatesFetched++;
+			}
 		}
 		return pu;
 	}
 
 	public void addProgressUpdate(String processId, ProgressUpdate pu) {
-		BoundListOperations<String, ProgressUpdate> blops = redisProgressUpdateTemplate.boundListOps(processId);
-		blops.expire(2, TimeUnit.MINUTES);
-		blops.leftPush(pu);
+		if (redisProgressUpdateTemplate != null && redisProgressUpdateTemplate.isPresent()) {
+			BoundListOperations<String, ProgressUpdate> blops = redisProgressUpdateTemplate.get().boundListOps(processId);
+			blops.expire(2, TimeUnit.MINUTES);
+			blops.leftPush(pu);
+		}
 	}
 
 	@Override
