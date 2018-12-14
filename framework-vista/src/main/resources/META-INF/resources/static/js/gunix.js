@@ -90,7 +90,7 @@ function addParamToData(originalOptions, options, paramName, paramValue){
 												(options.data==null||
 												 options.data==''||
 												 typeof(options.data)=='undefined')?{}:options.data, 
-													eval('{'+ paramName + ' : \'' + paramValue + '\'}')
+													JSON.parse('{"' + paramName + '":"' + paramValue + '"}')
 												)
 									  );	
 		}
