@@ -59,10 +59,22 @@
 	<select id="getUsuario" resultMap="usuarioResultMap">
 		select u.*, DU.curp, DU.rfc, DU.ap_paterno, DU.ap_materno, DU.nombre, DU.correo_electronico, DU.telefono from SEGURIDAD.menu_usuario(#{idUsuario}) u LEFT JOIN SEGURIDAD.DATOS_USUARIO DU ON (U.ID_USUARIO = DU.ID_USUARIO) order by u.id_aplicacion,u.id_rol,u.id_modulo,u.orden
 	</select>
+	<select id="getPasswordActual" resultType="java.lang.String">
+		select password from SEGURIDAD.usuario where id_usuario = #{idUsuario}
+	</select>
 	<update id="updatePassword">
 		update SEGURIDAD.usuario set password = #{encodePassword} where id_usuario = #{idUsuario}
 	</update>
-	<select id="getPasswordActual">
-		select password from SEGURIDAD.usuario where id_usuario = #{idUsuario}
+	<insert id="guardaSAMLSSOAuth">
+		INSERT INTO SEGURIDAD.SAML_AUTHS(ID_APLICACION, ID_USUARIO, ID_SESION_LOCAL, ID_SESION_SSO) 
+		VALUES(#{idAplicacion}, #{idUsuario}, #{localSessionID}, #{ssoIndex})
+	</insert>
+	<select id="getSAMLLocalSessions" resultType="java.lang.String">
+		select id_sesion_local from SEGURIDAD.SAML_AUTHS where ID_APLICACION = #{idAplicacion} and ID_USUARIO = #{idUsuario} and ID_SESION_SSO = #{ssoIndex}
 	</select>
+	<delete id="deleteSAMLLocalSessions">
+		<foreach collection="sesionesExpiradas" item="localSessionId" open="" separator=";" close="">
+			delete from SEGURIDAD.SAML_AUTHS where ID_APLICACION = #{idAplicacion} and ID_USUARIO = #{idUsuario} and ID_SESION_SSO = #{ssoIndex} and ID_SESION_LOCAL = #{localSessionId}
+		</foreach>
+	</delete>
 </mapper>

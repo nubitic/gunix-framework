@@ -1,9 +1,5 @@
 package mx.com.gunix.framework.config;
 
-import mx.com.gunix.framework.ui.vaadin.spring.security.GenericVaadinSecurity;
-import mx.com.gunix.framework.ui.vaadin.spring.security.SecuredViewProviderAccessDelegate;
-import mx.com.gunix.framework.ui.vaadin.spring.security.VaadinAuthenticationFailureHandler;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -12,6 +8,8 @@ import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.saml.SAMLProcessingFilter;
+import org.springframework.security.saml.metadata.MetadataDisplayFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.vaadin.spring.security.VaadinSecurity;
 import org.vaadin.spring.security.VaadinSecurityContext;
@@ -22,6 +20,12 @@ import org.vaadin.spring.security.web.VaadinDefaultRedirectStrategy;
 import org.vaadin.spring.security.web.VaadinRedirectStrategy;
 import org.vaadin.spring.security.web.authentication.SavedRequestAwareVaadinAuthenticationSuccessHandler;
 import org.vaadin.spring.security.web.authentication.VaadinAuthenticationSuccessHandler;
+
+import com.hunteron.core.Context;
+
+import mx.com.gunix.framework.ui.vaadin.spring.security.GenericVaadinSecurity;
+import mx.com.gunix.framework.ui.vaadin.spring.security.SecuredViewProviderAccessDelegate;
+import mx.com.gunix.framework.ui.vaadin.spring.security.VaadinAuthenticationFailureHandler;
 
 @Configuration
 @ComponentScan({ "mx.com.gunix.ui", "mx.com.gunix.framework.ui.vaadin"})
@@ -47,7 +51,7 @@ public class VaadinSecurityConfig  extends AbstractSecurityConfig{
 	}
 
 	@Bean(name = Beans.VAADIN_SECURITY)
-	VaadinSecurity vaadinSecurity() {
+	public VaadinSecurity vaadinSecurity() {
 		return new GenericVaadinSecurity();
 	}
 
@@ -99,12 +103,12 @@ public class VaadinSecurityConfig  extends AbstractSecurityConfig{
 		http
 			.authorizeRequests()
 				.antMatchers("/" + VaadinSecurityConfig.VAADIN_LOCATION + "login/**").permitAll()
+				.antMatchers(Context.VIEW_SSO_SAML_SUCCESS_LOGOUT.get()).permitAll()
+				.antMatchers(MetadataDisplayFilter.FILTER_URL + "/**").permitAll()
+				.antMatchers(SAMLProcessingFilter.FILTER_URL + "/**").permitAll()
 				.antMatchers("/" + VaadinSecurityConfig.VAADIN_LOCATION + "public/**").permitAll()
 				.antMatchers("/" + VaadinSecurityConfig.VAADIN_LOCATION + "UIDL/**").permitAll()
 				.antMatchers(STATIC_RESOURCES_PATTERN).permitAll()
-				.antMatchers("/" + VaadinSecurityConfig.VAADIN_LOCATION + "HEARTBEAT/**").authenticated()
-				.antMatchers("/" + VaadinSecurityConfig.VAADIN_LOCATION + "APP/**").authenticated()
-				.antMatchers("/**").authenticated()
 				.anyRequest().authenticated();
 		return "/" + VaadinSecurityConfig.VAADIN_LOCATION + "login";
 	}

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -198,7 +199,7 @@ public class OpenLEngine extends org.openl.rules.activiti.spring.OpenLEngine imp
 					// Si lo encontramos en logicaldoc procedemos a inicializar el ambiente
 					InputStream inputStream = ds.getContent(rulesDoc.getId());
 
-					final File workspaceFolder = FileUtils.createTempDirectory();
+					final File workspaceFolder = Files.createTempDirectory("openLwksDir").toFile();
 
 					if (resource.endsWith(".zip")) {
 						// Unzip

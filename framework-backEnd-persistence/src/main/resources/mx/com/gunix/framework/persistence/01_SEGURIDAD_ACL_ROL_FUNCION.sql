@@ -262,6 +262,16 @@ create table PERSISTENT_LOGINS
         LAST_USED timestamp not null
 );
 
+create table SAML_AUTHS
+(
+	ID_APLICACION VARCHAR(30) NOT NULL,
+	ID_USUARIO VARCHAR(254) NOT NULL,
+	ID_SESION_LOCAL VARCHAR(32) NOT NULL,
+	ID_SESION_SSO VARCHAR(36) NOT NULL,
+	CREATE_TIME timestamp NOT NULL default now(),
+	PRIMARY KEY(ID_APLICACION, ID_USUARIO, ID_SESION_LOCAL, ID_SESION_SSO)
+);
+
 INSERT INTO acl_class(class,descripcion,get_all_uri,id_aplicacion) values ('mx.com.gunix.framework.security.domain.Aplicacion','Aplicaciones alojadas en Gunix','http://localhost:8081/map-backEnd?servicio=aplicacionService','ADMIN_APP');
 INSERT INTO acl_object_identity(object_id_class,owner_sid,entries_inheriting) values( currval(pg_get_serial_sequence('acl_class', 'id')),(select id from acl_sid where sid = 'admin@gunix.mx'),true);
 

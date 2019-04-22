@@ -14,21 +14,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.validation.ConstraintViolation;
 import javax.validation.groups.Default;
 
-import mx.com.gunix.adminapp.domain.persistence.AmbitoMapper;
-import mx.com.gunix.adminapp.domain.persistence.RolMapper;
-import mx.com.gunix.adminapp.domain.persistence.UsuarioAdminMapper;
-import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
-import mx.com.gunix.framework.security.domain.ACLType;
-import mx.com.gunix.framework.security.domain.ACLTypeMap;
-import mx.com.gunix.framework.security.domain.Ambito;
-import mx.com.gunix.framework.security.domain.Ambito.Permiso;
-import mx.com.gunix.framework.security.domain.Aplicacion;
-import mx.com.gunix.framework.security.domain.Usuario;
-import mx.com.gunix.framework.service.ACLTypeService;
-import mx.com.gunix.framework.service.GetterService;
-import mx.com.gunix.framework.service.GunixActivitServiceSupport;
-import mx.com.gunix.framework.service.hessian.ByteBuddyUtils;
-
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,10 +34,24 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import mx.com.gunix.adminapp.domain.persistence.AmbitoMapper;
+import mx.com.gunix.adminapp.domain.persistence.RolMapper;
+import mx.com.gunix.adminapp.domain.persistence.UsuarioAdminMapper;
+import mx.com.gunix.framework.domain.validation.GunixValidationGroups.BeanValidations;
+import mx.com.gunix.framework.security.domain.ACLType;
+import mx.com.gunix.framework.security.domain.ACLTypeMap;
+import mx.com.gunix.framework.security.domain.Ambito;
+import mx.com.gunix.framework.security.domain.Ambito.Permiso;
+import mx.com.gunix.framework.security.domain.Aplicacion;
+import mx.com.gunix.framework.security.domain.Usuario;
+import mx.com.gunix.framework.service.ACLTypeService;
+import mx.com.gunix.framework.service.GetterService;
+import mx.com.gunix.framework.service.GunixActivitServiceSupport;
+import mx.com.gunix.framework.service.hessian.ByteBuddyUtils;
 
 @Service("usuarioAdminService")
 @Transactional(rollbackFor = Exception.class)
@@ -77,7 +76,8 @@ public class UsuarioAdminServiceImpl extends GunixActivitServiceSupport<Usuario>
 	@Autowired
 	MutableAclService aclService;
 	
-	private PasswordEncoder pe = new BCryptPasswordEncoder(16);
+	@Autowired
+	PasswordEncoder pe;
 	
 	private static Class<GetterService> securedACLGetterInterface;
 	private static Method getMethod;

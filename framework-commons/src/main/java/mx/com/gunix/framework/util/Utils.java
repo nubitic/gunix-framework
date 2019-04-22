@@ -13,6 +13,8 @@ import java.util.stream.Stream;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.context.ContextCleanupListener;
 
 public abstract class Utils {
@@ -91,6 +93,10 @@ public abstract class Utils {
 			throw new IllegalArgumentException("La clase no puede ser null");
 		}
 		return procesaMensaje(ms, clase, mKey, defaultMessage, mArgs);
+	}
+	
+	public static PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder(16);
 	}
 	
 	static private class GunixResourceBundleMessageSource extends ResourceBundleMessageSource{

@@ -68,6 +68,22 @@
 			<artifactId>activiti-engine</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.activiti</groupId>
+			<artifactId>activiti-bpmn-model</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.activiti</groupId>
+			<artifactId>activiti-image-generator</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.activiti</groupId>
+		    <artifactId>activiti-process-validation</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.activiti</groupId>
+		    <artifactId>activiti-bpmn-converter</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.openl.rules</groupId>
 			<artifactId>org.openl.rules.activiti</artifactId>
 		</dependency>

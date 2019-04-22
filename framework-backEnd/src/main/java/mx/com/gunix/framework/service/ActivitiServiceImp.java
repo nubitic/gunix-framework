@@ -83,8 +83,6 @@ import mx.com.gunix.framework.security.domain.Usuario;
 @Transactional(rollbackFor = Exception.class)
 public class ActivitiServiceImp implements ActivitiService, BusinessProcessManager {
 	
-	
-	
 	@Autowired
 	TaskService ts;
 
@@ -123,9 +121,9 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 	private static final String PROCESS_CREATION_COMMENT = "PROCESS_CREATION_COMMENT";
 	private static final String TASK_COMMENT = "TASK_COMMENT";
 	
-	private static final Logger log = Logger.getLogger(ActivitiServiceImp.class) ;
-
 	private final String ID_APLICACION = com.hunteron.core.Context.ID_APLICACION.get();
+	
+	private static final Logger log = Logger.getLogger(ActivitiServiceImp.class);
 
 	@Override
 	public Instancia completaTarea(Tarea tarea) {
@@ -192,16 +190,18 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 			UserDetails usuario = ((UserDetails) auth.getPrincipal());
 			is.setAuthenticatedUserId(usuario.getIdUsuario());
 
-			ProcessInstance pi = rs.startProcessInstanceByKey(processKey, toMap(variables)[Variable.Scope.PROCESO.ordinal()]);
+			UserDetails usuarioSimpl = new UserDetails(usuario);
+			usuarioSimpl.setAuthorities((List<GrantedAuthority>) usuario.getAuthorities());
+			usuarioSimpl.setSelectedAuthority(usuario.getSelectedAuthority());
+			usuarioSimpl.setAplicaciones(null);
+			
+			variables.add(new Variable<UserDetails>(CURRENT_AUTHENTICATION_USUARIO_VAR, usuarioSimpl));
+			if (ID_APLICACION != null) {
+				variables.add(new Variable<String>(ID_APLICACION_VAR, ID_APLICACION));
+			}
+			
+			ProcessInstance pi = rs.startProcessInstanceByKeyAndTenantId(processKey, toMap(variables)[Variable.Scope.PROCESO.ordinal()], ID_APLICACION);
 			if (pi != null) {
-				UserDetails usuarioSimpl = new UserDetails(usuario);
-				usuarioSimpl.setAuthorities((List<GrantedAuthority>) usuario.getAuthorities());
-				usuarioSimpl.setSelectedAuthority(usuario.getSelectedAuthority());
-				usuarioSimpl.setAplicaciones(null);
-				rs.setVariable(pi.getProcessInstanceId(), CURRENT_AUTHENTICATION_USUARIO_VAR, usuarioSimpl);
-				if (ID_APLICACION != null) {
-					rs.setVariable(pi.getProcessInstanceId(), ID_APLICACION_VAR, ID_APLICACION);
-				}
 				instancia = new Instancia();
 				instancia.setId(pi.getId());
 				instancia.setProcessDefinitionId(pi.getProcessDefinitionId());
@@ -327,60 +327,18 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 		});
 	}
 
-	// A las 00:00 todos los días
-	@Scheduled(cron = "0 0 0 * * *")
-	public void eliminaTodasLasInstanciasVolatilesTerminadasOIniciadasHaceMasDe35Minutos(){
-		eliminaInstanciasVolatiles();
-		eliminaInstanciasVolatiles(); //<---------- Se ejecuta por segunda vez por si han quedado registros.
-	}
-	
-	public synchronized  void eliminaInstanciasVolatiles(){
+	// Cada 90 minutos
+	@Scheduled(cron = "0 0-21/3 0 * * *")
+	@Scheduled(cron = "30 1-22/3 0 * * *")
+	public void eliminaTodasLasInstanciasVolatilesSinActividadHaceMasDe35Minutos(){
 		if(Boolean.valueOf(com.hunteron.core.Context.ACTIVITI_MASTER.get())) {
-			Date hace30Minutos = Date.from(Instant.now().minus(30, ChronoUnit.MINUTES));
-			
-			gvpm.obtainVolatileProcessDefinitionIds().forEach(processDefinitionId->{
-
-				if(log.isDebugEnabled()){
-					log.debug("Id de definición de proceso: " + processDefinitionId);
-					log.debug("Número de procesos: " + gvpm.obtainProcessInstanceIdsByProcessDefinitionId(processDefinitionId, hace30Minutos).size());
-				}
-
-				if(gvpm.obtainProcessInstanceIdsByProcessDefinitionId(processDefinitionId,hace30Minutos).size() > 0){
-					gvpm.obtainProcessInstanceIdsByProcessDefinitionId(processDefinitionId,hace30Minutos).forEach(processInstanceId->{
-
-						gvpm.deleteFromActHiActinstByProcessInstanceId(processInstanceId);
-						gvpm.deleteFromActHiAttachmenttByProcessInstanceId(processInstanceId);
-						gvpm.deleteFromActHiCommentByProcessInstanceId(processInstanceId);
-						gvpm.deleteFromActHiDetailByProcessInstanceId(processInstanceId);
-						gvpm.deleteFromActHiIdentityLinkByProcessInstanceId(processInstanceId);
-						gvpm.deleteFromActHiTaskInstByProcessInstanceId(processInstanceId);
-						gvpm.deleteFromActRuEventSubcrByProcessInstanceId(processInstanceId);
-						gvpm.deleteFromActTaskIdByProcessInstanceId(processInstanceId);
-						gvpm.deleteFromActRuTaskByProcessInstanceId(processInstanceId);
-						gvpm.deleteFromActRuJobByProcessInstanceId(processInstanceId);
-						gvpm.deleteFromActRuVariableByProcessInstanceId(processInstanceId);
-						gvpm.deleteFromActHiVarinstByProcessInstanceId(processInstanceId);
-						gvpm.deleteFromActRuExecutionByProcessInstanceId(processInstanceId);
-						gvpm.deleteFromActHiProcInstByProcessInstanceId(processInstanceId);
-						if(log.isDebugEnabled()){
-							log.debug("Proceso " + processInstanceId + " eliminado.");
-						}
-						
-					});
-
-					if(log.isDebugEnabled()){
-						log.debug("Se han eliminado los procesos volátiles de " + processDefinitionId);
-					}
-					
-				}
-				else{
-					if(log.isDebugEnabled()){
-						log.debug("El proceso volátil" + processDefinitionId + " no tiene información :)");
-						
-					}
-				}
-			});
-
+			try {
+				Date hace35Minutos = Date.from(Instant.now().minus(35, ChronoUnit.MINUTES));
+				gvpm.deleteProcessInstanceIdByTenantIDltDate(ID_APLICACION, hace35Minutos);
+			} catch (Throwable thr) {
+				log.error("Error al intentar eliminar las instancias volatiles sin actividad hace más de 35 min", thr);
+				throw new RuntimeException(thr);
+			}
 		}
 	}
 
@@ -998,4 +956,5 @@ public class ActivitiServiceImp implements ActivitiService, BusinessProcessManag
 				})
 				.collect(Collectors.toList());
 	}
+
 }

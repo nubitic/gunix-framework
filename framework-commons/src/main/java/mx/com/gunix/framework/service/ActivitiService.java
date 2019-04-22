@@ -14,8 +14,6 @@ import com.hunteron.core.Hessian;
 public interface ActivitiService {
 	static final String VOLATIL = "VOLATIL";
 
-	public void eliminaTodasLasInstanciasVolatilesTerminadasOIniciadasHaceMasDe35Minutos();
-
 	public List<ProgressUpdate> getRecentProgressUpdates(String processId);
 
 	public void addProgressUpdate(String processId, ProgressUpdate pu);

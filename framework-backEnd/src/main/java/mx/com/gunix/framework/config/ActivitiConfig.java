@@ -4,16 +4,20 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.RejectedExecutionException;
+import java.util.zip.ZipInputStream;
 
 import javax.sql.DataSource;
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
@@ -28,12 +32,16 @@ import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.delegate.event.ActivitiExceptionEvent;
 import org.activiti.engine.impl.asyncexecutor.AsyncExecutor;
+import org.activiti.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
+import org.activiti.engine.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
+import org.activiti.engine.impl.asyncexecutor.multitenant.SharedExecutorServiceAsyncExecutor;
 import org.activiti.engine.impl.bpmn.data.ItemInstance;
 import org.activiti.engine.impl.cfg.IdGenerator;
-import org.activiti.engine.impl.context.Context;
+import org.activiti.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.el.ReadOnlyMapELResolver;
 import org.activiti.engine.impl.el.VariableScopeElResolver;
+import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.javax.el.ArrayELResolver;
 import org.activiti.engine.impl.javax.el.BeanELResolver;
 import org.activiti.engine.impl.javax.el.CompositeELResolver;
@@ -48,12 +56,11 @@ import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.variable.VariableType;
+import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.spring.ApplicationContextElResolver;
 import org.activiti.spring.ProcessEngineFactoryBean;
-import org.activiti.spring.SpringAsyncExecutor;
 import org.activiti.spring.SpringExpressionManager;
 import org.activiti.spring.SpringProcessEngineConfiguration;
-import org.activiti.spring.SpringRejectedJobsHandler;
 import org.activiti.spring.autodeployment.AutoDeploymentStrategy;
 import org.activiti.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.openl.rules.activiti.spring.OpenLResourcesHandleListener;
@@ -69,13 +76,13 @@ import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
+
+import com.hunteron.core.Context;
 
 import mx.com.gunix.framework.activiti.ExecuteAsyncSecuredRunnable;
 import mx.com.gunix.framework.activiti.FloatType;
@@ -98,17 +105,17 @@ public class ActivitiConfig {
 	@Bean
 	public SpringProcessEngineConfiguration springProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager, Optional<ProcessEngineConfigurationCustomizator> customConfig) throws IOException {
 		SpringProcessEngineConfiguration speConf = new SpringProcessEngineConfiguration() {
+			
 			private AutoDeploymentStrategy autoDS = new ResourceParentFolderAutoDeploymentStrategy() {
+				
 				@Override
 				protected String determineResourceName(final Resource resource) {
 					String resourceName = null;
 
 					if (resource instanceof ContextResource) {
 						resourceName = ((ContextResource) resource).getPathWithinContext();
-
 					} else if (resource instanceof ByteArrayResource) {
 						resourceName = resource.getDescription();
-
 					} else {
 						try {
 							resourceName = resource.getFile().getName();
@@ -118,12 +125,82 @@ public class ActivitiConfig {
 					}
 					return resourceName;
 				}
+				
+			    @Override
+			    public void deployResources(final String deploymentNameHint, final Resource[] resources, final RepositoryService repositoryService) {
+
+			        // Create a deployment for each distinct parent folder using the name hint
+			        // as a prefix
+			        final Map<String, Set<Resource>> resourcesMap = createMap(resources);
+
+			        for (final Entry<String, Set<Resource>> group : resourcesMap.entrySet()) {
+
+			            final String deploymentName = determineDeploymentName(deploymentNameHint, group.getKey());
+
+			            final DeploymentBuilder deploymentBuilder = repositoryService
+				            														.createDeployment()
+				            														.enableDuplicateFiltering()
+				            														.tenantId(Context.ID_APLICACION.get())
+				            														.name(deploymentName);
+
+			            for (final Resource resource : group.getValue()) {
+			                final String resourceName = determineResourceName(resource);
+
+			                try {
+			                    if (resourceName.endsWith(".bar") || resourceName.endsWith(".zip") || resourceName.endsWith(".jar")) {
+			                        deploymentBuilder.addZipInputStream(new ZipInputStream(resource.getInputStream()));
+			                    } else {
+			                        deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
+			                    }
+			                } catch (IOException e) {
+			                    throw new ActivitiException("couldn't auto deploy resource '" + resource + "': " + e.getMessage(), e);
+			                }
+			            }
+			            deploymentBuilder.deploy();
+			        }
+
+			    }
+
+			    private Map<String, Set<Resource>> createMap(final Resource[] resources) {
+			        final Map<String, Set<Resource>> resourcesMap = new HashMap<String, Set<Resource>>();
+
+			        for (final Resource resource : resources) {
+			            final String parentFolderName = determineGroupName(resource);
+			            if (resourcesMap.get(parentFolderName) == null) {
+			                resourcesMap.put(parentFolderName, new HashSet<Resource>());
+			            }
+			            resourcesMap.get(parentFolderName).add(resource);
+			        }
+			        return resourcesMap;
+			    }
+
+			    private String determineGroupName(final Resource resource) {
+			        String result = determineResourceName(resource);
+			        try {
+			            if (resourceParentIsDirectory(resource)) {
+			                result = resource.getFile().getParentFile().getName();
+			            }
+			        } catch (IOException e) {
+			            // no-op, fallback to resource name
+			        }
+			        return result;
+			    }
+
+			    private boolean resourceParentIsDirectory(final Resource resource) throws IOException {
+			        return resource.getFile() != null && resource.getFile().getParentFile() != null && resource.getFile().getParentFile().isDirectory();
+			    }
+
+			    private String determineDeploymentName(final String deploymentNameHint, final String groupName) {
+			        return String.format("%s.%s", deploymentNameHint, groupName);
+			    }
+				
 			};
 
 			@Override
 			protected AutoDeploymentStrategy getAutoDeploymentStrategy(final String mode) {
 				return autoDS;
 			}
+			
 		};
 		speConf.setDataSource(dataSource);
 		speConf.setTransactionManager(transactionManager);
@@ -141,7 +218,7 @@ public class ActivitiConfig {
 		speConf.setBatchSizeTasks(1000);
 		speConf.setEnableSafeBpmnXml(true);
 
-		if (Boolean.valueOf(com.hunteron.core.Context.ACTIVITI_MASTER.get())) {
+		if (Boolean.valueOf(Context.ACTIVITI_MASTER.get())) {
 			speConf.setAsyncExecutor(asyncExecutor());
 			speConf.setAsyncExecutorEnabled(true);
 			speConf.setAsyncExecutorActivate(true);
@@ -157,9 +234,8 @@ public class ActivitiConfig {
 			System.arraycopy(appPackedBPMNResources, 0, resources, 0, appPackedBPMNResources.length);
 		}
 
-		if (Boolean.valueOf(com.hunteron.core.Context.STANDALONE_APP.get())) {
+		if (Boolean.valueOf(Context.STANDALONE_APP.get())) {
 			Resource[] adminAppResources = resourcePatternResolver.getResources("classpath*:/mx/com/gunix/adminapp/procesos/*.bpmn");
-
 			if (resources != null && resources.length > 0) {
 				Resource[] finalResources = new Resource[resources.length + adminAppResources.length];
 				System.arraycopy(adminAppResources, 0, finalResources, 0, adminAppResources.length);
@@ -194,7 +270,7 @@ public class ActivitiConfig {
 					if (entity instanceof TaskEntity) {
 						TaskEntity te = (TaskEntity) entity;
 						if (te.getIdentityLinks() != null && !te.getIdentityLinks().isEmpty()) {
-							DbSqlSession dbSqlSession = Context.getCommandContext().getSession(DbSqlSession.class);
+							DbSqlSession dbSqlSession = org.activiti.engine.impl.context.Context.getCommandContext().getSession(DbSqlSession.class);
 							te.getIdentityLinks().forEach(idLk -> {
 								dbSqlSession.delete(idLk);
 							});
@@ -235,7 +311,27 @@ public class ActivitiConfig {
 
 	@Bean
 	public AsyncExecutor asyncExecutor() {
-		SpringAsyncExecutor sajex = new SpringAsyncSecuredExecutor(taskExecutor());
+		DefaultAsyncJobExecutor sajex = new TenantAsyncSecuredExecutor(new TenantInfoHolder() {
+			private final Collection <String> allTenants = Arrays.asList(Context.ID_APLICACION.get()); 
+			
+			@Override
+			public Collection<String> getAllTenants() {
+				return allTenants;
+			}
+
+			@Override
+			public void setCurrentTenantId(String tenantid) {
+			}
+
+			@Override
+			public String getCurrentTenantId() {
+				return Context.ID_APLICACION.get();
+			}
+
+			@Override
+			public void clearCurrentTenantId() {
+			}
+		});
 		sajex.setCorePoolSize(5);
 		sajex.setMaxPoolSize(100);
 		sajex.setKeepAliveTime(5000);
@@ -243,15 +339,10 @@ public class ActivitiConfig {
 		sajex.setMaxTimerJobsPerAcquisition(75);
 		sajex.setMaxAsyncJobsDuePerAcquisition(75);
 		sajex.setDefaultTimerJobAcquireWaitTimeInMillis(60000);
-		sajex.setDefaultAsyncJobAcquireWaitTimeInMillis(2000);
+		sajex.setDefaultAsyncJobAcquireWaitTimeInMillis(4000);
 		sajex.setTimerLockTimeInMillis(2147483647);
 		sajex.setAsyncJobLockTimeInMillis(2147483647);
 		return sajex;
-	}
-
-	@Bean
-	public TaskExecutor taskExecutor() {
-		return new SimpleAsyncTaskExecutor();
 	}
 
 	@Bean
@@ -382,9 +473,8 @@ public class ActivitiConfig {
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	static class SpringAsyncSecuredExecutor extends SpringAsyncExecutor implements SpringRejectedJobsHandler {
-		private static Logger log = LoggerFactory.getLogger(SpringAsyncSecuredExecutor.class);
-
+	static class TenantAsyncSecuredExecutor extends SharedExecutorServiceAsyncExecutor {
+		
 		@Autowired
 		@Lazy
 		RuntimeService rs;
@@ -393,31 +483,16 @@ public class ActivitiConfig {
 		@Lazy
 		RepositoryService repos;
 
-		public SpringAsyncSecuredExecutor(TaskExecutor taskExecutor) {
-			super(taskExecutor, null);
-			setRejectedJobsHandler(this);
-		}
-
-		@Override
-		public boolean executeAsyncJob(JobEntity job) {
-			try {
-				taskExecutor.execute(new ExecuteAsyncSecuredRunnable(job, commandExecutor, rs, repos));
-			} catch (RejectedExecutionException e) {
-				log.error("Failed to execute rejected job " + job.getId(), e);
-				rejectedJobsHandler.jobRejected(this, job);
-				return false;
-			}
-			return true;
-		}
-
-		@Override
-		public void jobRejected(AsyncExecutor asyncExecutor, JobEntity job) {
-			try {
-				// execute rejected work in caller thread (potentially blocking job acquisition)
-				new ExecuteAsyncSecuredRunnable(job, asyncExecutor.getCommandExecutor(), rs, repos).run();
-			} catch (Exception e) {
-				log.error("Failed to execute rejected job " + job.getId(), e);
-			}
+		public TenantAsyncSecuredExecutor(TenantInfoHolder tenantInfoHolder) {
+			super(tenantInfoHolder);
+		    setExecuteAsyncRunnableFactory(new ExecuteAsyncRunnableFactory() {
+		        public Runnable createExecuteAsyncRunnable(JobEntity jobEntity, CommandExecutor commandExecutor) {
+		          // Here, the runnable will be created by for example the acquire thread, which has already set the current id.
+		          // But it will be executed later on, by the executorService and thus we need to set it explicitely again then
+		          return new ExecuteAsyncSecuredRunnable(jobEntity, commandExecutor, tenantInfoHolder, tenantInfoHolder.getCurrentTenantId(), rs, repos);
+		        }
+		        
+		      });
 		}
 	}
 

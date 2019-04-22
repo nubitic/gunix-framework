@@ -24,6 +24,7 @@ import org.vaadin.spring.servlet.SpringAwareUIProvider;
 import org.vaadin.spring.servlet.SpringAwareVaadinServlet;
 
 import com.hunteron.core.Context;
+import com.vaadin.server.Constants;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionInitEvent;
 import com.vaadin.server.SessionInitListener;
@@ -70,6 +71,9 @@ public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
 		savsReg.setLoadOnStartup(2);
 		savsReg.setInitParameter("widgetset", "mx.com.gunix.framework.ui.vaadin.GunixWidgetset");
 		savsReg.setInitParameter("productionMode", "true".equals(Context.VIEW_VAADIN_ENABLE_DEBUG_MODE.get()) ? "false" : "true");
+		if(!"".equals(Context.VIEW_VAADIN_STATIC_RESOURCES.get())){
+			savsReg.setInitParameter(Constants.PARAMETER_VAADIN_RESOURCES, Context.VIEW_VAADIN_STATIC_RESOURCES.get());
+		}
 		savsReg.addMapping("/VAADIN/*", "/" + VaadinSecurityConfig.VAADIN_LOCATION + "*");
 
 		DispatcherServlet ds = new DispatcherServlet();

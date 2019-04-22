@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -17,6 +18,9 @@ import org.springframework.core.ControlFlow;
 import org.springframework.core.ControlFlowFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.saml.SAMLAuthenticationProvider;
+import org.springframework.security.saml.SAMLLogoutFilter;
+import org.springframework.security.saml.SAMLLogoutProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.stereotype.Component;
@@ -38,18 +42,26 @@ public class HessianServiceAdvice {
 			System.arraycopy(orgArgs, 0, newArgs, 0, orgArgs.length);
 			
 			ControlFlow controlFlow = null;
+			Signature pjpSignature = null;
+			
 			
 			Object principal = (SecurityContextHolder.getContext().getAuthentication()==null && 
-								((pjp.getSignature().getDeclaringType().equals(UsuarioService.class) &&				// Excepciones para las que se acepta autenticación null
-							     (pjp.getSignature().getName().equals("getAnonymous") || 							// UsuarioService.getAnonymous(),
-							      (pjp.getSignature().getName().equals("getUsuario") && 							// UsuarioService.getUsuario() siempre y cuando provenga de:
-							       ((controlFlow= ControlFlowFactory.createControlFlow()).under(PersistentTokenBasedRememberMeServices.class, "processAutoLoginCookie") || // PersistentTokenBasedRememberMeServices.processAutoLoginCookie ó 
-							    		   									  controlFlow.under(UsernamePasswordAuthenticationFilter.class, "attemptAuthentication") 	|| // UsernamePasswordAuthenticationFilter.attemptAuthentication ó 
-							    		   									  controlFlow.under(JOSSOAuthenticationProvider.class, "authenticate")))))			|| // JOSSOAuthenticationProvider.authenticate,
-							    (pjp.getSignature().getDeclaringType().equals(PersistentTokenRepository.class) &&	// ó 
-							     (pjp.getSignature().getName().equals("getTokenForSeries") || 						// PersistentTokenRepository.getTokenForSeries() ó
-							      pjp.getSignature().getName().equals("updateToken") || 							// PersistentTokenRepository.getTokenForSeries() ó
-							      pjp.getSignature().getName().equals("removeUserTokens")) 							// PersistentTokenRepository.removeUserTokens
+								(((pjpSignature = pjp.getSignature()).getDeclaringType().equals(UsuarioService.class) &&	// Excepciones para las que se acepta autenticación null
+							     (pjpSignature.getName().equals("getAnonymous") || 											// UsuarioService.getAnonymous(),
+							       ((pjpSignature.getName().equals("getUsuario") || 										// UsuarioService.getUsuario(),
+							    	 pjpSignature.getName().equals("guardaSAMLSSOAuth") ||									// UsuarioService.guardaSAMLSSOAuth(), 
+							    	 pjpSignature.getName().equals("getSAMLLocalSessions") || 								// UsuarioService.getSAMLLocalSessions(), 
+							    	 pjpSignature.getName().equals("deleteSAMLLocalSessions")) && 							// UsuarioService.deleteSAMLLocalSessions() siempre y cuando provenga de:
+							        ((controlFlow= ControlFlowFactory.createControlFlow()).under(PersistentTokenBasedRememberMeServices.class, "processAutoLoginCookie")	|| // PersistentTokenBasedRememberMeServices.processAutoLoginCookie ó 
+							    	    									   controlFlow.under(UsernamePasswordAuthenticationFilter.class, "attemptAuthentication") 		|| // UsernamePasswordAuthenticationFilter.attemptAuthentication ó 
+							    		   									   controlFlow.under(JOSSOAuthenticationProvider.class, "authenticate")							|| // JOSSOAuthenticationProvider.authenticate ó
+							    		   									   controlFlow.under(SAMLLogoutProcessingFilter.class, "processLogout")							|| // SAMLLogoutProcessingFilter.processLogout ó
+							    		   									   controlFlow.under(SAMLLogoutFilter.class, "processLogout")									|| // SAMLLogoutFilter.processLogout ó
+							    		   									   controlFlow.under(SAMLAuthenticationProvider.class, "getUserDetails")))))					|| // SAMLAuthenticationProvider.getUserDetails
+							    (pjpSignature.getDeclaringType().equals(PersistentTokenRepository.class) &&	// ó 
+							     (pjpSignature.getName().equals("getTokenForSeries") || 					// PersistentTokenRepository.getTokenForSeries() ó
+							      pjpSignature.getName().equals("updateToken") || 							// PersistentTokenRepository.getTokenForSeries() ó
+							      pjpSignature.getName().equals("removeUserTokens")) 						// PersistentTokenRepository.removeUserTokens
 							    )))?																				
 								null
 								:SecurityContextHolder.getContext().getAuthentication().getPrincipal();

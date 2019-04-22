@@ -2,7 +2,8 @@ package mx.com.gunix.framework.activiti;
 
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.impl.asyncexecutor.ExecuteAsyncRunnable;
+import org.activiti.engine.impl.asyncexecutor.multitenant.TenantAwareExecuteAsyncRunnable;
+import org.activiti.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
 import org.slf4j.Logger;
@@ -17,13 +18,13 @@ import mx.com.gunix.framework.security.UserDetails;
 import mx.com.gunix.framework.service.ActivitiService;
 import mx.com.gunix.framework.service.ActivitiServiceImp;
 
-public class ExecuteAsyncSecuredRunnable extends ExecuteAsyncRunnable {
+public class ExecuteAsyncSecuredRunnable extends TenantAwareExecuteAsyncRunnable {
 	private static Logger log = LoggerFactory.getLogger(ExecuteAsyncSecuredRunnable.class);
 	private RuntimeService rs;
 	private RepositoryService repos;
 
-	public ExecuteAsyncSecuredRunnable(JobEntity job, CommandExecutor commandExecutor, RuntimeService rs, RepositoryService repos) {
-		super(job, commandExecutor);
+	public ExecuteAsyncSecuredRunnable(JobEntity job, CommandExecutor commandExecutor, TenantInfoHolder tenantInfoHolder, String tenantId, RuntimeService rs, RepositoryService repos) {
+		super(job, commandExecutor, tenantInfoHolder, tenantId);
 		this.rs = rs;
 		this.repos = repos;
 	}

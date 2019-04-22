@@ -21,5 +21,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		}
 		return new mx.com.gunix.framework.security.UserDetails(u);
 	}
+	
+	public void guardaSAMLSSOAuth(String ssoIndex, String localSessionID, String idUsuario) {
+		usuarioService.guardaSAMLSSOAuth(ssoIndex, localSessionID, idUsuario);
+	}
 
 }

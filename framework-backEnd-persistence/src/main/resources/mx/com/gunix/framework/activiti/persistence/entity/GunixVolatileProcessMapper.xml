@@ -1,52 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="mx.com.gunix.framework.activiti.persistence.entity.GunixVolatileProcessMapper">
-	<select id="obtainVolatileProcessDefinitionIds">
-		select id_ from activiti.act_re_procdef where category_ = 'VOLATIL'
-	</select>
-	<select id="obtainProcessInstanceIdsByProcessDefinitionId">
-		select id_ from activiti.act_hi_procinst where proc_def_id_ = #{processDefinitionId} and start_time_ &lt; #{date}
-	</select>
-	<delete id="deleteFromActHiActinstByProcessInstanceId">
-		delete from activiti.ACT_HI_ACTINST where PROC_INST_ID_ = #{processInstanceId}
-	</delete>
-	<delete id="deleteFromActHiAttachmenttByProcessInstanceId">
-		delete from activiti.ACT_HI_ATTACHMENT where PROC_INST_ID_ = #{processInstanceId} 
-	</delete>
-	<delete id="deleteFromActHiCommentByProcessInstanceId">
-		delete from activiti.ACT_HI_COMMENT where PROC_INST_ID_ = #{processInstanceId} 
-	</delete>
-	<delete id="deleteFromActHiDetailByProcessInstanceId">
-		delete from activiti.ACT_HI_DETAIL where PROC_INST_ID_ = #{processInstanceId}
-	</delete>
-	<delete id="deleteFromActHiIdentityLinkByProcessInstanceId">
-		delete from activiti.ACT_HI_IDENTITYLINK where PROC_INST_ID_ = #{processInstanceId} 
-	</delete>
-	<delete id="deleteFromActHiTaskInstByProcessInstanceId">
-		delete from activiti.ACT_HI_TASKINST where PROC_INST_ID_ = #{processInstanceId} 
-	</delete>
-	<delete id="deleteFromActRuEventSubcrByProcessInstanceId">
-		delete from activiti.ACT_RU_EVENT_SUBSCR where PROC_INST_ID_ = #{processInstanceId} 
-	</delete>
-	<delete id="deleteFromActTaskIdByProcessInstanceId">
-		delete from activiti.ACT_RU_IDENTITYLINK where PROC_INST_ID_ = #{processInstanceId} Or TASK_ID_ in (select ID_ from activiti.ACT_RU_TASK where PROC_INST_ID_ = #{processInstanceId}) 
-	</delete>
-	<delete id="deleteFromActRuTaskByProcessInstanceId">
-		delete from activiti.ACT_RU_TASK where PROC_INST_ID_ = #{processInstanceId} 
-	</delete>
-	<delete id="deleteFromActRuJobByProcessInstanceId">
-		delete from activiti.ACT_RU_JOB where PROCESS_INSTANCE_ID_ = #{processInstanceId} 
-	</delete>
-	<delete id="deleteFromActRuVariableByProcessInstanceId">
-		delete from activiti.ACT_RU_VARIABLE where PROC_INST_ID_ = #{processInstanceId} 
-	</delete>
-	<delete id="deleteFromActHiVarinstByProcessInstanceId">
-		delete from activiti.ACT_HI_VARINST where PROC_INST_ID_ = #{processInstanceId} 
-	</delete>
-	<delete id="deleteFromActRuExecutionByProcessInstanceId">
-		delete from activiti.ACT_RU_EXECUTION where proc_inst_id_ = #{processInstanceId} 
-	</delete>
-	<delete id="deleteFromActHiProcInstByProcessInstanceId">
-		delete from activiti.ACT_HI_PROCINST where id_ = #{processInstanceId}
+	<sql id="processInstanceIdsByTenantIDltDate">
+		select act_hi_procinst.id_ from activiti.act_hi_procinst left join activiti.act_ru_execution on (act_ru_execution.proc_inst_id_ = act_hi_procinst.id_) left join activiti.act_hi_actinst on (act_ru_execution.id_=act_hi_actinst.execution_id_) where act_hi_procinst.proc_def_id_ in (select id_ from activiti.act_re_procdef where category_ = 'VOLATIL' and tenant_id_ = #{idAplicacion}) group by act_hi_procinst.id_ having max(coalesce(act_hi_actinst.start_time_,act_hi_procinst.start_time_)) &lt; #{date}
+	</sql>
+	<delete id="deleteProcessInstanceIdByTenantIDltDate">
+		delete from activiti.ACT_HI_ACTINST where PROC_INST_ID_ in(<include refid="processInstanceIdsByTenantIDltDate"/>);
+		delete from activiti.ACT_HI_ATTACHMENT where PROC_INST_ID_ in(<include refid="processInstanceIdsByTenantIDltDate"/>);
+		delete from activiti.ACT_HI_COMMENT where PROC_INST_ID_ in(<include refid="processInstanceIdsByTenantIDltDate"/>);
+		delete from activiti.ACT_HI_DETAIL where PROC_INST_ID_ in(<include refid="processInstanceIdsByTenantIDltDate"/>);
+		delete from activiti.ACT_HI_IDENTITYLINK where PROC_INST_ID_ in(<include refid="processInstanceIdsByTenantIDltDate"/>);
+		delete from activiti.ACT_HI_TASKINST where PROC_INST_ID_ in(<include refid="processInstanceIdsByTenantIDltDate"/>);
+		delete from activiti.ACT_RU_EVENT_SUBSCR where PROC_INST_ID_ in(<include refid="processInstanceIdsByTenantIDltDate"/>);
+		delete from activiti.ACT_RU_IDENTITYLINK where PROC_INST_ID_ in(<include refid="processInstanceIdsByTenantIDltDate"/>) or TASK_ID_ in (select ID_ from activiti.ACT_RU_TASK where PROC_INST_ID_ in(<include refid="processInstanceIdsByTenantIDltDate"/>));
+		delete from activiti.ACT_RU_TASK where PROC_INST_ID_ in(<include refid="processInstanceIdsByTenantIDltDate"/>);
+		delete from activiti.ACT_RU_JOB where PROCESS_INSTANCE_ID_ in(<include refid="processInstanceIdsByTenantIDltDate"/>);
+		delete from activiti.ACT_RU_VARIABLE where PROC_INST_ID_ in(<include refid="processInstanceIdsByTenantIDltDate"/>);
+		delete from activiti.ACT_HI_VARINST where PROC_INST_ID_ in(<include refid="processInstanceIdsByTenantIDltDate"/>);
+		delete from activiti.ACT_RU_EXECUTION where proc_inst_id_ in (<include refid="processInstanceIdsByTenantIDltDate"/>);
+		delete from activiti.ACT_GE_BYTEARRAY where not exists(select 1 existe from activiti.ACT_RE_MODEL where EDITOR_SOURCE_VALUE_ID_=ACT_GE_BYTEARRAY.id_ or EDITOR_SOURCE_EXTRA_VALUE_ID_=ACT_GE_BYTEARRAY.id_) and not exists(select 1 existe from activiti.ACT_RU_JOB where EXCEPTION_STACK_ID_=ACT_GE_BYTEARRAY.id_ ) and not exists(select 1 existe from activiti.ACT_RU_VARIABLE where BYTEARRAY_ID_=ACT_GE_BYTEARRAY.id_ ) and not exists(select 1 existe from activiti.ACT_HI_VARINST where BYTEARRAY_ID_=ACT_GE_BYTEARRAY.id_ ) and not exists(select 1 existe from activiti.ACT_RE_PROCDEF where DEPLOYMENT_ID_=ACT_GE_BYTEARRAY.DEPLOYMENT_ID_ and  RESOURCE_NAME_=ACT_GE_BYTEARRAY.NAME_) and (GENERATED_ = false or GENERATED_ is null);
+		delete from activiti.ACT_HI_PROCINST where id_ in(<include refid="processInstanceIdsByTenantIDltDate"/>);
 	</delete>
 </mapper>

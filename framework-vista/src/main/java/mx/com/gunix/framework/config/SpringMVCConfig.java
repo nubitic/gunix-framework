@@ -104,7 +104,9 @@ public class SpringMVCConfig extends WebMvcConfigurerAdapter {
 	@Bean
 	public TilesConfigurer tilesConfigurer() {
 		TilesConfigurer tc = new TilesConfigurer();
-		tc.setDefinitions("/WEB-INF/mx/com/gunix/ui/springmvc/framework/tiles-defs-gunix.xml", "/WEB-INF/mx/com/gunix/ui/springmvc/**/tiles-defs-*.xml");	
+		tc.setDefinitions("/WEB-INF/mx/com/gunix/ui/springmvc/framework/framework-tiles-defs-gunix.xml",
+						  "/WEB-INF/mx/com/gunix/ui/springmvc/**/tiles-defs-*.xml", 
+						  "classpath*:/META-INF/resources/WEB-INF/mx/com/gunix/ui/springmvc/**/tiles-defs-*.xml");	
 		return tc;
 	}
 	

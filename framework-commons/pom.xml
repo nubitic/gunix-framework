@@ -11,7 +11,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<super-csv.version>2.4.0</super-csv.version>
 		<dozer.version>5.5.1</dozer.version>
-		<stagemonitor.version>0.85.1</stagemonitor.version>
+		<stagemonitor.version>0.88.9</stagemonitor.version>
+		<byte-buddy.version>1.8.22</byte-buddy.version>
 	</properties>
 	<artifactId>framework-commons</artifactId>
 	<repositories>
@@ -114,7 +115,12 @@
 		<dependency>
 			<groupId>net.bytebuddy</groupId>
 			<artifactId>byte-buddy</artifactId>
-			<version>1.7.11</version>
+			<version>${byte-buddy.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.bytebuddy</groupId>
+			<artifactId>byte-buddy-agent</artifactId>
+			<version>${byte-buddy.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -132,7 +138,6 @@
 		<dependency>
 			<groupId>javax.activation</groupId>
 			<artifactId>activation</artifactId>
-			<version>1.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -147,11 +152,45 @@
 			<groupId>org.stagemonitor</groupId>
 			<artifactId>stagemonitor-web-servlet</artifactId>
 			<version>${stagemonitor.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>net.bytebuddy</groupId>
+					<artifactId>byte-buddy</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.bytebuddy</groupId>
+					<artifactId>byte-buddy-agent</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.stagemonitor</groupId>
 			<artifactId>stagemonitor-tracing-elasticsearch</artifactId>
 			<version>${stagemonitor.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>javax.xml.bind</groupId>
+		    <artifactId>jaxb-api</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>com.sun.xml.bind</groupId>
+		    <artifactId>jaxb-core</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>com.sun.xml.bind</groupId>
+		    <artifactId>jaxb-impl</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>javax.xml.ws</groupId>
+		    <artifactId>jaxws-api</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>javax.activation</groupId>
+		    <artifactId>activation</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>joda-time</groupId>
+		    <artifactId>joda-time</artifactId>
 		</dependency>
 	</dependencies>
 	<distributionManagement>

@@ -13,6 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
@@ -65,5 +66,10 @@ public class ServerServiceConfig extends WebMvcConfigurerAdapter {
 	@Bean
 	public MessageSource messageSource() {
 		return Utils.buildMessageSource(getClass().getClassLoader());
+	}
+	
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return mx.com.gunix.framework.util.Utils.passwordEncoder();
 	}
 }

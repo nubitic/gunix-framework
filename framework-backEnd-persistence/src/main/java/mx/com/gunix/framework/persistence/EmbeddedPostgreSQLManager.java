@@ -296,8 +296,6 @@ public final class EmbeddedPostgreSQLManager {
 			cmd.add(puerto);
 
 			cmd.add("-c");
-			cmd.add("checkpoint_segments=2025");
-			cmd.add("-c");
 			cmd.add("checkpoint_timeout=600");
 
 			cmd.add("-c");
@@ -364,8 +362,7 @@ public final class EmbeddedPostgreSQLManager {
 	}
 
 	private static void downloadPostgreSQLDist(File pgsqlHomeFile, String osType, String arch) throws IOException {
-		String fileURL = "http://get.enterprisedb.com/postgresql/postgresql-9.4.5-1-" + ("win".equals(osType) ? "windows" + ("64".equals(arch) ? "-x64" : "") : "mac".equals(osType) ? "osx" : "*nix".equals(osType) ? "linux" + ("64".equals(arch) ? "-x64" : "") : "") + "-binaries." + ("*nix".equals(osType) ? "tar.gz" : "zip");
-
+		String fileURL = "http://get.enterprisedb.com/postgresql/postgresql-11.2-1-" + ("win".equals(osType) ? "windows" + ("64".equals(arch) ? "-x64" : "") : "mac".equals(osType) ? "osx" : "*nix".equals(osType) ? "linux" + ("64".equals(arch) ? "-x64" : "") : "") + "-binaries." + ("*nix".equals(osType) ? "tar.gz" : "zip");
 		String postgreSQLAbsPath = pgsqlHomeFile.getAbsolutePath() + File.separator;
 		File downloadedFile = EmbeddedServerUtils.descargaArchivo(fileURL, "postgreSQLDist", null, log);
 		if ("*nix".equals(osType) || "mac".equals(osType)) {

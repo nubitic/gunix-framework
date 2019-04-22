@@ -1,17 +1,19 @@
 package mx.com.gunix.framework.service;
 
 import java.util.Date;
-
-import mx.com.gunix.framework.security.PersistentRememberMeToken;
-import mx.com.gunix.framework.security.domain.Usuario;
-import mx.com.gunix.framework.security.domain.persistence.UsuarioMapper;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.hunteron.core.Context;
+
+import mx.com.gunix.framework.security.PersistentRememberMeToken;
+import mx.com.gunix.framework.security.domain.Usuario;
+import mx.com.gunix.framework.security.domain.persistence.UsuarioMapper;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -19,11 +21,14 @@ public class UsuarioServiceImp implements UsuarioService {
 	@Autowired
 	UsuarioMapper um;
 	
+	private String idAplicacion = Context.ID_APLICACION.get() == null ? "MAIN" : Context.ID_APLICACION.get();
+	
 
 	@Autowired
 	PersistentTokenRepository persistentTokenRepository;
 
-	private PasswordEncoder pe = new BCryptPasswordEncoder(16);
+	@Autowired
+	PasswordEncoder pe;
 	
 	@Override
 	public Usuario getUsuario(String idUsuario) {
@@ -73,4 +78,18 @@ public class UsuarioServiceImp implements UsuarioService {
 		}
 	}
 
+	@Override
+	public void guardaSAMLSSOAuth(String ssoIndex, String localSessionID, String idUsuario) {
+		um.guardaSAMLSSOAuth(idAplicacion, ssoIndex, localSessionID, idUsuario);
+	}
+
+	@Override
+	public List<String> getSAMLLocalSessions(String ssoIndex, String idUsuario) {
+		return um.getSAMLLocalSessions(idAplicacion, ssoIndex, idUsuario);
+	}
+
+	@Override
+	public void deleteSAMLLocalSessions(String ssoIndex, String idUsuario, List<String> sesionesExpiradas) {
+		um.deleteSAMLLocalSessions(idAplicacion, ssoIndex, idUsuario, sesionesExpiradas);
+	}
 }

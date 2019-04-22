@@ -220,4 +220,8 @@
 		<name>mapToHtmlAttrString</name>
 		<path>/META-INF/tags/mx/com/gunix/ui/springmvc/framework/mapToHtmlAttrString.tag</path>
 	</tag-file>
+	<tag-file>
+		<name>getEnv</name>
+		<path>/META-INF/tags/mx/com/gunix/ui/springmvc/framework/getEnv.tag</path>
+	</tag-file>
 </taglib>

@@ -1,5 +1,8 @@
 package com.hunteron.core;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -26,6 +29,8 @@ public enum Context {
 	VIEW_VAADIN_ENABLE_DEBUG_MODE("VIEW_VAADIN_ENABLE_DEBUG_MODE","false"),
 	
 	VIEW_ENABLE_SSO("VIEW_ENABLE_SSO","false"),
+	VIEW_SSO_IMPLEMENTATION("VIEW_SSO_IMPLEMENTATION","josso"),
+	
 	VIEW_SSO_PARTNER_ID("VIEW_SSO_PARTNER_ID","false"),
 	VIEW_SSO_GATEWAY_ENDPOINT_TRANSPORT_PROTOCOL("VIEW_SSO_GATEWAY_ENDPOINT_TRANSPORT_PROTOCOL",null),
 	VIEW_SSO_GATEWAY_ENDPOINT_HOST_PORT("VIEW_SSO_GATEWAY_ENDPOINT_HOST_PORT",null),
@@ -33,6 +38,16 @@ public enum Context {
 	VIEW_SSO_GATEWAY_ENDPOINT_PASSWORD("VIEW_SSO_GATEWAY_ENDPOINT_PASSWORD",null),
 	VIEW_SSO_BACKTO_HOST("VIEW_SSO_BACKTO_HOST",null),
 	VIEW_SSO_BACKTO_CONTEXT("VIEW_SSO_BACKTO_CONTEXT",null),
+	
+	VIEW_SSO_SAML_SUCCESS_PAGE("VIEW_SSO_SAML_SUCCESS_PAGE","/"),
+	VIEW_SSO_SAML_SUCCESS_LOGOUT("VIEW_SSO_SAML_SUCCESS_LOGOUT","/logout"),
+	VIEW_SSO_SAML_METADATA_FILE("VIEW_SSO_SAML_METADATA_FILE",null),
+	VIEW_SSO_SAML_KEYSTORE("VIEW_SSO_SAML_KEYSTORE",null),
+	VIEW_SSO_SAML_KEYSTORE_ALIAS("VIEW_SSO_SAML_KEYSTORE_ALIAS",null),
+	VIEW_SSO_SAML_KEYSTORE_PASS("VIEW_SSO_SAML_KEYSTORE_PASS",null),
+	VIEW_SSO_SAML_IPID("VIEW_SSO_SAML_IPID",null),
+	
+	VIEW_VAADIN_STATIC_RESOURCES("VIEW_VAADIN_STATIC_RESOURCES", ""),
 	
 	VIEW_ENABLE_ANONYMOUS("VIEW_ENABLE_ANONYMOUS","false"),
 	
@@ -84,15 +99,14 @@ public enum Context {
 	
 	private String envVar;
 	private String defaultValue;
-	private Object cachedValue;
-	private javax.naming.Context ic;
+	private static ConcurrentMap<String,Object> cachedValueMap = new ConcurrentHashMap<String,Object>();
+	private static javax.naming.Context ic;
 	
-	private Object NULL_OBJECT;
+	private static Object NULL_OBJECT  = new Object();
 
 	private Context(String envVar, String defaultValue) {
 		this.envVar = envVar;
 		this.defaultValue = defaultValue;
-		this.NULL_OBJECT = new Object();
 	}
 
 	public String get() {
@@ -100,9 +114,19 @@ public enum Context {
 			return null;
 		}
 		
+		return getEnvVar(envVar, defaultValue);
+	}
+
+	private static javax.naming.Context getIc() throws NamingException {
+		if (ic == null) {
+			ic = (javax.naming.Context) new InitialContext().lookup("java:comp/env");
+		}
+		return ic;
+	}
+	
+	public static String getEnvVar(String envVar, String defaultValue) {
 		String value = null;
-		
-		if(cachedValue == null) {
+		if(cachedValueMap.get(envVar) == null) {
 			value = System.getenv(envVar);
 			if (value == null) {
 				value = System.getProperty(envVar);
@@ -111,26 +135,19 @@ public enum Context {
 						Object object = getIc().lookup(envVar);
 						if (object != null) {
 							value = object.toString();
-							cachedValue = value;
+							cachedValueMap.put(envVar, value);
 						} else {
-							cachedValue = NULL_OBJECT;
+							cachedValueMap.put(envVar, NULL_OBJECT);
 						}
 					} catch (Throwable logE) {
-						cachedValue = NULL_OBJECT;
+						cachedValueMap.put(envVar, NULL_OBJECT);
 					}
 				}
 			}
 		} else {
-			value = cachedValue == NULL_OBJECT ? null : cachedValue.toString();
+			value = cachedValueMap.get(envVar) == NULL_OBJECT ? null : cachedValueMap.get(envVar).toString();
 		}
 		
-		return value != null ? value : defaultValue;
-	}
-
-	private javax.naming.Context getIc() throws NamingException {
-		if (ic == null) {
-			ic = (javax.naming.Context) new InitialContext().lookup("java:comp/env");
-		}
-		return ic;
+		return value != null ? value : defaultValue;		
 	}
 }
