@@ -13,13 +13,6 @@
 		<logicaldoc.version>7.4.2</logicaldoc.version>
 		<cxf.version>2.7.18</cxf.version>
 	</properties>
-	<repositories>
-		<repository>
-			<id>logicaldoc</id>
-			<name>LogicalDOC Repository</name>
-			<url>http://logicaldoc.sourceforge.net/maven</url>
-		</repository>
-	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>mx.com.gunix</groupId>

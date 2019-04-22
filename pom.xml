@@ -18,7 +18,102 @@
 		<module>framework-backEnd-persistence-oracle11g</module>
 		<module>framework-commons-logicaldoc</module>
 	</modules>
+	<repositories>
+		<repository>
+			<id>central</id>
+			<name>Central Repository</name>
+			<url>http://repo.maven.apache.org/maven2</url>
+			<layout>default</layout>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>gunix-mvn-repo</id>
+			<url>https://raw.github.com/loloq123/gunix/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>framework-commons-mvn-repo</id>
+			<url>https://raw.github.com/loloq123/framework-commons/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>framework-commons-logicaldoc-mvn-repo</id>
+			<url>https://raw.github.com/loloq123/framework-commons-logicaldoc/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>oss.sonatype.org.snapshots</id>
+			<name>OSS Sonatype Snapshot Repository</name>
+			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
+			<snapshots />
+		</repository>
+		<repository>
+			<id>framework-backEnd-persistence-mvn-repo</id>
+			<url>https://raw.github.com/loloq123/framework-backEnd-persistence/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>framework-backEnd-persistence-shared-mvn-repo</id>
+			<url>https://raw.github.com/loloq123/framework-backEnd-persistence-shared/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>logicaldoc</id>
+			<name>LogicalDOC Repository</name>
+			<url>http://logicaldoc.sourceforge.net/maven</url>
+		</repository>
+		<repository>
+			<id>vaadin-addons</id>
+			<url>http://maven.vaadin.com/vaadin-addons</url>
+		</repository>
+		<repository>
+			<id>josso-m2-repo</id>
+			<name>JOSSO Maven2 Repository</name>
+			<url>http://repository.josso.org</url>
 
+			<releases>
+				<checksumPolicy>fail</checksumPolicy>
+				<enabled>true</enabled>
+			</releases>
+
+			<snapshots>
+				<checksumPolicy>fail</checksumPolicy>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>mulesoft</id>
+			<name>mulesoft Repository</name>
+			<url>http://repository.mulesoft.org/releases/</url>
+		</repository>
+		<repository>
+			<id>alfresco</id>
+			<name>alfresco Repository</name>
+			<url>https://artifacts.alfresco.com/nexus/content/repositories/public/</url>
+		</repository>
+		<repository>
+			<id>lexaden</id>
+			<name>Lexaden Repository</name>
+			<url>http://www.lexaden.com/maven2/repo</url>
+		</repository>
+	</repositories>
 	<properties>
 		<openl.version>5.22.0.1</openl.version>
 		<activiti.version>5.22.0</activiti.version>

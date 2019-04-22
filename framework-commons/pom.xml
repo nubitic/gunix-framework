@@ -7,6 +7,7 @@
 		<artifactId>gunix</artifactId>
 		<version>1.0</version>
 	</parent>
+	<artifactId>framework-commons</artifactId>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<super-csv.version>2.4.0</super-csv.version>
@@ -14,26 +15,6 @@
 		<stagemonitor.version>0.88.9</stagemonitor.version>
 		<byte-buddy.version>1.8.22</byte-buddy.version>
 	</properties>
-	<artifactId>framework-commons</artifactId>
-	<repositories>
-		<repository>
-			<id>central</id>
-			<name>Central Repository</name>
-			<url>http://repo.maven.apache.org/maven2</url>
-			<layout>default</layout>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>gunix-mvn-repo</id>
-			<url>https://raw.github.com/loloq123/gunix/mvn-repo/</url>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-			</snapshots>
-		</repository>
-	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
