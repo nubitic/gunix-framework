@@ -78,7 +78,7 @@
 		<result column="DESCRIPCION" property="descripcion"/>
 	</resultMap>
 	<select id="getFuncionesByIdRol" resultMap="funcionesRolMap">
-		select ID_APLICACION, ID_MODULO, ID_FUNCION, ID_FUNCION_PADRE from ADMON_SEG.FUNCIONES_ROL(#{idAplicacion},#{idRol})
+		select ID_APLICACION, ID_MODULO, ID_FUNCION, ID_FUNCION_PADRE from SEGURIDAD.FUNCIONES_ROL(#{idAplicacion},#{idRol})
 	</select>
 	<insert id="inserta">
 		INSERT INTO SEGURIDAD.ROL VALUES(#{aplicacion.idAplicacion},#{idRol},#{descripcion})

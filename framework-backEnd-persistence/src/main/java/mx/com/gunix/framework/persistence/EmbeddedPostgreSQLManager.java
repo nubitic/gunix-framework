@@ -228,7 +228,6 @@ public final class EmbeddedPostgreSQLManager {
 	private static void initDB(File pgsqlHomeFile, String usuario, String database, String puerto, ClassLoader classLoader) {
 		ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/01_SEGURIDAD_ACL_ROL_FUNCION.sql"), pgsqlHomeFile, usuario, database, puerto, log);
 		ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/02_ACTIVITI.sql"), pgsqlHomeFile, usuario, database, puerto, log);
-		ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/03_ADMON_SEG.sql"), pgsqlHomeFile, usuario, database, puerto, log);
 		ejecutaScript(classLoader.getResourceAsStream("/mx/com/gunix/framework/persistence/04_JOB_TOKENIZER.sql"), pgsqlHomeFile, usuario, database, puerto, log);
 
 	}
