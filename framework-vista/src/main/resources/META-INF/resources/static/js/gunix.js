@@ -123,3 +123,25 @@ function startProcess(idAplicacion, idRol, idModulo, idFuncion) {
 function buildHrefGet(uri, params) {
 	return cCurrentGunixViewPath + uri + "?idAplicacion=" + cIdAplicacion + "&" + (params != null && params != undefined ? $.param(params):'');
 }
+
+
+/** http://blog.jonathanargentiero.com/downloading-files-with-jquery/ */
+jQuery.download = function(url, data, method){
+    //url and data options required
+    if( url && data ){ 
+        //data can be string of parameters or array/object
+        data = typeof data == 'string' ? data : jQuery.param(data);
+        //split params into form inputs
+        var inputs = '';
+        jQuery.each(data.split('&'), function(){ 
+            var pair = this.split('=');
+            inputs+='<input type="hidden" name="'+ pair[0] +'" value="'+ pair[1] +'" />'; 
+        });
+        
+        inputs+='<input type="hidden" name="idAplicacion" value="'+ cIdAplicacion +'" />'; 
+        inputs+='<input type="hidden" name="cgCommandName" value="'+ cgCommandName +'" />'; 
+        //send request
+        jQuery('<form action="'+ cCurrentGunixViewPath + url +'" method="'+ (method||'post') +'" target="_blank">'+inputs+'</form>')
+        .appendTo('body').submit().remove();
+    };
+};

@@ -43,13 +43,14 @@ public class CollectionSSMLExporter<T extends List<S>, S extends Serializable> i
 		bwi.setAutoGrowNestedPaths(true);
 		for (int i = 0; i < columnPaths.length; i++) {
 			Class<?> fieldType = bwi.getPropertyDescriptor(columnPaths[i]).getPropertyType();
-			if (Utils.isNumber(fieldType)) {
+			
+			if (value2StringConverters != null && value2StringConverters.get(columnPaths[i]) != null) {
+				haveStringConverters[i] = true;
+			}
+			if (!haveStringConverters[i] && Utils.isNumber(fieldType)) {
 				columnTypes[i] = MetaDatos.NUMERICO;
 			} else {
 				columnTypes[i] = MetaDatos.TEXTO;
-			}
-			if (value2StringConverters != null && value2StringConverters.get(columnPaths[i]) != null) {
-				haveStringConverters[i] = true;
 			}
 		}
 		pub = new PropertyUtilsBean();
