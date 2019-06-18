@@ -43,3 +43,7 @@ framework-backEnd-persistence-oracle11g/.project
 framework-backEnd-persistence-oracle11g/.classpath
 framework-backEnd-persistence-oracle11g/.classpath
 framework-backEnd-persistence-oracle11g/.project
+/framework-commons-alfresco/*.classpath
+/framework-commons-alfresco/*.gitignore
+/framework-commons-alfresco/*.project
+/framework-commons-alfresco/.settings/

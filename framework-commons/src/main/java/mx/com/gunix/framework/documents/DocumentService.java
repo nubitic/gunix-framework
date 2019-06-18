@@ -39,4 +39,9 @@ public interface DocumentService {
 
 	InputStream getContent(long idDocumento);
 
+	Documento getByStringId(String idDocumento);
+
+	void delete(String idDocumento);
+
+	InputStream getContent(String idDocumento);
 }

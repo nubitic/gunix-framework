@@ -47,11 +47,11 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 			configClasses.add(MongoDBConfig.class);
 		}
 		
-		if (Boolean.parseBoolean(Context.LOGICALDOC_ENABLED.get())) {
+		if (Boolean.parseBoolean(Context.SOPORTE_DOCUMENTAL_ENABLED.get())) {
 			try {
-				configClasses.add(AppInitializer.class.getClassLoader().loadClass("mx.com.gunix.framework.documents.config.LogicalDocConfig"));
+				configClasses.add(AppInitializer.class.getClassLoader().loadClass("mx.com.gunix.framework.documents.config.SoporteDocumentalConfig"));
 			} catch (ClassNotFoundException e) {
-				throw new MissingResourceException("No fue posible cargar la clase porque no existe","mx.com.gunix.framework.documents.config.LogicalDocConfig","");
+				throw new MissingResourceException("No fue posible cargar la clase porque no existe","mx.com.gunix.framework.documents.config.SoporteDocumentalConfig","");
 			}
 		}
 

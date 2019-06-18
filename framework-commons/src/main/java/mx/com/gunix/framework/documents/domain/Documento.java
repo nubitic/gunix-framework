@@ -16,6 +16,9 @@ public class Documento extends ActivitiGunixFile {
 	@Identificador
 	private Long id;
 
+	@Identificador
+	private String idStr;
+
 	@NotNull
 	private Carpeta carpeta;
 
@@ -29,6 +32,14 @@ public class Documento extends ActivitiGunixFile {
 		this.id = id;
 	}
 
+	public String getIdStr() {
+		return idStr;
+	}
+
+	public void setIdStr(String idStr) {
+		this.idStr = idStr;
+	}
+
 	public Carpeta getCarpeta() {
 		return carpeta;
 	}
@@ -36,13 +47,13 @@ public class Documento extends ActivitiGunixFile {
 	public void setCarpeta(Carpeta carpeta) {
 		this.carpeta = carpeta;
 	}
-	
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((idStr == null) ? 0 : idStr.hashCode());
 		return result;
 	}
 
@@ -60,18 +71,24 @@ public class Documento extends ActivitiGunixFile {
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
+		if (idStr == null) {
+			if (other.idStr != null)
+				return false;
+		} else if (!idStr.equals(other.idStr))
+			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "Documento [id=" + id + ", nombre=" + getFileName() + ", carpeta=" + carpeta + "]";
+		return "Documento [id=" + id + ", idStr=" + idStr + ", carpeta=" + carpeta + "]";
 	}
 
 	/*
 	 * public Map<String, String> getAtributos() { return atributos; }
 	 * 
-	 * public void setAtributos(Map<String, String> atributos) { this.atributos = atributos; }
+	 * public void setAtributos(Map<String, String> atributos) { this.atributos =
+	 * atributos; }
 	 */
 
 }

@@ -6,10 +6,4 @@
 
 	<name>mx_com_gunix_framework_vista</name>
 	<distributable />
-	<jsp-config>
-		<taglib>
-			<taglib-uri>/framework/index/tags</taglib-uri>
-			<taglib-location>/WEB-INF/tags/mx/com/gunix/ui/springmvc/framework/index/index-taglib.tld</taglib-location>
-		</taglib>
-	</jsp-config>
 </web-fragment>

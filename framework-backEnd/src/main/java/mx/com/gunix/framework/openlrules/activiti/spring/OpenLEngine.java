@@ -181,7 +181,7 @@ public class OpenLEngine extends org.openl.rules.activiti.spring.OpenLEngine imp
 	public ResultValue execute(DelegateExecution execution, String resource, String methodName, Object... args) throws Exception {
 		ResultValue rv = null;
 
-		if (Boolean.parseBoolean(com.hunteron.core.Context.LOGICALDOC_ENABLED.get())) {
+		if (Boolean.parseBoolean(com.hunteron.core.Context.SOPORTE_DOCUMENTAL_ENABLED.get())) {
 			Map<String, DeploymentCache<ProjectEngineFactory>> cache = (Map<String, DeploymentCache<ProjectEngineFactory>>) oLRHCacheField.get(OpenLRulesHelper.getInstance());
 			DeploymentCache<ProjectEngineFactory> depCach = null;
 			String processDefinitionId = execution.getProcessDefinitionId();

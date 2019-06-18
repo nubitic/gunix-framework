@@ -31,6 +31,7 @@ import com.hunteron.core.Context;
 import mx.com.gunix.framework.processes.domain.Instancia;
 import mx.com.gunix.framework.processes.domain.Tarea;
 import mx.com.gunix.framework.processes.domain.Variable;
+import mx.com.gunix.framework.security.UserDetails;
 import mx.com.gunix.framework.security.domain.Aplicacion;
 import mx.com.gunix.framework.security.domain.Funcion;
 import mx.com.gunix.framework.security.domain.Modulo;
@@ -73,6 +74,7 @@ public class MainController {
 		Instancia instancia = null;
 		
 		Funcion funcion = determinaFuncion(request);
+		((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).setSelectedAuthority(request.getParameter("idAplicacion") + "_" + request.getParameter("idRol"));
 		instancia = as.iniciaProceso(funcion.getProcessKey(), Variable.fromParametros(funcion.getParametros()), "");
 		
 		doControl(request, instancia, uiModel, false, false);

@@ -3,15 +3,13 @@ package mx.com.gunix.framework.config;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.MissingResourceException;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
-
-import mx.com.gunix.framework.documents.config.LogicalDocConfig;
-import mx.com.gunix.framework.mail.config.MailConfig;
 
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 import org.springframework.web.context.WebApplicationContext;
@@ -29,6 +27,8 @@ import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionInitEvent;
 import com.vaadin.server.SessionInitListener;
 import com.vaadin.server.UICreateEvent;
+
+import mx.com.gunix.framework.mail.config.MailConfig;
 
 public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
 
@@ -98,8 +98,12 @@ public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
 		configClasses.add(AspectJConfig.class);
 		configClasses.add(MailConfig.class);
 
-		if (Boolean.parseBoolean(Context.LOGICALDOC_ENABLED.get())) {
-			configClasses.add(LogicalDocConfig.class);
+		if (Boolean.parseBoolean(Context.SOPORTE_DOCUMENTAL_ENABLED.get())) {
+			try {
+				configClasses.add(AppInitializer.class.getClassLoader().loadClass("mx.com.gunix.framework.documents.config.SoporteDocumentalConfig"));
+			} catch (ClassNotFoundException e) {
+				throw new MissingResourceException("No fue posible cargar la clase porque no existe","mx.com.gunix.framework.documents.config.SoporteDocumentalConfig","");
+			}
 		}
 		try {
 			configClasses.add(AppInitializer.class.getClassLoader().loadClass("mx.com.gunix.config.ClientServiceConfig"));

@@ -367,4 +367,22 @@ public class DocumentServiceImpl implements DocumentService {
 	public interface Funcion<T> {
 		T doApply(String token, Carpeta root) throws Exception;
 	}
+
+	@Override
+	public Documento getByStringId(String idDocumento) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void delete(String idDocumento) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public InputStream getContent(String idDocumento) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

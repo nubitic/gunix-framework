@@ -17,6 +17,7 @@
 		<module>sso-gateway</module>
 		<module>framework-backEnd-persistence-oracle11g</module>
 		<module>framework-commons-logicaldoc</module>
+		<module>framework-commons-alfresco</module>
 	</modules>
 	<repositories>
 		<repository>

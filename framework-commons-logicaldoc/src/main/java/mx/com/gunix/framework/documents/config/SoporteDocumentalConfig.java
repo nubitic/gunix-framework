@@ -24,7 +24,7 @@ import mx.com.gunix.framework.documents.EmbeddedLogicalDocManager;
 
 @Configuration
 @ComponentScan("mx.com.gunix.framework.documents")
-public class LogicalDocConfig {
+public class SoporteDocumentalConfig {
 
 	@Bean
 	public AuthService ldAuthService(EmbeddedLogicalDocManager ldMngr) throws Exception {
