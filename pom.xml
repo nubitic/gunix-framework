@@ -90,7 +90,7 @@
 		<slf4j.version>1.7.26</slf4j.version>
 		<aspectj.version>1.8.13</aspectj.version>
 		<josso.version>1.8.11</josso.version>
-		<jackson.version>2.8.11</jackson.version>
+		<jackson.version>2.10.0</jackson.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<rxjava.version>1.2.10</rxjava.version>
 		<javax.xml.version>2.3.0</javax.xml.version>
